@@ -3,11 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import sklearn as skl
-import sklearn.datasets
+# import sklearn.datasets
 import sklearn.cluster
 import pandas
 from sort import *
-from scipy.signal import savgol_filter
 
 
 '''
@@ -44,8 +43,9 @@ def get_cluster_centroids(locs, clustering):
 '''
 Get the bounding box for each cluster
 '''
-def get_cluster_bboxes(locs, clustering):
+def get_cluster_bboxes(locs, clustering, size_multiplier):
 
+    min_dimensions = 200.
     labels = clustering.labels_
     result = []
     for i in range(count_clusters(clustering)[0]):
@@ -53,44 +53,26 @@ def get_cluster_bboxes(locs, clustering):
         centroid = [np.mean(locs[(labels == i)][:, 0]),
                     np.mean(locs[(labels == i)][:, 1])]
 
+        width = max(min_dimensions, size_multiplier * (locs[(labels == i)][:, 0].max()
+                    - locs[(labels == i)][:, 0].min()))
+        height = max(min_dimensions, size_multiplier * (locs[(labels == i)][:, 1].max()
+                     - locs[(labels == i)][:, 1].min()))
+
         result.append([
-            locs[(labels == i)][:, 0].min(),
-            locs[(labels == i)][:, 1].min(),
-            locs[(labels == i)][:, 0].max(),
-            locs[(labels == i)][:, 1].max()
+            max(centroid[0] - width / 2., 0),
+            max(centroid[1] - height / 2., 0),
+            min(centroid[0] + width / 2., 2500),
+            min(centroid[1] + height / 2., 2500)
         ])
 
-    return smooth_bboxes(np.array(result), 4.)
-
-'''
-Smooth bounding boxes over time
-'''
-def smooth_bboxes(cluster_bboxes, size_multiplier):
-
-    window_length = min(len(cluster_bboxes), 51)
-    if window_length % 2 == 0:
-        window_length -= 1
-    x_min = (cluster_bboxes[...,0] + (cluster_bboxes[...,2] - cluster_bboxes[...,0]) / 2.
-             - size_multiplier * savgol_filter(cluster_bboxes[...,2] - cluster_bboxes[...,0], window_length, 2) / 2.)
-    x_max = (cluster_bboxes[...,0] + (cluster_bboxes[...,2] - cluster_bboxes[...,0]) / 2.
-             + size_multiplier * savgol_filter(cluster_bboxes[...,2] - cluster_bboxes[...,0], window_length, 2) / 2.)
-    y_min = (cluster_bboxes[...,1] + (cluster_bboxes[...,3] - cluster_bboxes[...,1]) / 2.
-             - size_multiplier * savgol_filter(cluster_bboxes[...,3] - cluster_bboxes[...,1], window_length, 2) / 2.)
-    y_max = (cluster_bboxes[...,1] + (cluster_bboxes[...,3] - cluster_bboxes[...,1]) / 2.
-             + size_multiplier * savgol_filter(cluster_bboxes[...,3] - cluster_bboxes[...,1], window_length, 2) / 2.)
-
-    x_min = [max(x, 0) for x in x_min]
-    x_max = [min(x, 2500) for x in x_max]
-    y_min = [max(y, 0) for y in y_min]
-    y_max = [min(y, 2500) for y in y_max]
-
-    return np.array([[x_min[i], y_min[i], x_max[i], y_max[i]] for i in range(len(cluster_bboxes))])
+    return np.array(result)
 
 '''
 Track clusters over time
 '''
 def track_clusters(cluster_bboxes):
 
+    detection_score = 40.0
     bboxes = cluster_bboxes
 
     total_time = 0.0
@@ -103,7 +85,7 @@ def track_clusters(cluster_bboxes):
         detections = []
         for i in range(len(bboxes[frame])):
             d = bboxes[frame][i].tolist()
-            d.append(40.0)
+            d.append(detection_score)
             detections.append(d)
 
         total_frames += 1
@@ -258,7 +240,7 @@ for t in range(frames):
 
     clustering = dbscan(locs, 80)
     centroids = get_cluster_centroids(locs, clustering)
-    cluster_bboxes.append(get_cluster_bboxes(locs, clustering))
+    cluster_bboxes.append(get_cluster_bboxes(locs, clustering, 2.))
 
     cluster_count = count_clusters(clustering)
     print("{} : {} clusters, {} singles".format(
