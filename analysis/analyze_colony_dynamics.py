@@ -3,10 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import sklearn as skl
-# import sklearn.datasets
 import sklearn.cluster
-import pandas
 from sort import *
+import pandas
+from pathlib import Path
+from pyMCDS import pyMCDS
 
 
 '''
@@ -53,16 +54,18 @@ def get_cluster_bboxes(locs, clustering, size_multiplier):
         centroid = [np.mean(locs[(labels == i)][:, 0]),
                     np.mean(locs[(labels == i)][:, 1])]
 
-        width = max(min_dimensions, size_multiplier * (locs[(labels == i)][:, 0].max()
+        width = max(min_dimensions,
+                    size_multiplier * (locs[(labels == i)][:, 0].max()
                     - locs[(labels == i)][:, 0].min()))
-        height = max(min_dimensions, size_multiplier * (locs[(labels == i)][:, 1].max()
+        height = max(min_dimensions,
+                     size_multiplier * (locs[(labels == i)][:, 1].max()
                      - locs[(labels == i)][:, 1].min()))
 
         result.append([
-            max(centroid[0] - width / 2., 0),
-            max(centroid[1] - height / 2., 0),
-            min(centroid[0] + width / 2., 2500),
-            min(centroid[1] + height / 2., 2500)
+            max(centroid[0] - width / 2., -1200),
+            max(centroid[1] - height / 2., -1200),
+            min(centroid[0] + width / 2., 1200),
+            min(centroid[1] + height / 2., 1200)
         ])
 
     return np.array(result)
@@ -101,7 +104,8 @@ def track_clusters(cluster_bboxes):
             if cluster_id not in result:
                 result[cluster_id] = {}
 
-            result[cluster_id][frame] = [d[0]+(d[2]-d[0])/2., d[1]+(d[3]-d[1])/2.]
+            result[cluster_id][frame] = [d[0]+(d[2]-d[0])/2.,
+                                         d[1]+(d[3]-d[1])/2.]
 
     print("Total Tracking took: %.3f for %d frames or %.1f FPS"%(
         total_time,total_frames,total_frames/total_time))
@@ -109,7 +113,7 @@ def track_clusters(cluster_bboxes):
     return result
 
 '''
-format time for filenames
+Format time for filenames
 '''
 def get_time_string(time):
 
@@ -121,14 +125,14 @@ def get_time_string(time):
 '''
 Plot clusters with coloring, from https://tinyurl.com/s6zj6w9
 '''
-def plot_clusters(locs, clustering, time):
+def plot_clusters(locs, clustering, time, output_path):
 
     labels = clustering.labels_
     core_samples_mask = np.zeros_like(labels, dtype=bool)
     core_samples_mask[clustering.core_sample_indices_] = True
     fig, ax = plt.subplots(1,1)
-    ax.set(xlim=(0,2500),
-           ylim=(0,2500),
+    ax.set(xlim=(-1200,1200),
+           ylim=(-1200,1200),
            aspect=1,
            title="")
     unique_labels = set(labels)
@@ -149,17 +153,18 @@ def plot_clusters(locs, clustering, time):
                 markeredgecolor='k',
                 markersize=5)
 
-    plt.savefig("output/cluster{}.png".format(get_time_string(time)), dpi=220)
+    plt.savefig("{}/cluster{}.png".format(output_path,
+                                          get_time_string(time)), dpi=220)
     plt.close()
 
 '''
 Plot centroids for each cluster
 '''
-def plot_centroids(centroids, time):
+def plot_centroids(centroids, time, output_path):
 
     fig, ax = plt.subplots(1,1)
-    ax.set(xlim=(0,2500),
-           ylim=(0,2500),
+    ax.set(xlim=(-1200,1200),
+           ylim=(-1200,1200),
            aspect=1,
            title="")
     ax.plot(centroids[:, 0], centroids[:, 1], '*',
@@ -167,17 +172,18 @@ def plot_centroids(centroids, time):
         markeredgecolor='k',
         markersize=10)
 
-    plt.savefig("output/centroid{}.png".format(get_time_string(time)), dpi=220)
+    plt.savefig("{}/centroid{}.png".format(output_path,
+                                           get_time_string(time)), dpi=220)
     plt.close()
 
 '''
 Plot bounding boxes for each cluster
 '''
-def plot_bboxes(bboxes, time):
+def plot_bboxes(bboxes, time, output_path):
 
     fig, ax = plt.subplots(1,1)
-    ax.set(xlim=(0,2500),
-           ylim=(0,2500),
+    ax.set(xlim=(-1200,1200),
+           ylim=(-1200,1200),
            aspect=1,
            title="")
 
@@ -187,13 +193,14 @@ def plot_bboxes(bboxes, time):
             bbox[2]-bbox[0],bbox[3]-bbox[1],
             linewidth=1,edgecolor='k',facecolor='none'))
 
-    plt.savefig("output/bbox{}.png".format(get_time_string(time)), dpi=220)
+    plt.savefig("{}/bbox{}.png".format(output_path,
+                                       get_time_string(time)), dpi=220)
     plt.close()
 
 '''
 Plot tracks for each cluster
 '''
-def plot_tracks(tracks, total_frames):
+def plot_tracks(tracks, total_frames, output_path):
 
     track_length = 70
 
@@ -213,42 +220,92 @@ def plot_tracks(tracks, total_frames):
         # positions = np.array(positions)
 
         fig, ax = plt.subplots(1,1)
-        ax.set(xlim=(0,2500),
-               ylim=(0,2500),
+        ax.set(xlim=(-1200,1200),
+               ylim=(-1200,1200),
                aspect=1,
                title="")
 
         for cluster in range(len(positions)):
-            plt.plot(positions[cluster][:,0], positions[cluster][:,1], color='k')
+            plt.plot(positions[cluster][:,0],
+                     positions[cluster][:,1], color='k')
 
-        plt.savefig("output/track{}.png".format(get_time_string(time)), dpi=220)
+        plt.savefig("{}/track{}.png".format(output_path,
+                                            get_time_string(time)), dpi=220)
         plt.close()
+
+'''
+Plot clusters, centroids, bounding boxes, and tracks
+'''
+def analyze_data(locs, output_path, cluster_distance):
+
+    cluster_bboxes = []
+    for t in range(len(locs)):
+
+        clustering = dbscan(locs[t], cluster_distance)
+        centroids = get_cluster_centroids(locs[t], clustering)
+        cluster_bboxes.append(get_cluster_bboxes(locs[t], clustering, 2.))
+
+        cluster_count = count_clusters(clustering)
+        print("{} : {} clusters, {} singles".format(
+            t, cluster_count[0], cluster_count[1]))
+
+        plot_clusters(locs[t], clustering, t, output_path)
+        plot_centroids(centroids, t, output_path)
+        plot_bboxes(cluster_bboxes[t], t, output_path)
+
+    tracks = track_clusters(cluster_bboxes)
+    plot_tracks(tracks, len(locs), output_path)
+
+
+'''
+Open test experimental data and plot it
+'''
+def analyze_experimental_data(path_to_cell_centroids_csv):
+
+    if not os.path.exists("exp_output"):
+        os.makedirs("exp_output")
+
+    data = pandas.read_csv(
+        "{}/cell_centroids.csv".format(path_to_cell_centroids_csv))
+
+    frames = data[['time']].max().values[0]
+    locs = []
+    for t in range(frames):
+        locs.append(data.loc[data['time'] == t][['x', 'y']].values
+                    - len(data.loc[data['time'] == t]['x'])*[[1200, 1200]])
+
+    analyze_data(locs, "exp_output", 80)
+
+'''
+Open simulated data and plot it
+'''
+def analyze_simulated_data(path_to_multicellDS_files):
+
+    if not os.path.exists("sim_output"):
+        os.makedirs("sim_output")
+
+    sorted_files = sorted(Path(path_to_multicellDS_files).glob('output*.xml'))
+    data = []
+    for file in sorted_files:
+        data.append(pyMCDS(file.name, False, path_to_multicellDS_files))
+    sim_data = np.array(data)
+
+    locs = []
+    for t in range(len(sim_data)):
+
+        locs.append([])
+        discrete_cells = sim_data[t].get_cell_df()
+
+        for i in range(len(discrete_cells['position_x'])):
+            locs[t].append([discrete_cells['position_x'][i],
+                            discrete_cells['position_y'][i]])
+
+        locs[t] = np.array(locs[t])
+
+    analyze_data(locs, "sim_output", 130)
 
 
 # -----------------------------------------------------------------------------
 
-if not os.path.exists("output/"):
-    os.makedirs("output/")
-
-data = pandas.read_csv("../sample_data/cell_centroids.csv")
-
-frames = data[['time']].max().values[0]
-cluster_bboxes = []
-for t in range(frames):
-
-    locs = data.loc[data['time'] == t][['x', 'y']].values
-
-    clustering = dbscan(locs, 80)
-    centroids = get_cluster_centroids(locs, clustering)
-    cluster_bboxes.append(get_cluster_bboxes(locs, clustering, 2.))
-
-    cluster_count = count_clusters(clustering)
-    print("{} : {} clusters, {} singles".format(
-        t, cluster_count[0], cluster_count[1]))
-
-    plot_clusters(locs, clustering, t)
-    plot_centroids(centroids, t)
-    plot_bboxes(cluster_bboxes[t], t)
-
-tracks = track_clusters(cluster_bboxes)
-plot_tracks(tracks, frames)
+# analyze_experimental_data("../sample_data")
+analyze_simulated_data("../../PhysiCell/output/")
