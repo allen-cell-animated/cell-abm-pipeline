@@ -105,5 +105,7 @@ def write_json_data(viz_data, json_output_path="output", model_name="new_model")
 
 def convert_xml_to_json(path_to_xml_files):
     """ convert a set of MultiCellDS XML files to a Simularium JSON file """
-    write_json_data(convert_physicell_to_simularium(load_simulation_data(path_to_xml_files)))
+    write_json_data(
+        convert_physicell_to_simularium(load_simulation_data(path_to_xml_files))
+    )
     print("wrote Simularium JSON with {} agent types".format(last_id))

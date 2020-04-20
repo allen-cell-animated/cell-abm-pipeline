@@ -7,6 +7,7 @@ import numpy as np
 import scipy
 import sklearn.preprocessing
 
+
 def hopkins(locs, subsample_n):
     """Create the hopkins statistic by sampling points out of locs,
     you'll want to bootstrap this"""
