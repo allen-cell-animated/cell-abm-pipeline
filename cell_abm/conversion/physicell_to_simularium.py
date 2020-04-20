@@ -80,7 +80,7 @@ def get_visualization_data_one_frame(index, sim_data_one_frame):
     return data
 
 
-def get_visualization_data(sim_data):
+def convert_physicell_to_simularium(sim_data):
     """ get data in Simularium format """
     data = {}
     data["msgType"] = 1
@@ -95,7 +95,7 @@ def get_visualization_data(sim_data):
 def write_json_data(viz_data, json_output_path="output", model_name="new_model"):
     """ write all data to a json file """
     json_output_path = Path(json_output_path)
-    if not json.exists():
+    if not json_output_path.exists():
         json_output_path.mkdir(parents=True)
     if not model_name.endswith(".json"):
         model_name += ".json"
@@ -103,7 +103,7 @@ def write_json_data(viz_data, json_output_path="output", model_name="new_model")
         json.dump(viz_data, outfile)
 
 
-def convert_xml_to_json():
+def convert_xml_to_json(path_to_xml_files):
     """ convert a set of MultiCellDS XML files to a Simularium JSON file """
-    write_json_data(get_visualization_data(load_simulation_data()))
+    write_json_data(convert_physicell_to_simularium(load_simulation_data(path_to_xml_files)))
     print("wrote Simularium JSON with {} agent types".format(last_id))
