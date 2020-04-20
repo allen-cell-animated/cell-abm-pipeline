@@ -1,25 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import os
-import numpy as np
-from pathlib import Path
-from pyMCDS import pyMCDS
 import json
+from pathlib import Path
+
+import numpy as np
+from .pyMCDS import pyMCDS
 
 
-model_name = "new_model"
-path_to_xml_files = "../../PhysiCell/output/"
-json_output_path = "output/"
-
-# ---------------------------------------------------------------------------------------------------------
-
-
-def load_simulation_data():
+def load_simulation_data(path_to_xml_files):
     """ load simulation data from PhysiCell MultiCellDS XML files """
-
     sorted_files = sorted(Path(path_to_xml_files).glob("output*.xml"))
     data = []
     for file in sorted_files:
         data.append(pyMCDS(file.name, False, path_to_xml_files))
-
     return np.array(data)
 
 
@@ -82,30 +77,29 @@ def get_visualization_data_one_frame(index, sim_data_one_frame):
             round(np.cbrt(3.0 / 4.0 * discrete_cells["total_volume"][i] / np.pi), 1)
         )  # scale
         data["data"].append(0.0)  # ?
-
     return data
 
 
 def get_visualization_data(sim_data):
     """ get data in Simularium format """
-
     data = {}
     data["msgType"] = 1
     data["bundleStart"] = 0
     data["bundleSize"] = len(sim_data)
     data["bundleData"] = []
-
     for i in range(len(sim_data)):
         data["bundleData"].append(get_visualization_data_one_frame(i, sim_data[i]))
-
     return data
 
 
-def write_json_data(viz_data):
+def write_json_data(viz_data, json_output_path="output", model_name="new_model"):
     """ write all data to a json file """
-    if not os.path.exists(json_output_path):
-        os.makedirs(json_output_path)
-    with open("{}{}.json".format(json_output_path, model_name), "w+") as outfile:
+    json_output_path = Path(json_output_path)
+    if not json.exists():
+        json_output_path.mkdir(parents=True)
+    if not model_name.endswith(".json"):
+        model_name += ".json"
+    with open(json_output_path / model_name, "w+") as outfile:
         json.dump(viz_data, outfile)
 
 
