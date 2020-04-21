@@ -106,4 +106,7 @@ ENV/
 /site
 
 # mypy
-.mypy_cache/
+.mypy_cache
+
+# ignore vscode settings
+.vscode/settings.json
