@@ -110,3 +110,6 @@ ENV/
 
 # ignore vscode settings
 .vscode/settings.json
+
+# outputs
+visualization/output
