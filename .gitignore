@@ -113,3 +113,4 @@ ENV/
 
 # outputs
 visualization/output
+*.simularium
