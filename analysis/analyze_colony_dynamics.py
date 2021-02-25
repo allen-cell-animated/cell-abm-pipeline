@@ -277,12 +277,13 @@ def analyze_experimental_data(path_to_cell_centroids_csv):
 
 def main():
     """ Open simulated data and plot it """
-    args = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(
         description="Analyze AICS colony dynamics in PhysiCell"
     )
-    args.add_argument(
+    parser.add_argument(
         "dir_path", help="the file path of the PhysiCell\
         output directory containing the trajectory to parse")
+    args = parser.parse_args()
 
     if not os.path.exists("sim_output"):
         os.makedirs("sim_output")

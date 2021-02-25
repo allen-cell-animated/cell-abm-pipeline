@@ -114,3 +114,6 @@ ENV/
 # outputs
 visualization/output
 *.simularium
+*.pkl
+*.tiff
+init_conditions/*.csv
