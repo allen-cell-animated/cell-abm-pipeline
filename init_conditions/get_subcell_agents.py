@@ -61,7 +61,7 @@ def download_max_cells_fov_images():
     file_paths = np.unique(max_cells_fovs.loc[:,"fov_seg_path"].values)
     with open("max_cells_fovs_metadata.csv", "w") as text_file:
         text_file.write(max_cells_fovs.to_csv())
-    print("saved metadata for cells in FOVs with most segmented cells to quilt_metadata.csv")
+    print("saved metadata for cells in FOVs with most segmented cells to max_cells_fovs_metadata.csv")
     if not Path("aics_images").is_dir():
         os.mkdir("aics_images")
     for file_path in file_paths:
