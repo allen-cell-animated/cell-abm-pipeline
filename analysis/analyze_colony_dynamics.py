@@ -2,13 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import os
+import argparse
+from pathlib import Path
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import sklearn as skl
 import sklearn.cluster
 import pandas
-from pathlib import Path
+
 from .sort import Sort
 from .pyMCDS import pyMCDS
 
@@ -272,15 +275,22 @@ def analyze_experimental_data(path_to_cell_centroids_csv):
     return analyze_data(locs, "exp_output", 80)
 
 
-def analyze_simulated_data(path_to_multicellDS_files):
+def main():
     """ Open simulated data and plot it """
+    args = argparse.ArgumentParser(
+        description="Analyze AICS colony dynamics in PhysiCell"
+    )
+    args.add_argument(
+        "dir_path", help="the file path of the PhysiCell\
+        output directory containing the trajectory to parse")
+
     if not os.path.exists("sim_output"):
         os.makedirs("sim_output")
 
-    sorted_files = sorted(Path(path_to_multicellDS_files).glob("output*.xml"))
+    sorted_files = sorted(Path(args.dir_path).glob("output*.xml"))
     data = []
     for file in sorted_files:
-        data.append(pyMCDS(file.name, False, path_to_multicellDS_files))
+        data.append(pyMCDS(file.name, False, args.dir_path))
     sim_data = np.array(data)
 
     locs = []
@@ -301,5 +311,7 @@ def analyze_simulated_data(path_to_multicellDS_files):
 
 # -----------------------------------------------------------------------------
 
-# analyze_experimental_data("../sample_data")
-# analyze_simulated_data("../../PhysiCell/output/")
+analyze_experimental_data("../data/sample_data")
+
+if __name__ == '__main__':
+    main()
