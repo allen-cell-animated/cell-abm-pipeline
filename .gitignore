@@ -117,3 +117,4 @@ visualization/output
 *.pkl
 *.tiff
 init_conditions/*.csv
+*.png

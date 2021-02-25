@@ -72,7 +72,7 @@ def download_max_cells_fov_images():
         if not Path(f"aics_images/{file_name}.png").is_file():
             # save XY projection of segmented FOV as png    
             img = AICSImage(f"aics_images/{file_name}")
-            imwrite(f"aics_images/{file_name}.png", img.get_image_data("ZYX", S=0, T=0, C=0).max())
+            imwrite(f"aics_images/{file_name}.png", img.get_image_data("ZYX", S=0, T=0, C=1)[25])
 
 def main():
     '''
