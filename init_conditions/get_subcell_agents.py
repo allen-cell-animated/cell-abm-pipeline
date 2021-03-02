@@ -106,6 +106,9 @@ def sample_hex_grid(resolution = 10):
                     x_array.append(x_rounded)
                     y_array.append(y_rounded)
                     values.append(v)
+
+        data = pd.DataFrame({"x": x_array, "y": y_array, "id": values})
+        data.to_csv(f"hex_id_data_{file_name}.csv", index=False)
                 
         plt.scatter(x_array, y_array, c=values, cmap="jet", s=5)
         plt.axis("equal")
