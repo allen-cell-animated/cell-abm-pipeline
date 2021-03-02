@@ -7,11 +7,13 @@ import os
 import numpy as np
 import pandas as pd
 import quilt3
+from matplotlib import pyplot as plt
 
 from lkaccess import LabKey
 import lkaccess.contexts
 from aicsimageio import AICSImage
-from imageio import imwrite
+import imageio
+from hexalattice.hexalattice import *
 
 def get_labkey_cell_data():
     '''
@@ -72,13 +74,49 @@ def download_max_cells_fov_images():
         if not Path(f"aics_images/{file_name}.png").is_file():
             # save XY projection of segmented FOV as png    
             img = AICSImage(f"aics_images/{file_name}")
-            imwrite(f"aics_images/{file_name}.png", img.get_image_data("ZYX", S=0, T=0, C=1)[25])
+            imageio.imwrite(f"aics_images/{file_name}.png", img.get_image_data("ZYX", S=0, T=0, C=1)[25])
+                
+def sample_hex_grid(resolution = 10):
+
+    for file_path in os.listdir("aics_images/"):
+
+        file_name = Path(file_path).name
+        if not "png" in file_name or "hex" in file_name:
+            continue
+        fov_image_slice = imageio.imread(f"aics_images/{file_name}")
+
+        hex_centers, _ = create_hex_grid(
+            nx=round(fov_image_slice.shape[0] / resolution),
+            ny=round(fov_image_slice.shape[1] / resolution),
+            min_diam=resolution,
+            align_to_origin=False,
+            do_plot=False,
+        )
+        # plt.savefig(f"aics_images/hex_{file_name}",bbox_inches="tight")
+
+        x_array = []
+        y_array = []
+        values = []
+        for hex_center in hex_centers[:]:
+            y_rounded = round(hex_center[1])
+            x_rounded = round(hex_center[0])
+            if y_rounded < fov_image_slice.shape[1] and x_rounded < fov_image_slice.shape[0]:
+                v = fov_image_slice[x_rounded][y_rounded]
+                if v > 0:
+                    x_array.append(x_rounded)
+                    y_array.append(y_rounded)
+                    values.append(v)
+                
+        plt.scatter(x_array, y_array, c=values, cmap="jet", s=5)
+        plt.axis("equal")
+        plt.savefig(f"aics_images/hex_ids_{file_name}",bbox_inches="tight")
 
 def main():
     '''
     Save images of the fields of view with the most segmented cells
     '''
     download_max_cells_fov_images()
+    sample_hex_grid()
 
 if __name__ == '__main__':
     main()
