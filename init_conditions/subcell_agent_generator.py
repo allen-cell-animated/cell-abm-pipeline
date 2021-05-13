@@ -3,8 +3,8 @@
 
 import os
 import math
-import imageio
 import argparse
+import imageio
 
 import numpy as np
 import pandas as pd
@@ -15,6 +15,10 @@ from hexalattice.hexalattice import create_hex_grid
 
 
 OUTPUT_COLUMNS = ["x", "y", "z", "id"]
+class SCALE_MICRONS:
+    X = 0.108333
+    Y = 0.108333 
+    Z = 0.108333
 
 class SubcellAgentGenerator:
     """
@@ -30,6 +34,10 @@ class SubcellAgentGenerator:
             "aics/hipsc_single_cell_image_dataset", "s3://allencell"
         )
         pkg_metadata = pkg["metadata.csv"]()
+        metadata_path = os.path.join(path_to_aics_images, "metadata.csv")
+        if not os.path.isfile(metadata_path):
+            with open(metadata_path, "w") as text_file:
+                text_file.write(pkg_metadata.to_csv())
         fov_seg_paths = (
             np.unique(pkg_metadata.sort_values(by=["FOVId"]).loc[:, "fov_seg_path"].values)
         )
@@ -82,32 +90,49 @@ class SubcellAgentGenerator:
             xlist = [int(round(hex_center[0])) for hex_center in hex_centers[:]]
             ylist = [int(round(hex_center[1])) for hex_center in hex_centers[:]]
         else:
+            pixel_offset = (resolution / SCALE_MICRONS.X) / 2
             xlist = [
-                int(round(hex_center[0] + (resolution / 2)))
+                int(round(hex_center[0] + pixel_offset))
                 for hex_center in hex_centers[:]
             ]
             ylist = [
-                int(round(hex_center[1] + (resolution / 2)))
+                int(round(hex_center[1] + pixel_offset))
                 for hex_center in hex_centers[:]
             ]
         # load image file
         file_name = os.path.basename(file_path)
         fov_image_slice = imageio.imread(os.path.join(sub_img_path, file_name))
-        # cycle through all x and y coordinates to sample
-        result = pd.DataFrame([], columns=OUTPUT_COLUMNS)
+        # get result dimensions
+        n = 0
         for x, y in zip(xlist, ylist):
             if y < fov_image_slice.shape[1] and x < fov_image_slice.shape[0]:
                 v = fov_image_slice[x][y]
                 if v > 0:
-                    result = result.append({"x" : x, "y" : y, "z" : z, "id": v}, ignore_index=True)
-        return result
+                    n += 1
+        if n < 1:
+            return None
+        result = np.zeros((int(n), 4))
+        # cycle through all x and y coordinates to sample
+        i = 0
+        for x, y in zip(xlist, ylist):
+            if y < fov_image_slice.shape[1] and x < fov_image_slice.shape[0]:
+                v = fov_image_slice[x][y]
+                if v > 0:
+                    result[i][:] = [x, y, z, v]
+                    i += 1
+        return pd.DataFrame(result, columns=OUTPUT_COLUMNS)
 
     @staticmethod
-    def sample_images_hex_grid(path_to_aics_images="", resolution=10):
+    def sample_images_hex_grid(path_to_aics_images="", resolution=1.0):
         """
         Sample downloaded PNGs on a hexagonal grid
         to get initial subcell agents in 3D
         """
+        if SCALE_MICRONS.X != SCALE_MICRONS.Y:
+            raise Exception(
+                "Scale needs to be equal in X and Y dimensions to "
+                "calculate circular or square agents"
+            )
         img_path = os.path.join(path_to_aics_images, "aics_images")
         hex_path = os.path.join(path_to_aics_images, "hex_seeds")
         if not os.path.isdir(hex_path):
@@ -123,17 +148,17 @@ class SubcellAgentGenerator:
                 os.mkdir(sub_hex_path)
             # Get list of z values to sample
             sub_img_path = os.path.join(img_path, file_dir)
-            zmax = (
-                len(os.listdir(sub_img_path)) - 2
-            )  # Subtract 2: 1 for 0-indexing and 1 for .tiff file
-            zlist = np.arange(0, zmax, resolution)
+            zmax = len(os.listdir(sub_img_path)) - 1 # Subtract 1 for .tiff file
+            n_slices = 1 + int(math.ceil((zmax - 1) * SCALE_MICRONS.Z / resolution))
+            zlist = np.arange(0, zmax - 1, math.floor((zmax - 1) / (n_slices - 1)))
             # Get list of x and y values to sample on hexgrid using a sample 2D image slice
             sample_filename = os.listdir(sub_img_path)[0]
             fov_image_slice = imageio.imread(os.path.join(sub_img_path, sample_filename))
+            pixel_resolution = math.ceil(resolution / SCALE_MICRONS.X)
             hex_centers, _ = create_hex_grid(
-                nx=round(fov_image_slice.shape[0] / resolution),
-                ny=round(fov_image_slice.shape[1] / resolution),
-                min_diam=resolution,
+                nx=round(fov_image_slice.shape[0] / pixel_resolution),
+                ny=round(fov_image_slice.shape[1] / pixel_resolution),
+                min_diam=pixel_resolution,
                 align_to_origin=False,
                 do_plot=False,
             )
@@ -184,6 +209,12 @@ def main():
         default="10",
     )
     parser.add_argument(
+        "resolution",
+        nargs="?",
+        help="how many microns between subcell agents?",
+        default="1.0",
+    )
+    parser.add_argument(
         "grid_type",
         nargs="?",
         help="use a 'hexagonal' or 'cartesian' grid to sample the images?",
@@ -195,15 +226,9 @@ def main():
         help="path to aics_images directory, default to current directory",
         default="",
     )
-    parser.add_argument(
-        "resolution",
-        nargs="?",
-        help="how many pixels per subcell agent?",
-        default="10",
-    )
     args = parser.parse_args()
     n_images_download = int(args.n_images_download)
-    resolution = int(args.resolution)
+    resolution = float(args.resolution)
     if n_images_download > 0:
         SubcellAgentGenerator.download_fov_images(args.aics_images_path, n_images_download)
     if "hexagonal" in args.grid_type:
