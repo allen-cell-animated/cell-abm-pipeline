@@ -265,9 +265,7 @@ def main():
     n_images_download = int(args.n_images_download)
     resolution = float(args.resolution)
     if n_images_download > 0:
-        SubcellAgentGenerator.download_fov_images(
-            args.output_path, n_images_download
-        )
+        SubcellAgentGenerator.download_fov_images(args.output_path, n_images_download)
     SubcellAgentGenerator.sample_images_on_grid(
         "hex" in args.grid_type, args.output_path, resolution
     )
