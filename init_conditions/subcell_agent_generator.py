@@ -15,16 +15,15 @@ from hexalattice.hexalattice import create_hex_grid
 
 
 OUTPUT_COLUMNS = ["x", "y", "z", "id"]
-class SCALE_MICRONS:
-    X = 0.108333
-    Y = 0.108333 
-    Z = 0.108333
+SCALE_MICRONS = 0.108333
+
 
 class SubcellAgentGenerator:
     """
-    Download and read AICS segmented cell fields and 
+    Download and read AICS segmented cell fields and
     generate 3D positions and identities of initial subcell agents
     """
+
     @staticmethod
     def download_fov_images(path_to_aics_images="", max_images=10):
         """
@@ -38,8 +37,8 @@ class SubcellAgentGenerator:
         if not os.path.isfile(metadata_path):
             with open(metadata_path, "w") as text_file:
                 text_file.write(pkg_metadata.to_csv())
-        fov_seg_paths = (
-            np.unique(pkg_metadata.sort_values(by=["FOVId"]).loc[:, "fov_seg_path"].values)
+        fov_seg_paths = np.unique(
+            pkg_metadata.sort_values(by=["FOVId"]).loc[:, "fov_seg_path"].values
         )
         np.random.shuffle(fov_seg_paths)
         root_path = os.path.join(path_to_aics_images, "aics_images")
@@ -60,7 +59,9 @@ class SubcellAgentGenerator:
             os.mkdir(filedir)
             # download data
             print(f"DOWNLOADING {file_name}")
-            pkg["fov_seg_path"][file_name].fetch(filedir if filedir.endswith("/") else f"{filedir}/")
+            pkg["fov_seg_path"][file_name].fetch(
+                filedir if filedir.endswith("/") else f"{filedir}/"
+            )
             # save XY projection of segmented FOV as png
             img = AICSImage(os.path.join(filedir, file_name))
             for z in range(img.shape[3]):
@@ -70,7 +71,42 @@ class SubcellAgentGenerator:
                 )
 
     @staticmethod
-    def _sample_slice_hex_grid(file_path, zlist, hex_centers, resolution, sub_img_path):
+    def _get_hexagonal_centers(sub_img_path, resolution):
+        """
+        Get list of x and y values to sample on hexagonal grid using a sample 2D image slice
+        """
+        sample_filename = os.listdir(sub_img_path)[0]
+        fov_image_slice = imageio.imread(os.path.join(sub_img_path, sample_filename))
+        pixel_resolution = math.ceil(resolution / SCALE_MICRONS)
+        hex_centers, _ = create_hex_grid(
+            nx=math.floor(fov_image_slice.shape[0] / pixel_resolution),
+            ny=math.floor(fov_image_slice.shape[1] / pixel_resolution),
+            min_diam=pixel_resolution,
+            align_to_origin=False,
+            do_plot=False,
+        )
+        return hex_centers
+
+    @staticmethod
+    def _get_cartesian_centers(sub_img_path, resolution):
+        """
+        Get list of x and y values to sample on cartesian grid using a sample 2D image slice
+        """
+        sample_filename = os.listdir(sub_img_path)[0]
+        fov_image_slice = imageio.imread(os.path.join(sub_img_path, sample_filename))
+        pixel_resolution = math.ceil(resolution / SCALE_MICRONS)
+        x_pixels = pixel_resolution * np.arange(
+            math.floor(fov_image_slice.shape[0] / pixel_resolution) + 1
+        )
+        y_pixels = pixel_resolution * np.arange(
+            math.floor(fov_image_slice.shape[1] / pixel_resolution) + 1
+        )
+        return np.array(np.meshgrid(x_pixels, y_pixels)).T.reshape(-1, 2)
+
+    @staticmethod
+    def _sample_slice_on_grid(
+        use_hex_grid, file_path, zlist, sample_centers, sub_img_path, resolution=0
+    ):
         """
         Sample 2D hexgrid on each z slice
         """
@@ -86,19 +122,19 @@ class SubcellAgentGenerator:
             return None
         # Shift 2D hexgrid for every other z slice
         ind = np.where(zlist == z)[0][0]
-        if ind % 2 == 0:
-            xlist = [int(round(hex_center[0])) for hex_center in hex_centers[:]]
-            ylist = [int(round(hex_center[1])) for hex_center in hex_centers[:]]
-        else:
-            pixel_offset = (resolution / SCALE_MICRONS.X) / 2
+        if use_hex_grid and ind % 2 == 1:
+            pixel_offset = (resolution / SCALE_MICRONS) / 2
             xlist = [
                 int(round(hex_center[0] + pixel_offset))
-                for hex_center in hex_centers[:]
+                for hex_center in sample_centers[:]
             ]
             ylist = [
                 int(round(hex_center[1] + pixel_offset))
-                for hex_center in hex_centers[:]
+                for hex_center in sample_centers[:]
             ]
+        else:
+            xlist = [int(round(center[0])) for center in sample_centers[:]]
+            ylist = [int(round(center[1])) for center in sample_centers[:]]
         # load image file
         file_name = os.path.basename(file_path)
         fov_image_slice = imageio.imread(os.path.join(sub_img_path, file_name))
@@ -123,84 +159,83 @@ class SubcellAgentGenerator:
         return pd.DataFrame(result, columns=OUTPUT_COLUMNS)
 
     @staticmethod
-    def sample_images_hex_grid(path_to_aics_images="", resolution=1.0):
+    def sample_images_on_grid(use_hex_grid, path_to_aics_images="", resolution=1.0):
         """
         Sample downloaded PNGs on a hexagonal grid
         to get initial subcell agents in 3D
         """
-        if SCALE_MICRONS.X != SCALE_MICRONS.Y:
-            raise Exception(
-                "Scale needs to be equal in X and Y dimensions to "
-                "calculate circular or square agents"
-            )
         img_path = os.path.join(path_to_aics_images, "aics_images")
-        hex_path = os.path.join(path_to_aics_images, "hex_seeds")
-        if not os.path.isdir(hex_path):
-            os.mkdir(hex_path)
-        # loop through all images, and sample desired z-slices on hexgrid
+        grid_type = "hex" if use_hex_grid else "cartesian"
+        seed_path = os.path.join(path_to_aics_images, f"{grid_type}_seeds")
+        if not os.path.isdir(seed_path):
+            os.mkdir(seed_path)
+        # loop through all images, and sample desired z-slices on grid
         for file_dir in os.listdir(img_path):
-            # Create subdirectory for hex seed data for this image file
-            sub_hex_path = os.path.join(hex_path, file_dir)
-            if os.path.isdir(sub_hex_path):
+            # Create subdirectory for seed data for this image file
+            sub_seed_path = os.path.join(seed_path, file_dir)
+            if os.path.isdir(sub_seed_path):
                 print(f"Skipping sampling for {file_dir}...........")
                 continue
-            if not os.path.isdir(sub_hex_path):
-                os.mkdir(sub_hex_path)
+            if not os.path.isdir(sub_seed_path):
+                os.mkdir(sub_seed_path)
             # Get list of z values to sample
             sub_img_path = os.path.join(img_path, file_dir)
-            zmax = len(os.listdir(sub_img_path)) - 1 # Subtract 1 for .tiff file
-            n_slices = 1 + int(math.ceil((zmax - 1) * SCALE_MICRONS.Z / resolution))
+            zmax = len(os.listdir(sub_img_path)) - 1  # Subtract 1 for .tiff file
+            n_slices = 1 + int(math.ceil((zmax - 1) * SCALE_MICRONS / resolution))
             zlist = np.arange(0, zmax - 1, math.floor((zmax - 1) / (n_slices - 1)))
-            # Get list of x and y values to sample on hexgrid using a sample 2D image slice
-            sample_filename = os.listdir(sub_img_path)[0]
-            fov_image_slice = imageio.imread(os.path.join(sub_img_path, sample_filename))
-            pixel_resolution = math.ceil(resolution / SCALE_MICRONS.X)
-            hex_centers, _ = create_hex_grid(
-                nx=round(fov_image_slice.shape[0] / pixel_resolution),
-                ny=round(fov_image_slice.shape[1] / pixel_resolution),
-                min_diam=pixel_resolution,
-                align_to_origin=False,
-                do_plot=False,
-            )
+            # Get list of x and y values to sample on grid using a sample 2D image slice
+            if use_hex_grid:
+                seed_centers = SubcellAgentGenerator._get_hexagonal_centers(
+                    sub_img_path, resolution
+                )
+            else:
+                seed_centers = SubcellAgentGenerator._get_cartesian_centers(
+                    sub_img_path, resolution
+                )
             # Compile coordinates and values into a dataframe and save as csv
             data = pd.DataFrame([], columns=OUTPUT_COLUMNS)
             for file_path in os.listdir(sub_img_path):
-                slice_data = SubcellAgentGenerator._sample_slice_hex_grid(
-                    file_path, zlist, hex_centers, resolution, sub_img_path
+                slice_data = SubcellAgentGenerator._sample_slice_on_grid(
+                    use_hex_grid,
+                    file_path,
+                    zlist,
+                    seed_centers,
+                    sub_img_path,
+                    resolution,
                 )
                 if slice_data is not None:
                     data = data.append(slice_data)
             data.to_csv(
-                os.path.join(sub_hex_path, f"hex_id_data_{file_dir}.csv"), index=False
+                os.path.join(sub_seed_path, f"{grid_type}_id_data_{file_dir}.csv"),
+                index=False,
             )
             # Create and save scatterplots for each z-slice
-            hex_scatter_path = os.path.join(sub_hex_path, "scatter_by_z")
-            if not os.path.isdir(hex_scatter_path):
-                os.mkdir(hex_scatter_path)
+            scatter_path = os.path.join(sub_seed_path, "scatter_by_z")
+            if not os.path.isdir(scatter_path):
+                os.mkdir(scatter_path)
             for z in zlist:
                 if sum(data["z"] == z) > 0:
                     data_z = data.loc[data["z"] == z]
                     plt.clf()
-                    plt.scatter(data_z["x"], data_z["y"], c=data_z["id"], cmap="jet", s=5)
+                    plt.scatter(
+                        data_z["x"],
+                        data_z["y"],
+                        c=data_z["id"],
+                        cmap="jet",
+                        s=5,
+                        marker="o" if use_hex_grid else "s",
+                    )
                     plt.axis("equal")
                     plt.savefig(
-                        os.path.join(hex_scatter_path, f"z{z}_hex_ids_{file_dir}"),
+                        os.path.join(scatter_path, f"z{z}_{grid_type}_ids_{file_dir}"),
                         bbox_inches="tight",
                     )
 
-    @staticmethod
-    def sample_images_cartesian_grid(path_to_aics_images="", resolution=10):
-        """
-        Sample downloaded PNGs on a cartesian grid
-        to get initial subcell agents in 3D
-        """
-        # TODO
-        print("Cartesian sampling still TODO")
 
 def main():
     parser = argparse.ArgumentParser(
         description="Use AICS image data to create initial "
-            "subcell agents for a simulation"
+        "subcell agents for a simulation"
     )
     parser.add_argument(
         "n_images_download",
@@ -217,8 +252,8 @@ def main():
     parser.add_argument(
         "grid_type",
         nargs="?",
-        help="use a 'hexagonal' or 'cartesian' grid to sample the images?",
-        default="hexagonal",
+        help="use a 'hex' or 'cartesian' grid to sample the images?",
+        default="hex",
     )
     parser.add_argument(
         "aics_images_path",
@@ -230,11 +265,12 @@ def main():
     n_images_download = int(args.n_images_download)
     resolution = float(args.resolution)
     if n_images_download > 0:
-        SubcellAgentGenerator.download_fov_images(args.aics_images_path, n_images_download)
-    if "hexagonal" in args.grid_type:
-        SubcellAgentGenerator.sample_images_hex_grid(args.aics_images_path, resolution)
-    else:
-        SubcellAgentGenerator.sample_images_cartesian_grid(args.aics_images_path, resolution)
+        SubcellAgentGenerator.download_fov_images(
+            args.aics_images_path, n_images_download
+        )
+    SubcellAgentGenerator.sample_images_on_grid(
+        "hex" in args.grid_type, args.aics_images_path, resolution
+    )
 
 
 if __name__ == "__main__":
