@@ -25,7 +25,7 @@ class SubcellAgentGenerator:
     """
 
     @staticmethod
-    def download_fov_images(path_to_aics_images="", max_images=10):
+    def download_fov_images(output_path="", max_images=10):
         """
         Download data for FOVs and save XY projections as PNGs
         """
@@ -33,7 +33,7 @@ class SubcellAgentGenerator:
             "aics/hipsc_single_cell_image_dataset", "s3://allencell"
         )
         pkg_metadata = pkg["metadata.csv"]()
-        metadata_path = os.path.join(path_to_aics_images, "metadata.csv")
+        metadata_path = os.path.join(output_path, "metadata.csv")
         if not os.path.isfile(metadata_path):
             with open(metadata_path, "w") as text_file:
                 text_file.write(pkg_metadata.to_csv())
@@ -41,7 +41,7 @@ class SubcellAgentGenerator:
             pkg_metadata.sort_values(by=["FOVId"]).loc[:, "fov_seg_path"].values
         )
         np.random.shuffle(fov_seg_paths)
-        root_path = os.path.join(path_to_aics_images, "aics_images")
+        root_path = os.path.join(output_path, "aics_images")
         if not os.path.isdir(root_path):
             os.mkdir(root_path)
         # for each segmented field of view
@@ -159,14 +159,14 @@ class SubcellAgentGenerator:
         return pd.DataFrame(result, columns=OUTPUT_COLUMNS)
 
     @staticmethod
-    def sample_images_on_grid(use_hex_grid, path_to_aics_images="", resolution=1.0):
+    def sample_images_on_grid(use_hex_grid, output_path="", resolution=1.0):
         """
         Sample downloaded PNGs on a hexagonal grid
         to get initial subcell agents in 3D
         """
-        img_path = os.path.join(path_to_aics_images, "aics_images")
+        img_path = os.path.join(output_path, "aics_images")
         grid_type = "hex" if use_hex_grid else "cartesian"
-        seed_path = os.path.join(path_to_aics_images, f"{grid_type}_seeds")
+        seed_path = os.path.join(output_path, f"{grid_type}_seeds")
         if not os.path.isdir(seed_path):
             os.mkdir(seed_path)
         # loop through all images, and sample desired z-slices on grid
@@ -256,7 +256,7 @@ def main():
         default="hex",
     )
     parser.add_argument(
-        "aics_images_path",
+        "output_path",
         nargs="?",
         help="path to aics_images directory, default to current directory",
         default="",
@@ -266,10 +266,10 @@ def main():
     resolution = float(args.resolution)
     if n_images_download > 0:
         SubcellAgentGenerator.download_fov_images(
-            args.aics_images_path, n_images_download
+            args.output_path, n_images_download
         )
     SubcellAgentGenerator.sample_images_on_grid(
-        "hex" in args.grid_type, args.aics_images_path, resolution
+        "hex" in args.grid_type, args.output_path, resolution
     )
 
 
