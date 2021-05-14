@@ -15,19 +15,19 @@ from hexalattice.hexalattice import create_hex_grid
 
 
 OUTPUT_COLUMNS = ["x", "y", "z", "id"]
-SCALE_MICRONS = 0.108333
+SCALE_MICRONS = 0.108333  # from metadata.csv
 
 
 class SubcellAgentGenerator:
     """
     Download and read AICS segmented cell fields and
     generate 3D positions and identities of initial subcell agents
+    on a cartesian or hexagonal grid
     """
-
     @staticmethod
     def download_fov_images(output_path="", max_images=10):
         """
-        Download data for FOVs and save XY projections as PNGs
+        Download 3D segmentation data for FOVs and save XY projections as PNGs
         """
         pkg = quilt3.Package.browse(
             "aics/hipsc_single_cell_image_dataset", "s3://allencell"
@@ -108,7 +108,7 @@ class SubcellAgentGenerator:
         use_hex_grid, file_path, zlist, sample_centers, sub_img_path, resolution=0
     ):
         """
-        Sample 2D hexgrid on each z slice
+        Sample 2D z slice on grid
         """
         # Only use the png files, which are the zslice images
         if not "png" in file_path:
@@ -161,7 +161,7 @@ class SubcellAgentGenerator:
     @staticmethod
     def sample_images_on_grid(use_hex_grid, output_path="", resolution=1.0):
         """
-        Sample downloaded PNGs on a hexagonal grid
+        Sample downloaded PNGs on a grid
         to get initial subcell agents in 3D
         """
         img_path = os.path.join(output_path, "aics_images")
