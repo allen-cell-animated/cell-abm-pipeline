@@ -55,6 +55,7 @@ class SubcellAgentGenerator:
             filedir = os.path.join(root_path, file_name_noext)
             if os.path.isdir(filedir):
                 print(f"Skipping download for {file_name}...........")
+                max_images += 1
                 continue
             os.mkdir(filedir)
             # download data
