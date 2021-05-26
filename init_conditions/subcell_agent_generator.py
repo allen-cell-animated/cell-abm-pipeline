@@ -208,6 +208,7 @@ class SubcellAgentGenerator:
                     data = data.append(slice_data)
             data.to_csv(
                 os.path.join(sub_seed_path, f"{grid_type}_id_data_{file_dir}.csv"),
+                header=None,
                 index=False,
             )
             # Create and save scatterplots for each z-slice
