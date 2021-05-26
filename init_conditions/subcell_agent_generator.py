@@ -172,6 +172,8 @@ class SubcellAgentGenerator:
             os.mkdir(seed_path)
         # loop through all images, and sample desired z-slices on grid
         for file_dir in os.listdir(img_path):
+            if ".DS_Store" in file_dir:
+                continue
             # Create subdirectory for seed data for this image file
             sub_seed_path = os.path.join(seed_path, file_dir)
             if os.path.isdir(sub_seed_path):
