@@ -238,36 +238,36 @@ def main():
         "subcell agents for a simulation"
     )
     parser.add_argument(
-        "n_images_download",
+        "-n",  "--n_images",  dest="n_images_download",
         nargs="?",
         help="how many new images to download?",
         default="10",
     )
     parser.add_argument(
-        "resolution",
+        "-r", "--res", dest="resolution",
         nargs="?",
         help="how many microns between subcell agents?",
         default="1.0",
     )
     parser.add_argument(
-        "grid_type",
+        "-g", "--grid", dest="grid_type",
         nargs="?",
         help="use a 'hex' or 'cartesian' grid to sample the images?",
         default="hex",
     )
     parser.add_argument(
-        "output_path",
+        "-o", "--out_dir", dest="output_dir",
         nargs="?",
-        help="path to aics_images directory, default to current directory",
+        help="path to directory to save outputs, default to current directory",
         default="",
     )
     args = parser.parse_args()
     n_images_download = int(args.n_images_download)
     resolution = float(args.resolution)
     if n_images_download > 0:
-        SubcellAgentGenerator.download_fov_images(args.output_path, n_images_download)
+        SubcellAgentGenerator.download_fov_images(args.output_dir, n_images_download)
     SubcellAgentGenerator.sample_images_on_grid(
-        "hex" in args.grid_type, args.output_path, resolution
+        "hex" in args.grid_type, args.output_dir, resolution
     )
 
 
