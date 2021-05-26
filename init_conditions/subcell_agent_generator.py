@@ -80,7 +80,7 @@ class SubcellAgentGenerator:
         pixel_resolution = math.ceil(resolution / SCALE_MICRONS)
         hex_centers, _ = create_hex_grid(
             nx=math.floor(fov_image_slice.shape[0] / pixel_resolution),
-            ny=math.floor(fov_image_slice.shape[1] / pixel_resolution),
+            ny=math.floor(fov_image_slice.shape[1] / pixel_resolution * math.sqrt(3)),
             min_diam=pixel_resolution,
             align_to_origin=False,
             do_plot=False,
@@ -96,10 +96,10 @@ class SubcellAgentGenerator:
         fov_image_slice = imageio.imread(os.path.join(sub_img_path, sample_filename))
         pixel_resolution = math.ceil(resolution / SCALE_MICRONS)
         x_pixels = pixel_resolution * np.arange(
-            math.floor(fov_image_slice.shape[0] / pixel_resolution) + 1
+            math.floor(fov_image_slice.shape[0] / pixel_resolution)
         )
         y_pixels = pixel_resolution * np.arange(
-            math.floor(fov_image_slice.shape[1] / pixel_resolution) + 1
+            math.floor(fov_image_slice.shape[1] / pixel_resolution)
         )
         return np.array(np.meshgrid(x_pixels, y_pixels)).T.reshape(-1, 2)
 
