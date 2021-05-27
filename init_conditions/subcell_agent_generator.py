@@ -25,6 +25,7 @@ class SubcellAgentGenerator:
     generate 3D positions and identities of initial subcell agents
     on a cartesian or hexagonal grid
     """
+
     @staticmethod
     def download_fov_images(output_path="", max_images=10):
         """
@@ -107,8 +108,13 @@ class SubcellAgentGenerator:
 
     @staticmethod
     def _sample_image_slice_on_grid(
-        use_hex_grid, file_path, zlist, sample_centers, 
-        sub_img_path, resolution=0, scale_factor=1.0
+        use_hex_grid,
+        file_path,
+        zlist,
+        sample_centers,
+        sub_img_path,
+        resolution=0,
+        scale_factor=1.0,
     ):
         """
         Sample 2D z slice on grid
@@ -158,16 +164,18 @@ class SubcellAgentGenerator:
                 v = fov_image_slice[x][y]
                 if v > 0:
                     result[i][:] = [
-                        x * SCALE_MICRONS * scale_factor, 
-                        y * SCALE_MICRONS * scale_factor, 
-                        z * SCALE_MICRONS_Z * scale_factor, 
-                        v
+                        x * SCALE_MICRONS * scale_factor,
+                        y * SCALE_MICRONS * scale_factor,
+                        z * SCALE_MICRONS_Z * scale_factor,
+                        v,
                     ]
                     i += 1
         return pd.DataFrame(result, columns=OUTPUT_COLUMNS)
 
     @staticmethod
-    def sample_images_on_grid(use_hex_grid, output_path="", resolution=1.0, scale_factor=1.0):
+    def sample_images_on_grid(
+        use_hex_grid, output_path="", resolution=1.0, scale_factor=1.0
+    ):
         """
         Sample downloaded PNGs on a grid to get initial subcell agents in 3D
         """
@@ -250,31 +258,41 @@ def main():
         "subcell agents for a simulation"
     )
     parser.add_argument(
-        "-n",  "--n_images",  dest="n_images_download",
+        "-n",
+        "--n_images",
+        dest="n_images_download",
         nargs="?",
         help="how many new images to download?",
         default="10",
     )
     parser.add_argument(
-        "-r", "--res", dest="resolution",
+        "-r",
+        "--res",
+        dest="resolution",
         nargs="?",
         help="how many microns between subcell agents?",
         default="1.0",
     )
     parser.add_argument(
-        "-g", "--grid", dest="grid_type",
+        "-g",
+        "--grid",
+        dest="grid_type",
         nargs="?",
         help="use a 'hex' or 'cartesian' grid to sample the images?",
         default="hex",
     )
     parser.add_argument(
-        "-o", "--out_dir", dest="output_dir",
+        "-o",
+        "--out_dir",
+        dest="output_dir",
         nargs="?",
         help="path to directory to save outputs, default to current directory",
         default="",
     )
     parser.add_argument(
-        "-s", "--scale", dest="scale_factor",
+        "-s",
+        "--scale",
+        dest="scale_factor",
         nargs="?",
         help="data is in microns, multiply it to get numbers at a different scale?",
         default="1.0",
