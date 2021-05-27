@@ -16,6 +16,7 @@ from hexalattice.hexalattice import create_hex_grid
 
 OUTPUT_COLUMNS = ["x", "y", "z", "id"]
 SCALE_MICRONS = 0.108333  # from metadata.csv
+SCALE_MICRONS_Z = 0.29  # from preprint, z scale in metadata.csv is incorrect
 
 
 class SubcellAgentGenerator:
@@ -105,8 +106,9 @@ class SubcellAgentGenerator:
         return np.array(np.meshgrid(x_pixels, y_pixels)).T.reshape(-1, 2)
 
     @staticmethod
-    def _sample_slice_on_grid(
-        use_hex_grid, file_path, zlist, sample_centers, sub_img_path, resolution=0
+    def _sample_image_slice_on_grid(
+        use_hex_grid, file_path, zlist, sample_centers, 
+        sub_img_path, resolution=0, scale_factor=1.0
     ):
         """
         Sample 2D z slice on grid
@@ -155,15 +157,19 @@ class SubcellAgentGenerator:
             if y < fov_image_slice.shape[1] and x < fov_image_slice.shape[0]:
                 v = fov_image_slice[x][y]
                 if v > 0:
-                    result[i][:] = [x, y, z, v]
+                    result[i][:] = [
+                        x * SCALE_MICRONS * scale_factor, 
+                        y * SCALE_MICRONS * scale_factor, 
+                        z * SCALE_MICRONS_Z * scale_factor, 
+                        v
+                    ]
                     i += 1
         return pd.DataFrame(result, columns=OUTPUT_COLUMNS)
 
     @staticmethod
-    def sample_images_on_grid(use_hex_grid, output_path="", resolution=1.0):
+    def sample_images_on_grid(use_hex_grid, output_path="", resolution=1.0, scale_factor=1.0):
         """
-        Sample downloaded PNGs on a grid
-        to get initial subcell agents in 3D
+        Sample downloaded PNGs on a grid to get initial subcell agents in 3D
         """
         img_path = os.path.join(output_path, "aics_images")
         grid_type = "hex" if use_hex_grid else "cartesian"
@@ -184,7 +190,7 @@ class SubcellAgentGenerator:
             # Get list of z values to sample
             sub_img_path = os.path.join(img_path, file_dir)
             zmax = len(os.listdir(sub_img_path)) - 1  # Subtract 1 for .tiff file
-            n_slices = 1 + int(math.ceil((zmax - 1) * SCALE_MICRONS / resolution))
+            n_slices = 1 + int(math.ceil((zmax - 1) * SCALE_MICRONS_Z / resolution))
             zlist = np.arange(0, zmax - 1, math.floor((zmax - 1) / (n_slices - 1)))
             # Get list of x and y values to sample on grid using a sample 2D image slice
             if use_hex_grid:
@@ -198,13 +204,14 @@ class SubcellAgentGenerator:
             # Compile coordinates and values into a dataframe and save as csv
             data = pd.DataFrame([], columns=OUTPUT_COLUMNS)
             for file_path in os.listdir(sub_img_path):
-                slice_data = SubcellAgentGenerator._sample_slice_on_grid(
+                slice_data = SubcellAgentGenerator._sample_image_slice_on_grid(
                     use_hex_grid,
                     file_path,
                     zlist,
                     seed_centers,
                     sub_img_path,
                     resolution,
+                    scale_factor,
                 )
                 if slice_data is not None:
                     data = data.append(slice_data)
@@ -218,15 +225,16 @@ class SubcellAgentGenerator:
             if not os.path.isdir(scatter_path):
                 os.mkdir(scatter_path)
             for z in zlist:
-                if sum(data["z"] == z) > 0:
-                    data_z = data.loc[data["z"] == z]
+                z_coord = z * SCALE_MICRONS_Z * scale_factor
+                if sum(data["z"] == z_coord) > 0:
+                    data_z = data.loc[data["z"] == z_coord]
                     plt.clf()
                     plt.scatter(
                         data_z["x"],
                         data_z["y"],
                         c=data_z["id"],
                         cmap="jet",
-                        s=5,
+                        s=5 * resolution,
                         marker="o" if use_hex_grid else "s",
                     )
                     plt.axis("equal")
@@ -265,13 +273,19 @@ def main():
         help="path to directory to save outputs, default to current directory",
         default="",
     )
+    parser.add_argument(
+        "-s", "--scale", dest="scale_factor",
+        nargs="?",
+        help="data is in microns, multiply it to get numbers at a different scale?",
+        default="1.0",
+    )
     args = parser.parse_args()
     n_images_download = int(args.n_images_download)
     resolution = float(args.resolution)
     if n_images_download > 0:
         SubcellAgentGenerator.download_fov_images(args.output_dir, n_images_download)
     SubcellAgentGenerator.sample_images_on_grid(
-        "hex" in args.grid_type, args.output_dir, resolution
+        "hex" in args.grid_type, args.output_dir, resolution, float(args.scale_factor)
     )
 
 
