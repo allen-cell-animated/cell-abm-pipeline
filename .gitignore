@@ -118,3 +118,4 @@ visualization/output
 *.tiff
 init_conditions/*.csv
 *.png
+*.csv
