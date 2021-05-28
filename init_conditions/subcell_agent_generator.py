@@ -16,7 +16,7 @@ from hexalattice.hexalattice import create_hex_grid
 
 OUTPUT_COLUMNS = ["x", "y", "z", "id"]
 SCALE_MICRONS = 0.108333  # from metadata.csv
-SCALE_MICRONS_Z = 0.29  # from preprint, z scale in metadata.csv is incorrect
+SCALE_MICRONS_Z = 0.29  # from preprint
 
 
 class SubcellAgentGenerator:
