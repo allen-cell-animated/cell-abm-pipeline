@@ -50,7 +50,7 @@ class ProcessSamples:
         """Removes unconnected regions of cells."""
 
         arr, steps, offsets = ProcessSamples._convert_to_integer_array(df)
-        arr_connected = np.zeros(arr.shape, dtype="int")
+        arr_conn = np.zeros(arr.shape, dtype="int")
         labels = measure.label(arr)
 
         # Sort labeled regions by size.
@@ -67,17 +67,17 @@ class ProcessSamples:
             cell_id = list(set(arr[labels == index]))[0]
 
             if cell_id not in ids_added:
-                arr_connected[labels == index] = cell_id
+                arr_conn[labels == index] = cell_id
                 ids_added.add(cell_id)
             else:
                 print(f"Skipping unconnected region for cell id {cell_id}")
 
         # Convert back to dataframe.
-        df_connected = ProcessSamples._convert_to_dataframe(arr_connected, steps, offsets)
+        df_conn = ProcessSamples._convert_to_dataframe(arr_conn, steps, offsets)
 
         # TODO: update method for hexagonal grid
 
-        return df_connected
+        return df_conn
 
     @staticmethod
     def scale_coordinates(df, scale_factor):

@@ -1,5 +1,6 @@
 import click
 from download_images import DownloadImages
+from sample_images import SampleImages
 from process_samples import ProcessSamples
 
 
@@ -25,14 +26,43 @@ def cli():
 )
 def download_images(**kwargs):
     """
-    Download 3D segmentation data for FOVs and save XY projections as PNGs.
+    Download segmentation data and save XY projections.
     """
     DownloadImages().download(**kwargs)
 
 
-def sample_images():
-    # TODO: add sample images
-    pass
+@cli.command()
+@click.option(
+    "-p",
+    "--output-path",
+    type=click.Path(exists=True),
+    default=".",
+    help="path to directory to save outputs (default = current directory)",
+)
+@click.option(
+    "-g",
+    "--grid-type",
+    type=click.Choice(["hex", "cartesian"], case_sensitive=False),
+    default="hex",
+    help="sampling grid type (default = hex)",
+)
+@click.option(
+    "-r",
+    "--resolution",
+    type=float,
+    default=1.0,
+    help="microns between samples (default = 1.0)",
+)
+@click.option(
+    "--contact/--no-contact",
+    default=True,
+    help="True if contact sheet of images is saved, False otherwise (default = True)",
+)
+def sample_images(**kwargs):
+    """
+    Sample downloaded image files for given grid type.
+    """
+    SampleImages().sample(**kwargs)
 
 
 @cli.command()
@@ -60,7 +90,7 @@ def sample_images():
 )
 def process_samples(samples, **kwargs):
     """
-    Process SAMPLES file with selected post-processing steps.
+    Process SAMPLES file with selected post-processing.
     """
     ProcessSamples(samples).process(**kwargs)
 
