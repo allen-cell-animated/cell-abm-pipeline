@@ -27,53 +27,6 @@ class SubcellAgentGenerator:
     """
 
     @staticmethod
-    def download_fov_images(output_path="", max_images=10):
-        """
-        Download 3D segmentation data for FOVs and save XY projections as PNGs
-        """
-        pkg = quilt3.Package.browse(
-            "aics/hipsc_single_cell_image_dataset", "s3://allencell"
-        )
-        pkg_metadata = pkg["metadata.csv"]()
-        metadata_path = os.path.join(output_path, "metadata.csv")
-        if not os.path.isfile(metadata_path):
-            with open(metadata_path, "w") as text_file:
-                text_file.write(pkg_metadata.to_csv())
-        fov_seg_paths = np.unique(
-            pkg_metadata.sort_values(by=["FOVId"]).loc[:, "fov_seg_path"].values
-        )
-        np.random.shuffle(fov_seg_paths)
-        root_path = os.path.join(output_path, "aics_images")
-        if not os.path.isdir(root_path):
-            os.mkdir(root_path)
-        # for each segmented field of view
-        for file_path in fov_seg_paths:
-            max_images -= 1
-            if max_images < 0:
-                return
-            file_name = os.path.basename(file_path)
-            # find first '.' to remove '.ome' and '.tiff'
-            file_name_noext = file_name[: file_name.find(".")]
-            filedir = os.path.join(root_path, file_name_noext)
-            if os.path.isdir(filedir):
-                print(f"Skipping download for {file_name}...........")
-                max_images += 1
-                continue
-            os.mkdir(filedir)
-            # download data
-            print(f"DOWNLOADING {file_name}")
-            pkg["fov_seg_path"][file_name].fetch(
-                filedir if filedir.endswith("/") else f"{filedir}/"
-            )
-            # save XY projection of segmented FOV as png
-            img = AICSImage(os.path.join(filedir, file_name))
-            for z in range(img.shape[3]):
-                imageio.imwrite(
-                    os.path.join(filedir, f"{file_name_noext}_z{z}.png"),
-                    img.get_image_data("XYZ", S=0, T=0, C=1)[:, :, z],
-                )
-
-    @staticmethod
     def _get_hexagonal_centers(sub_img_path, resolution):
         """
         Get list of x and y values to sample on hexagonal grid using a sample 2D image slice
@@ -258,14 +211,6 @@ def main():
         "subcell agents for a simulation"
     )
     parser.add_argument(
-        "-n",
-        "--n_images",
-        dest="n_images_download",
-        nargs="?",
-        help="how many new images to download?",
-        default="10",
-    )
-    parser.add_argument(
         "-r",
         "--res",
         dest="resolution",
@@ -298,10 +243,8 @@ def main():
         default="1.0",
     )
     args = parser.parse_args()
-    n_images_download = int(args.n_images_download)
     resolution = float(args.resolution)
-    if n_images_download > 0:
-        SubcellAgentGenerator.download_fov_images(args.output_dir, n_images_download)
+
     SubcellAgentGenerator.sample_images_on_grid(
         "hex" in args.grid_type, args.output_dir, resolution, float(args.scale_factor)
     )
