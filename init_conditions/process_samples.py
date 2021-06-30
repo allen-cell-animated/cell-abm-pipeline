@@ -1,14 +1,15 @@
 import pandas as pd
 import numpy as np
 from skimage import measure
-from constants import SCALE_MICRONS, SCALE_MICRONS_Z
+from sample_images import SampleImages
+from constants import SCALE_MICRONS, SCALE_MICRONS_Z, OUTPUT_COLUMNS
 
 
 class ProcessSamples:
     def __init__(self, file):
         self.file = file
 
-    def process(self, edges, connected, scale, scale_factor):
+    def process(self, edges, connected, scale, scale_factor, grid_type, contact):
         """Applies selected processing steps to samples."""
 
         # Load samples file.
@@ -25,6 +26,13 @@ class ProcessSamples:
         if scale:
             print("Scaling coordinates ...")
             samples = self.scale_coordinates(samples, scale_factor)
+
+        if contact:
+            print("Saving contact sheet ...")
+            contact_path = self.file.replace(
+                f"{grid_type}_samples_", "contact_"
+            ).replace(".csv", ".PROCESSED.png")
+            SampleImages.save_contact_sheet(samples, contact_path)
 
         # Save processed samples.
         samples.to_csv(self.file.replace(".csv", ".PROCESSED.csv"), index=False)
@@ -141,15 +149,15 @@ class ProcessSamples:
 
         voxels = [
             (
+                arr[z, y, x],
                 step_x * (x + offset_x),
                 step_y * (y + offset_y),
                 step_z * (z + offset_z),
-                arr[z, y, x],
             )
             for z, y, x in zip(*np.where(arr != 0))
         ]
 
-        return pd.DataFrame(voxels, columns=["x", "y", "z", "id"])
+        return pd.DataFrame(voxels, columns=OUTPUT_COLUMNS)
 
     @staticmethod
     def _get_step_size(arr):

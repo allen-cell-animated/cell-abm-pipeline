@@ -88,6 +88,18 @@ def sample_images(**kwargs):
     default=1.0,
     help="Scaling factor for coordinates (default = 1.0).",
 )
+@click.option(
+    "-g",
+    "--grid-type",
+    type=click.Choice(["hex", "cartesian"], case_sensitive=False),
+    default="hex",
+    help="sampling grid type (default = hex)",
+)
+@click.option(
+    "--contact/--no-contact",
+    default=True,
+    help="True if contact sheet of images is saved, False otherwise (default = True)",
+)
 def process_samples(samples, **kwargs):
     """
     Process SAMPLES file with selected post-processing.
