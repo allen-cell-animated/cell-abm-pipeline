@@ -2,6 +2,7 @@ import click
 from download_images import DownloadImages
 from sample_images import SampleImages
 from process_samples import ProcessSamples
+from convert_samples_to_arcade import ConvertSamplesToARCADE
 
 
 @click.group()
@@ -107,9 +108,30 @@ def process_samples(samples, **kwargs):
     ProcessSamples(samples).process(**kwargs)
 
 
-def convert_samples():
-    # TODO: convert samples
-    pass
+@cli.command()
+@click.argument("samples", type=click.Path(exists=True))
+@click.option(
+    "--format",
+    "-f",
+    multiple=True,
+    default=[],
+    help="Format to convert to (options = arcade)",
+)
+@click.option(
+    "--box",
+    "-b",
+    nargs=3,
+    type=int,
+    default=[100, 100, 10],
+    help="Size of bounding box in x, y, and z directions (default = 100 x 100 x 10)",
+)
+def convert_samples(samples, format, **kwargs):
+    """
+    Convert SAMPLES file into selected formats.
+    """
+
+    if "arcade" in format:
+        ConvertSamplesToARCADE(samples).convert(**kwargs)
 
 
 if __name__ == "__main__":
