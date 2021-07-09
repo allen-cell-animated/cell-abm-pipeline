@@ -59,7 +59,7 @@ class ProcessSamples:
 
         arr, steps, offsets = ProcessSamples._convert_to_integer_array(df)
         arr_conn = np.zeros(arr.shape, dtype="int")
-        labels = measure.label(arr)
+        labels = measure.label(arr, connectivity=1)
 
         # Sort labeled regions by size.
         regions = np.bincount(labels.flatten())[1:]
