@@ -84,8 +84,16 @@ def sample_images(**kwargs):
     help="True if coordinates are scaled, False otherwise (default = True)",
 )
 @click.option(
+    "-t",
+    "--edge-threshold",
+    type=int,
+    default=1,
+    help="Number of samples touching edge to be considered edge (default = 1).",
+)
+@click.option(
     "-s",
     "--scale-factor",
+    type=float,
     default=1.0,
     help="Scaling factor for coordinates (default = 1.0).",
 )

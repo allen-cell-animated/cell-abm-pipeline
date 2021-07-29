@@ -43,7 +43,7 @@ Downloaded images are sampled to extract samples in the form (`id`, `x`, `y`, `z
 Samples are saved `<grid-type>_samples/<image-id>/<grid-type>_samples_<image-id>.csv`.
 Images that have already been sampled will not be re-sampled.
 
-### Process Samples
+### Process samples
 
 ```bash
 $ python cli.py process-samples [OPTIONS] SAMPLES
@@ -56,6 +56,8 @@ $ python cli.py process-samples [OPTIONS] SAMPLES
                                    False otherwise (default = True)
   --scale / --no-scale             True if coordinates are scaled, False
                                    otherwise (default = True)
+  -t, --edge-threshold INTEGER     Number of samples touching edge to be
+                                   considered edge (default = 1).
   -s, --scale-factor FLOAT         Scaling factor for coordinates (default =
                                    1.0).
   -g, --grid-type [hex|cartesian]  sampling grid type (default = hex)

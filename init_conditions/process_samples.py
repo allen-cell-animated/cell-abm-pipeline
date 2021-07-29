@@ -9,7 +9,9 @@ class ProcessSamples:
     def __init__(self, file):
         self.file = file
 
-    def process(self, edges, connected, scale, scale_factor, grid_type, contact):
+    def process(
+        self, edges, connected, scale, edge_threshold, scale_factor, grid_type, contact
+    ):
         """Applies selected processing steps to samples."""
 
         # Load samples file.
@@ -17,7 +19,7 @@ class ProcessSamples:
 
         if edges:
             print("Removing edge cells ...")
-            samples = self.remove_edge_cells(samples)
+            samples = self.remove_edge_cells(samples, grid_type, edge_threshold)
 
         if connected:
             print("Removing unconnected regions ...")
@@ -38,18 +40,20 @@ class ProcessSamples:
         samples.to_csv(self.file.replace(".csv", ".PROCESSED.csv"), index=False)
 
     @staticmethod
-    def remove_edge_cells(df):
+    def remove_edge_cells(df, grid_type, edge_threshold):
         """Removes cells at edges of FOV."""
 
+        # Get edge padding.
+        x_padding = ProcessSamples._get_step_size(df.x) if grid_type == "hex" else 0
+        y_padding = ProcessSamples._get_step_size(df.y) if grid_type == "hex" else 0
+
         # Get ids of cell at edge.
-        x_edge_ids = ProcessSamples._find_edge_ids("x", df)
-        y_edge_ids = ProcessSamples._find_edge_ids("y", df)
-        all_edge_ids = set(x_edge_ids + y_edge_ids)
+        x_edge_ids = ProcessSamples._find_edge_ids("x", df, x_padding, edge_threshold)
+        y_edge_ids = ProcessSamples._find_edge_ids("y", df, y_padding, edge_threshold)
 
         # Filter df for cells not at edge.
+        all_edge_ids = set(x_edge_ids + y_edge_ids)
         df_filtered = df[~df["id"].isin(all_edge_ids)]
-
-        # TODO: update method for hexagonal grid
 
         return df_filtered
 
@@ -95,23 +99,24 @@ class ProcessSamples:
         return df
 
     @staticmethod
-    def _find_edge_ids(axis, df):
+    def _find_edge_ids(axis, df, padding, threshold):
         """Finds ids of cells at edges of given axis."""
 
         # Get min and max coordinate for given axis.
-        axis_min = df[axis].min()
-        axis_max = df[axis].max()
+        axis_min = df[axis].min() + padding
+        axis_max = df[axis].max() - padding
 
         # Get min and max coordinate for each cell.
         df_mins = df.groupby("id")[axis].min()
         df_maxs = df.groupby("id")[axis].max()
 
         # Check for cell ids located at edges.
-        edge_ids = []
-        edge_ids = edge_ids + df_mins[df_mins <= axis_min].index.tolist()
-        edge_ids = edge_ids + df_maxs[df_maxs >= axis_max].index.tolist()
+        edges = df.groupby("id").apply(
+            lambda g: len(g[(g[axis] <= axis_min) | (g[axis] >= axis_max)])
+        )
+        edge_ids = edges[edges > threshold]
 
-        return list(set(edge_ids))
+        return list(edge_ids.index)
 
     @staticmethod
     def _convert_to_integer_array(df):
@@ -168,7 +173,7 @@ class ProcessSamples:
         steps = [j - i for i, j in zip(unique[:-1], unique[1:])]
         step = set(steps)
 
-        # Check that array only has one step size.
-        assert len(step) == 1, "variable step size in array -- check scaling"
+        if len(step) == 1:
+            print("WARNING: variable step size in array")
 
-        return step.pop()
+        return max(step)
