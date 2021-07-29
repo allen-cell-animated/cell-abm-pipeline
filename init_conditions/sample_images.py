@@ -152,6 +152,9 @@ class SampleImages:
     @staticmethod
     def save_contact_sheet(df, output_file, size=5):
         """Save contact sheet image for all z slices in dataframe."""
+        if len(df) == 0:
+            return
+
         max_id = int(df.id.max())
         min_id = int(df.id.min())
         cmap = cm.get_cmap("jet", max_id - min_id + 1)

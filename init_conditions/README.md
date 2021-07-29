@@ -58,6 +58,8 @@ $ python cli.py process-samples [OPTIONS] SAMPLES
                                    otherwise (default = True)
   -t, --edge-threshold INTEGER     Number of samples touching edge to be
                                    considered edge (default = 1).
+  -c, --connected-threshold FLOAT  Maximum distance to nearest neighbor to be
+                                   considered connected in um (default = 2.0).
   -s, --scale-factor FLOAT         Scaling factor for coordinates (default =
                                    1.0).
   -g, --grid-type [hex|cartesian]  sampling grid type (default = hex)

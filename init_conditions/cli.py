@@ -91,6 +91,13 @@ def sample_images(**kwargs):
     help="Number of samples touching edge to be considered edge (default = 1).",
 )
 @click.option(
+    "-c",
+    "--connected-threshold",
+    type=float,
+    default=2.0,
+    help="Maximum distance to nearest neighbor to be considered connected in um (default = 2.0).",
+)
+@click.option(
     "-s",
     "--scale-factor",
     type=float,

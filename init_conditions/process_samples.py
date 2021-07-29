@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from skimage import measure
+from scipy.spatial import distance
 from sample_images import SampleImages
 from constants import SCALE_MICRONS, SCALE_MICRONS_Z, OUTPUT_COLUMNS
 
@@ -10,7 +11,15 @@ class ProcessSamples:
         self.file = file
 
     def process(
-        self, edges, connected, scale, edge_threshold, scale_factor, grid_type, contact
+        self,
+        edges,
+        connected,
+        scale,
+        edge_threshold,
+        connected_threshold,
+        scale_factor,
+        grid_type,
+        contact,
     ):
         """Applies selected processing steps to samples."""
 
@@ -23,7 +32,9 @@ class ProcessSamples:
 
         if connected:
             print("Removing unconnected regions ...")
-            samples = self.remove_unconnected_regions(samples)
+            samples = self.remove_unconnected_regions(
+                samples, grid_type, connected_threshold
+            )
 
         if scale:
             print("Scaling coordinates ...")
@@ -58,8 +69,47 @@ class ProcessSamples:
         return df_filtered
 
     @staticmethod
-    def remove_unconnected_regions(df):
+    def remove_unconnected_regions(df, grid_type, connected_threshold):
         """Removes unconnected regions of cells."""
+        if grid_type == "hex":
+            return ProcessSamples.remove_unconnected_by_distance(
+                df, connected_threshold
+            )
+        else:
+            return ProcessSamples.remove_unconnected_by_connectivity(df)
+
+    @staticmethod
+    def remove_unconnected_by_distance(df, threshold):
+        """Removes unconnected regions based on distance."""
+        all_connected = []
+
+        # Rescale coordinates to um.
+        df["xs"] = df.x * SCALE_MICRONS
+        df["ys"] = df.y * SCALE_MICRONS
+        df["zs"] = df.z * SCALE_MICRONS_Z
+
+        # Iterate through each id and filter out samples above the distance threshold.
+        for name, group in df.groupby("id"):
+            coords = group[["x", "y", "z", "xs", "ys", "zs"]].to_numpy()
+            dists = [
+                [ProcessSamples._get_minimum_distance(c[3:], coords[:, 3:]), *c[:3]]
+                for c in coords
+            ]
+            connected = [[name, x, y, z] for d, x, y, z in dists if d < threshold]
+            all_connected = all_connected + connected
+
+        if len(all_connected) == 0:
+            print("WARNING: no connected samples, try increasing connected threshold")
+            return pd.DataFrame()
+
+        # Convert back to dataframe.
+        df_conn = pd.DataFrame(all_connected, columns=["id", "x", "y", "z"], dtype=int)
+
+        return df_conn
+
+    @staticmethod
+    def remove_unconnected_by_connectivity(df):
+        """Removes unconnected regions based on connectivity."""
 
         arr, steps, offsets = ProcessSamples._convert_to_integer_array(df)
         arr_conn = np.zeros(arr.shape, dtype="int")
@@ -86,8 +136,6 @@ class ProcessSamples:
 
         # Convert back to dataframe.
         df_conn = ProcessSamples._convert_to_dataframe(arr_conn, steps, offsets)
-
-        # TODO: update method for hexagonal grid
 
         return df_conn
 
@@ -117,6 +165,12 @@ class ProcessSamples:
         edge_ids = edges[edges > threshold]
 
         return list(edge_ids.index)
+
+    @staticmethod
+    def _get_minimum_distance(point, points):
+        """Get minimum distance of point to array of points."""
+        dists = distance.cdist([point], points)
+        return np.min(dists[dists != 0])
 
     @staticmethod
     def _convert_to_integer_array(df):
