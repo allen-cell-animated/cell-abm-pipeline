@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "project_aics"
+version = "0.0.0"
+description = ""
+authors = ["jessicasyu <jesyu@uw.edu>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+numpy = "1.19.5"
+tifffile = "2021.4.8"
+imagecodecs = "2021.4.28"
+matplotlib = "3.4.2"
+aicsimageio = "3.3.7"
+simulariumio = "1.4.1"
+scikit-image = "0.19.2"
+jupyter = "^1.0.0"
+arcadeio = { path = "../arcadeio/", develop = true }
+jupyterlab = "^3.3.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
