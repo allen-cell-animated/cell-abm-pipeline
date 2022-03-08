@@ -16,8 +16,13 @@ scikit-image = "0.19.2"
 jupyter = "^1.0.0"
 arcadeio = { path = "../arcadeio/", develop = true }
 jupyterlab = "^3.3.0"
+aicsshparam = "^0.1.1"
 
 [tool.poetry.dev-dependencies]
+black = "^22.1.0"
+
+[tool.poetry.scripts]
+spherical-harmonics = "project_aics.spherical_harmonics.cli:cli"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
