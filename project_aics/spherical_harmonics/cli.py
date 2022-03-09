@@ -1,5 +1,4 @@
 import click
-import json
 
 from .spherical_harmonics import SphericalHarmonics
 
@@ -10,13 +9,31 @@ def cli():
 
 
 @cli.command()
-@click.option("--name", type=str, default="")
-@click.option("--keys", type=str, multiple=True, default=[])
-@click.option("--seeds", type=int, multiple=True, default=[])
-@click.option("--path", type=str, default=".")
+@click.argument("name", type=str)
+@click.option("-k", "--keys", type=str, multiple=True, default=[])
+@click.option("-s", "--seeds", type=int, multiple=True, default=[])
+@click.option("-w", "--working", type=str, default=".")
 @click.option("--scale", type=int, default=1)
 def calculate(**kwargs):
     SphericalHarmonics.run_calculate(**kwargs)
+
+
+@cli.command()
+@click.argument("name", type=str)
+@click.option("-k", "--keys", type=str, multiple=True, default=[])
+@click.option("-s", "--seeds", type=int, multiple=True, default=[])
+@click.option("-w", "--working", type=str, default=".")
+def compress(**kwargs):
+    SphericalHarmonics.run_compress(**kwargs)
+
+
+@cli.command()
+@click.argument("name", type=str)
+@click.option("-k", "--keys", type=str, multiple=True, default=[])
+@click.option("-s", "--seeds", type=int, multiple=True, default=[])
+@click.option("-w", "--working", type=str, default=".")
+def merge(**kwargs):
+    SphericalHarmonics.run_merge(**kwargs)
 
 
 if __name__ == "__main__":
