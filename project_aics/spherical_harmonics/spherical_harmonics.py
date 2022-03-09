@@ -5,30 +5,30 @@ import tarfile
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from aicsshparam import shparam
+from aicsshparam import shparam, shtools
 
 from project_aics.utilities import load_tar, load_tar_member, load_buffer, save_df, save_buffer
 
 
 class SphericalHarmonics:
     @staticmethod
-    def run_calculate(name, keys, seeds, working, scale=1):
+    def run_calculate(name, keys, seeds, working, scale=1, region=None):
         for key in keys:
             for seed in seeds:
-                SphericalHarmonics.calculate_coefficients(name, key, seed, working, scale)
+                SphericalHarmonics.calculate_coefficients(name, key, seed, working, scale, region)
 
     @staticmethod
-    def run_compress(name, keys, seeds, working):
+    def run_compress(name, keys, seeds, working, region=None):
         for seed in seeds:
-            SphericalHarmonics.compress_coefficients(name, keys, seed, working)
+            SphericalHarmonics.compress_coefficients(name, keys, seed, working, region)
 
     @staticmethod
-    def run_merge(name, keys, seeds, working):
+    def run_merge(name, keys, seeds, working, region=None):
         for seed in seeds:
-            SphericalHarmonics.merge_coefficients(name, keys, seed, working)
+            SphericalHarmonics.merge_coefficients(name, keys, seed, working, region)
 
     @staticmethod
-    def calculate_coefficients(name, key, seed, working, scale):
+    def calculate_coefficients(name, key, seed, working, scale, region):
         """
         Calculates spherical harmonics coefficients for all cells.
         """
@@ -44,15 +44,24 @@ class SphericalHarmonics:
 
             for location in member:
                 voxels = SphericalHarmonics.get_location_voxels(location)
-                array = SphericalHarmonics.make_voxels_array(voxels)
+                array = SphericalHarmonics.make_voxels_array(voxels, scale)
 
-                if scale != 1:
-                    array = SphericalHarmonics.scale_voxel_array(array, scale)
+                # Calculate alignment angle outside of get_shcoeffs so that angle can be used for
+                # aligning regions (if needed).
+                array, angle = shtools.align_image_2d(image=array)
+                array = array.squeeze()
+
+                if region:
+                    region_voxels = SphericalHarmonics.get_location_voxels(location, region)
+                    region_array = SphericalHarmonics.make_voxels_array(region_voxels, scale)
+                    array = shtools.apply_image_alignment_2d(region_array, angle).squeeze()
 
                 if np.sum(array) == 1:
                     continue
 
-                (coeffs, _), _ = shparam.get_shcoeffs(image=array, lmax=16, compute_lcc=False)
+                (coeffs, _), _ = shparam.get_shcoeffs(
+                    image=array, lmax=16, compute_lcc=False, alignment_2d=False
+                )
 
                 coeffs["KEY"] = key
                 coeffs["ID"] = location["id"]
@@ -62,16 +71,19 @@ class SphericalHarmonics:
                 all_coeffs.append(coeffs)
 
         coeff_df = pd.DataFrame(all_coeffs)
-        analysis_key = SphericalHarmonics.make_analysis_key(name, seed, "SH.csv", key=key)
+        region = f".{region}" if region else ""
+        analysis_key = SphericalHarmonics.make_analysis_key(name, seed, f"SH{region}.csv", key=key)
         save_df(working, analysis_key, coeff_df, index=False)
 
     @staticmethod
-    def compress_coefficients(name, keys, seed, working):
+    def compress_coefficients(name, keys, seed, working, region):
         """
         Compress individual coefficients files into single archive.
         """
+        region = f".{region}" if region else ""
         file_keys = [
-            SphericalHarmonics.make_analysis_key(name, seed, "SH.csv", key=key) for key in keys
+            SphericalHarmonics.make_analysis_key(name, seed, f"SH{region}.csv", key=key)
+            for key in keys
         ]
 
         with io.BytesIO() as buffer:
@@ -84,16 +96,18 @@ class SphericalHarmonics:
 
                     tar.addfile(info, fileobj=contents)
 
-            analysis_key = SphericalHarmonics.make_analysis_key(name, seed, "SH.tar.xz")
+            analysis_key = SphericalHarmonics.make_analysis_key(name, seed, f"SH{region}.tar.xz")
             save_buffer(working, analysis_key, buffer)
 
     @staticmethod
-    def merge_coefficients(name, keys, seed, working):
+    def merge_coefficients(name, keys, seed, working, region):
         """
         Merge individual coefficients files into single file.
         """
+        region = f".{region}" if region else ""
         file_keys = [
-            SphericalHarmonics.make_analysis_key(name, seed, "SH.csv", key=key) for key in keys
+            SphericalHarmonics.make_analysis_key(name, seed, f"SH{region}.csv", key=key)
+            for key in keys
         ]
 
         with io.BytesIO() as buffer:
@@ -109,7 +123,7 @@ class SphericalHarmonics:
                     rows = [entry.replace("0.0,", "0,") for entry in file_contents[1:]]
                     lzf.write("\n".join(rows).encode("utf-8"))
 
-            analysis_key = SphericalHarmonics.make_analysis_key(name, seed, "SH.csv.xz")
+            analysis_key = SphericalHarmonics.make_analysis_key(name, seed, f"SH{region}.csv.xz")
             save_buffer(working, analysis_key, buffer)
 
     @staticmethod
@@ -123,11 +137,14 @@ class SphericalHarmonics:
         return f"{name}/analysis/{name}_{key}{seed:04d}.{extension}"
 
     @staticmethod
-    def get_location_voxels(location):
+    def get_location_voxels(location, region=None):
         all_voxels = []
 
-        for region in location["location"]:
-            all_voxels = all_voxels + region["voxels"]
+        for loc in location["location"]:
+            if region and loc["region"] == region:
+                return loc["voxels"]
+
+            all_voxels = all_voxels + loc["voxels"]
 
         return all_voxels
 
@@ -137,7 +154,7 @@ class SphericalHarmonics:
         return array_scaled
 
     @staticmethod
-    def make_voxels_array(voxels):
+    def make_voxels_array(voxels, scale):
         """
         Converts list of voxels to array.
         """
@@ -158,5 +175,9 @@ class SphericalHarmonics:
         ]
         vals = [1] * len(all_xyz_offset)
         array[tuple(np.transpose(all_xyz_offset))] = vals
+
+        # Scale the array if necessary.
+        if scale != 1:
+            array = SphericalHarmonics.scale_voxel_array(array, scale)
 
         return array

@@ -1,8 +1,8 @@
-import boto3
 import io
 import json
 import tarfile
 
+import boto3
 
 MAX_CONTENT_LENGTH = 2**31 - 1
 
@@ -77,8 +77,8 @@ def save_buffer(working, key, body):
 
 def save_buffer_to_fs(path, key, body):
     full_path = f"{path}{key}"
-    with open(full_path, "wb") as f:
-        f.write(body.getbuffer())
+    with open(full_path, "wb") as file:
+        file.write(body.getbuffer())
 
 
 def save_buffer_to_s3(bucket, key, body):
