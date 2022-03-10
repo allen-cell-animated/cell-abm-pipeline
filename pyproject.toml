@@ -24,7 +24,7 @@ black = "^22.1.0"
 pylint = "^2.12.2"
 
 [tool.poetry.scripts]
-cell_shape = "project_aics.cell_shape.__main__:cli"
+cell-shape = "project_aics.cell_shape.__main__:cli"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -1,9 +1,5 @@
 import click
 
-from .calculate_coefficients import CalculateCoefficients
-from .compress_coefficients import CompressCoefficients
-from .merge_coefficients import MergeCoefficients
-
 
 class Context:
     def __init__(self, name, keys, seeds, working):
@@ -28,6 +24,8 @@ def cli(ctx, **kwargs):
 @click.option("--region", type=str, default=None)
 @click.pass_obj
 def calculate_coefficients(obj, **kwargs):
+    from .calculate_coefficients import CalculateCoefficients
+
     CalculateCoefficients(obj).run(**kwargs)
 
 
@@ -35,6 +33,8 @@ def calculate_coefficients(obj, **kwargs):
 @click.option("--region", type=str, default=None)
 @click.pass_obj
 def compress_coefficients(obj, **kwargs):
+    from .compress_coefficients import CompressCoefficients
+
     CompressCoefficients(obj).run(**kwargs)
 
 
@@ -42,7 +42,18 @@ def compress_coefficients(obj, **kwargs):
 @click.option("--region", type=str, default=None)
 @click.pass_obj
 def merge_coefficients(obj, **kwargs):
+    from .merge_coefficients import MergeCoefficients
+
     MergeCoefficients(obj).run(**kwargs)
+
+
+@cli.command()
+@click.option("--region", type=str, default=None)
+@click.pass_obj
+def perform_pca(obj, **kwargs):
+    from .perform_pca import PerformPCA
+
+    PerformPCA(obj).run(**kwargs)
 
 
 if __name__ == "__main__":

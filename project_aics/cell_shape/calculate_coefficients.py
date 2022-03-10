@@ -74,7 +74,7 @@ class CalculateCoefficients:
                 coeffs["ID"] = location["id"]
                 coeffs["SEED"] = seed
                 coeffs["TICK"] = frame
-                coeffs["VOXELS"] = cell["voxels"]
+                coeffs["NUM_VOXELS"] = cell["voxels"]
                 coeffs["PHASE"] = cell["phase"]
 
                 all_coeffs.append(coeffs)

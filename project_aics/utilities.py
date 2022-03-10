@@ -1,10 +1,42 @@
 import io
 import json
+import lzma
+import os
+import pickle
 import tarfile
+from datetime import date
 
 import boto3
+import pandas as pd
 
 MAX_CONTENT_LENGTH = 2**31 - 1
+
+CHUNKSIZE = 100000
+
+DTYPES = {
+    "SEED": "uint8",
+    "ID": "uint32",
+    "NEIGHBOR": "uint32",
+    "REGION": "uint32",
+    "TICK": "uint16",
+    "PARENT": "uint32",
+    "POPULATION": "uint8",
+    "AGE": "uint16",
+    "DIVISIONS": "uint16",
+    "STATE": "category",
+    "PHASE": "category",
+    "NUM_VOXELS": "uint32",
+    "CENTER_X": "uint16",
+    "CENTER_Y": "uint16",
+    "CENTER_Z": "uint16",
+    "MIN_X": "uint16",
+    "MIN_Y": "uint16",
+    "MIN_Z": "uint16",
+    "MAX_X": "uint16",
+    "MAX_Y": "uint16",
+    "MAX_Z": "uint16",
+    "KEY": "category",
+}
 
 
 def load_buffer(working, key):
@@ -68,6 +100,43 @@ def load_tar_member(tar, member):
     return json.loads("".join(member_contents))
 
 
+def load_dataframe(working, key):
+    if working[:5] == "s3://":
+        return load_dataframe_from_s3(working[5:], key)
+    else:
+        return load_dataframe_from_fs(working, key)
+
+
+def load_dataframe_from_fs(path, key):
+    full_path = f"{path}{key}"
+    return load_dataframe_object(full_path)
+
+
+def load_dataframe_from_s3(bucket, key):
+    contents = load_xz_from_s3(bucket, key)
+    return load_dataframe_object(io.BytesIO(contents))
+
+
+def load_dataframe_object(obj, chunksize=CHUNKSIZE, dtypes=DTYPES):
+    df = pd.DataFrame()
+
+    for chunk in pd.read_csv(obj, chunksize=chunksize, dtype=dtypes):
+        df = pd.concat([df, chunk])
+
+    zero_columns = {key: "uint8" for key in df.columns[(df == 0).all()]}
+    df = df.astype(zero_columns)
+
+    return df
+
+
+def load_xz_from_s3(bucket, key):
+    """
+    Loads XZ compressed file from bucket with given key.
+    """
+    buffer = load_buffer_from_s3(bucket, key)
+    return lzma.decompress(buffer.getbuffer())
+
+
 def save_buffer(working, key, body):
     if working[:5] == "s3://":
         return save_buffer_to_s3(working[5:], key, body)
@@ -110,6 +179,12 @@ def save_df_to_s3(bucket, key, df, index=True):
     with io.StringIO() as buffer:
         df.to_csv(buffer, index=index)
         save_buffer_to_s3(bucket, key, buffer)
+
+
+def save_pickle_to_fs(path, key, obj):
+    full_path = f"{path}{key}"
+    make_folders(full_path)
+    pickle.dump(obj, open(full_path, "wb"))
 
 
 def make_folders(path):
