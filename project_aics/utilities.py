@@ -77,6 +77,7 @@ def save_buffer(working, key, body):
 
 def save_buffer_to_fs(path, key, body):
     full_path = f"{path}{key}"
+    make_folders(full_path)
     with open(full_path, "wb") as file:
         file.write(body.getbuffer())
 
@@ -98,6 +99,7 @@ def save_df(working, key, df, index=True):
 
 def save_df_to_fs(path, key, df, index=True):
     full_path = f"{path}{key}"
+    make_folders(full_path)
     df.to_csv(full_path, index=index)
 
 
@@ -108,3 +110,27 @@ def save_df_to_s3(bucket, key, df, index=True):
     with io.StringIO() as buffer:
         df.to_csv(buffer, index=index)
         save_buffer_to_s3(bucket, key, buffer)
+
+
+def make_folders(path):
+    folders = "/".join(path.split("/")[:-1])
+    os.makedirs(folders, exist_ok=True)
+
+
+def make_folder_key(name, group, subgroup, timestamp):
+    timestamp = f"/{date.today().strftime('%Y-%m-%d')}" if timestamp else ""
+    subgroup = f"/{group}.{subgroup}" if subgroup else ""
+    return f"{name}{timestamp}/{group}{subgroup}/"
+
+
+def make_file_key(name, extension, key, seed):
+    key = f"_{key}" if key else key
+    seed = f"_{seed}" if seed else seed
+    extension = ".".join([ext for ext in extension if ext])
+    return f"{name}{key}{seed}.{extension}"
+
+
+def make_full_key(name, group, extension, subgroup="", key="", seed="", timestamp=True):
+    folder_key = make_folder_key(name, group, subgroup, timestamp)
+    file_key = make_file_key(name, extension, key, seed)
+    return f"{folder_key}{file_key}"
