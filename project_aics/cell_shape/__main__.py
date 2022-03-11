@@ -56,5 +56,17 @@ def perform_pca(obj, **kwargs):
     PerformPCA(obj).run(**kwargs)
 
 
+@cli.command()
+@click.option("--delta", type=float, default=1.0)
+@click.option("--box", nargs=2, type=int, default=(100, 100))
+@click.option("--scale", type=float, default=1.0)
+@click.option("--region", type=str, default=None)
+@click.pass_obj
+def extract_shapes(obj, **kwargs):
+    from .extract_shapes import ExtractShapes
+
+    ExtractShapes(obj).run(**kwargs)
+
+
 if __name__ == "__main__":
     cli()
