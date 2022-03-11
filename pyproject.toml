@@ -14,10 +14,11 @@ aicsimageio = "3.3.7"
 simulariumio = "1.4.1"
 scikit-image = "0.19.2"
 jupyter = "^1.0.0"
-arcadeio = { path = "../arcadeio/", develop = true }
 jupyterlab = "^3.3.0"
 aicsshparam = "^0.1.1"
 boto3 = "^1.21.16"
+trimesh = {extras = ["shapely"], version = "^3.10.2"}
+Shapely = "^1.8.1"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"
