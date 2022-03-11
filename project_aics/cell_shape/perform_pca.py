@@ -1,17 +1,12 @@
 import numpy as np
 import pandas as pd
-
 from sklearn.decomposition import PCA
 
-from project_aics.utilities import (
-    load_dataframe,
-    save_pickle_to_fs,
-    make_folder_key,
-    make_file_key,
-)
-
-COEFF_ORDER = 16
-PCA_COMPONENTS = 8
+from project_aics.cell_shape.__config__ import PCA_COMPONENTS
+from project_aics.cell_shape.calculate_coefficients import CalculateCoefficients
+from project_aics.utilities.load import load_dataframe
+from project_aics.utilities.save import save_pickle_to_fs
+from project_aics.utilities.keys import make_folder_key, make_file_key
 
 
 class PerformPCA:
@@ -41,12 +36,13 @@ class PerformPCA:
         # TODO: add filter by cell phase
 
         data_df = pd.concat(all_data).set_index("KEY")
-        coeff_names = self.get_coeff_names()
+        coeff_names = CalculateCoefficients.get_coeff_names()
 
         for key, key_group in data_df.groupby("KEY"):
             output_key = self.folders["output"] + self.files["output"](region) % (key)
             pca = self.fit_feature_pca(key_group[coeff_names], key_group["NUM_VOXELS"])
-            save_pickle_to_fs(self.context.working, output_key, pca)
+            output = {"data": key_group, "pca": pca}
+            save_pickle_to_fs(self.context.working, output_key, output)
 
     @staticmethod
     def fit_feature_pca(features, ordering, components=PCA_COMPONENTS):
@@ -66,16 +62,3 @@ class PerformPCA:
                 pca.components_[i] = pca.components_[i] * -1
 
         return pca
-
-    @staticmethod
-    def get_coeff_names(prefix="", suffix="", order=COEFF_ORDER):
-        """Get names of spherical harmonics coefficients."""
-        return [
-            f"{prefix}shcoeffs_L{a}M{b}C{suffix}"
-            for a in range(order + 1)
-            for b in range(order + 1)
-        ] + [
-            f"{prefix}shcoeffs_L{a}M{b}S{suffix}"
-            for a in range(order + 1)
-            for b in range(order + 1)
-        ]

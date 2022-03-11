@@ -3,13 +3,10 @@ import pandas as pd
 from tqdm import tqdm
 from aicsshparam import shparam, shtools
 
-from project_aics.utilities import (
-    load_tar,
-    load_tar_member,
-    save_df,
-    make_folder_key,
-    make_file_key,
-)
+from project_aics.cell_shape.__config__ import COEFF_ORDER
+from project_aics.utilities.load import load_tar, load_tar_member
+from project_aics.utilities.save import save_dataframe
+from project_aics.utilities.keys import make_folder_key, make_file_key
 
 
 class CalculateCoefficients:
@@ -67,21 +64,21 @@ class CalculateCoefficients:
                     continue
 
                 (coeffs, _), _ = shparam.get_shcoeffs(
-                    image=array, lmax=16, compute_lcc=False, alignment_2d=False
+                    image=array, lmax=COEFF_ORDER, compute_lcc=False, alignment_2d=False
                 )
 
                 coeffs["KEY"] = key
                 coeffs["ID"] = location["id"]
                 coeffs["SEED"] = seed
                 coeffs["TICK"] = frame
-                coeffs["NUM_VOXELS"] = cell["voxels"]
+                coeffs["NUM_VOXELS"] = len(region_voxels) if region else len(voxels)
                 coeffs["PHASE"] = cell["phase"]
 
                 all_coeffs.append(coeffs)
 
         coeff_df = pd.DataFrame(all_coeffs)
         analysis_key = self.folders["analysis"] + self.files["analysis"](region) % (key, seed)
-        save_df(self.context.working, analysis_key, coeff_df, index=False)
+        save_dataframe(self.context.working, analysis_key, coeff_df, index=False)
 
     @staticmethod
     def get_location_voxels(location, region=None):
@@ -99,7 +96,7 @@ class CalculateCoefficients:
         return array_scaled
 
     @staticmethod
-    def make_voxels_array(voxels, scale):
+    def make_voxels_array(voxels, scale=1):
         """
         Converts list of voxels to array.
         """
@@ -126,3 +123,16 @@ class CalculateCoefficients:
             array = CalculateCoefficients.scale_voxel_array(array, scale)
 
         return array
+
+    @staticmethod
+    def get_coeff_names(prefix="", suffix="", order=COEFF_ORDER):
+        """Get names of spherical harmonics coefficients."""
+        return [
+            f"{prefix}shcoeffs_L{a}M{b}C{suffix}"
+            for a in range(order + 1)
+            for b in range(order + 1)
+        ] + [
+            f"{prefix}shcoeffs_L{a}M{b}S{suffix}"
+            for a in range(order + 1)
+            for b in range(order + 1)
+        ]

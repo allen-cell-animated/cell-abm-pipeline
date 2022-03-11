@@ -1,14 +1,10 @@
 import io
 import tarfile
-
 from tqdm import tqdm
 
-from project_aics.utilities import (
-    load_buffer,
-    save_buffer,
-    make_folder_key,
-    make_file_key,
-)
+from project_aics.utilities.load import load_buffer
+from project_aics.utilities.save import save_buffer
+from project_aics.utilities.keys import make_folder_key, make_file_key
 
 
 class CompressCoefficients:
