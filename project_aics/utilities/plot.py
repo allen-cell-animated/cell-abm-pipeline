@@ -1,12 +1,44 @@
 from math import sqrt, ceil, floor
 
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rc
+from matplotlib import cm
+from matplotlib.lines import Line2D
 
-PLOT_SIZE = 3
+PLOT_SIZE = 2
 
 rc("font", size=8)
 rc("axes", titlesize=10, titleweight="bold")
+
+
+def make_plot(keys, data, func, size=PLOT_SIZE, xlabel="", ylabel="", legend=False):
+    n_rows, n_cols, indices = separate_keys(keys)
+    offset = size if legend else 0
+    fig, axs = make_subplots(n_rows, n_cols, size=size, offset=offset)
+
+    for i, j, k in indices:
+        key = keys[k]
+        ax = select_axes(axs, i, j, n_rows, n_cols)
+        func(ax, data, key)
+        ax.set_title(key)
+
+    col_ax = select_axes(axs, -1, floor(n_cols / 2), n_rows, n_cols)
+    col_ax.set_xlabel(xlabel)
+
+    row_ax = select_axes(axs, floor(n_rows / 2), 0, n_rows, n_cols)
+    row_ax.set_ylabel(ylabel)
+
+    if legend:
+        legend_ax = select_axes(axs, 0, -1, n_rows, n_cols)
+
+        if isinstance(legend, dict):
+            legend_ax.legend(**legend, bbox_to_anchor=(1.2, 1), loc="upper left")
+        else:
+            legend_ax.legend(bbox_to_anchor=(1.2, 1), loc="upper left")
+
+    fig.tight_layout()
+    # plt.show()
 
 
 def make_subplots(n_rows, n_cols, size, offset=0, sharex="all", sharey="all"):
@@ -35,30 +67,22 @@ def select_axes(axs, i, j, n_rows, n_cols):
         return axs[i, j]
 
 
-def plot_keys(keys, data, func, size=PLOT_SIZE, xlabel="", ylabel="", legend=False):
-    n_rows, n_cols, indices = separate_keys(keys)
-    offset = size / 2 if legend else 0
-    fig, axs = make_subplots(n_rows, n_cols, size=size, offset=offset)
+def make_legend(label, bounds, n=5, colormap="magma_r"):
+    cmap = cm.get_cmap("magma_r")
+    elements = []
 
-    for i, j, k in indices:
-        key = keys[k]
-        ax = select_axes(axs, i, j, n_rows, n_cols)
-        func(ax, data, key)
-        ax.set_title(key)
+    for i in np.linspace(0, 1, 5):
+        value = int(bounds[0] + i * bounds[1])
+        elements.append(
+            Line2D(
+                [0],
+                [0],
+                marker="o",
+                color="w",
+                label=f"{label} = {value}",
+                markerfacecolor=cmap(i),
+                markersize=5,
+            )
+        )
 
-    col_ax = select_axes(axs, -1, floor(n_cols / 2), n_rows, n_cols)
-    col_ax.set_xlabel(xlabel)
-
-    row_ax = select_axes(axs, floor(n_rows / 2), 0, n_rows, n_cols)
-    row_ax.set_ylabel(ylabel)
-
-    if legend:
-        legend_ax = select_axes(axs, 0, -1, n_rows, n_cols)
-
-        if isinstance(legend, dict):
-            legend_ax.legend(**legend, bbox_to_anchor=(1.2, 1), loc="upper left")
-        else:
-            legend_ax.legend(bbox_to_anchor=(1.2, 1), loc="upper left")
-
-    fig.tight_layout()
-    plt.show()
+    return elements

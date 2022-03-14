@@ -68,5 +68,15 @@ def extract_shapes(obj, **kwargs):
     ExtractShapes(obj).run(**kwargs)
 
 
+@cli.command()
+@click.option("--features", type=str, multiple=True, default=[])
+@click.option("--region", type=str, default=None)
+@click.pass_obj
+def plot_pca(obj, **kwargs):
+    from .plot_pca import PlotPCA
+
+    PlotPCA(obj).run(**kwargs)
+
+
 if __name__ == "__main__":
     cli()
