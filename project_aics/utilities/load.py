@@ -6,6 +6,7 @@ import tarfile
 
 import boto3
 import pandas as pd
+from aicsimageio import AICSImage
 
 MAX_CONTENT_LENGTH = 2**31 - 1
 
@@ -138,3 +139,8 @@ def load_xz_from_s3(bucket, key):
 def load_pickle_from_fs(path, key):
     full_path = f"{path}{key}"
     return pickle.load(open(full_path, "rb"))
+
+
+def load_image_from_fs(path, key):
+    full_path = f"{path}{key}"
+    return AICSImage(full_path)

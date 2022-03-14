@@ -38,7 +38,6 @@ def make_plot(keys, data, func, size=PLOT_SIZE, xlabel="", ylabel="", legend=Fal
             legend_ax.legend(bbox_to_anchor=(1.2, 1), loc="upper left")
 
     fig.tight_layout()
-    # plt.show()
 
 
 def make_subplots(n_rows, n_cols, size, offset=0, sharex="all", sharey="all"):
