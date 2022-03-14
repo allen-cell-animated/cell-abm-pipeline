@@ -17,12 +17,12 @@ class SampleImages:
         self.context = context
         self.folders = {
             "image": make_folder_key(context.name, "images", "", False),
-            "sample": make_folder_key(context.name, "samples", "", False),
+            "sample": make_folder_key(context.name, "samples", "RAW", False),
             "contact": make_folder_key(context.name, "plots", "SAMPLE", False),
         }
         self.files = {
             "image": make_file_key(context.name, ["ome", "tiff"], "%s", ""),
-            "sample": make_file_key(context.name, ["csv"], "%s", ""),
+            "sample": make_file_key(context.name, ["RAW", "csv"], "%s", ""),
             "contact": make_file_key(context.name, ["SAMPLE", "png"], "%s", ""),
         }
 
@@ -39,12 +39,12 @@ class SampleImages:
 
         sample_indices = self.get_sample_indices(image, resolution, grid)
         samples = self.get_image_samples(image, sample_indices)
-        df = pd.DataFrame(samples, columns=["id", "x", "y", "z"])
+        samples_df = pd.DataFrame(samples, columns=["id", "x", "y", "z"])
 
         sample_key = self.folders["sample"] + self.files["sample"] % (key)
-        save_dataframe(self.context.working, sample_key, df, index=False)
+        save_dataframe(self.context.working, sample_key, samples_df, index=False)
 
-        return df
+        return samples_df
 
     @staticmethod
     def get_sample_indices(image, resolution=1, grid="rect"):

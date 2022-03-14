@@ -42,3 +42,39 @@ def sample_images(obj, **kwargs):
     from .sample_images import SampleImages
 
     SampleImages(obj).run(**kwargs)
+
+
+@cli.command()
+@click.option(
+    "-g",
+    "--grid",
+    type=click.Choice(["rect", "hex"], case_sensitive=False),
+    default="rect",
+    help="sampling grid type (default = rect)",
+)
+@click.option(
+    "--scale",
+    type=float,
+    default=None,
+    help="Scaling factor for coordinates (default = 1.0).",
+)
+@click.option(
+    "--edges/--no-edges",
+    default=True,
+    help="True if cells touching edges are removed, False otherwise (default = True)",
+)
+@click.option(
+    "--connected/--no-connected",
+    default=True,
+    help="True if unconnected voxels are removed, False otherwise (default = True)",
+)
+@click.option(
+    "--contact/--no-contact",
+    default=True,
+    help="True if contact sheet of images is saved, False otherwise (default = True)",
+)
+@click.pass_obj
+def process_samples(obj, **kwargs):
+    from .process_samples import ProcessSamples
+
+    ProcessSamples(obj).run(**kwargs)
