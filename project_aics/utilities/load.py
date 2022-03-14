@@ -135,6 +135,6 @@ def load_xz_from_s3(bucket, key):
     return lzma.decompress(buffer.getbuffer())
 
 
-def load_pickle_from_df(path, key):
+def load_pickle_from_fs(path, key):
     full_path = f"{path}{key}"
     return pickle.load(open(full_path, "rb"))

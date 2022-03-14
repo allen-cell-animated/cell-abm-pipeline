@@ -10,7 +10,7 @@ from aicsshparam import shtools
 
 from project_aics.cell_shape.__config__ import COEFF_ORDER, PCA_COMPONENTS
 from project_aics.cell_shape.calculate_coefficients import CalculateCoefficients
-from project_aics.utilities.load import load_pickle_from_df
+from project_aics.utilities.load import load_pickle_from_fs
 from project_aics.utilities.save import save_buffer
 from project_aics.utilities.keys import make_folder_key, make_file_key
 
@@ -33,7 +33,7 @@ class ExtractShapes:
 
     def extract_shapes(self, key, region, delta, scale, box):
         file_key = self.folders["input"] + self.files["input"](region) % key
-        loaded = load_pickle_from_df(self.context.working, file_key)
+        loaded = load_pickle_from_fs(self.context.working, file_key)
         pca = loaded["pca"]
         data = loaded["data"]
 
