@@ -4,7 +4,6 @@ from skimage import measure
 from scipy.spatial import distance
 import matplotlib.pyplot as plt
 
-from project_aics.initial_conditions.sample_images import SampleImages
 from project_aics.initial_conditions.__config__ import (
     EDGE_THRESHOLD,
     CONNECTED_THRESHOLD,
@@ -52,7 +51,7 @@ class ProcessSamples:
             print("Removing unconnected regions ...")
             processed_df = self.remove_unconnected_regions(processed_df, grid)
 
-        if scale != None:
+        if scale is not None:
             print("Scaling coordinates ...")
             processed_df = self.scale_coordinates(processed_df, scale)
 
@@ -67,7 +66,7 @@ class ProcessSamples:
         processed_key = self.folders["processed"] + self.files["processed"] % (key, channel)
         processed_data = load_dataframe(self.context.working, processed_key)
 
-        data = { "samples": sample_data, "processed": processed_data }
+        data = {"samples": sample_data, "processed": processed_data}
         make_plot(sorted(data["samples"].z.unique()), data, self._plot_contact_sheet)
 
         plt.gca().invert_yaxis()
@@ -78,8 +77,8 @@ class ProcessSamples:
     def _plot_contact_sheet(ax, data, key):
         samples = data["samples"]
         processed = data["processed"]
-        filter = pd.merge(samples, processed, how="outer", indicator=True)
-        removed = filter[filter._merge == "left_only"]
+        filtered = pd.merge(samples, processed, how="outer", indicator=True)
+        removed = filtered[filtered['_merge'] == "left_only"]
 
         z_slice = processed[processed.z == key]
         z_removed = removed[removed.z == key]
@@ -89,7 +88,7 @@ class ProcessSamples:
 
         ax.scatter(z_slice.x, z_slice.y, c=z_slice.id, vmin=min_id, vmax=max_id, s=1, cmap="jet")
         ax.scatter(z_removed.x, z_removed.y, s=0.5, c="#ccc")
-        ax.set_aspect('equal', adjustable='box')
+        ax.set_aspect("equal", adjustable="box")
 
     @staticmethod
     def scale_coordinates(df, scale_factor):
@@ -144,7 +143,7 @@ class ProcessSamples:
 
         # Iterate through all regions and copy largest connected region to array.
         ids_added = set()
-        for index, count in regions_sorted:
+        for index, _ in regions_sorted:
             cell_id = list(set(arr[labels == index]))[0]
 
             if cell_id not in ids_added:
@@ -207,10 +206,6 @@ class ProcessSamples:
         # Get min and max coordinate for given axis.
         axis_min = df[axis].min() + padding
         axis_max = df[axis].max() - padding
-
-        # Get min and max coordinate for each cell.
-        df_mins = df.groupby("id")[axis].min()
-        df_maxs = df.groupby("id")[axis].max()
 
         # Check for cell ids located at edges.
         edges = df.groupby("id").apply(

@@ -66,11 +66,11 @@ def select_axes(axs, i, j, n_rows, n_cols):
         return axs[i, j]
 
 
-def make_legend(label, bounds, n=5, colormap="magma_r"):
-    cmap = cm.get_cmap("magma_r")
+def make_legend(label, bounds, intervals=5, colormap="magma_r"):
+    cmap = cm.get_cmap(colormap)
     elements = []
 
-    for i in np.linspace(0, 1, 5):
+    for i in np.linspace(0, 1, intervals):
         value = int(bounds[0] + i * bounds[1])
         elements.append(
             Line2D(

@@ -69,7 +69,7 @@ class SampleImages:
         min_id = int(data.id.min())
 
         ax.scatter(z_slice.x, z_slice.y, c=z_slice.id, vmin=min_id, vmax=max_id, s=1, cmap="jet")
-        ax.set_aspect('equal', adjustable='box')
+        ax.set_aspect("equal", adjustable="box")
 
     @staticmethod
     def get_sample_indices(image, resolution=1, grid="rect"):
@@ -123,7 +123,7 @@ class SampleImages:
         return sample_indices
 
     @staticmethod
-    def get_image_samples(image, sample_indices, channel=0, region=None):
+    def get_image_samples(image, sample_indices, channel=0):
         """Sample image at given indices."""
         array = image.get_image_data("XYZ", S=0, T=0, C=channel)
         samples = [(array[x, y, z], x, y, z) for x, y, z in sample_indices if array[x, y, z] > 0]
