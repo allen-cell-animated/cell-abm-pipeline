@@ -6,7 +6,7 @@ from hexalattice.hexalattice import create_hex_grid
 import matplotlib.pyplot as plt
 
 from project_aics.initial_conditions.__config__ import SCALE_MICRONS_XY, SCALE_MICRONS_Z
-from project_aics.utilities.load import load_image_from_fs
+from project_aics.utilities.load import load_dataframe, load_image_from_fs
 from project_aics.utilities.save import save_dataframe, save_image
 from project_aics.utilities.keys import make_folder_key, make_file_key
 from project_aics.utilities.plot import make_plot
@@ -22,39 +22,43 @@ class SampleImages:
         }
         self.files = {
             "image": make_file_key(context.name, ["ome", "tiff"], "%s", ""),
-            "sample": make_file_key(context.name, ["RAW", "csv"], "%s", ""),
-            "contact": make_file_key(context.name, ["SAMPLE", "png"], "%s", ""),
+            "sample": make_file_key(context.name, ["RAW", "csv"], "%s", "%02d"),
+            "contact": make_file_key(context.name, ["SAMPLE", "png"], "%s", "%02d"),
         }
 
-    def run(self, resolution=1, grid="rect", contact=True):
+    def run(self, grid="rect", resolution=1.0, contact=True):
         for key in self.context.keys:
-            df = self.sample_images(key, resolution, grid)
+            self.sample_images(key, grid, resolution, self.context.channels)
 
             if contact:
-                self.plot_contact_sheet(key, df)
+                for channel in self.context.channels:
+                    self.plot_contact_sheet(key, channel)
 
-    def sample_images(self, key, resolution, grid):
+    def sample_images(self, key, grid, resolution, channels):
         image_key = self.folders["image"] + self.files["image"] % (key)
         image = load_image_from_fs(self.context.working, image_key)
 
         sample_indices = self.get_sample_indices(image, resolution, grid)
-        samples = self.get_image_samples(image, sample_indices)
-        samples_df = pd.DataFrame(samples, columns=["id", "x", "y", "z"])
 
-        sample_key = self.folders["sample"] + self.files["sample"] % (key)
-        save_dataframe(self.context.working, sample_key, samples_df, index=False)
+        for channel in channels:
+            samples = self.get_image_samples(image, sample_indices, channel)
+            samples_df = pd.DataFrame(samples, columns=["id", "x", "y", "z"])
 
-        return samples_df
+            sample_key = self.folders["sample"] + self.files["sample"] % (key, channel)
+            save_dataframe(self.context.working, sample_key, samples_df, index=False)
 
-    def plot_contact_sheet(self, key, data):
+    def plot_contact_sheet(self, key, channel):
         """Save contact sheet image for all z slices in samples."""
+        data_key = self.folders["sample"] + self.files["sample"] % (key, channel)
+        data = load_dataframe(self.context.working, data_key)
+
         if len(data) == 0:
             return
 
         make_plot(sorted(data.z.unique()), data, self._plot_contact_sheet)
 
         plt.gca().invert_yaxis()
-        plot_key = self.folders["contact"] + self.files["contact"] % key
+        plot_key = self.folders["contact"] + self.files["contact"] % (key, channel)
         save_image(self.context.working, plot_key)
 
     @staticmethod
@@ -65,6 +69,7 @@ class SampleImages:
         min_id = int(data.id.min())
 
         ax.scatter(z_slice.x, z_slice.y, c=z_slice.id, vmin=min_id, vmax=max_id, s=1, cmap="jet")
+        ax.set_aspect('equal', adjustable='box')
 
     @staticmethod
     def get_sample_indices(image, resolution=1, grid="rect"):
@@ -105,7 +110,7 @@ class SampleImages:
     @staticmethod
     def get_rect_sample_indices(image, resolution=1):
         """Get list of (x, y, z) sample indices for rect grid."""
-        x_size, y_size, z_size = image.get_image_data("XYZ", S=0, T=0, C=1).shape
+        _, _, _, z_size, y_size, x_size = image.shape
 
         z_increment = round(resolution / SCALE_MICRONS_Z)
         z_indices = np.arange(0, z_size, z_increment)
@@ -118,8 +123,8 @@ class SampleImages:
         return sample_indices
 
     @staticmethod
-    def get_image_samples(image, sample_indices, region=None):
+    def get_image_samples(image, sample_indices, channel=0, region=None):
         """Sample image at given indices."""
-        array = image.get_image_data("XYZ", S=0, T=0, C=1)
+        array = image.get_image_data("XYZ", S=0, T=0, C=channel)
         samples = [(array[x, y, z], x, y, z) for x, y, z in sample_indices if array[x, y, z] > 0]
         return samples
