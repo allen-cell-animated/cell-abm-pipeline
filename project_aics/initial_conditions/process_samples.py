@@ -30,9 +30,8 @@ class ProcessSamples:
             "processed": make_file_key(context.name, ["PROCESSED", "csv"], "%s", ""),
             "contact": make_file_key(context.name, ["SAMPLE", "png"], "%s", ""),
         }
-        # TODO: update contact sheet paths
 
-    def run(self, grid, scale=None, edges=True, connected=True, contact=True):
+    def run(self, grid, scale=None, edges=False, connected=False, contact=True):
         for key in self.context.keys:
             processed_df, samples_df = self.process_samples(key, grid, scale, edges, connected)
 
@@ -66,12 +65,11 @@ class ProcessSamples:
         if len(data) == 0:
             return
 
-        make_plot(sorted(data["samples"].z.unique()), data, self._plot_contact_sheet, size=3)
+        make_plot(sorted(data["samples"].z.unique()), data, self._plot_contact_sheet)
 
         plt.gca().invert_yaxis()
         plot_key = self.folders["contact"] + self.files["contact"] % key
         save_image(self.context.working, plot_key)
-        plt.show()
 
     @staticmethod
     def _plot_contact_sheet(ax, data, key):

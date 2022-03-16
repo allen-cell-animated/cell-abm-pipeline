@@ -46,6 +46,26 @@ class SampleImages:
 
         return samples_df
 
+    def plot_contact_sheet(self, key, data):
+        """Save contact sheet image for all z slices in samples."""
+        if len(data) == 0:
+            return
+
+        make_plot(sorted(data.z.unique()), data, self._plot_contact_sheet)
+
+        plt.gca().invert_yaxis()
+        plot_key = self.folders["contact"] + self.files["contact"] % key
+        save_image(self.context.working, plot_key)
+
+    @staticmethod
+    def _plot_contact_sheet(ax, data, key):
+        z_slice = data[data.z == key]
+
+        max_id = int(data.id.max())
+        min_id = int(data.id.min())
+
+        ax.scatter(z_slice.x, z_slice.y, c=z_slice.id, vmin=min_id, vmax=max_id, s=1, cmap="jet")
+
     @staticmethod
     def get_sample_indices(image, resolution=1, grid="rect"):
         if grid == "rect":
@@ -103,27 +123,3 @@ class SampleImages:
         array = image.get_image_data("XYZ", S=0, T=0, C=1)
         samples = [(array[x, y, z], x, y, z) for x, y, z in sample_indices if array[x, y, z] > 0]
         return samples
-
-    def plot_contact_sheet(self, key, data):
-        """Save contact sheet image for all z slices in samples."""
-        if len(data) == 0:
-            return
-
-        make_plot(
-            sorted(data.z.unique()),
-            data,
-            self._plot_contact_sheet,
-        )
-
-        plt.gca().invert_yaxis()
-        plot_key = self.folders["contact"] + self.files["contact"] % key
-        save_image(self.context.working, plot_key)
-
-    @staticmethod
-    def _plot_contact_sheet(ax, data, key):
-        z_slice = data[data.z == key]
-
-        max_id = int(data.id.max())
-        min_id = int(data.id.min())
-
-        ax.scatter(z_slice.x, z_slice.y, c=z_slice.id, vmin=min_id, vmax=max_id, s=1, cmap="jet")

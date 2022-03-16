@@ -56,17 +56,17 @@ def sample_images(obj, **kwargs):
     "--scale",
     type=float,
     default=None,
-    help="Scaling factor for coordinates (default = 1.0).",
+    help="Scaling factor for coordinates (default = None).",
 )
 @click.option(
     "--edges/--no-edges",
-    default=True,
-    help="True if cells touching edges are removed, False otherwise (default = True)",
+    default=False,
+    help="True if cells touching edges are removed, False otherwise (default = False)",
 )
 @click.option(
     "--connected/--no-connected",
-    default=True,
-    help="True if unconnected voxels are removed, False otherwise (default = True)",
+    default=False,
+    help="True if unconnected voxels are removed, False otherwise (default = False)",
 )
 @click.option(
     "--contact/--no-contact",
