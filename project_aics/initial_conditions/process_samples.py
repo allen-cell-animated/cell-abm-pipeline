@@ -25,21 +25,20 @@ class ProcessSamples:
             "contact": make_folder_key(context.name, "plots", "SAMPLE", False),
         }
         self.files = {
-            "sample": make_file_key(context.name, ["RAW", "csv"], "%s", "%02d"),
-            "processed": make_file_key(context.name, ["PROCESSED", "csv"], "%s", "%02d"),
-            "contact": make_file_key(context.name, ["SAMPLE", "png"], "%s", "%02d"),
+            "sample": make_file_key(context.name, ["RAW", "csv"], "%s", ""),
+            "processed": make_file_key(context.name, ["PROCESSED", "csv"], "%s", ""),
+            "contact": make_file_key(context.name, ["SAMPLE", "png"], "%s", ""),
         }
 
     def run(self, grid, scale=None, edges=False, connected=False, contact=True):
         for key in self.context.keys:
-            for channel in self.context.channels:
-                self.process_samples(key, channel, grid, scale, edges, connected)
+            self.process_samples(key, grid, scale, edges, connected)
 
-                if contact:
-                    self.plot_contact_sheet(key, channel)
+            if contact:
+                self.plot_contact_sheet(key)
 
-    def process_samples(self, key, channel, grid, scale, edges, connected):
-        sample_key = self.folders["sample"] + self.files["sample"] % (key, channel)
+    def process_samples(self, key, grid, scale, edges, connected):
+        sample_key = self.folders["sample"] + self.files["sample"] % key
         samples_df = load_dataframe(self.context.working, sample_key)
         processed_df = samples_df.copy()
 
@@ -55,22 +54,22 @@ class ProcessSamples:
             print("Scaling coordinates ...")
             processed_df = self.scale_coordinates(processed_df, scale)
 
-        processed_key = self.folders["processed"] + self.files["processed"] % (key, channel)
+        processed_key = self.folders["processed"] + self.files["processed"] % key
         save_dataframe(self.context.working, processed_key, processed_df, index=False)
 
-    def plot_contact_sheet(self, key, channel):
+    def plot_contact_sheet(self, key):
         """Save contact sheet image for processed samples."""
-        sample_key = self.folders["sample"] + self.files["sample"] % (key, channel)
+        sample_key = self.folders["sample"] + self.files["sample"] % key
         sample_data = load_dataframe(self.context.working, sample_key)
 
-        processed_key = self.folders["processed"] + self.files["processed"] % (key, channel)
+        processed_key = self.folders["processed"] + self.files["processed"] % key
         processed_data = load_dataframe(self.context.working, processed_key)
 
         data = {"samples": sample_data, "processed": processed_data}
         make_plot(sorted(data["samples"].z.unique()), data, self._plot_contact_sheet)
 
         plt.gca().invert_yaxis()
-        plot_key = self.folders["contact"] + self.files["contact"] % (key, channel)
+        plot_key = self.folders["contact"] + self.files["contact"] % key
         save_plot(self.context.working, plot_key)
 
     @staticmethod

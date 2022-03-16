@@ -2,17 +2,15 @@ import click
 
 
 class Context:
-    def __init__(self, name, keys, channels, working):
+    def __init__(self, name, keys, working):
         self.name = name
         self.keys = keys
-        self.channels = channels
         self.working = working
 
 
 @click.group(invoke_without_command=True)
 @click.option("-n", "--name", type=str, default="")
 @click.option("-k", "--keys", type=str, multiple=True, default=[])
-@click.option("-c", "--channels", type=int, multiple=True, default=[0])
 @click.option("-w", "--working", type=str, default=".")
 @click.pass_context
 def cli(ctx, **kwargs):
@@ -20,6 +18,7 @@ def cli(ctx, **kwargs):
 
 
 @cli.command()
+@click.option("-c", "--channels", type=int, multiple=True, default=[0])
 @click.option(
     "-g",
     "--grid",
@@ -83,6 +82,7 @@ def process_samples(obj, **kwargs):
 
 
 @cli.command()
+@click.option("-c", "--channels", type=int, multiple=True, default=[0])
 @click.pass_obj
 def create_voronoi(obj, **kwargs):
     from .create_voronoi import CreateVoronoi

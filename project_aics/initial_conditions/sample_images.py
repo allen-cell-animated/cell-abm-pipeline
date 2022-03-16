@@ -26,12 +26,12 @@ class SampleImages:
             "contact": make_file_key(context.name, ["SAMPLE", "png"], "%s", "%02d"),
         }
 
-    def run(self, grid="rect", resolution=1.0, contact=True):
+    def run(self, channels=[0], grid="rect", resolution=1.0, contact=True):
         for key in self.context.keys:
-            self.sample_images(key, grid, resolution, self.context.channels)
+            self.sample_images(key, grid, resolution, channels)
 
             if contact:
-                for channel in self.context.channels:
+                for channel in channels:
                     self.plot_contact_sheet(key, channel)
 
     def sample_images(self, key, grid, resolution, channels):

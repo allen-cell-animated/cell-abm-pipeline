@@ -13,12 +13,12 @@ class CreateVoronoi:
         }
         self.files = {
             "image": make_file_key(context.name, ["ome", "tiff"], "%s", ""),
-            "output": make_file_key(context.name, ["ome", "tiff"], "%s", "voronoi_%02d"),
+            "output": make_file_key(context.name, ["ome", "tiff"], "%s", "%02d_voronoi"),
         }
 
-    def run(self):
+    def run(self, channels=[0]):
         for key in self.context.keys:
-            for channel in self.context.channels:
+            for channel in channels:
                 self.create_voronoi(key, channel)
 
     def create_voronoi(self, key, channel):
