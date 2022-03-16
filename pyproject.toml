@@ -7,10 +7,10 @@ authors = ["jessicasyu <jesyu@uw.edu>"]
 [tool.poetry.dependencies]
 python = "^3.9"
 numpy = "1.19.5"
-tifffile = "2021.4.8"
+tifffile = ">=2021.8.30"
 imagecodecs = "2021.4.28"
 matplotlib = "3.4.2"
-aicsimageio = "3.3.7"
+aicsimageio = "4.6.3"
 simulariumio = "1.4.1"
 scikit-image = "0.19.2"
 jupyter = "^1.0.0"

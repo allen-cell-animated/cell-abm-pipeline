@@ -4,6 +4,7 @@ import pickle
 
 import boto3
 import matplotlib.pyplot as plt
+from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 
 
 def save_buffer(working, key, body):
@@ -56,20 +57,26 @@ def save_pickle_to_fs(path, key, obj):
     pickle.dump(obj, open(full_path, "wb"))
 
 
-def save_image(working, key):
+def save_image_to_fs(path, key, img):
+    full_path = f"{path}{key}"
+    make_folders(full_path)
+    OmeTiffWriter.save(img, full_path)
+
+
+def save_plot(working, key):
     if working[:5] == "s3://":
-        return save_image_to_s3(working[5:], key)
+        return save_plot_to_s3(working[5:], key)
     else:
-        return save_image_to_fs(working, key)
+        return save_plot_to_fs(working, key)
 
 
-def save_image_to_fs(path, key):
+def save_plot_to_fs(path, key):
     full_path = f"{path}{key}"
     make_folders(full_path)
     plt.savefig(full_path)
 
 
-def save_image_to_s3(bucket, key):
+def save_plot_to_s3(bucket, key):
     with io.BytesIO() as buffer:
         plt.savefig(buffer)
         save_buffer_to_s3(bucket, key, buffer)

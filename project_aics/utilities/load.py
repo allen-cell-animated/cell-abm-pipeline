@@ -8,6 +8,7 @@ import tarfile
 import boto3
 import pandas as pd
 from aicsimageio import AICSImage
+from aicsimageio.readers.tiff_reader import TiffReader
 
 MAX_CONTENT_LENGTH = 2**31 - 1
 
@@ -149,6 +150,6 @@ def load_image_from_fs(path, key):
     full_path = f"{path}{key}"
 
     if os.path.exists(full_path):
-        return AICSImage(full_path)
+        return AICSImage(full_path, reader=TiffReader)
     else:
-        return AICSImage(full_path.replace(".ome.", "."))
+        return AICSImage(full_path.replace(".ome.", "."), reader=TiffReader, dim_order="ZYX")

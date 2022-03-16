@@ -80,3 +80,11 @@ def process_samples(obj, **kwargs):
     from .process_samples import ProcessSamples
 
     ProcessSamples(obj).run(**kwargs)
+
+
+@cli.command()
+@click.pass_obj
+def create_voronoi(obj, **kwargs):
+    from .create_voronoi import CreateVoronoi
+
+    CreateVoronoi(obj).run(**kwargs)

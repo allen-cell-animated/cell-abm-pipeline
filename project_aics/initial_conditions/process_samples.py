@@ -11,7 +11,7 @@ from project_aics.initial_conditions.__config__ import (
     SCALE_MICRONS_Z,
 )
 from project_aics.utilities.load import load_dataframe
-from project_aics.utilities.save import save_dataframe, save_image
+from project_aics.utilities.save import save_dataframe, save_plot
 from project_aics.utilities.keys import make_folder_key, make_file_key
 from project_aics.utilities.plot import make_plot
 
@@ -71,14 +71,14 @@ class ProcessSamples:
 
         plt.gca().invert_yaxis()
         plot_key = self.folders["contact"] + self.files["contact"] % (key, channel)
-        save_image(self.context.working, plot_key)
+        save_plot(self.context.working, plot_key)
 
     @staticmethod
     def _plot_contact_sheet(ax, data, key):
         samples = data["samples"]
         processed = data["processed"]
         filtered = pd.merge(samples, processed, how="outer", indicator=True)
-        removed = filtered[filtered['_merge'] == "left_only"]
+        removed = filtered[filtered["_merge"] == "left_only"]
 
         z_slice = processed[processed.z == key]
         z_removed = removed[removed.z == key]
