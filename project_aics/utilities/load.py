@@ -1,4 +1,5 @@
 import io
+import os
 import json
 import lzma
 import pickle
@@ -142,5 +143,12 @@ def load_pickle_from_fs(path, key):
 
 
 def load_image_from_fs(path, key):
+    """
+    Loads TIFF image as AICSImage object.
+    """
     full_path = f"{path}{key}"
-    return AICSImage(full_path)
+
+    if os.path.exists(full_path):
+        return AICSImage(full_path)
+    else:
+        return AICSImage(full_path.replace(".ome.", "."))
