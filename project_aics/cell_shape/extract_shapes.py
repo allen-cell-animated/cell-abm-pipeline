@@ -24,10 +24,10 @@ class ExtractShapes:
         }
         self.files = {
             "input": lambda r: make_file_key(context.name, ["SHPCA", r, "pkl"], "%s", ""),
-            "output": make_file_key(context.name, ["SHPCA", "svg"], "%s", ""),
+            "output": lambda r: make_file_key(context.name, ["SHPCA", r, "svg"], "%s", ""),
         }
 
-    def run(self, delta=1, scale=1, box=(100, 100), region=None):
+    def run(self, delta=1.0, scale=1, box=(100, 100), region=None):
         for key in self.context.keys:
             self.extract_shapes(key, region, delta, scale, box)
 
@@ -37,16 +37,22 @@ class ExtractShapes:
         pca = loaded["pca"]
         data = loaded["data"]
 
-        shape_svgs = self.extract_shape_svgs(pca, data, delta)
-        svg = self.compile_shape_svg(shape_svgs, scale, box)
+        shape_svgs = self.extract_shape_svgs(pca, data, delta, region)
+        svg = self.compile_shape_svg(shape_svgs, scale, box, region)
 
-        output_key = self.folders["output"] + self.files["output"] % key
+        output_key = self.folders["output"] + self.files["output"](region) % key
         save_buffer(self.context.working, output_key, svg)
 
     @staticmethod
-    def extract_shape_svgs(pca, data, delta=1.0, components=PCA_COMPONENTS, order=COEFF_ORDER):
+    def extract_shape_svgs(
+        pca, data, delta=1.0, region=None, components=PCA_COMPONENTS, order=COEFF_ORDER
+    ):
         # Transform data.
         coeffs = CalculateCoefficients.get_coeff_names()
+
+        if region:
+            coeffs = coeffs + CalculateCoefficients.get_coeff_names(suffix=f".{region}")
+
         transformed_data = pca.transform(data[coeffs].values)
 
         # Calculate means and standard deviations of the transformed data.
@@ -65,9 +71,14 @@ class ExtractShapes:
             for point in points:
                 point_vector[i] = point
                 vector = means + np.multiply(stds, point_vector)
-                mesh = ExtractShapes.construct_mesh_from_points(pca, vector, coeffs, order)
-                mesh = ExtractShapes.convert_vtk_to_trimesh(mesh)
-                slices = ExtractShapes.get_mesh_slices(mesh)
+
+                slices = ExtractShapes.extract_shape_svg(pca, vector, coeffs)
+
+                if region:
+                    region_slices = ExtractShapes.extract_shape_svg(pca, vector, coeffs, region)
+                    region_slices = {f"{k}.{region}": v for k, v in region_slices.items()}
+                    slices.update(region_slices)
+
                 component_shape_svgs.append(slices)
 
             shape_svgs.append(component_shape_svgs)
@@ -75,27 +86,28 @@ class ExtractShapes:
         return shape_svgs
 
     @staticmethod
-    def compile_shape_svg(svgs, scale=1, box=(100, 100)):
-        width, height = box
+    def extract_shape_svg(pca, vector, coeffs, region=None, order=COEFF_ORDER):
+        prefix = ""
+        suffix = f".{region}" if region else ""
+        mesh = ExtractShapes.construct_mesh_from_points(pca, vector, coeffs, prefix, suffix, order)
+        mesh = ExtractShapes.convert_vtk_to_trimesh(mesh)
+        slices = ExtractShapes.get_mesh_slices(mesh)
+        return slices
 
+    @staticmethod
+    def compile_shape_svg(svgs, scale=1, box=(100, 100), region=None):
         # Initialize output.
         root = ET.fromstring("<svg></svg>")
-        group_top = ET.SubElement(root, "g", {"id": "view_top", "transform": "translate(0,0)"})
-        group_side1 = ET.SubElement(root, "g", {"id": "view_side_1", "transform": "translate(0,0)"})
-        group_side2 = ET.SubElement(root, "g", {"id": "view_side_2", "transform": "translate(0,0)"})
+        groups = {view: ET.SubElement(root, "g", {"id": view}) for view in svgs[0][0].keys()}
 
         # Add svg elements to output.
         for i, component in enumerate(svgs):
             for j, slices in enumerate(component):
-                ExtractShapes.append_svg_element(
-                    slices["side1"], group_side1, i, j, width, height, scale, rotate=90
-                )
-                ExtractShapes.append_svg_element(
-                    slices["side2"], group_side2, i, j, width, height, scale, rotate=90
-                )
-                ExtractShapes.append_svg_element(
-                    slices["top"], group_top, i, j, width, height, scale, rotate=0
-                )
+                for view, slice in slices.items():
+                    rotate = 0 if "top" in view else 90
+                    color = "#aaa" if region is not None and region in view else "#555"
+                    group = groups[view]
+                    ExtractShapes.append_svg_element(slice, group, i, j, box, scale, rotate, color)
 
         ExtractShapes.clear_svg_namespaces(root)
 
@@ -104,21 +116,21 @@ class ExtractShapes:
 
         # Set SVG size and namespace.
         root.set("xmlns", "http://www.w3.org/2000/svg")
-        root.set("height", str(height * len(svgs)))
-        root.set("width", str(width * len(svgs[0])))
+        root.set("height", str(box[1] * len(svgs)))
+        root.set("width", str(box[0] * len(svgs[0])))
 
         return io.BytesIO(ET.tostring(root))
 
     @staticmethod
-    def construct_mesh_from_points(pca, points, features, order=COEFF_ORDER):
+    def construct_mesh_from_points(pca, points, features, prefix="", suffix="", order=COEFF_ORDER):
         """Constructs mesh given PCA transformation points."""
         coeffs = pd.Series(pca.inverse_transform(points), index=features)
         coeffs_map = np.zeros((2, order + 1, order + 1), dtype=np.float32)
 
         for l in range(order + 1):
             for m in range(order + 1):
-                coeffs_map[0, l, m] = coeffs[f"shcoeffs_L{l}M{m}C"]
-                coeffs_map[1, l, m] = coeffs[f"shcoeffs_L{l}M{m}S"]
+                coeffs_map[0, l, m] = coeffs[f"{prefix}shcoeffs_L{l}M{m}C{suffix}"]
+                coeffs_map[1, l, m] = coeffs[f"{prefix}shcoeffs_L{l}M{m}S{suffix}"]
 
         mesh, _ = shtools.get_reconstruction_from_coeffs(coeffs_map)
         return mesh
@@ -151,8 +163,9 @@ class ExtractShapes:
         return svg
 
     @staticmethod
-    def append_svg_element(svg, root, row, col, width, height, scale=1.0, rotate=0, color="#555"):
+    def append_svg_element(svg, root, row, col, box, scale=1.0, rotate=0, color="#555"):
         """Append svg element to root."""
+        width, height = box
         element = ET.fromstring(svg)
         path = element.findall(".//")[0]
         group = ET.SubElement(root, "g", {"transform": f"translate({col*width},{row*height})"})
