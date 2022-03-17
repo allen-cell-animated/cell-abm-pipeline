@@ -63,6 +63,11 @@ class PerformPCA:
         if isinstance(features, pd.DataFrame):
             features = features.values.copy()
 
+        # Drop nans.
+        nan_rows = np.isnan(features).any(axis=1)
+        features = features[~nan_rows]
+        ordering = ordering[~nan_rows]
+
         # Fit data.
         pca = PCA(n_components=components)
         pca = pca.fit(features)

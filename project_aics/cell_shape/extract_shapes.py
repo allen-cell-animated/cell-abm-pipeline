@@ -53,7 +53,8 @@ class ExtractShapes:
         if region:
             coeffs = coeffs + CalculateCoefficients.get_coeff_names(suffix=f".{region}")
 
-        transformed_data = pca.transform(data[coeffs].values)
+        values = data[coeffs].values
+        transformed_data = pca.transform(values[~np.isnan(values).any(axis=1)])
 
         # Calculate means and standard deviations of the transformed data.
         means = transformed_data.mean(axis=0)
