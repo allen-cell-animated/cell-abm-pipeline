@@ -9,3 +9,6 @@ CELL_FEATURES = {
     "NUM_VOXELS": [500, 2000],
     "TICK": [0, 24],
 }
+
+# Valid cell phases for calculating shapes.
+VALID_PHASES = ["PROLIFERATIVE_G1", "PROLIFERATIVE_S", "PROLIFERATIVE_G2"]

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
 
-from project_aics.cell_shape.__config__ import PCA_COMPONENTS
+from project_aics.cell_shape.__config__ import PCA_COMPONENTS, VALID_PHASES
 from project_aics.cell_shape.calculate_coefficients import CalculateCoefficients
 from project_aics.utilities.load import load_dataframe
 from project_aics.utilities.save import save_pickle
@@ -18,6 +18,7 @@ class PerformPCA:
         }
         self.files = {
             "input": make_file_key(context.name, ["SH", "csv", "xz"], "", "%04d"),
+            "region": lambda r: make_file_key(context.name, ["SH", r, "csv", "xz"], "", "%04d"),
             "output": lambda r: make_file_key(context.name, ["SHPCA", r, "pkl"], "%s", ""),
         }
 
@@ -30,13 +31,25 @@ class PerformPCA:
         for seed in self.context.seeds:
             file_key = self.folders["input"] + self.files["input"] % (seed)
             data = load_dataframe(self.context.working, file_key)
+
+            if region:
+                region_file_key = self.folders["input"] + self.files["region"](region) % (seed)
+                region_data = load_dataframe(self.context.working, region_file_key)
+
+                join_columns = ["KEY", "ID", "SEED", "TICK"]
+                region_data = region_data.set_index(join_columns)
+                data = data.join(region_data, on=join_columns, rsuffix=f".{region}")
+
             data = data[data.KEY.isin(self.context.keys)]
             all_data.append(data)
 
-        # TODO: add filter by cell phase
-
         data_df = pd.concat(all_data).set_index("KEY")
+        data_df = data_df[data_df.PHASE.isin(VALID_PHASES)]
+
         coeff_names = CalculateCoefficients.get_coeff_names()
+
+        if region:
+            coeff_names = coeff_names + CalculateCoefficients.get_coeff_names(suffix=f".{region}")
 
         for key, key_group in data_df.groupby("KEY"):
             output_key = self.folders["output"] + self.files["output"](region) % (key)
