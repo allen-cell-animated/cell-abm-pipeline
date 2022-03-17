@@ -42,17 +42,17 @@ DTYPES = {
 
 def load_buffer(working, key):
     if working[:5] == "s3://":
-        return load_buffer_from_s3(working[5:], key)
+        return _load_buffer_from_s3(working[5:], key)
     else:
-        return load_buffer_from_fs(working, key)
+        return _load_buffer_from_fs(working, key)
 
 
-def load_buffer_from_fs(path, key):
+def _load_buffer_from_fs(path, key):
     full_path = f"{path}{key}"
     return io.BytesIO(open(full_path, "rb").read())
 
 
-def load_buffer_from_s3(bucket, key):
+def _load_buffer_from_s3(bucket, key):
     """
     Loads body from bucket for given key.
     """
@@ -74,17 +74,17 @@ def load_buffer_from_s3(bucket, key):
 
 def load_tar(working, key):
     if working[:5] == "s3://":
-        return load_tar_from_s3(working[5:], key)
+        return _load_tar_from_s3(working[5:], key)
     else:
-        return load_tar_from_fs(working, key)
+        return _load_tar_from_fs(working, key)
 
 
-def load_tar_from_fs(path, key):
+def _load_tar_from_fs(path, key):
     full_path = f"{path}{key}"
     return tarfile.open(full_path, mode="r:xz")
 
 
-def load_tar_from_s3(bucket, key):
+def _load_tar_from_s3(bucket, key):
     """
     Loads tar archive from bucket with given key.
     """
@@ -103,17 +103,17 @@ def load_tar_member(tar, member):
 
 def load_dataframe(working, key):
     if working[:5] == "s3://":
-        return load_dataframe_from_s3(working[5:], key)
+        return _load_dataframe_from_s3(working[5:], key)
     else:
-        return load_dataframe_from_fs(working, key)
+        return _load_dataframe_from_fs(working, key)
 
 
-def load_dataframe_from_fs(path, key):
+def _load_dataframe_from_fs(path, key):
     full_path = f"{path}{key}"
     return load_dataframe_object(full_path)
 
 
-def load_dataframe_from_s3(bucket, key):
+def _load_dataframe_from_s3(bucket, key):
     contents = load_xz_from_s3(bucket, key)
     return load_dataframe_object(io.BytesIO(contents))
 
@@ -130,7 +130,7 @@ def load_dataframe_object(obj, chunksize=CHUNKSIZE, dtypes=DTYPES):
     return df
 
 
-def load_xz_from_s3(bucket, key):
+def _load_xz_from_s3(bucket, key):
     """
     Loads XZ compressed file from bucket with given key.
     """
@@ -138,12 +138,25 @@ def load_xz_from_s3(bucket, key):
     return lzma.decompress(buffer.getbuffer())
 
 
-def load_pickle_from_fs(path, key):
+def load_pickle(working, key):
+    if working[:5] == "s3://":
+        return _load_pickle_from_s3(working[5:], key)
+    else:
+        return _load_pickle_from_fs(working, key)
+
+
+def _load_pickle_from_s3(bucket, key):
+    # TODO: implement load_pickle_from_s3
+    warnings.warn("load_pickle_from_s3 not implemented, object not loaded")
+    return None
+
+
+def _load_pickle_from_fs(path, key):
     full_path = f"{path}{key}"
     return pickle.load(open(full_path, "rb"))
 
 
-def load_image_from_fs(path, key):
+def _load_image_from_fs(path, key):
     """
     Loads TIFF image as AICSImage object.
     """

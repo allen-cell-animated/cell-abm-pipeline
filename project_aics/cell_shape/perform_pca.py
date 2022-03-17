@@ -5,7 +5,7 @@ from sklearn.decomposition import PCA
 from project_aics.cell_shape.__config__ import PCA_COMPONENTS
 from project_aics.cell_shape.calculate_coefficients import CalculateCoefficients
 from project_aics.utilities.load import load_dataframe
-from project_aics.utilities.save import save_pickle_to_fs
+from project_aics.utilities.save import save_pickle
 from project_aics.utilities.keys import make_folder_key, make_file_key
 
 
@@ -42,7 +42,7 @@ class PerformPCA:
             output_key = self.folders["output"] + self.files["output"](region) % (key)
             pca = self.fit_feature_pca(key_group[coeff_names], key_group["NUM_VOXELS"])
             output = {"data": key_group, "pca": pca}
-            save_pickle_to_fs(self.context.working, output_key, output)
+            save_pickle(self.context.working, output_key, output)
 
     @staticmethod
     def fit_feature_pca(features, ordering, components=PCA_COMPONENTS):

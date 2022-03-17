@@ -2,7 +2,7 @@ import numpy as np
 
 from project_aics.cell_shape.__config__ import CELL_FEATURES
 from project_aics.cell_shape.calculate_coefficients import CalculateCoefficients
-from project_aics.utilities.load import load_pickle_from_fs
+from project_aics.utilities.load import load_pickle
 from project_aics.utilities.save import save_plot
 from project_aics.utilities.keys import make_folder_key, make_file_key
 from project_aics.utilities.plot import make_plot, make_legend
@@ -25,7 +25,7 @@ class PlotPCA:
 
         for key in self.context.keys:
             key_file = self.folders["input"] + self.files["input"](region) % key
-            data[key] = load_pickle_from_fs(self.context.working, key_file)
+            data[key] = load_pickle(self.context.working, key_file)
 
         self.plot_pca_variance_explained(data)
 
