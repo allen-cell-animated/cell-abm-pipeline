@@ -7,7 +7,6 @@ PCA_COMPONENTS = 8
 # Valid cell features and corresponding ranges.
 CELL_FEATURES = {
     "NUM_VOXELS": [500, 2000],
-    "TICK": [0, 24],
 }
 
 # Valid cell phases for calculating shapes.

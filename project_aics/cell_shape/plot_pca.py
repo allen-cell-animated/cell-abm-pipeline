@@ -18,7 +18,7 @@ class PlotPCA:
         }
         self.files = {
             "input": lambda r: make_file_key(context.name, ["SHPCA", r, "pkl"], "%s", ""),
-            "output": make_file_key(context.name, ["SHPCA", "png"], "%s", ""),
+            "output": lambda r: make_file_key(context.name, ["SHPCA", r, "png"], "%s", ""),
         }
 
     def run(self, features=[], components=[], region=None, reference=None):
@@ -31,16 +31,16 @@ class PlotPCA:
         if reference:
             data["_reference"] = load_pickle(self.context.working, reference)
 
-        self.plot_pca_variance_explained(data)
+        self.plot_pca_variance_explained(data, region)
 
         for feature in features:
-            self.plot_pca_transform_features(data, feature)
+            self.plot_pca_transform_features(data, feature, region)
 
         if reference:
             for component in components:
-                self.plot_pca_transform_compare(data, component)
+                self.plot_pca_transform_compare(data, component, region)
 
-    def plot_pca_variance_explained(self, data):
+    def plot_pca_variance_explained(self, data, region):
         make_plot(
             self.context.keys,
             data,
@@ -50,7 +50,7 @@ class PlotPCA:
             legend=True,
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "variance_explained"
+        plot_key = self.folders["output"] + self.files["output"](region) % "variance_explained"
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -66,8 +66,9 @@ class PlotPCA:
         ax.set_xticks(np.arange(0, len(sim_var), 1))
         ax.set_xticklabels(np.arange(1, len(sim_var) + 1, 1))
 
-    def plot_pca_transform_features(self, data, feature):
+    def plot_pca_transform_features(self, data, feature, region):
         data["_feature"] = feature
+        data["_region"] = region
         legend = make_legend(feature, CELL_FEATURES[feature])
 
         make_plot(
@@ -79,17 +80,24 @@ class PlotPCA:
             legend={"handles": legend},
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % f"transform_features_{feature}"
+        feature_key = f"transform_features_{feature}"
+        plot_key = self.folders["output"] + self.files["output"](region) % feature_key
         save_plot(self.context.working, plot_key)
 
     @staticmethod
     def _plot_pca_transform_features(ax, data, key):
         df = data[key]["data"]
         pca = data[key]["pca"]
+        region = data["_region"]
         feature = data["_feature"]
 
         bounds = CELL_FEATURES[feature]
         coeff_names = CalculateCoefficients.get_coeff_names()
+
+        if region:
+            feature = f"{feature}.{region}"
+            coeff_names = coeff_names + CalculateCoefficients.get_coeff_names(suffix=f".{region}")
+
         transformed, nan_indices = PerformPCA.apply_data_transform(df[coeff_names], pca)
 
         ax.scatter(
@@ -102,9 +110,10 @@ class PlotPCA:
             cmap="magma_r",
         )
 
-    def plot_pca_transform_compare(self, data, component):
+    def plot_pca_transform_compare(self, data, component, region):
         pc = component + 1
         data["_component"] = component
+        data["_region"] = region
 
         make_plot(
             self.context.keys,
@@ -114,7 +123,8 @@ class PlotPCA:
             sharey="none",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % f"transform_compare_PC{pc}"
+        component_key = f"transform_component_PC{pc}"
+        plot_key = self.folders["output"] + self.files["output"](region) % component_key
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -122,9 +132,14 @@ class PlotPCA:
         df = data[key]["data"]
         df_ref = data["_reference"]["data"]
         pca = data["_reference"]["pca"]
+        region = data["_region"]
         component = data["_component"]
 
         coeff_names = CalculateCoefficients.get_coeff_names()
+
+        if region:
+            coeff_names = coeff_names + CalculateCoefficients.get_coeff_names(suffix=f".{region}")
+
         reference, _ = PerformPCA.apply_data_transform(df_ref[coeff_names], pca)
         transformed, _ = PerformPCA.apply_data_transform(df[coeff_names], pca)
 
