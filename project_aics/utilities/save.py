@@ -1,5 +1,7 @@
 import io
 import os
+import re
+import json
 import pickle
 import warnings
 
@@ -88,6 +90,25 @@ def _save_image_to_fs(path, key, img):
     OmeTiffWriter.save(img, full_path)
 
 
+def save_json(working, key, obj):
+    if working[:5] == "s3://":
+        return _save_json_to_s3(working[5:], key, obj)
+    else:
+        return _save_json_to_fs(working, key, obj)
+
+
+def _save_json_to_s3(bucket, key, obj):
+    # TODO: implement save_json_to_s3
+    warnings.warn("save_json_to_s3 not implemented, image not saved")
+
+
+def _save_json_to_fs(path, key, contents):
+    full_path = f"{path}{key}"
+    make_folders(full_path)
+    with open(full_path, "w") as f:
+        f.write(format_json(json.dumps(contents, indent=2, separators=(",", ":"))))
+
+
 def save_plot(working, key):
     if working[:5] == "s3://":
         return _save_plot_to_s3(working[5:], key)
@@ -110,3 +131,13 @@ def _save_plot_to_s3(bucket, key):
 def make_folders(path):
     folders = "/".join(path.split("/")[:-1])
     os.makedirs(folders, exist_ok=True)
+
+
+def format_json(contents):
+    contents = contents.replace(":", ": ")
+    for arr in re.findall('\[\n\s+[A-z0-9$",\-\.\n\s]*\]', contents):
+        contents = contents.replace(arr, re.sub(r",\n\s+", r",", arr))
+    contents = re.sub(r'\[\n\s+([A-Za-z0-9,"$\.\-]+)\n\s+\]', r"[\1]", contents)
+    contents = contents.replace("],[", "],\n          [")
+    contents = re.sub("([0-9]{1}),", r"\1, ", contents)
+    return contents

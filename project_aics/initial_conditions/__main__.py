@@ -88,3 +88,19 @@ def create_voronoi(obj, **kwargs):
     from .create_voronoi import CreateVoronoi
 
     CreateVoronoi(obj).run(**kwargs)
+
+
+@cli.command()
+@click.option(
+    "--margin",
+    "-m",
+    nargs=3,
+    type=int,
+    default=[0, 0, 0],
+    help="Margin size in x, y, and z directions (default = [0, 0, 0])",
+)
+@click.pass_obj
+def convert_arcade(obj, **kwargs):
+    from .convert_arcade import ConvertARCADE
+
+    ConvertARCADE(obj).run(**kwargs)
