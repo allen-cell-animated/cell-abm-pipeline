@@ -9,7 +9,14 @@ from project_aics.utilities.load import load_dataframe
 from project_aics.utilities.save import save_json, save_buffer
 from project_aics.utilities.keys import make_folder_key, make_file_key
 
+# Critical cell height (in voxels)
 CRITICAL_HEIGHT = 5
+
+# Minimum number of voxels per cell
+MIN_VOXELS = 100
+
+# Minimum number of voxels per cell region
+MIN_REGION_VOXELS = 50
 
 
 class ConvertARCADE:
@@ -20,20 +27,34 @@ class ConvertARCADE:
             "output": make_folder_key(context.name, "converted", "ARCADE", False),
         }
         self.files = {
-            "input": make_file_key(context.name, ["PROCESSED", "csv"], "%s", ""),
+            "input": lambda r: make_file_key(context.name, ["PROCESSED", r, "csv"], "%s", ""),
             "cells": make_file_key(context.name, ["CELLS", "json"], "%s", ""),
             "locations": make_file_key(context.name, ["LOCATIONS", "json"], "%s", ""),
             "setup": make_file_key(context.name, ["xml"], "%s", ""),
         }
 
-    def run(self, margin=[0, 0, 0]):
+    def run(self, margins=[0, 0, 0], region=None):
         for key in self.context.keys:
-            self.convert_arcade(key, margin)
+            self.convert_arcade(key, margins, region)
 
-    def convert_arcade(self, key, margin):
-        sample_key = self.folders["input"] + self.files["input"] % key
+    def convert_arcade(self, key, margins, region):
+        sample_key = self.folders["input"] + self.files["input"](None) % key
         samples_df = load_dataframe(self.context.working, sample_key)
-        samples, bounds = self.extract_sample_voxels(samples_df, *margin)
+
+        steps, offsets, bounds = self.calculate_sample_transform(samples_df, margins)
+        samples = self.transform_sample_voxels(samples_df, steps, offsets)
+
+        if region:
+            region_key = self.folders["input"] + self.files["input"](region) % key
+            region_df = load_dataframe(self.context.working, region_key)
+            region_samples = self.transform_sample_voxels(region_df, steps, offsets)
+            region_samples["region"] = region
+
+            samples = samples.merge(region_samples, on=["id", "x", "y", "z"], how="left")
+            samples["region"].fillna("DEFAULT", inplace=True)
+
+        # Filter samples for valid samples.
+        samples = self.filter_valid_samples(samples)
 
         # Initialize outputs.
         locations, cells = [], []
@@ -52,40 +73,38 @@ class ConvertARCADE:
         save_json(self.context.working, locations_key, locations)
 
         # Create and save setup file.
-        setup = self.make_setup_file(len(cells), **bounds)
+        setup = self.make_setup_file(samples, **bounds)
         setup_key = self.folders["output"] + self.files["setup"] % key
         save_buffer(self.context.working, setup_key, setup)
 
     @staticmethod
-    def extract_sample_voxels(df, margin_x, margin_y, margin_z):
-        """Load samples and reposition to center of bounding box."""
+    def calculate_sample_transform(df, margins):
+        sizes = ["length", "width", "height"]
+        coords = ["x", "y", "z"]
 
-        # Get step size for voxels.
-        step_x = ProcessSamples.get_step_size(df.x)
-        step_y = ProcessSamples.get_step_size(df.y)
-        step_z = ProcessSamples.get_step_size(df.z)
+        steps = {i: ProcessSamples.get_step_size(df[i]) for i in coords}
 
-        # Rescale integers to step size 1.
-        df["x"] = df["x"].divide(step_x).astype("int32")
-        df["y"] = df["y"].divide(step_y).astype("int32")
-        df["z"] = df["z"].divide(step_z).astype("int32")
+        mins = {i: df[i].min() for i in coords}
+        maxs = {i: df[i].max() for i in coords}
 
-        # Calculate voxel bounds
+        offsets = {i: -(mins[i] / steps[i]) + margin + 1 for i, margin in zip(coords, margins)}
+
         bounds = {
-            "length": df["x"].max() - df["x"].min() + 2 * margin_x + 3,
-            "width": df["y"].max() - df["y"].min() + 2 * margin_y + 3,
-            "height": df["z"].max() - df["z"].min() + 2 * margin_z + 3,
+            size: (maxs[i] - mins[i]) / steps[i] + 2 * margin + 3
+            for i, margin, size in zip(coords, margins, sizes)
         }
 
-        # Adjust bounds.
-        df["x"] = df["x"] - df["x"].min() + margin_x + 1
-        df["y"] = df["y"] - df["y"].min() + margin_y + 1
-        df["z"] = df["z"] - df["z"].min() + margin_z + 1
-
-        return df, bounds
+        return steps, offsets, bounds
 
     @staticmethod
-    def make_setup_file(init, length, width, height, terms=POTTS_TERMS):
+    def transform_sample_voxels(df, steps, offsets):
+        """Scale samples and reposition to center of bounding box."""
+        for i in ["x", "y", "z"]:
+            df[i] = df[i].divide(steps[i]).astype("int32") + offsets[i]
+        return df
+
+    @staticmethod
+    def make_setup_file(samples, length, width, height, terms=POTTS_TERMS):
         """Create empty setup file for converted samples."""
         root = ET.fromstring("<set></set>")
         series = ET.SubElement(
@@ -111,9 +130,30 @@ class ConvertARCADE:
 
         agents = ET.SubElement(series, "agents")
         populations = ET.SubElement(agents, "populations")
-        ET.SubElement(populations, "population", {"id": "X", "init": str(init)})
+
+        init = len(samples.id.unique())
+        population = ET.SubElement(populations, "population", {"id": "X", "init": str(init)})
+
+        if "region" in samples.columns:
+            for region in samples.region.unique():
+                ET.SubElement(population, "population.region", {"id": region, "fraction": "0.5"})
+
         ET.indent(root, space="    ", level=0)
         return io.BytesIO(ET.tostring(root))
+
+    @staticmethod
+    def filter_valid_samples(samples):
+        # Filter for cells less than minimum volume.
+        samples = samples.groupby("id").filter(lambda x: x["x"].count() > MIN_VOXELS)
+
+        if "region" in samples.columns:
+            # Filter out cells less than minimum region volume.
+            samples = samples.groupby(["region", "id"]).filter(lambda x: len(x) > MIN_REGION_VOXELS)
+
+            # Ensure that each cell has all regions.
+            samples = samples.groupby("id").filter(lambda x: len(x.region.unique()) > 1)
+
+        return samples
 
     @staticmethod
     def convert_to_cell(cell_id, samples):
@@ -121,7 +161,7 @@ class ConvertARCADE:
         volume, surface = ConvertARCADE.get_cell_targets(samples)
         state, phase = ConvertARCADE.get_cell_phase()
 
-        return {
+        cell = {
             "id": cell_id,
             "parent": 0,
             "pop": 1,
@@ -133,16 +173,31 @@ class ConvertARCADE:
             "targets": [volume, surface],
         }
 
+        if "region" in samples.columns:
+            regions = ConvertARCADE.get_cell_regions(samples)
+            cell.update({"regions": regions})
+
+        return cell
+
     @staticmethod
     def convert_to_location(cell_id, samples):
         """Convert samples to ARCADE .LOCATIONS json format."""
         center = ConvertARCADE.make_location_center(samples)
-        voxels = ConvertARCADE.make_location_voxels(samples)
+
+        if "region" not in samples.columns:
+            location = [
+                {"region": "UNDEFINED", "voxels": ConvertARCADE.make_location_voxels(samples)}
+            ]
+        else:
+            location = [
+                {"region": region, "voxels": ConvertARCADE.make_location_voxels(group)}
+                for region, group in samples.groupby("region")
+            ]
 
         return {
             "id": cell_id,
             "center": center,
-            "location": [{"region": "UNDEFINED", "voxels": voxels}],
+            "location": location,
         }
 
     @staticmethod
@@ -161,6 +216,19 @@ class ConvertARCADE:
             phase = "PROLIFERATIVE_G1"
 
         return state, phase
+
+    @staticmethod
+    def get_cell_regions(samples):
+        regions = []
+        for region, group in samples.groupby("region"):
+            regions.append(
+                {
+                    "region": region,
+                    "voxels": len(group),
+                    "targets": list(ConvertARCADE.get_cell_targets(group)),
+                }
+            )
+        return regions
 
     @staticmethod
     def calculate_surface_area(volume, height):
