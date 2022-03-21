@@ -73,10 +73,12 @@ class ExtractShapes:
                 point_vector[i] = point
                 vector = means + np.multiply(stds, point_vector)
 
-                slices = ExtractShapes.extract_shape_svg(pca, vector, coeffs)
+                slices = ExtractShapes.extract_shape_svg(pca, vector, coeffs, order)
 
                 if region:
-                    region_slices = ExtractShapes.extract_shape_svg(pca, vector, coeffs, region)
+                    region_slices = ExtractShapes.extract_shape_svg(
+                        pca, vector, coeffs, order, region
+                    )
                     region_slices = {f"{k}.{region}": v for k, v in region_slices.items()}
                     slices.update(region_slices)
 
@@ -87,7 +89,7 @@ class ExtractShapes:
         return shape_svgs
 
     @staticmethod
-    def extract_shape_svg(pca, vector, coeffs, region=None, order=COEFF_ORDER):
+    def extract_shape_svg(pca, vector, coeffs, order=COEFF_ORDER, region=None):
         prefix = ""
         suffix = f".{region}" if region else ""
         mesh = ExtractShapes.construct_mesh_from_points(pca, vector, coeffs, prefix, suffix, order)
@@ -103,12 +105,12 @@ class ExtractShapes:
 
         # Add svg elements to output.
         for i, component in enumerate(svgs):
-            for j, slices in enumerate(component):
-                for view, slice in slices.items():
+            for j, elements in enumerate(component):
+                for view, elem in elements.items():
                     rotate = 0 if "top" in view else 90
                     color = "#aaa" if region is not None and region in view else "#555"
                     group = groups[view]
-                    ExtractShapes.append_svg_element(slice, group, i, j, box, scale, rotate, color)
+                    ExtractShapes.append_svg_element(elem, group, i, j, box, scale, rotate, color)
 
         ExtractShapes.clear_svg_namespaces(root)
 
