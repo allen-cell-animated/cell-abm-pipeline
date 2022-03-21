@@ -4,6 +4,7 @@ import json
 import lzma
 import pickle
 import tarfile
+import warnings
 
 import boto3
 import pandas as pd
@@ -154,6 +155,19 @@ def _load_pickle_from_s3(bucket, key):
 def _load_pickle_from_fs(path, key):
     full_path = f"{path}{key}"
     return pickle.load(open(full_path, "rb"))
+
+
+def load_image(working, key):
+    if working[:5] == "s3://":
+        return _load_image_from_s3(working[5:], key)
+    else:
+        return _load_image_from_fs(working, key)
+
+
+def _load_image_from_s3(bucket, key):
+    # TODO: implement load_image_from_s3
+    warnings.warn("load_image_from_s3 not implemented, image not loaded")
+    return None
 
 
 def _load_image_from_fs(path, key):

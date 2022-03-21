@@ -1,7 +1,7 @@
 from scipy.ndimage import distance_transform_edt
 
-from project_aics.utilities.load import load_image_from_fs
-from project_aics.utilities.save import save_image_to_fs
+from project_aics.utilities.load import load_image
+from project_aics.utilities.save import save_image
 from project_aics.utilities.keys import make_folder_key, make_file_key
 
 
@@ -23,7 +23,7 @@ class CreateVoronoi:
 
     def create_voronoi(self, key, channel):
         image_key = self.folders["image"] + self.files["image"] % (key)
-        image = load_image_from_fs(self.context.working, image_key)
+        image = load_image(self.context.working, image_key)
 
         array = image.get_image_data("ZYX", T=0, C=channel)
         distances = distance_transform_edt(array == 0, return_distances=False, return_indices=True)
@@ -34,4 +34,4 @@ class CreateVoronoi:
         voronoi = array[coordz, coordy, coordx].reshape(array.shape)
 
         output_key = self.folders["image"] + self.files["output"] % (key, channel)
-        save_image_to_fs(self.context.working, output_key, voronoi)
+        save_image(self.context.working, output_key, voronoi)

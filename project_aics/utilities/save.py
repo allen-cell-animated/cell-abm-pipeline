@@ -70,6 +70,18 @@ def _save_pickle_to_fs(path, key, obj):
     pickle.dump(obj, open(full_path, "wb"))
 
 
+def save_image(working, key, obj):
+    if working[:5] == "s3://":
+        return _save_image_to_s3(working[5:], key, obj)
+    else:
+        return _save_image_to_fs(working, key, obj)
+
+
+def _save_image_to_s3(bucket, key, obj):
+    # TODO: implement save_image_to_s3
+    warnings.warn("save_image_to_s3 not implemented, image not saved")
+
+
 def _save_image_to_fs(path, key, img):
     full_path = f"{path}{key}"
     make_folders(full_path)

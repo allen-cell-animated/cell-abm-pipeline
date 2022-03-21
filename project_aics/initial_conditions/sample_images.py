@@ -6,7 +6,7 @@ from hexalattice.hexalattice import create_hex_grid
 import matplotlib.pyplot as plt
 
 from project_aics.initial_conditions.__config__ import SCALE_MICRONS_XY, SCALE_MICRONS_Z
-from project_aics.utilities.load import load_dataframe, load_image_from_fs
+from project_aics.utilities.load import load_dataframe, load_image
 from project_aics.utilities.save import save_dataframe, save_plot
 from project_aics.utilities.keys import make_folder_key, make_file_key
 from project_aics.utilities.plot import make_plot
@@ -36,7 +36,7 @@ class SampleImages:
 
     def sample_images(self, key, grid, resolution, channels):
         image_key = self.folders["image"] + self.files["image"] % (key)
-        image = load_image_from_fs(self.context.working, image_key)
+        image = load_image(self.context.working, image_key)
 
         sample_indices = self.get_sample_indices(image, resolution, grid)
 
