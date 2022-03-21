@@ -70,7 +70,9 @@ def extract_shapes(obj, **kwargs):
 
 @cli.command()
 @click.option("--features", type=str, multiple=True, default=[])
+@click.option("--components", type=int, multiple=True, default=[])
 @click.option("--region", type=str, default=None)
+@click.option("--reference", type=str, default=None)
 @click.pass_obj
 def plot_pca(obj, **kwargs):
     from .plot_pca import PlotPCA

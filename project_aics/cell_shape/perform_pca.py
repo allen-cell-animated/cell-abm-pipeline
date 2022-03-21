@@ -80,3 +80,13 @@ class PerformPCA:
                 pca.components_[i] = pca.components_[i] * -1
 
         return pca
+
+    @staticmethod
+    def apply_data_transform(features, pca):
+        if isinstance(features, pd.DataFrame):
+            features = features.values.copy()
+
+        nan_indices = np.isnan(features).any(axis=1)
+        features = features[~nan_indices]
+
+        return pca.transform(features), nan_indices

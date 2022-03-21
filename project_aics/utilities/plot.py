@@ -12,10 +12,12 @@ rc("font", size=8)
 rc("axes", titlesize=10, titleweight="bold")
 
 
-def make_plot(keys, data, func, size=PLOT_SIZE, xlabel="", ylabel="", legend=False):
+def make_plot(
+    keys, data, func, size=PLOT_SIZE, xlabel="", ylabel="", sharex="all", sharey="all", legend=False
+):
     n_rows, n_cols, indices = separate_keys(keys)
     offset = size if legend else 0
-    fig, axs = make_subplots(n_rows, n_cols, size=size, offset=offset)
+    fig, axs = make_subplots(n_rows, n_cols, size=size, offset=offset, sharex=sharex, sharey=sharey)
 
     for i, j, k in indices:
         key = keys[k]

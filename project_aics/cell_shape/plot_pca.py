@@ -2,6 +2,7 @@ import numpy as np
 
 from project_aics.cell_shape.__config__ import CELL_FEATURES
 from project_aics.cell_shape.calculate_coefficients import CalculateCoefficients
+from project_aics.cell_shape.perform_pca import PerformPCA
 from project_aics.utilities.load import load_pickle
 from project_aics.utilities.save import save_plot
 from project_aics.utilities.keys import make_folder_key, make_file_key
@@ -20,17 +21,24 @@ class PlotPCA:
             "output": make_file_key(context.name, ["SHPCA", "png"], "%s", ""),
         }
 
-    def run(self, features=[], region=None):
+    def run(self, features=[], components=[], region=None, reference=None):
         data = {}
 
         for key in self.context.keys:
             key_file = self.folders["input"] + self.files["input"](region) % key
             data[key] = load_pickle(self.context.working, key_file)
 
+        if reference:
+            data["_reference"] = load_pickle(self.context.working, reference)
+
         self.plot_pca_variance_explained(data)
 
         for feature in features:
             self.plot_pca_transform_features(data, feature)
+
+        if reference:
+            for component in components:
+                self.plot_pca_transform_compare(data, component)
 
     def plot_pca_variance_explained(self, data):
         make_plot(
@@ -48,8 +56,12 @@ class PlotPCA:
     @staticmethod
     def _plot_pca_variance_explained(ax, data, key):
         sim_var = np.cumsum(data[key]["pca"].explained_variance_ratio_)
+        ax.plot(100 * sim_var, "-o", color="#555", markersize=3, label="data")
 
-        ax.plot(100 * sim_var, "-o", color="#555", markersize=3, label="sim")
+        if "_reference" in data:
+            ref_var = np.cumsum(data["_reference"]["pca"].explained_variance_ratio_)
+            ax.plot(100 * ref_var, "-o", color="#aaa", markersize=3, label="ref")
+
         ax.set_ylim([0, 100])
         ax.set_xticks(np.arange(0, len(sim_var), 1))
         ax.set_xticklabels(np.arange(1, len(sim_var) + 1, 1))
@@ -78,14 +90,43 @@ class PlotPCA:
 
         bounds = CELL_FEATURES[feature]
         coeff_names = CalculateCoefficients.get_coeff_names()
-        transformed = pca.transform(df[coeff_names].values)
+        transformed, nan_indices = PerformPCA.apply_data_transform(df[coeff_names], pca)
 
         ax.scatter(
             transformed[:, 0],
             transformed[:, 1],
-            c=df[feature],
+            c=df[feature][~nan_indices],
             vmin=bounds[0],
             vmax=bounds[1],
             s=2,
             cmap="magma_r",
         )
+
+    def plot_pca_transform_compare(self, data, component):
+        pc = component + 1
+        data["_component"] = component
+
+        make_plot(
+            self.context.keys,
+            data,
+            self._plot_pca_transform_compare,
+            xlabel=f"PC {pc}",
+            sharey="none",
+        )
+
+        plot_key = self.folders["output"] + self.files["output"] % f"transform_compare_PC{pc}"
+        save_plot(self.context.working, plot_key)
+
+    @staticmethod
+    def _plot_pca_transform_compare(ax, data, key):
+        df = data[key]["data"]
+        df_ref = data["_reference"]["data"]
+        pca = data["_reference"]["pca"]
+        component = data["_component"]
+
+        coeff_names = CalculateCoefficients.get_coeff_names()
+        reference, _ = PerformPCA.apply_data_transform(df_ref[coeff_names], pca)
+        transformed, _ = PerformPCA.apply_data_transform(df[coeff_names], pca)
+
+        ax.hist(reference[:, component], bins=20, density=True, alpha=0.3, color="black")
+        ax.hist(transformed[:, component], bins=20, color="black", density=True, histtype="step")
