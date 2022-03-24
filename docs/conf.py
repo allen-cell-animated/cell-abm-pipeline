@@ -12,6 +12,7 @@
 
 import os
 import sys
+sys.path.insert(0, os.path.abspath('../src'))
 sys.path.insert(0, os.path.abspath('../src/project_aics'))
 
 import sphinx_rtd_theme
@@ -53,7 +54,11 @@ add_module_names = False
 # Default options for autodoc directives.
 autodoc_default_options = {
     'member-order': 'bysource',
+    'undoc-members': True,
 }
+
+# List of modules to be mocked up. Useful when some external dependencies are not met at build time and break the building process.
+autodoc_mock_imports = ["numpy", "pandas", "tifffile", "imagecodecs", "matplotlib", "aicsimageio", "simulariumio", "scikit-image", "jupyter", "jupyterlab", "aicsshparam", "boto3", "trimesh", "Shapely", "quilt3", "hexalattice", "scipy", "vtk", "tqdm", "sklearn", "skimage"]
 
 # -- Options for HTML output -------------------------------------------------
 

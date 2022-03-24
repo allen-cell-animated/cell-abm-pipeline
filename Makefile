@@ -20,5 +20,5 @@ build: # run tox tests and lint
 	tox
 
 docs: # generates documentation
-	SPHINX_APIDOC_OPTIONS=members,show-inheritance,undoc-members sphinx-apidoc -o docs/ -f -M -e src/* **/tests/
+	sphinx-apidoc -o docs/ -f -M -e src/* **/tests/
 	make -C docs html
