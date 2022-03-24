@@ -18,6 +18,21 @@ def cli(ctx, **kwargs):
 
 
 @cli.command()
+@click.option(
+    "-n",
+    "--num-images",
+    type=int,
+    default=0,
+    help="number of images to download",
+)
+@click.pass_obj
+def download_images(obj, **kwargs):
+    from .download_images import DownloadImages
+
+    DownloadImages(obj).run(**kwargs)
+
+
+@cli.command()
 @click.option("-c", "--channels", type=int, multiple=True, default=[0])
 @click.option(
     "-g",
