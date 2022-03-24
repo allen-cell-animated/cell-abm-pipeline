@@ -25,6 +25,13 @@ hexalattice = "^1.2.1"
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"
 pylint = "^2.12.2"
+tox = "^3.24.5"
+pytest = "^6.2.4"
+pytest-cov = "^2.12.1"
+Sphinx = "^4.1.1"
+mypy = "^0.941"
+sphinx-rtd-theme = "^1.0.0"
+sphinx_mdinclude = "^0.5.1"
 
 [tool.poetry.scripts]
 cell-shape = "project_aics.cell_shape.__main__:cli"
