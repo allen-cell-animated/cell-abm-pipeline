@@ -1,3 +1,5 @@
+from typing import List
+
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -125,8 +127,19 @@ class CalculateCoefficients:
         return array
 
     @staticmethod
-    def get_coeff_names(prefix="", suffix="", order=COEFF_ORDER):
-        """Get names of spherical harmonics coefficients."""
+    def get_coeff_names(prefix: str = "", suffix: str = "", order: int = COEFF_ORDER) -> List[str]:
+        """
+        Get names of spherical harmonics coefficients.
+
+        Parameters
+        ----------
+        prefix
+            Prefix to prepend to each coefficient name
+        suffix
+            Suffix to append to each coefficient name
+        order
+            Order of the spherical harmonics parametrization
+        """
         return [
             f"{prefix}shcoeffs_L{a}M{b}C{suffix}"
             for a in range(order + 1)
