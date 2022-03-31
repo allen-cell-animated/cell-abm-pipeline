@@ -3,11 +3,11 @@ import io
 from math import ceil, sqrt, pi
 import xml.etree.ElementTree as ET
 
-from project_aics.initial_conditions.__config__ import POTTS_TERMS
-from project_aics.initial_conditions.process_samples import ProcessSamples
-from project_aics.utilities.load import load_dataframe
-from project_aics.utilities.save import save_json, save_buffer
-from project_aics.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.initial_conditions.__config__ import POTTS_TERMS
+from cell_abm_pipeline.initial_conditions.process_samples import ProcessSamples
+from cell_abm_pipeline.utilities.load import load_dataframe
+from cell_abm_pipeline.utilities.save import save_json, save_buffer
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
 
 # Critical cell height (in voxels)
 CRITICAL_HEIGHT = 5

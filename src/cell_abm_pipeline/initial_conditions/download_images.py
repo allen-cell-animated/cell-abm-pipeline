@@ -4,9 +4,9 @@ import io
 import quilt3
 import pandas as pd
 
-from project_aics.utilities.load import load_dataframe
-from project_aics.utilities.save import save_dataframe, save_buffer
-from project_aics.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.load import load_dataframe
+from cell_abm_pipeline.utilities.save import save_dataframe, save_buffer
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
 
 QUILT_PACKAGE = "aics/hipsc_single_cell_image_dataset"
 QUILT_REGISTRY = "s3://allencell"

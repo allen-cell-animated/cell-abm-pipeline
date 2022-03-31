@@ -5,10 +5,10 @@ import pandas as pd
 from tqdm import tqdm
 from aicsshparam import shparam, shtools
 
-from project_aics.cell_shape.__config__ import COEFF_ORDER
-from project_aics.utilities.load import load_tar, load_tar_member
-from project_aics.utilities.save import save_dataframe
-from project_aics.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.cell_shape.__config__ import COEFF_ORDER
+from cell_abm_pipeline.utilities.load import load_tar, load_tar_member
+from cell_abm_pipeline.utilities.save import save_dataframe
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
 
 
 class CalculateCoefficients:

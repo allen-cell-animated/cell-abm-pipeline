@@ -1,6 +1,6 @@
 import unittest
 
-from project_aics.cell_shape.calculate_coefficients import CalculateCoefficients
+from cell_abm_pipeline.cell_shape.calculate_coefficients import CalculateCoefficients
 
 
 class TestCalculateCoefficients(unittest.TestCase):

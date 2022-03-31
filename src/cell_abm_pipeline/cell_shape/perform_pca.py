@@ -2,11 +2,11 @@ import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
 
-from project_aics.cell_shape.__config__ import PCA_COMPONENTS, VALID_PHASES
-from project_aics.cell_shape.calculate_coefficients import CalculateCoefficients
-from project_aics.utilities.load import load_dataframe
-from project_aics.utilities.save import save_pickle
-from project_aics.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.cell_shape.__config__ import PCA_COMPONENTS, VALID_PHASES
+from cell_abm_pipeline.cell_shape.calculate_coefficients import CalculateCoefficients
+from cell_abm_pipeline.utilities.load import load_dataframe
+from cell_abm_pipeline.utilities.save import save_pickle
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
 
 
 class PerformPCA:

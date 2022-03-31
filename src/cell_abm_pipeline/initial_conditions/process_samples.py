@@ -4,16 +4,16 @@ from skimage import measure
 from scipy.spatial import distance
 import matplotlib.pyplot as plt
 
-from project_aics.initial_conditions.__config__ import (
+from cell_abm_pipeline.initial_conditions.__config__ import (
     EDGE_THRESHOLD,
     CONNECTED_THRESHOLD,
     SCALE_MICRONS_XY,
     SCALE_MICRONS_Z,
 )
-from project_aics.utilities.load import load_dataframe
-from project_aics.utilities.save import save_dataframe, save_plot
-from project_aics.utilities.keys import make_folder_key, make_file_key
-from project_aics.utilities.plot import make_plot
+from cell_abm_pipeline.utilities.load import load_dataframe
+from cell_abm_pipeline.utilities.save import save_dataframe, save_plot
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.plot import make_plot
 
 
 class ProcessSamples:

@@ -1,8 +1,8 @@
 from scipy.ndimage import distance_transform_edt
 
-from project_aics.utilities.load import load_image
-from project_aics.utilities.save import save_image
-from project_aics.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.load import load_image
+from cell_abm_pipeline.utilities.save import save_image
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
 
 
 class CreateVoronoi:

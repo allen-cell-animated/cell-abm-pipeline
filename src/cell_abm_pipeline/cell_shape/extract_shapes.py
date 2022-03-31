@@ -8,11 +8,11 @@ import numpy as np
 import pandas as pd
 from aicsshparam import shtools
 
-from project_aics.cell_shape.__config__ import COEFF_ORDER, PCA_COMPONENTS
-from project_aics.cell_shape.calculate_coefficients import CalculateCoefficients
-from project_aics.utilities.load import load_pickle
-from project_aics.utilities.save import save_buffer
-from project_aics.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.cell_shape.__config__ import COEFF_ORDER, PCA_COMPONENTS
+from cell_abm_pipeline.cell_shape.calculate_coefficients import CalculateCoefficients
+from cell_abm_pipeline.utilities.load import load_pickle
+from cell_abm_pipeline.utilities.save import save_buffer
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
 
 
 class ExtractShapes:

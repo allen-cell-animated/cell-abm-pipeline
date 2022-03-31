@@ -1,12 +1,12 @@
 import numpy as np
 
-from project_aics.cell_shape.__config__ import CELL_FEATURES
-from project_aics.cell_shape.calculate_coefficients import CalculateCoefficients
-from project_aics.cell_shape.perform_pca import PerformPCA
-from project_aics.utilities.load import load_pickle
-from project_aics.utilities.save import save_plot
-from project_aics.utilities.keys import make_folder_key, make_file_key
-from project_aics.utilities.plot import make_plot, make_legend
+from cell_abm_pipeline.cell_shape.__config__ import CELL_FEATURES
+from cell_abm_pipeline.cell_shape.calculate_coefficients import CalculateCoefficients
+from cell_abm_pipeline.cell_shape.perform_pca import PerformPCA
+from cell_abm_pipeline.utilities.load import load_pickle
+from cell_abm_pipeline.utilities.save import save_plot
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.plot import make_plot, make_legend
 
 
 class PlotPCA:
