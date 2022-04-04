@@ -1,9 +1,9 @@
 # Cell agent-based model pipeline
 
-[![Build Status](https://github.com/jessicasyu/project_aics/actions/workflows/build.yml/badge.svg?branch=cell-abm-pipeline)](https://github.com/jessicasyu/project_aics/actions/workflows/build.yml)
-[![Lint Status](https://github.com/jessicasyu/project_aics/actions/workflows/lint.yml/badge.svg?branch=cell-abm-pipeline)](https://github.com/jessicasyu/project_aics/actions/workflows/lint.yml)
-[![Codecov](https://codecov.io/gh/jessicasyu/project_aics/branch/cell-abm-pipeline/graph/badge.svg?token=7XSD7YI099)](https://codecov.io/gh/jessicasyu/project_aics)
-[![Documentation](https://github.com/jessicasyu/project_aics/actions/workflows/documentation.yml/badge.svg?branch=cell-abm-pipeline)](https://jessicasyu.github.io/project_aics/)
+[![Build Status](https://github.com/allen-cell-animated/cell-abm-pipeline/actions/workflows/build.yml/badge.svg)](https://github.com/allen-cell-animated/cell-abm-pipeline/actions/workflows/build.yml)
+[![Lint Status](https://github.com/allen-cell-animated/cell-abm-pipeline/actions/workflows/lint.yml/badge.svg)](https://github.com/allen-cell-animated/cell-abm-pipeline/actions/workflows/lint.yml)
+[![Codecov](https://codecov.io/gh/allen-cell-animated/cell-abm-pipeline/branch/main/graph/badge.svg?token=1S5ZKVET7T)](https://codecov.io/gh/allen-cell-animated/cell-abm-pipeline)
+[![Documentation](https://github.com/allen-cell-animated/cell-abm-pipeline/actions/workflows/documentation.yml/badge.svg)](https://allen-cell-animated.github.io/cell-abm-pipeline/)
 [![Code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 This repository contains useful modules for working with cell agent-based models.
