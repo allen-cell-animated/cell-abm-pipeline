@@ -9,9 +9,31 @@ class Context:
 
 
 @click.group(invoke_without_command=True)
-@click.option("-n", "--name", type=str, default="")
-@click.option("-k", "--keys", type=str, multiple=True, default=[])
-@click.option("-w", "--working", type=str, default=".")
+@click.option(
+    "-n",
+    "--name",
+    type=str,
+    default="",
+    help="Name of data set",
+    show_default=True,
+)
+@click.option(
+    "-k",
+    "--keys",
+    type=str,
+    multiple=True,
+    default=[],
+    help="Key(s) for data set",
+    show_default=True,
+)
+@click.option(
+    "-w",
+    "--working",
+    type=str,
+    default=".",
+    help="Working location (local path or S3 bucket)",
+    show_default=True,
+)
 @click.pass_context
 def cli(ctx, **kwargs):
     ctx.obj = Context(**kwargs)
@@ -23,10 +45,12 @@ def cli(ctx, **kwargs):
     "--num-images",
     type=int,
     default=0,
-    help="number of images to download",
+    help="Number of images to download.",
+    show_default=True,
 )
 @click.pass_obj
 def download_images(obj, **kwargs):
+    """Download images from Quilt package."""
     from .download_images import DownloadImages
 
     DownloadImages(obj).run(**kwargs)
@@ -55,6 +79,7 @@ def download_images(obj, **kwargs):
 )
 @click.pass_obj
 def sample_images(obj, **kwargs):
+    """Sample image into list of id and xyz coordinates."""
     from .sample_images import SampleImages
 
     SampleImages(obj).run(**kwargs)
@@ -91,6 +116,7 @@ def sample_images(obj, **kwargs):
 )
 @click.pass_obj
 def process_samples(obj, **kwargs):
+    """Process samples with selected processing steps."""
     from .process_samples import ProcessSamples
 
     ProcessSamples(obj).run(**kwargs)
@@ -100,6 +126,7 @@ def process_samples(obj, **kwargs):
 @click.option("-c", "--channels", type=int, multiple=True, default=[0])
 @click.pass_obj
 def create_voronoi(obj, **kwargs):
+    """Create Voronoi tesselation from given starting image."""
     from .create_voronoi import CreateVoronoi
 
     CreateVoronoi(obj).run(**kwargs)
@@ -117,6 +144,7 @@ def create_voronoi(obj, **kwargs):
 @click.option("--region", type=str, default=None)
 @click.pass_obj
 def convert_arcade(obj, **kwargs):
+    """Convert samples into ARCADE input formats."""
     from .convert_arcade import ConvertARCADE
 
     ConvertARCADE(obj).run(**kwargs)

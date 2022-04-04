@@ -12,3 +12,9 @@ CONNECTED_THRESHOLD = 2.0
 
 # List of Potts Hamiltonian terms for setup file
 POTTS_TERMS = ["volume", "surface", "adhesion", "height", "substrate", "persistence"]
+
+# Name of Quilt package for downloading images
+QUILT_PACKAGE = "aics/hipsc_single_cell_image_dataset"
+
+# Name of Quilt registry
+QUILT_REGISTRY = "s3://allencell"
