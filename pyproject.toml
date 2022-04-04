@@ -34,7 +34,10 @@ sphinx-rtd-theme = "^1.0.0"
 sphinx_mdinclude = "^0.5.1"
 
 [tool.poetry.scripts]
+basic-metrics = "cell_abm_pipeline.basic_metrics.__main__:cli"
+resource-usage = "cell_abm_pipeline.resource_usage.__main__:cli"
 cell-shape = "cell_abm_pipeline.cell_shape.__main__:cli"
+colony-dynamics = "cell_abm_pipeline.colony_dynamics.__main__:cli"
 initial-conditions = "cell_abm_pipeline.initial_conditions.__main__:cli"
 
 [build-system]
