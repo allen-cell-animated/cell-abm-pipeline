@@ -1,17 +1,63 @@
-# cell-ABM
+# Cell agent-based model pipeline
 
-Useful scripts for AICS cell-scale agent-based models project
+[![Build Status](https://github.com/jessicasyu/project_aics/actions/workflows/build.yml/badge.svg?branch=cell-abm-pipeline)](https://github.com/jessicasyu/project_aics/actions/workflows/build.yml)
+[![Lint Status](https://github.com/jessicasyu/project_aics/actions/workflows/lint.yml/badge.svg?branch=cell-abm-pipeline)](https://github.com/jessicasyu/project_aics/actions/workflows/lint.yml)
+[![Codecov](https://codecov.io/gh/jessicasyu/project_aics/branch/cell-abm-pipeline/graph/badge.svg?token=7XSD7YI099)](https://codecov.io/gh/jessicasyu/project_aics)
+[![Documentation](https://github.com/jessicasyu/project_aics/actions/workflows/documentation.yml/badge.svg?branch=cell-abm-pipeline)](https://jessicasyu.github.io/project_aics/)
+[![Code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
----
+This repository contains useful modules for working with cell agent-based models.
+Modules can be called via CLI or imported into a Python project.
+Top-level subpackages include:
 
-# Visualize PhysiCell outputs in Simularium
+- [`basic_metrics`](src/cell_abm_pipeline/basic_metrics/README.md). Modules for calculating and plotting basic simulation metrics.
+- [`resource_usage`](src/cell_abm_pipeline/resource_usage/README.md). Modules for quantifying resource usage (wall clock and object storage) for simulation sets.
+- [`cell_shape`](src/cell_abm_pipeline/cell_shape/README.md). Modules for calculating spherical harmonic coefficients and extracting cell shapes via dimensionality reduction.
+- [`colony_dynamics`](src/cell_abm_pipeline/colony_dynamics/README.md). Modules for calculating cell neighbors and quantifying colony dynamics from cell neighbor graphs.
+- [`initial_conditions`](src/cell_abm_pipeline/initial_conditions/README.md). Modules for sampling from images and converting into input formats for various model frameworks.
 
-Create an environment, install `simulariumio` (https://github.com/allen-cell-animated/simulariumio), and run the conversion script:
-```python
-conda create -n physicell_simularium python=3
-conda activate physicell_simularium
-pip install 'simulariumio[physicell]'
-python [path_to_this_repo]/visualization/physicell_to_simularium.py [path_to_PhysiCell_project]/output physicell0
+See relevant subpackage README for details.
+
+The `utilities` subpackage contains various utility functions for saving and loading files (locally and on the cloud), plotting, and key management.
+
+## Features
+
+This repository uses the following tools for managing Python projects:
+
+- [Poetry](https://python-poetry.org/) for packaging and dependency management
+- [Tox](https://tox.readthedocs.io/en/latest/) for automated testing
+- [Black](https://black.readthedocs.io/en/stable/) for code formatting
+- [Pylint](https://www.pylint.org/) for linting
+
+as well as GitHub Actions to automatically build, test, lint, and generate documentation.
+
+## Installation
+
+1. Clone the repo.
+2. Initialize the repository with Poetry by running:
+
+```bash
+$ poetry init
 ```
-this will create a file 'physicell0.simularium' in your working directory, drag and drop this at https://simularium.allencell.org/viewer
 
+3. Install dependencies.
+
+```bash
+$ poetry install
+```
+
+4. Activate the environment.
+
+```bash
+$ poetry shell
+```
+
+5. Run the CLI
+
+## Commands
+
+The `Makefile` include three commands for working with the project.
+
+- `make clean` will clean all the build and testing files
+- `make build` will run tests, lint, and type check your code (you can also just run `tox`)
+- `make docs` will generate documentation
