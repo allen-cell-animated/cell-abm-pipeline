@@ -1,0 +1,7 @@
+colony\_dynamics package
+========================
+
+.. automodule:: colony_dynamics
+   :members:
+   :undoc-members:
+   :show-inheritance:

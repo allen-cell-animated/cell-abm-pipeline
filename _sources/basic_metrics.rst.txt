@@ -1,0 +1,7 @@
+basic\_metrics package
+======================
+
+.. automodule:: basic_metrics
+   :members:
+   :undoc-members:
+   :show-inheritance:

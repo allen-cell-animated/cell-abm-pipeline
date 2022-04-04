@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cell_shape.extract_shapes &mdash; PROJECT_NAME VERSION NUMBER X.X.X documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> PROJECT_NAME
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Package modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PROJECT_NAME</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>cell_shape.extract_shapes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cell_shape.extract_shapes</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
+
+<span class="kn">import</span> <span class="nn">vtk</span>
+<span class="kn">import</span> <span class="nn">trimesh</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">aicsshparam</span> <span class="kn">import</span> <span class="n">shtools</span>
+
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.cell_shape.__config__</span> <span class="kn">import</span> <span class="n">COEFF_ORDER</span><span class="p">,</span> <span class="n">PCA_COMPONENTS</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.cell_shape.calculate_coefficients</span> <span class="kn">import</span> <span class="n">CalculateCoefficients</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.load</span> <span class="kn">import</span> <span class="n">load_pickle</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.save</span> <span class="kn">import</span> <span class="n">save_buffer</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.keys</span> <span class="kn">import</span> <span class="n">make_folder_key</span><span class="p">,</span> <span class="n">make_file_key</span>
+
+
+<div class="viewcode-block" id="ExtractShapes"><a class="viewcode-back" href="../../cell_shape.extract_shapes.html#cell_shape.extract_shapes.ExtractShapes">[docs]</a><span class="k">class</span> <span class="nc">ExtractShapes</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folders</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="n">make_folder_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;analysis&quot;</span><span class="p">,</span> <span class="s2">&quot;SHPCA&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+            <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="n">make_folder_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;SHPCA&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;SHPCA&quot;</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="s2">&quot;pkl&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;SHPCA&quot;</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="s2">&quot;svg&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="ExtractShapes.run"><a class="viewcode-back" href="../../cell_shape.extract_shapes.html#cell_shape.extract_shapes.ExtractShapes.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">region</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">extract_shapes</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">box</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExtractShapes.extract_shapes"><a class="viewcode-back" href="../../cell_shape.extract_shapes.html#cell_shape.extract_shapes.ExtractShapes.extract_shapes">[docs]</a>    <span class="k">def</span> <span class="nf">extract_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">box</span><span class="p">):</span>
+        <span class="n">file_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">](</span><span class="n">region</span><span class="p">)</span> <span class="o">%</span> <span class="n">key</span>
+        <span class="n">loaded</span> <span class="o">=</span> <span class="n">load_pickle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">file_key</span><span class="p">)</span>
+        <span class="n">pca</span> <span class="o">=</span> <span class="n">loaded</span><span class="p">[</span><span class="s2">&quot;pca&quot;</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">loaded</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+
+        <span class="n">shape_svgs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_shape_svgs</span><span class="p">(</span><span class="n">pca</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
+        <span class="n">svg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compile_shape_svg</span><span class="p">(</span><span class="n">shape_svgs</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
+
+        <span class="n">output_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">](</span><span class="n">region</span><span class="p">)</span> <span class="o">%</span> <span class="n">key</span>
+        <span class="n">save_buffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">output_key</span><span class="p">,</span> <span class="n">svg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExtractShapes.extract_shape_svgs"><a class="viewcode-back" href="../../cell_shape.extract_shapes.html#cell_shape.extract_shapes.ExtractShapes.extract_shape_svgs">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">extract_shape_svgs</span><span class="p">(</span>
+        <span class="n">pca</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="n">PCA_COMPONENTS</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">COEFF_ORDER</span>
+    <span class="p">):</span>
+        <span class="c1"># Transform data.</span>
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="n">CalculateCoefficients</span><span class="o">.</span><span class="n">get_coeff_names</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">region</span><span class="p">:</span>
+            <span class="n">coeffs</span> <span class="o">=</span> <span class="n">coeffs</span> <span class="o">+</span> <span class="n">CalculateCoefficients</span><span class="o">.</span><span class="n">get_coeff_names</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">coeffs</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">transformed_data</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)])</span>
+
+        <span class="c1"># Calculate means and standard deviations of the transformed data.</span>
+        <span class="n">means</span> <span class="o">=</span> <span class="n">transformed_data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">stds</span> <span class="o">=</span> <span class="n">transformed_data</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Select points in transformed space.</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span>
+
+        <span class="n">shape_svgs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">components</span><span class="p">):</span>
+            <span class="n">point_vector</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">components</span>
+            <span class="n">component_shape_svgs</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points</span><span class="p">:</span>
+                <span class="n">point_vector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">point</span>
+                <span class="n">vector</span> <span class="o">=</span> <span class="n">means</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">stds</span><span class="p">,</span> <span class="n">point_vector</span><span class="p">)</span>
+
+                <span class="n">slices</span> <span class="o">=</span> <span class="n">ExtractShapes</span><span class="o">.</span><span class="n">extract_shape_svg</span><span class="p">(</span><span class="n">pca</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">region</span><span class="p">:</span>
+                    <span class="n">region_slices</span> <span class="o">=</span> <span class="n">ExtractShapes</span><span class="o">.</span><span class="n">extract_shape_svg</span><span class="p">(</span>
+                        <span class="n">pca</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">region</span>
+                    <span class="p">)</span>
+                    <span class="n">region_slices</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">region_slices</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+                    <span class="n">slices</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">region_slices</span><span class="p">)</span>
+
+                <span class="n">component_shape_svgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">slices</span><span class="p">)</span>
+
+            <span class="n">shape_svgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">component_shape_svgs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">shape_svgs</span></div>
+
+<div class="viewcode-block" id="ExtractShapes.extract_shape_svg"><a class="viewcode-back" href="../../cell_shape.extract_shapes.html#cell_shape.extract_shapes.ExtractShapes.extract_shape_svg">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">extract_shape_svg</span><span class="p">(</span><span class="n">pca</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">COEFF_ORDER</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">region</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="n">ExtractShapes</span><span class="o">.</span><span class="n">construct_mesh_from_points</span><span class="p">(</span><span class="n">pca</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="n">ExtractShapes</span><span class="o">.</span><span class="n">convert_vtk_to_trimesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="n">slices</span> <span class="o">=</span> <span class="n">ExtractShapes</span><span class="o">.</span><span class="n">get_mesh_slices</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">slices</span></div>
+
+<div class="viewcode-block" id="ExtractShapes.compile_shape_svg"><a class="viewcode-back" href="../../cell_shape.extract_shapes.html#cell_shape.extract_shapes.ExtractShapes.compile_shape_svg">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">compile_shape_svg</span><span class="p">(</span><span class="n">svgs</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">region</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Initialize output.</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="s2">&quot;&lt;svg&gt;&lt;/svg&gt;&quot;</span><span class="p">)</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="p">{</span><span class="n">view</span><span class="p">:</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">view</span><span class="p">})</span> <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">svgs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+
+        <span class="c1"># Add svg elements to output.</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">component</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">svgs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">elements</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">component</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">view</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">elements</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">rotate</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="s2">&quot;top&quot;</span> <span class="ow">in</span> <span class="n">view</span> <span class="k">else</span> <span class="mi">90</span>
+                    <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;#aaa&quot;</span> <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">view</span> <span class="k">else</span> <span class="s2">&quot;#555&quot;</span>
+                    <span class="n">group</span> <span class="o">=</span> <span class="n">groups</span><span class="p">[</span><span class="n">view</span><span class="p">]</span>
+                    <span class="n">ExtractShapes</span><span class="o">.</span><span class="n">append_svg_element</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">rotate</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
+
+        <span class="n">ExtractShapes</span><span class="o">.</span><span class="n">clear_svg_namespaces</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//*&quot;</span><span class="p">):</span>
+            <span class="n">ExtractShapes</span><span class="o">.</span><span class="n">clear_svg_namespaces</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+        <span class="c1"># Set SVG size and namespace.</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;xmlns&quot;</span><span class="p">,</span> <span class="s2">&quot;http://www.w3.org/2000/svg&quot;</span><span class="p">)</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;height&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">svgs</span><span class="p">)))</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;width&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">svgs</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+
+        <span class="k">return</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">ET</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ExtractShapes.construct_mesh_from_points"><a class="viewcode-back" href="../../cell_shape.extract_shapes.html#cell_shape.extract_shapes.ExtractShapes.construct_mesh_from_points">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">construct_mesh_from_points</span><span class="p">(</span><span class="n">pca</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">COEFF_ORDER</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructs mesh given PCA transformation points.&quot;&quot;&quot;</span>
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">features</span><span class="p">)</span>
+        <span class="n">coeffs_map</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">coeffs_map</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">shcoeffs_L</span><span class="si">{</span><span class="n">l</span><span class="si">}</span><span class="s2">M</span><span class="si">{</span><span class="n">m</span><span class="si">}</span><span class="s2">C</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+                <span class="n">coeffs_map</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">shcoeffs_L</span><span class="si">{</span><span class="n">l</span><span class="si">}</span><span class="s2">M</span><span class="si">{</span><span class="n">m</span><span class="si">}</span><span class="s2">S</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+
+        <span class="n">mesh</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">shtools</span><span class="o">.</span><span class="n">get_reconstruction_from_coeffs</span><span class="p">(</span><span class="n">coeffs_map</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mesh</span></div>
+
+<div class="viewcode-block" id="ExtractShapes.convert_vtk_to_trimesh"><a class="viewcode-back" href="../../cell_shape.extract_shapes.html#cell_shape.extract_shapes.ExtractShapes.convert_vtk_to_trimesh">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">convert_vtk_to_trimesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp</span><span class="p">:</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPLYWriter</span><span class="p">()</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">SetInputData</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">SetFileTypeToASCII</span><span class="p">()</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">temp</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.ply&quot;</span><span class="p">)</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">writer</span><span class="o">.</span><span class="n">Write</span><span class="p">()</span>
+            <span class="n">mesh</span> <span class="o">=</span> <span class="n">trimesh</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">temp</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.ply&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mesh</span></div>
+
+<div class="viewcode-block" id="ExtractShapes.get_mesh_slices"><a class="viewcode-back" href="../../cell_shape.extract_shapes.html#cell_shape.extract_shapes.ExtractShapes.get_mesh_slices">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_mesh_slices</span><span class="p">(</span><span class="n">mesh</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;side1&quot;</span><span class="p">:</span> <span class="n">ExtractShapes</span><span class="o">.</span><span class="n">get_mesh_slice</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+            <span class="s2">&quot;side2&quot;</span><span class="p">:</span> <span class="n">ExtractShapes</span><span class="o">.</span><span class="n">get_mesh_slice</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+            <span class="s2">&quot;top&quot;</span><span class="p">:</span> <span class="n">ExtractShapes</span><span class="o">.</span><span class="n">get_mesh_slice</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="ExtractShapes.get_mesh_slice"><a class="viewcode-back" href="../../cell_shape.extract_shapes.html#cell_shape.extract_shapes.ExtractShapes.get_mesh_slice">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_mesh_slice</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">normal</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get svg slice of mesh along plane for given normal.&quot;&quot;&quot;</span>
+        <span class="n">mesh_slice</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">section_multiplane</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">centroid</span><span class="p">,</span> <span class="n">normal</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">svg</span> <span class="o">=</span> <span class="n">trimesh</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exchange</span><span class="o">.</span><span class="n">svg_io</span><span class="o">.</span><span class="n">export_svg</span><span class="p">(</span><span class="n">mesh_slice</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">svg</span></div>
+
+<div class="viewcode-block" id="ExtractShapes.append_svg_element"><a class="viewcode-back" href="../../cell_shape.extract_shapes.html#cell_shape.extract_shapes.ExtractShapes.append_svg_element">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">append_svg_element</span><span class="p">(</span><span class="n">svg</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">rotate</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#555&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Append svg element to root.&quot;&quot;&quot;</span>
+        <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">box</span>
+        <span class="n">element</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">svg</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;translate(</span><span class="si">{</span><span class="n">col</span><span class="o">*</span><span class="n">width</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">row</span><span class="o">*</span><span class="n">height</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">})</span>
+
+        <span class="n">cx</span> <span class="o">=</span> <span class="n">width</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">cy</span> <span class="o">=</span> <span class="n">height</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="n">path</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;fill&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">)</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;stroke&quot;</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;stroke-width&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="mi">80</span> <span class="o">/</span> <span class="n">scale</span><span class="p">))</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;rotate(</span><span class="si">{</span><span class="n">rotate</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">cx</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">cy</span><span class="si">}</span><span class="s2">) translate(</span><span class="si">{</span><span class="n">cx</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">cy</span><span class="si">}</span><span class="s2">) scale(</span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="n">group</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExtractShapes.clear_svg_namespaces"><a class="viewcode-back" href="../../cell_shape.extract_shapes.html#cell_shape.extract_shapes.ExtractShapes.clear_svg_namespaces">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">clear_svg_namespaces</span><span class="p">(</span><span class="n">svg</span><span class="p">):</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">has_namespace</span><span class="p">,</span> <span class="n">postfix</span> <span class="o">=</span> <span class="n">svg</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">has_namespace</span><span class="p">:</span>
+            <span class="n">svg</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">postfix</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright YYYY, AUTHOR_NAME.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

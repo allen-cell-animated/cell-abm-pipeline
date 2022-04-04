@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>initial_conditions.convert_arcade &mdash; PROJECT_NAME VERSION NUMBER X.X.X documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> PROJECT_NAME
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Package modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PROJECT_NAME</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>initial_conditions.convert_arcade</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for initial_conditions.convert_arcade</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">pi</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
+
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.initial_conditions.__config__</span> <span class="kn">import</span> <span class="n">POTTS_TERMS</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.initial_conditions.process_samples</span> <span class="kn">import</span> <span class="n">ProcessSamples</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.load</span> <span class="kn">import</span> <span class="n">load_dataframe</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.save</span> <span class="kn">import</span> <span class="n">save_json</span><span class="p">,</span> <span class="n">save_buffer</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.keys</span> <span class="kn">import</span> <span class="n">make_folder_key</span><span class="p">,</span> <span class="n">make_file_key</span>
+
+<span class="c1"># Critical cell height (in voxels)</span>
+<span class="n">CRITICAL_HEIGHT</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="c1"># Minimum number of voxels per cell</span>
+<span class="n">MIN_VOXELS</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="c1"># Minimum number of voxels per cell region</span>
+<span class="n">MIN_REGION_VOXELS</span> <span class="o">=</span> <span class="mi">50</span>
+
+
+<div class="viewcode-block" id="ConvertARCADE"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE">[docs]</a><span class="k">class</span> <span class="nc">ConvertARCADE</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folders</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="n">make_folder_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;PROCESSED&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="n">make_folder_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;converted&quot;</span><span class="p">,</span> <span class="s2">&quot;ARCADE&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;PROCESSED&quot;</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="s2">&quot;csv&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;cells&quot;</span><span class="p">:</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;CELLS&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;locations&quot;</span><span class="p">:</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;LOCATIONS&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;setup&quot;</span><span class="p">:</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;xml&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="ConvertARCADE.run"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">margins</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">region</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">convert_arcade</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">margins</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvertARCADE.convert_arcade"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.convert_arcade">[docs]</a>    <span class="k">def</span> <span class="nf">convert_arcade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">margins</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
+        <span class="n">sample_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">](</span><span class="kc">None</span><span class="p">)</span> <span class="o">%</span> <span class="n">key</span>
+        <span class="n">samples_df</span> <span class="o">=</span> <span class="n">load_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">sample_key</span><span class="p">)</span>
+
+        <span class="n">steps</span><span class="p">,</span> <span class="n">offsets</span><span class="p">,</span> <span class="n">bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_sample_transform</span><span class="p">(</span><span class="n">samples_df</span><span class="p">,</span> <span class="n">margins</span><span class="p">)</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_sample_voxels</span><span class="p">(</span><span class="n">samples_df</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">offsets</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">region</span><span class="p">:</span>
+            <span class="n">region_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">](</span><span class="n">region</span><span class="p">)</span> <span class="o">%</span> <span class="n">key</span>
+            <span class="n">region_df</span> <span class="o">=</span> <span class="n">load_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">region_key</span><span class="p">)</span>
+            <span class="n">region_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_sample_voxels</span><span class="p">(</span><span class="n">region_df</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">offsets</span><span class="p">)</span>
+            <span class="n">region_samples</span><span class="p">[</span><span class="s2">&quot;region&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">region</span>
+
+            <span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">region_samples</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+            <span class="n">samples</span><span class="p">[</span><span class="s2">&quot;region&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s2">&quot;DEFAULT&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Filter samples for valid samples.</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_valid_samples</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+
+        <span class="c1"># Initialize outputs.</span>
+        <span class="n">locations</span><span class="p">,</span> <span class="n">cells</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="n">samples_by_id</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Iterate through each cell in samples and convert.</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">samples_by_id</span><span class="p">):</span>
+            <span class="n">cells</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">convert_to_cell</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">group</span><span class="p">))</span>
+            <span class="n">locations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">convert_to_location</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">group</span><span class="p">))</span>
+
+        <span class="c1"># Save converted ARCADE files.</span>
+        <span class="n">cells_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s2">&quot;cells&quot;</span><span class="p">]</span> <span class="o">%</span> <span class="n">key</span>
+        <span class="n">save_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">cells_key</span><span class="p">,</span> <span class="n">cells</span><span class="p">)</span>
+
+        <span class="n">locations_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s2">&quot;locations&quot;</span><span class="p">]</span> <span class="o">%</span> <span class="n">key</span>
+        <span class="n">save_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">locations_key</span><span class="p">,</span> <span class="n">locations</span><span class="p">)</span>
+
+        <span class="c1"># Create and save setup file.</span>
+        <span class="n">setup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_setup_file</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="o">**</span><span class="n">bounds</span><span class="p">)</span>
+        <span class="n">setup_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s2">&quot;setup&quot;</span><span class="p">]</span> <span class="o">%</span> <span class="n">key</span>
+        <span class="n">save_buffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">setup_key</span><span class="p">,</span> <span class="n">setup</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvertARCADE.calculate_sample_transform"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.calculate_sample_transform">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">calculate_sample_transform</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">margins</span><span class="p">):</span>
+        <span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;length&quot;</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">,</span> <span class="s2">&quot;height&quot;</span><span class="p">]</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">]</span>
+
+        <span class="n">steps</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">ProcessSamples</span><span class="o">.</span><span class="n">get_step_size</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">coords</span><span class="p">}</span>
+
+        <span class="n">mins</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">coords</span><span class="p">}</span>
+        <span class="n">maxs</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">coords</span><span class="p">}</span>
+
+        <span class="n">offsets</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="o">-</span><span class="p">(</span><span class="n">mins</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">steps</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="n">margin</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">margin</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">margins</span><span class="p">)}</span>
+
+        <span class="n">bounds</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">size</span><span class="p">:</span> <span class="p">(</span><span class="n">maxs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">mins</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="n">steps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">margin</span> <span class="o">+</span> <span class="mi">3</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">margin</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">margins</span><span class="p">,</span> <span class="n">sizes</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">steps</span><span class="p">,</span> <span class="n">offsets</span><span class="p">,</span> <span class="n">bounds</span></div>
+
+<div class="viewcode-block" id="ConvertARCADE.transform_sample_voxels"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.transform_sample_voxels">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">transform_sample_voxels</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">offsets</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scale samples and reposition to center of bounding box.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">]:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">steps</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int32&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">offsets</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="ConvertARCADE.make_setup_file"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.make_setup_file">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">make_setup_file</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">terms</span><span class="o">=</span><span class="n">POTTS_TERMS</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create empty setup file for converted samples.&quot;&quot;&quot;</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="s2">&quot;&lt;set&gt;&lt;/set&gt;&quot;</span><span class="p">)</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+            <span class="n">root</span><span class="p">,</span>
+            <span class="s2">&quot;series&quot;</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ARCADE&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;interval&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;dt&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ticks&quot;</span><span class="p">:</span> <span class="s2">&quot;24&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ds&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">height</span><span class="p">),</span>
+                <span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">length</span><span class="p">),</span>
+                <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">width</span><span class="p">),</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="n">potts</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="s2">&quot;potts&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">terms</span><span class="p">:</span>
+            <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">potts</span><span class="p">,</span> <span class="s2">&quot;potts.term&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">term</span><span class="p">})</span>
+
+        <span class="n">agents</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="s2">&quot;agents&quot;</span><span class="p">)</span>
+        <span class="n">populations</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">agents</span><span class="p">,</span> <span class="s2">&quot;populations&quot;</span><span class="p">)</span>
+
+        <span class="n">init</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+        <span class="n">population</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">populations</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;init&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">init</span><span class="p">)})</span>
+
+        <span class="k">if</span> <span class="s2">&quot;region&quot;</span> <span class="ow">in</span> <span class="n">samples</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">samples</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+                <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="s2">&quot;population.region&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">region</span><span class="p">,</span> <span class="s2">&quot;fraction&quot;</span><span class="p">:</span> <span class="s2">&quot;0.5&quot;</span><span class="p">})</span>
+
+        <span class="n">ET</span><span class="o">.</span><span class="n">indent</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">space</span><span class="o">=</span><span class="s2">&quot;    &quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">ET</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ConvertARCADE.filter_valid_samples"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.filter_valid_samples">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_valid_samples</span><span class="p">(</span><span class="n">samples</span><span class="p">):</span>
+        <span class="c1"># Filter for cells less than minimum volume.</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">MIN_VOXELS</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;region&quot;</span> <span class="ow">in</span> <span class="n">samples</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="c1"># Filter out cells less than minimum region volume.</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;region&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">MIN_REGION_VOXELS</span><span class="p">)</span>
+
+            <span class="c1"># Ensure that each cell has all regions.</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">samples</span></div>
+
+<div class="viewcode-block" id="ConvertARCADE.convert_to_cell"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.convert_to_cell">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">convert_to_cell</span><span class="p">(</span><span class="n">cell_id</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert samples to ARCADE .CELLS json format.&quot;&quot;&quot;</span>
+        <span class="n">volume</span><span class="p">,</span> <span class="n">surface</span> <span class="o">=</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_targets</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+        <span class="n">state</span><span class="p">,</span> <span class="n">phase</span> <span class="o">=</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_phase</span><span class="p">()</span>
+
+        <span class="n">cell</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">cell_id</span><span class="p">,</span>
+            <span class="s2">&quot;parent&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;pop&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;divisions&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">state</span><span class="p">,</span>
+            <span class="s2">&quot;phase&quot;</span><span class="p">:</span> <span class="n">phase</span><span class="p">,</span>
+            <span class="s2">&quot;voxels&quot;</span><span class="p">:</span> <span class="n">volume</span><span class="p">,</span>
+            <span class="s2">&quot;targets&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">volume</span><span class="p">,</span> <span class="n">surface</span><span class="p">],</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="s2">&quot;region&quot;</span> <span class="ow">in</span> <span class="n">samples</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">regions</span> <span class="o">=</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_regions</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+            <span class="n">cell</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;regions&quot;</span><span class="p">:</span> <span class="n">regions</span><span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">cell</span></div>
+
+<div class="viewcode-block" id="ConvertARCADE.convert_to_location"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.convert_to_location">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">convert_to_location</span><span class="p">(</span><span class="n">cell_id</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert samples to ARCADE .LOCATIONS json format.&quot;&quot;&quot;</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">make_location_center</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;region&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">samples</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">location</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;UNDEFINED&quot;</span><span class="p">,</span> <span class="s2">&quot;voxels&quot;</span><span class="p">:</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">make_location_voxels</span><span class="p">(</span><span class="n">samples</span><span class="p">)}</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">location</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="n">region</span><span class="p">,</span> <span class="s2">&quot;voxels&quot;</span><span class="p">:</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">make_location_voxels</span><span class="p">(</span><span class="n">group</span><span class="p">)}</span>
+                <span class="k">for</span> <span class="n">region</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">samples</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;region&quot;</span><span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">cell_id</span><span class="p">,</span>
+            <span class="s2">&quot;center&quot;</span><span class="p">:</span> <span class="n">center</span><span class="p">,</span>
+            <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="n">location</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="ConvertARCADE.get_cell_targets"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.get_cell_targets">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_cell_targets</span><span class="p">(</span><span class="n">samples</span><span class="p">):</span>
+        <span class="n">volume</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+        <span class="n">surface</span> <span class="o">=</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">calculate_surface_area</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">CRITICAL_HEIGHT</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">volume</span><span class="p">,</span> <span class="n">surface</span></div>
+
+<div class="viewcode-block" id="ConvertARCADE.get_cell_phase"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.get_cell_phase">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_cell_phase</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.1</span><span class="p">:</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="s2">&quot;APOPTOTIC&quot;</span>
+            <span class="n">phase</span> <span class="o">=</span> <span class="s2">&quot;APOPTOTIC_EARLY&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="s2">&quot;PROLIFERATIVE&quot;</span>
+            <span class="n">phase</span> <span class="o">=</span> <span class="s2">&quot;PROLIFERATIVE_G1&quot;</span>
+
+        <span class="k">return</span> <span class="n">state</span><span class="p">,</span> <span class="n">phase</span></div>
+
+<div class="viewcode-block" id="ConvertARCADE.get_cell_regions"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.get_cell_regions">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_cell_regions</span><span class="p">(</span><span class="n">samples</span><span class="p">):</span>
+        <span class="n">regions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">region</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">samples</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;region&quot;</span><span class="p">):</span>
+            <span class="n">regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="n">region</span><span class="p">,</span>
+                    <span class="s2">&quot;voxels&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">group</span><span class="p">),</span>
+                    <span class="s2">&quot;targets&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_targets</span><span class="p">(</span><span class="n">group</span><span class="p">)),</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">regions</span></div>
+
+<div class="viewcode-block" id="ConvertARCADE.calculate_surface_area"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.calculate_surface_area">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">calculate_surface_area</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mf">0.50931200</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="mf">0.79295247</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.54292969</span>
+        <span class="n">surface</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">volume</span> <span class="o">/</span> <span class="n">height</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">volume</span> <span class="o">*</span> <span class="n">height</span><span class="p">)</span>
+        <span class="n">correction</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="p">((</span><span class="n">volume</span> <span class="o">*</span> <span class="n">height</span><span class="p">)</span> <span class="o">**</span> <span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span>
+        <span class="k">return</span> <span class="n">ceil</span><span class="p">(</span><span class="n">surface</span> <span class="o">+</span> <span class="n">correction</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvertARCADE.make_location_center"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.make_location_center">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">make_location_center</span><span class="p">(</span><span class="n">samples</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets coordinates of center of samples.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="ConvertARCADE.make_location_voxels"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.make_location_voxels">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">make_location_voxels</span><span class="p">(</span><span class="n">samples</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get list of voxel coordinates from samples dataframe.&quot;&quot;&quot;</span>
+        <span class="n">xyz_samples</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_records</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[[</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">voxel</span><span class="p">]</span> <span class="k">for</span> <span class="n">voxel</span> <span class="ow">in</span> <span class="n">xyz_samples</span><span class="p">]</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright YYYY, AUTHOR_NAME.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

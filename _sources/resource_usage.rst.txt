@@ -1,0 +1,7 @@
+resource\_usage package
+=======================
+
+.. automodule:: resource_usage
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+initial\_conditions.process\_samples module
+===========================================
+
+.. automodule:: initial_conditions.process_samples
+   :members:
+   :undoc-members:
+   :show-inheritance:

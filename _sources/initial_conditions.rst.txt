@@ -1,0 +1,19 @@
+initial\_conditions package
+===========================
+
+.. automodule:: initial_conditions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   initial_conditions.convert_arcade
+   initial_conditions.create_voronoi
+   initial_conditions.download_images
+   initial_conditions.process_samples
+   initial_conditions.sample_images
