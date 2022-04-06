@@ -20,3 +20,7 @@ class TestCalculateCoefficients(unittest.TestCase):
         }
 
         self.assertSetEqual(expected_names, set(coeff_names))
+
+
+if __name__ == "__main__":
+    unittest.main()

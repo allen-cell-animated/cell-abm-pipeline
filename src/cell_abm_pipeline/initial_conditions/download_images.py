@@ -1,5 +1,6 @@
 import os
 import io
+from typing import List
 
 import quilt3
 import pandas as pd
@@ -93,8 +94,8 @@ class DownloadImages:
 
         # Iterate through downloadable images until no more images are available
         # or requested number of images have been downloaded.
-        downloaded_fov_files = []
-        for fov_file, status in fov_files.to_records(index=False):
+        downloaded_fov_files: List[str] = []
+        for fov_seg_path, _, status in fov_files.to_records(index=False):
             if len(downloaded_fov_files) >= num_images:
                 break
 
@@ -102,11 +103,12 @@ class DownloadImages:
                 continue
 
             # Download image from Quilt as bytes, then save buffer.
-            print(f"Downloading {fov_file} ...")
-            contents = io.BytesIO(pkg["fov_seg_path"][fov_file].get_bytes())
-            image_key = self.folders["image"] + self.files["image"] % fov_file
+            print(f"Downloading {fov_seg_path} ...")
+            contents = io.BytesIO(pkg[fov_seg_path].get_bytes())
+            fov_seg_path_key = fov_seg_path.split("/")[-1]
+            image_key = self.folders["image"] + self.files["image"] % fov_seg_path_key
             save_buffer(self.context.working, image_key, contents)
-            downloaded_fov_files.append(fov_file)
+            downloaded_fov_files.append(fov_seg_path)
 
         # Update status for downloaded FOV images.
         fov_files.loc[fov_files["fov_seg_path"].isin(downloaded_fov_files), "status"] = "downloaded"
@@ -115,18 +117,19 @@ class DownloadImages:
     @staticmethod
     def get_fov_files(working: str, key: str, pkg: quilt3.Package) -> pd.DataFrame:
         """
-        Gets dataframe of all FOV files paths and statuses.
+        Gets dataframe of all FOV file paths and statuses.
 
         ============  =========================================
         Column        Description
         ============  =========================================
         fov_seg_path  path to FOV segmentation file
+        fov_path      path to FOV raw file
         status        file status ("available" or "downloaded")
         ============  =========================================
 
         If saved manifest exists, it is loaded directly.
         If saved manifest does not exists, the manifest is extracted from the
-        Quilt manifest column ``fov_seg_path``.
+        Quilt manifest column ``fov_seg_path`` and ``fov_path``.
 
         Parameters
         ----------
@@ -140,9 +143,19 @@ class DownloadImages:
         full_path = f"{working}{key}"
 
         if not os.path.isfile(full_path):
-            fov_file_list = list(pkg["fov_seg_path"].map(lambda lk, entry: lk))
-            fov_files = pd.DataFrame(fov_file_list, columns=["fov_seg_path"])
-            fov_files["status"] = "available"
+            all_fov_entries = set()
+
+            for pkg_entry in pkg.manifest:
+                try:
+                    associates = pkg_entry["meta"]["user_meta"]["associates"]
+                    fov_entry = (associates["fov_seg_path"], associates["fov_path"], "available")
+                    all_fov_entries.add(fov_entry)
+                except KeyError:
+                    pass
+
+            sorted_fov_entries = sorted(list(all_fov_entries))
+            fov_columns = ["fov_seg_path", "fov_path", "status"]
+            fov_files = pd.DataFrame(sorted_fov_entries, columns=fov_columns)
             save_dataframe(working, key, fov_files, index=False)
         else:
             fov_files = load_dataframe(working, key)
