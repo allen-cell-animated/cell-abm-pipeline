@@ -1,3 +1,20 @@
+# Editors
+.vscode/
+.idea/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Vagrant
+.vagrant/
+
+# Mac/OSX
+.DS_Store
+
+# Windows
+Thumbs.db
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -8,7 +25,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-env/
 build/
 develop-eggs/
 dist/
@@ -24,9 +40,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-
-# OS generated files
-.DS_Store
+MANIFEST
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -41,6 +55,7 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports
 htmlcov/
 .tox/
+.nox/
 .coverage
 .coverage.*
 .cache
@@ -50,24 +65,12 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-
 # Flask stuff:
 instance/
 .webassets-cache
 
-# Scrapy stuff:
-.scrapy
-
 # Sphinx documentation
 docs/_build/
-docs/cell_abm.*rst
 
 # PyBuilder
 target/
@@ -75,47 +78,28 @@ target/
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# pyenv
-.python-version
+# IPython
+profile_default/
+ipython_config.py
 
-# celery beat schedule file
-celerybeat-schedule
-
-# Dask
-dask-worker-space/
-
-# SageMath parsed files
-*.sage.py
-
-# dotenv
+# Environments
 .env
-
-# virtualenv
 .venv
+env/
 venv/
 ENV/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
+env.bak/
+venv.bak/
 
 # mkdocs documentation
 /site
 
 # mypy
-.mypy_cache
+.mypy_cache/
+.dmypy.json
+dmypy.json
 
-# ignore vscode settings
-.vscode/settings.json
+# generally informed by:
+# https://gist.github.com/GhostofGoes/94580e76cd251972b15b4821c8a06f59
 
-# outputs
-visualization/output
-*.simularium
-*.pkl
-*.tiff
-init_conditions/*.csv
-*.png
-*.csv
+working/
