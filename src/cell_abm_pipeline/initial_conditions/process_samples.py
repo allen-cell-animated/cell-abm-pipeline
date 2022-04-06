@@ -42,13 +42,13 @@ class ProcessSamples:
         samples_df = load_dataframe(self.context.working, sample_key)
         processed_df = samples_df.copy()
 
-        if edges:
-            print("Removing edge cells ...")
-            processed_df = self.remove_edge_cells(processed_df, grid)
-
         if connected:
             print("Removing unconnected regions ...")
             processed_df = self.remove_unconnected_regions(processed_df, grid)
+
+        if edges:
+            print("Removing edge cells ...")
+            processed_df = self.remove_edge_cells(processed_df, grid)
 
         if scale is not None:
             print("Scaling coordinates ...")
