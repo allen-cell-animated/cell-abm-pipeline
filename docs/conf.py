@@ -19,7 +19,7 @@ import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
 
-project = 'PROJECT_NAME'
+project = 'Cell agent-based model pipeline'
 copyright = 'YYYY, AUTHOR_NAME'
 author = 'AUTHOR_NAME'
 

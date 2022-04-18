@@ -10,11 +10,11 @@ This repository contains useful modules for working with cell agent-based models
 Modules can be called via CLI or imported into a Python project.
 Top-level subpackages include:
 
-- [`basic_metrics`](src/cell_abm_pipeline/basic_metrics/README.md). Modules for calculating and plotting basic simulation metrics.
-- [`resource_usage`](src/cell_abm_pipeline/resource_usage/README.md). Modules for quantifying resource usage (wall clock and object storage) for simulation sets.
-- [`cell_shape`](src/cell_abm_pipeline/cell_shape/README.md). Modules for calculating spherical harmonic coefficients and extracting cell shapes via dimensionality reduction.
-- [`colony_dynamics`](src/cell_abm_pipeline/colony_dynamics/README.md). Modules for calculating cell neighbors and quantifying colony dynamics from cell neighbor graphs.
-- [`initial_conditions`](src/cell_abm_pipeline/initial_conditions/README.md). Modules for sampling from images and converting into input formats for various model frameworks.
+- `basic_metrics` includes modules for calculating and plotting basic simulation metrics
+- `resource_usage` includes modules for quantifying resource usage (wall clock and object storage) for simulation sets
+- `cell_shape` includes modules for calculating spherical harmonic coefficients and extracting cell shapes via dimensionality reduction
+- `colony_dynamics` includes modules for calculating cell neighbors and quantifying colony dynamics from cell neighbor graphs
+- `initial_conditions` includes modules for sampling from images and converting into input formats for various model frameworks
 
 See relevant subpackage README for details.
 
