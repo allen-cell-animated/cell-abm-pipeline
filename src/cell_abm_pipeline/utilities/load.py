@@ -89,7 +89,7 @@ def _load_tar_from_s3(bucket, key):
     """
     Loads tar archive from bucket with given key.
     """
-    buffer = load_buffer_from_s3(bucket, key)
+    buffer = _load_buffer_from_s3(bucket, key)
     return tarfile.open(fileobj=buffer, mode="r:xz")
 
 
@@ -135,7 +135,7 @@ def _load_xz_from_s3(bucket, key):
     """
     Loads XZ compressed file from bucket with given key.
     """
-    buffer = load_buffer_from_s3(bucket, key)
+    buffer = _load_buffer_from_s3(bucket, key)
     return lzma.decompress(buffer.getbuffer())
 
 

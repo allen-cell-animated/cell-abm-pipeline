@@ -51,7 +51,7 @@ def _save_dataframe_to_s3(bucket, key, df, index=True):
     """
     with io.StringIO() as buffer:
         df.to_csv(buffer, index=index)
-        save_buffer_to_s3(bucket, key, buffer)
+        _save_buffer_to_s3(bucket, key, buffer)
 
 
 def save_pickle(working, key, obj):
@@ -125,7 +125,7 @@ def _save_plot_to_fs(path, key):
 def _save_plot_to_s3(bucket, key):
     with io.BytesIO() as buffer:
         plt.savefig(buffer)
-        save_buffer_to_s3(bucket, key, buffer)
+        _save_buffer_to_s3(bucket, key, buffer)
 
 
 def make_folders(path):
