@@ -1,0 +1,8 @@
+working/
+docs/
+.git
+.idea
+.github
+.mypy_cache
+.pytest_cache
+.tox
