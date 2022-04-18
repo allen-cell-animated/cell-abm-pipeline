@@ -58,7 +58,7 @@ autodoc_default_options = {
 }
 
 # List of modules to be mocked up. Useful when some external dependencies are not met at build time and break the building process.
-autodoc_mock_imports = ["numpy", "pandas", "tifffile", "imagecodecs", "matplotlib", "aicsimageio", "simulariumio", "scikit-image", "jupyter", "jupyterlab", "aicsshparam", "boto3", "trimesh", "Shapely", "quilt3", "hexalattice", "scipy", "vtk", "tqdm", "sklearn", "skimage"]
+autodoc_mock_imports = ["numpy", "pandas", "tifffile", "imagecodecs", "matplotlib", "aicsimageio", "simulariumio", "scikit-image", "jupyter", "jupyterlab", "aicsshparam", "boto3", "trimesh", "Shapely", "quilt3", "hexalattice", "scipy", "vtk", "tqdm", "sklearn", "skimage", "click"]
 
 # -- Options for HTML output -------------------------------------------------
 
