@@ -6,6 +6,7 @@ import quilt3
 import pandas as pd
 
 from cell_abm_pipeline.initial_conditions.__config__ import QUILT_REGISTRY, QUILT_PACKAGE
+from cell_abm_pipeline.initial_conditions.__main__ import Context
 from cell_abm_pipeline.utilities.load import load_dataframe
 from cell_abm_pipeline.utilities.save import save_dataframe, save_buffer
 from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
@@ -35,15 +36,15 @@ class DownloadImages:
 
     Attributes
     ----------
-    context:
-        ``Context`` object defining working location, name, and keys
-    folders :
-        Dictionary of input and output folder keys
-    files:
-        Dictionary of input and output file keys
+    context
+        ``Context`` object defining working location and name.
+    folders
+        Dictionary of input and output folder keys.
+    files
+        Dictionary of input and output file keys.
     """
 
-    def __init__(self, context):
+    def __init__(self, context: Context):
         self.context = context
         self.folders = {
             "manifest": make_folder_key(context.name, "", "", False),
@@ -70,9 +71,8 @@ class DownloadImages:
         Download image task.
 
         Connects to Quilt package specified by ``QUILT_PACKAGE`` and ``QUILT_REGISTRY``.
-        Downloads the requested number of images (up to number of available
-        images). Downloaded images are marked as "downloaded" in the manifest.
-
+        Downloads the requested number of images (up to available images).
+        Downloaded images are marked as "downloaded" in the manifest.
 
         Parameters
         ----------
@@ -128,7 +128,7 @@ class DownloadImages:
         ============  =========================================
 
         If saved manifest exists, it is loaded directly.
-        If saved manifest does not exists, the manifest is extracted from the
+        If saved manifest does not exist, the manifest is extracted from the
         Quilt manifest column ``fov_seg_path`` and ``fov_path``.
 
         Parameters
