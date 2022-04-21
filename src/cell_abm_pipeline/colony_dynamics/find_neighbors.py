@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from skimage import measure
-import scipy.ndimage as ndimage
+from scipy import ndimage
 
 from cell_abm_pipeline.utilities.load import load_tar, load_tar_member
 from cell_abm_pipeline.utilities.save import save_dataframe
@@ -36,29 +36,34 @@ class FindNeighbors:
         all_neighbors = []
         member_names = [member.name.split(".")[0] for member in loc_data_tar.getmembers()]
 
-        for member_name in tqdm(reversed(member_names)):
+        for member_name in tqdm(member_names):
             frame = member_name.split("_")[-1]
             member = load_tar_member(loc_data_tar, f"{member_name}.LOCATIONS.json")
 
             array = self.make_voxels_array(member)
-            neighbors = self.get_neighbors(array)
+            neighbors = self.get_array_neighbors(array)
 
-            for region, voxel_id, neighbor_list in neighbors:
-                if len(neighbor_list) == 0:
-                    neighbor_list = [0]
-
-                for neighbor in neighbor_list:
-                    connection = {"REGION": region, "ID": voxel_id, "NEIGHBOR": neighbor}
-
-                    connection["KEY"] = key
-                    connection["SEED"] = seed
-                    connection["TICK"] = frame
-
-                    all_neighbors.append(connection)
+            attributes = {"KEY": key, "SEED": seed, "TICK": frame}
+            all_neighbors = all_neighbors + self.flatten_neighbors_list(neighbors, attributes)
 
         neighbor_df = pd.DataFrame(all_neighbors)
         analysis_key = self.folders["analysis"] + self.files["analysis"] % (key, seed)
         save_dataframe(self.context.working, analysis_key, neighbor_df, index=False)
+
+    @staticmethod
+    def flatten_neighbors_list(neighbors, attributes):
+        flattened_neighbors_list = []
+
+        for region, voxel_id, neighbor_list in neighbors:
+            if len(neighbor_list) == 0:
+                neighbor_list = [0]
+
+            for neighbor in neighbor_list:
+                entries = {"REGION": region, "ID": voxel_id, "NEIGHBOR": neighbor}
+                entries.update(attributes)
+                flattened_neighbors_list.append(entries)
+
+        return flattened_neighbors_list
 
     @staticmethod
     def make_voxels_array(locations):
@@ -90,7 +95,7 @@ class FindNeighbors:
         return array
 
     @staticmethod
-    def get_neighbors(array):
+    def get_array_neighbors(array):
         """Get list of neighbors for each unique ID in array."""
         neighbors = []
 
@@ -101,36 +106,24 @@ class FindNeighbors:
         # Label connected regions.
         labels, regions = measure.label(mask, connectivity=2, return_num=True)
 
+        # In line function that returns a filter lambda for a given id
+        voxel_filter = lambda voxel_id: lambda v: voxel_id in v
+
         for region in range(1, regions + 1):
-            # Set all voxels outside of region of interest to zero.
-            array_region = array.copy()
-            array_region[labels != region] = 0
-
-            # Crop array to region.
-            xmin, xmax, ymin, ymax, zmin, zmax = FindNeighbors.get_bounding_box(array_region)
-            array_region_cropped = array_region[xmin:xmax, ymin:ymax, zmin:zmax]
-
-            # Iterate through each voxel id in region to get neighbors.
-            voxel_ids = np.unique(array_region_cropped)
-            voxel_ids = [i for i in voxel_ids if i != 0]
+            region_crop = FindNeighbors.get_cropped_array(array, labels, region)
+            voxel_ids = [i for i in np.unique(region_crop) if i != 0]
 
             # Find neighbors for each voxel id.
             for voxel_id in voxel_ids:
-                # Set all other voxels to zero.
-                voxel_region = array_region_cropped.copy()
-                voxel_region[voxel_region != voxel_id] = 0
-
-                # Crop array to voxel.
-                xmin, xmax, ymin, ymax, zmin, zmax = FindNeighbors.get_bounding_box(voxel_region)
-                voxel_region_cropped = array_region_cropped[xmin:xmax, ymin:ymax, zmin:zmax]
-
-                # Apply custom filter to get border locations.
-                border_mask = ndimage.generic_filter(
-                    voxel_region_cropped, (lambda v: voxel_id in v), size=3
+                voxel_crop = FindNeighbors.get_cropped_array(
+                    region_crop, voxel_id, crop_original=True
                 )
 
+                # Apply custom filter to get border locations.
+                border_mask = ndimage.generic_filter(voxel_crop, voxel_filter(voxel_id), size=3)
+
                 # Find neighbors overlapping border.
-                neighbor_list = np.unique(voxel_region_cropped[border_mask == 1])
+                neighbor_list = np.unique(voxel_crop[border_mask == 1])
                 neighbor_list = [i for i in neighbor_list if i not in [0, voxel_id]]
                 neighbors.append([region, voxel_id, neighbor_list])
 
@@ -159,3 +152,18 @@ class FindNeighbors:
         zmax = min(zmax + 2, z)
 
         return xmin, xmax, ymin, ymax, zmin, zmax
+
+    @staticmethod
+    def get_cropped_array(array, label, labels=None, crop_original=False):
+        # Set all voxels not matching label to zero.
+        array_mask = array.copy()
+        labels = labels if labels else array_mask
+        array_mask[labels != label] = 0
+
+        # Crop array to region.
+        xmin, xmax, ymin, ymax, zmin, zmax = FindNeighbors.get_bounding_box(array_mask)
+
+        if crop_original:
+            return array[xmin:xmax, ymin:ymax, zmin:zmax]
+
+        return array_mask[xmin:xmax, ymin:ymax, zmin:zmax]

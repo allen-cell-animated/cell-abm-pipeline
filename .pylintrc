@@ -1,6 +1,10 @@
 [MESSAGES CONTROL]
 
+# Disable specific messages
 disable=missing-module-docstring
+
+# Set good names.
+good-names=i,j,x,y,z
 
 [DESIGN]
 
