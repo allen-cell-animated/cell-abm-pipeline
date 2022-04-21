@@ -165,9 +165,11 @@ def load_image(working, key):
 
 
 def _load_image_from_s3(bucket, key):
-    # TODO: implement load_image_from_s3
-    warnings.warn("load_image_from_s3 not implemented, image not loaded")
-    return None
+    full_key = f"s3://{bucket}/{key}"
+    try:
+        return AICSImage(full_key)
+    except:
+        return AICSImage(full_key.replace(".ome.", "."), reader=TiffReader, dim_order="ZYX")
 
 
 def _load_image_from_fs(path, key):

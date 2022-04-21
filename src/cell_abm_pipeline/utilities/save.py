@@ -4,6 +4,7 @@ import re
 import json
 import pickle
 import warnings
+import tempfile
 
 import boto3
 import matplotlib.pyplot as plt
@@ -80,8 +81,10 @@ def save_image(working, key, obj):
 
 
 def _save_image_to_s3(bucket, key, obj):
-    # TODO: implement save_image_to_s3
-    warnings.warn("save_image_to_s3 not implemented, image not saved")
+    with tempfile.NamedTemporaryFile() as temp_file:
+        OmeTiffWriter.save(obj, temp_file.name)
+        full_key = f"s3://{bucket}/{key}"
+        _save_buffer_to_s3(bucket, key, io.BytesIO(temp_file.read()))
 
 
 def _save_image_to_fs(path, key, img):
@@ -99,7 +102,7 @@ def save_json(working, key, obj):
 
 def _save_json_to_s3(bucket, key, obj):
     # TODO: implement save_json_to_s3
-    warnings.warn("save_json_to_s3 not implemented, image not saved")
+    warnings.warn("save_json_to_s3 not implemented, json not saved")
 
 
 def _save_json_to_fs(path, key, contents):
