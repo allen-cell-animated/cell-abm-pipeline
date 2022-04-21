@@ -232,9 +232,11 @@
 
 
 <span class="k">def</span> <span class="nf">_load_image_from_s3</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-    <span class="c1"># TODO: implement load_image_from_s3</span>
-    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;load_image_from_s3 not implemented, image not loaded&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">full_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;s3://</span><span class="si">{</span><span class="n">bucket</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">full_key</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">full_key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.ome.&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">),</span> <span class="n">reader</span><span class="o">=</span><span class="n">TiffReader</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;ZYX&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_load_image_from_fs</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
