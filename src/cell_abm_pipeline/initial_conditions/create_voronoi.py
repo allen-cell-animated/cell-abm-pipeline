@@ -27,6 +27,7 @@ class CreateVoronoi:
 
         array = image.get_image_data("ZYX", T=0, C=channel)
         distances = distance_transform_edt(array == 0, return_distances=False, return_indices=True)
+        distances = distances.astype("uint16", copy=False)
 
         coordz = distances[0].flatten()
         coordy = distances[1].flatten()
