@@ -27,5 +27,13 @@ def find_neighbors(obj, **kwargs):
     FindNeighbors(obj).run(**kwargs)
 
 
+@cli.command()
+@click.pass_obj
+def compress_neighbors(obj, **kwargs):
+    from .compress_neighbors import CompressNeighbors
+
+    CompressNeighbors(obj).run(**kwargs)
+
+
 if __name__ == "__main__":
     cli()
