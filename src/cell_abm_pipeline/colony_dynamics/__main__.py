@@ -51,5 +51,13 @@ def analyze_clusters(obj, **kwargs):
     AnalyzeClusters(obj).run(**kwargs)
 
 
+@cli.command()
+@click.pass_obj
+def create_networks(obj, **kwargs):
+    from .create_networks import CreateNetworks
+
+    CreateNetworks(obj).run(**kwargs)
+
+
 if __name__ == "__main__":
     cli()
