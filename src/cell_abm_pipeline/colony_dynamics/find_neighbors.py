@@ -44,23 +44,29 @@ class FindNeighbors:
             neighbors = self.get_array_neighbors(array)
 
             attributes = {"KEY": key, "SEED": seed, "TICK": frame}
-            all_neighbors = all_neighbors + self.flatten_neighbors_list(neighbors, attributes)
+            centers = {location["id"]: location["center"] for location in member}
+            all_neighbors = all_neighbors + self.flatten_neighbors_list(
+                neighbors, attributes, centers
+            )
 
         neighbor_df = pd.DataFrame(all_neighbors)
         analysis_key = self.folders["analysis"] + self.files["analysis"] % (key, seed)
         save_dataframe(self.context.working, analysis_key, neighbor_df, index=False)
 
     @staticmethod
-    def flatten_neighbors_list(neighbors, attributes):
+    def flatten_neighbors_list(neighbors, attributes, centers):
         flattened_neighbors_list = []
 
         for group, voxel_id, neighbor_list in neighbors:
+            center = centers[voxel_id]
+
             if len(neighbor_list) == 0:
                 neighbor_list = [0]
 
             for neighbor in neighbor_list:
                 entries = {"GROUP": group, "ID": voxel_id, "NEIGHBOR": neighbor}
                 entries.update(attributes)
+                entries.update({"CX": center[0], "CY": center[1], "CZ": center[2]})
                 flattened_neighbors_list.append(entries)
 
         return flattened_neighbors_list

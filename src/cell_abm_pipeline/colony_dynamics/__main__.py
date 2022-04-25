@@ -43,5 +43,13 @@ def merge_neighbors(obj, **kwargs):
     MergeNeighbors(obj).run(**kwargs)
 
 
+@cli.command()
+@click.pass_obj
+def analyze_clusters(obj, **kwargs):
+    from .analyze_clusters import AnalyzeClusters
+
+    AnalyzeClusters(obj).run(**kwargs)
+
+
 if __name__ == "__main__":
     cli()
