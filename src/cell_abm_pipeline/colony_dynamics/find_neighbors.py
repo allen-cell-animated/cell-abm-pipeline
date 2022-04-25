@@ -54,12 +54,12 @@ class FindNeighbors:
     def flatten_neighbors_list(neighbors, attributes):
         flattened_neighbors_list = []
 
-        for region, voxel_id, neighbor_list in neighbors:
+        for group, voxel_id, neighbor_list in neighbors:
             if len(neighbor_list) == 0:
                 neighbor_list = [0]
 
             for neighbor in neighbor_list:
-                entries = {"REGION": region, "ID": voxel_id, "NEIGHBOR": neighbor}
+                entries = {"GROUP": group, "ID": voxel_id, "NEIGHBOR": neighbor}
                 entries.update(attributes)
                 flattened_neighbors_list.append(entries)
 
@@ -103,20 +103,20 @@ class FindNeighbors:
         mask = np.zeros(array.shape, dtype="int")
         mask[array != 0] = 1
 
-        # Label connected regions.
-        labels, regions = measure.label(mask, connectivity=2, return_num=True)
+        # Label connected groups.
+        labels, groups = measure.label(mask, connectivity=2, return_num=True)
 
         # In line function that returns a filter lambda for a given id
         voxel_filter = lambda voxel_id: lambda v: voxel_id in v
 
-        for region in range(1, regions + 1):
-            region_crop = FindNeighbors.get_cropped_array(array, labels, region)
-            voxel_ids = [i for i in np.unique(region_crop) if i != 0]
+        for group in range(1, groups + 1):
+            group_crop = FindNeighbors.get_cropped_array(array, labels, group)
+            voxel_ids = [i for i in np.unique(group_crop) if i != 0]
 
             # Find neighbors for each voxel id.
             for voxel_id in voxel_ids:
                 voxel_crop = FindNeighbors.get_cropped_array(
-                    region_crop, voxel_id, crop_original=True
+                    group_crop, voxel_id, crop_original=True
                 )
 
                 # Apply custom filter to get border locations.
@@ -125,7 +125,7 @@ class FindNeighbors:
                 # Find neighbors overlapping border.
                 neighbor_list = np.unique(voxel_crop[border_mask == 1])
                 neighbor_list = [i for i in neighbor_list if i not in [0, voxel_id]]
-                neighbors.append([region, voxel_id, neighbor_list])
+                neighbors.append([group, voxel_id, neighbor_list])
 
         return neighbors
 
@@ -160,7 +160,7 @@ class FindNeighbors:
         labels = labels if labels else array_mask
         array_mask[labels != label] = 0
 
-        # Crop array to region.
+        # Crop array to label.
         xmin, xmax, ymin, ymax, zmin, zmax = FindNeighbors.get_bounding_box(array_mask)
 
         if crop_original:
