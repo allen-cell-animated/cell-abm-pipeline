@@ -35,5 +35,13 @@ def compress_neighbors(obj, **kwargs):
     CompressNeighbors(obj).run(**kwargs)
 
 
+@cli.command()
+@click.pass_obj
+def merge_neighbors(obj, **kwargs):
+    from .merge_neighbors import MergeNeighbors
+
+    MergeNeighbors(obj).run(**kwargs)
+
+
 if __name__ == "__main__":
     cli()
