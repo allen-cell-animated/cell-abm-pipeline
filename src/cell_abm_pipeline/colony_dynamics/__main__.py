@@ -59,5 +59,13 @@ def create_networks(obj, **kwargs):
     CreateNetworks(obj).run(**kwargs)
 
 
+@cli.command()
+@click.pass_obj
+def analyze_measures(obj, **kwargs):
+    from .analyze_measures import AnalyzeMeasures
+
+    AnalyzeMeasures(obj).run(**kwargs)
+
+
 if __name__ == "__main__":
     cli()
