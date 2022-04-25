@@ -36,12 +36,12 @@ class CreateNetworks:
             save_pickle(self.context.working, output_key, output)
 
     @staticmethod
-    def convert_to_network(group):
+    def convert_to_network(neighbors):
         """Converts lists of cell ids and neighbors to networks."""
         all_networks = {}
 
-        for tick, neighbors in group.groupby("TICK"):
-            edges = list(neighbors[["ID", "NEIGHBOR"]].to_records(index=False))
+        for tick, tick_group in neighbors.groupby("TICK"):
+            edges = list(tick_group[["ID", "NEIGHBOR"]].to_records(index=False))
             G = nx.Graph()
 
             singles = [from_node for from_node, to_node in edges if to_node == 0]

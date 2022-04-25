@@ -33,26 +33,21 @@ class AnalyzeClusters:
 
         for key, key_group in pd.concat(all_data).groupby("KEY"):
             output_key = self.folders["output"] + self.files["output"] % (key)
-            output_df = self.analyze_cluster(key_group)
+            output_df = self.calculate_cluster_metrics(key_group)
             save_dataframe(self.context.working, output_key, output_df, index=False)
 
     @staticmethod
-    def analyze_cluster(cluster):
-        clusters = []
+    def calculate_cluster_metrics(clusters):
+        all_metrics = []
 
-        for (seed, tick), neighbors in cluster.groupby(["SEED", "TICK"]):
-            groups = neighbors.groupby("GROUP")["ID"].unique()
+        for (seed, tick), cluster in clusters.groupby(["SEED", "TICK"]):
+            groups = cluster.groupby("GROUP")["ID"].unique()
             cluster_sizes, single_sizes = AnalyzeClusters.get_cluster_sizes(groups)
+            centroids = AnalyzeClusters.make_centroid_dict(cluster)
+            inter_mean, inter_std = AnalyzeClusters.get_inter_cluster_distances(groups, centroids)
+            intra_mean, intra_std = AnalyzeClusters.get_intra_cluster_distances(groups, centroids)
 
-            centroid_dict = AnalyzeClusters.make_centroid_dict(neighbors)
-            inter_mean, inter_std = AnalyzeClusters.get_inter_cluster_distances(
-                groups, centroid_dict
-            )
-            intra_mean, intra_std = AnalyzeClusters.get_intra_cluster_distances(
-                groups, centroid_dict
-            )
-
-            cluster = {
+            metrics = {
                 "SEED": seed,
                 "TICK": tick,
                 "NUM_CLUSTERS": len(cluster_sizes),
@@ -66,9 +61,9 @@ class AnalyzeClusters:
                 "INTRA_DISTANCE_STD": intra_std,
             }
 
-            clusters.append(cluster)
+            all_metrics.append(metrics)
 
-        return pd.DataFrame(clusters)
+        return pd.DataFrame(all_metrics)
 
     @staticmethod
     def make_centroid_dict(df):
