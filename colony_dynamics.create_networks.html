@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cell_shape.extract_shapes module &mdash; Cell agent-based model pipeline VERSION NUMBER X.X.X documentation</title>
+  <title>colony_dynamics.create_networks module &mdash; Cell agent-based model pipeline VERSION NUMBER X.X.X documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -18,8 +18,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cell_shape.merge_coefficients module" href="cell_shape.merge_coefficients.html" />
-    <link rel="prev" title="cell_shape.compress_coefficients module" href="cell_shape.compress_coefficients.html" /> 
+    <link rel="next" title="colony_dynamics.find_neighbors module" href="colony_dynamics.find_neighbors.html" />
+    <link rel="prev" title="colony_dynamics.compress_neighbors module" href="colony_dynamics.compress_neighbors.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,19 +42,22 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Package modules</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="basic_metrics.html">basic_metrics package</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="cell_shape.html">cell_shape package</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="cell_shape.html#submodules">Submodules</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="cell_shape.calculate_coefficients.html">cell_shape.calculate_coefficients module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cell_shape.compress_coefficients.html">cell_shape.compress_coefficients module</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">cell_shape.extract_shapes module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cell_shape.merge_coefficients.html">cell_shape.merge_coefficients module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cell_shape.perform_pca.html">cell_shape.perform_pca module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cell_shape.plot_pca.html">cell_shape.plot_pca module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_shape.html">cell_shape package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="colony_dynamics.html">colony_dynamics package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="colony_dynamics.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="colony_dynamics.analyze_clusters.html">colony_dynamics.analyze_clusters module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="colony_dynamics.analyze_measures.html">colony_dynamics.analyze_measures module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="colony_dynamics.compress_neighbors.html">colony_dynamics.compress_neighbors module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">colony_dynamics.create_networks module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="colony_dynamics.find_neighbors.html">colony_dynamics.find_neighbors module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="colony_dynamics.merge_neighbors.html">colony_dynamics.merge_neighbors module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="colony_dynamics.plot_clusters.html">colony_dynamics.plot_clusters module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="colony_dynamics.plot_measures.html">colony_dynamics.plot_measures module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="colony_dynamics.plot_neighbors.html">colony_dynamics.plot_neighbors module</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="colony_dynamics.html">colony_dynamics package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="initial_conditions.html">initial_conditions package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resource_usage.html">resource_usage package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utilities.html">utilities package</a></li>
@@ -77,10 +80,10 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="modules.html">cell_abm_pipeline</a> &raquo;</li>
-          <li><a href="cell_shape.html">cell_shape package</a> &raquo;</li>
-      <li>cell_shape.extract_shapes module</li>
+          <li><a href="colony_dynamics.html">colony_dynamics package</a> &raquo;</li>
+      <li>colony_dynamics.create_networks module</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/cell_shape.extract_shapes.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/colony_dynamics.create_networks.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -88,16 +91,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="cell-shape-extract-shapes-module">
-<h1>cell_shape.extract_shapes module<a class="headerlink" href="#cell-shape-extract-shapes-module" title="Permalink to this headline"></a></h1>
+  <section id="colony-dynamics-create-networks-module">
+<h1>colony_dynamics.create_networks module<a class="headerlink" href="#colony-dynamics-create-networks-module" title="Permalink to this headline"></a></h1>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cell_shape.compress_coefficients.html" class="btn btn-neutral float-left" title="cell_shape.compress_coefficients module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cell_shape.merge_coefficients.html" class="btn btn-neutral float-right" title="cell_shape.merge_coefficients module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="colony_dynamics.compress_neighbors.html" class="btn btn-neutral float-left" title="colony_dynamics.compress_neighbors module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="colony_dynamics.find_neighbors.html" class="btn btn-neutral float-right" title="colony_dynamics.find_neighbors module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

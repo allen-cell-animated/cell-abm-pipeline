@@ -1,0 +1,7 @@
+colony\_dynamics.merge\_neighbors module
+========================================
+
+.. automodule:: colony_dynamics.merge_neighbors
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+colony\_dynamics.plot\_neighbors module
+=======================================
+
+.. automodule:: colony_dynamics.plot_neighbors
+   :members:
+   :undoc-members:
+   :show-inheritance:

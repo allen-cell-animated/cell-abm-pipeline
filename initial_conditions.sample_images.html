@@ -87,53 +87,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-initial_conditions.sample_images">
-<span id="initial-conditions-sample-images-module"></span><h1>initial_conditions.sample_images module<a class="headerlink" href="#module-initial_conditions.sample_images" title="Permalink to this headline"></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="initial_conditions.sample_images.SampleImages">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SampleImages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/initial_conditions/sample_images.html#SampleImages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.sample_images.SampleImages" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="initial_conditions.sample_images.SampleImages.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rect'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/initial_conditions/sample_images.html#SampleImages.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.sample_images.SampleImages.run" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="initial_conditions.sample_images.SampleImages.sample_images">
-<span class="sig-name descname"><span class="pre">sample_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/initial_conditions/sample_images.html#SampleImages.sample_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.sample_images.SampleImages.sample_images" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="initial_conditions.sample_images.SampleImages.plot_contact_sheet">
-<span class="sig-name descname"><span class="pre">plot_contact_sheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/initial_conditions/sample_images.html#SampleImages.plot_contact_sheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.sample_images.SampleImages.plot_contact_sheet" title="Permalink to this definition"></a></dt>
-<dd><p>Save contact sheet image for all z slices in samples.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="initial_conditions.sample_images.SampleImages.get_sample_indices">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_sample_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rect'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/initial_conditions/sample_images.html#SampleImages.get_sample_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.sample_images.SampleImages.get_sample_indices" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="initial_conditions.sample_images.SampleImages.get_hex_sample_indices">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_hex_sample_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/initial_conditions/sample_images.html#SampleImages.get_hex_sample_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.sample_images.SampleImages.get_hex_sample_indices" title="Permalink to this definition"></a></dt>
-<dd><p>Get list of (x, y, z) sample indices for hex grid.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="initial_conditions.sample_images.SampleImages.get_rect_sample_indices">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_rect_sample_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/initial_conditions/sample_images.html#SampleImages.get_rect_sample_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.sample_images.SampleImages.get_rect_sample_indices" title="Permalink to this definition"></a></dt>
-<dd><p>Get list of (x, y, z) sample indices for rect grid.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="initial_conditions.sample_images.SampleImages.get_image_samples">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_image_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/initial_conditions/sample_images.html#SampleImages.get_image_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.sample_images.SampleImages.get_image_samples" title="Permalink to this definition"></a></dt>
-<dd><p>Sample image at given indices.</p>
-</dd></dl>
-
-</dd></dl>
-
+  <section id="initial-conditions-sample-images-module">
+<h1>initial_conditions.sample_images module<a class="headerlink" href="#initial-conditions-sample-images-module" title="Permalink to this headline"></a></h1>
 </section>
 
 

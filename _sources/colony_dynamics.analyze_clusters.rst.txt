@@ -1,0 +1,7 @@
+colony\_dynamics.analyze\_clusters module
+=========================================
+
+.. automodule:: colony_dynamics.analyze_clusters
+   :members:
+   :undoc-members:
+   :show-inheritance:
