@@ -45,6 +45,7 @@ def make_plot(
 
 
 def make_subplots(n_rows, n_cols, size, offset=0, sharex="all", sharey="all"):
+    plt.close('all')
     figsize = (n_cols * size + offset, n_rows * size)
     fig, axs = plt.subplots(n_rows, n_cols, figsize=figsize, sharex=sharex, sharey=sharey)
     return fig, axs

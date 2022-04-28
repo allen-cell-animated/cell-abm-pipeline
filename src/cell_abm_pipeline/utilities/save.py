@@ -8,6 +8,7 @@ import tempfile
 
 import boto3
 import matplotlib.pyplot as plt
+import imageio
 from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 
 
@@ -129,6 +130,28 @@ def _save_plot_to_s3(bucket, key):
     with io.BytesIO() as buffer:
         plt.savefig(buffer)
         _save_buffer_to_s3(bucket, key, buffer)
+
+
+def save_gif(working, key, frames):
+    if working[:5] == "s3://":
+        return _save_gif_to_s3(working[5:], key, frames)
+    else:
+        return _save_gif_to_fs(working, key, frames)
+
+
+def _save_gif_to_fs(path, key, frames):
+    full_path = f"{path}{key}"
+    make_folders(full_path)
+
+    with imageio.get_writer(full_path, mode='I') as writer:
+        for frame in frames:
+            image = imageio.imread(f"{path}{frame}")
+            writer.append_data(image)
+
+
+def _save_gif_to_s3(bucket, key, frames):
+    # TODO: implement save_gif_to_s3
+    warnings.warn("save_gif_to_s3 not implemented, object not saved")
 
 
 def make_folders(path):

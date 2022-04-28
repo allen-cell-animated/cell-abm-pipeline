@@ -83,5 +83,13 @@ def plot_measures(obj, **kwargs):
     PlotMeasures(obj).run(**kwargs)
 
 
+@cli.command()
+@click.pass_obj
+def plot_neighbors(obj, **kwargs):
+    from .plot_neighbors import PlotNeighbors
+
+    PlotNeighbors(obj).run(**kwargs)
+
+
 if __name__ == "__main__":
     cli()
