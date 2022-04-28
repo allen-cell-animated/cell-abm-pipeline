@@ -11,7 +11,7 @@ class AnalyzeMeasures:
     def __init__(self, context):
         self.context = context
         self.folders = {
-            "input": make_folder_key(context.name, "analysis", "NETWORKS", False),
+            "input": make_folder_key(context.name, "analysis", "NETWORKS", True),
             "output": make_folder_key(context.name, "analysis", "MEASURES", True),
         }
         self.files = {

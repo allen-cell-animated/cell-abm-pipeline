@@ -75,5 +75,13 @@ def plot_clusters(obj, **kwargs):
     PlotClusters(obj).run(**kwargs)
 
 
+@cli.command()
+@click.pass_obj
+def plot_measures(obj, **kwargs):
+    from .plot_measures import PlotMeasures
+
+    PlotMeasures(obj).run(**kwargs)
+
+
 if __name__ == "__main__":
     cli()

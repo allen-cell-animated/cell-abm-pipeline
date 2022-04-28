@@ -37,7 +37,9 @@ def make_plot(
         if isinstance(legend, dict):
             legend_ax.legend(**legend, bbox_to_anchor=(1.2, 1), loc="upper left")
         else:
-            legend_ax.legend(bbox_to_anchor=(1.2, 1), loc="upper left")
+            handles, labels = legend_ax.get_legend_handles_labels()
+            unique = dict(zip(labels, handles))
+            legend_ax.legend(unique.values(), unique.keys(), bbox_to_anchor=(1.2, 1), loc="upper left")
 
     fig.tight_layout()
 
