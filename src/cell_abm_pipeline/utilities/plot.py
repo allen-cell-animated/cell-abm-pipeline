@@ -39,13 +39,15 @@ def make_plot(
         else:
             handles, labels = legend_ax.get_legend_handles_labels()
             unique = dict(zip(labels, handles))
-            legend_ax.legend(unique.values(), unique.keys(), bbox_to_anchor=(1.2, 1), loc="upper left")
+            legend_ax.legend(
+                unique.values(), unique.keys(), bbox_to_anchor=(1.2, 1), loc="upper left"
+            )
 
     fig.tight_layout()
 
 
 def make_subplots(n_rows, n_cols, size, offset=0, sharex="all", sharey="all"):
-    plt.close('all')
+    plt.close("all")
     figsize = (n_cols * size + offset, n_rows * size)
     fig, axs = plt.subplots(n_rows, n_cols, figsize=figsize, sharex=sharex, sharey=sharey)
     return fig, axs

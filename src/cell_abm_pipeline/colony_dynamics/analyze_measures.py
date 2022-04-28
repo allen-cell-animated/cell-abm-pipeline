@@ -67,7 +67,7 @@ class AnalyzeMeasures:
     def get_network_degrees(graph):
         """Gets degrees of network."""
         if nx.is_empty(graph):
-            return np.nan, np.nan, np.nan
+            return [], np.nan, np.nan
 
         degrees = sorted([d for n, d in graph.degree()], reverse=True)
         degree_mean = np.mean(degrees)

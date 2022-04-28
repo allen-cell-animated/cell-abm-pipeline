@@ -143,7 +143,7 @@ def _save_gif_to_fs(path, key, frames):
     full_path = f"{path}{key}"
     make_folders(full_path)
 
-    with imageio.get_writer(full_path, mode='I') as writer:
+    with imageio.get_writer(full_path, mode="I") as writer:
         for frame in frames:
             image = imageio.imread(f"{path}{frame}")
             writer.append_data(image)
