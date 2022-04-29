@@ -115,7 +115,10 @@ def _load_dataframe_from_fs(path, key):
 
 
 def _load_dataframe_from_s3(bucket, key):
-    contents = load_xz_from_s3(bucket, key)
+    if key.split(".")[-1] == "xz":
+        contents = _load_xz_from_s3(bucket, key)
+    else:
+        contents = _load_csv_from_s3(bucket, key)
     return load_dataframe_object(io.BytesIO(contents))
 
 
@@ -129,6 +132,14 @@ def load_dataframe_object(obj, chunksize=CHUNKSIZE, dtypes=DTYPES):
     df = df.astype(zero_columns)
 
     return df
+
+
+def _load_csv_from_s3(bucket, key):
+    """
+    Loads XZ compressed file from bucket with given key.
+    """
+    buffer = _load_buffer_from_s3(bucket, key)
+    return buffer.getbuffer()
 
 
 def _load_xz_from_s3(bucket, key):
