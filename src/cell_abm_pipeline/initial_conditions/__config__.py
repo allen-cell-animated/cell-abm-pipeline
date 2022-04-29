@@ -4,7 +4,7 @@ from typing import List
 SCALE_MICRONS_XY: float = 0.108333
 
 # Pixel resolution for images (um/pixel) in z
-SCALE_MICRONS_Z: float = 0.108333
+SCALE_MICRONS_Z: float = 0.29
 
 # Threshold for number of samples touching edge of FOV to be considered edge
 EDGE_THRESHOLD: int = 1

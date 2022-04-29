@@ -100,6 +100,13 @@ def sample_images(obj, **kwargs):
     help="Scaling factor for coordinates (default = None).",
 )
 @click.option(
+    "--select",
+    type=int,
+    multiple=True,
+    default=None,
+    help="Specific cell ids to select (default = None).",
+)
+@click.option(
     "--edges/--no-edges",
     default=False,
     help="True if cells touching edges are removed, False otherwise (default = False)",

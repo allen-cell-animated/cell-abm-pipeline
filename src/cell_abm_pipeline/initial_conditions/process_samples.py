@@ -30,14 +30,14 @@ class ProcessSamples:
             "contact": make_file_key(context.name, ["SAMPLE", "png"], "%s", ""),
         }
 
-    def run(self, grid, scale=None, edges=False, connected=False, contact=True):
+    def run(self, grid, scale=None, select=None, edges=False, connected=False, contact=True):
         for key in self.context.keys:
-            self.process_samples(key, grid, scale, edges, connected)
+            self.process_samples(key, grid, scale, select, edges, connected)
 
             if contact:
                 self.plot_contact_sheet(key)
 
-    def process_samples(self, key, grid, scale, edges, connected):
+    def process_samples(self, key, grid, scale, select, edges, connected):
         sample_key = self.folders["sample"] + self.files["sample"] % key
         samples_df = load_dataframe(self.context.working, sample_key)
         processed_df = samples_df.copy()
@@ -53,6 +53,10 @@ class ProcessSamples:
         if scale is not None:
             print("Scaling coordinates ...")
             processed_df = self.scale_coordinates(processed_df, scale)
+
+        if select:
+            print("Selecting cell ids ...")
+            processed_df = self.select_cells(processed_df, select)
 
         processed_key = self.folders["processed"] + self.files["processed"] % key
         save_dataframe(self.context.working, processed_key, processed_df, index=False)
@@ -94,6 +98,11 @@ class ProcessSamples:
         df["x_scaled"] = df.x * SCALE_MICRONS_XY * scale_factor
         df["y_scaled"] = df.y * SCALE_MICRONS_XY * scale_factor
         df["z_scaled"] = df.z * SCALE_MICRONS_Z * scale_factor
+        return df
+
+    @staticmethod
+    def select_cells(df, select):
+        df = df[df.id.isin(select)]
         return df
 
     @staticmethod
@@ -196,7 +205,7 @@ class ProcessSamples:
         if len(step) > 1:
             print("WARNING: variable step size in array")
 
-        return max(step)
+        return max(set(step), key=steps.count)
 
     @staticmethod
     def find_edge_ids(axis, df, padding, threshold):
