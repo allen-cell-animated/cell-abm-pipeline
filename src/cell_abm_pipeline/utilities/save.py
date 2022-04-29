@@ -102,8 +102,9 @@ def save_json(working, key, obj):
 
 
 def _save_json_to_s3(bucket, key, obj):
-    # TODO: implement save_json_to_s3
-    warnings.warn("save_json_to_s3 not implemented, json not saved")
+    contents = json.dumps(obj).encode("ascii")
+    s3_client = boto3.client("s3")
+    s3_client.put_object(Bucket=bucket, Key=key, Body=contents)
 
 
 def _save_json_to_fs(path, key, contents):
