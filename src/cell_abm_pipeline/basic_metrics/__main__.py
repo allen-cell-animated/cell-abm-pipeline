@@ -27,5 +27,13 @@ def plot_temporal(obj, **kwargs):
     PlotTemporal(obj).run(**kwargs)
 
 
+@cli.command()
+@click.pass_obj
+def plot_spatial(obj, **kwargs):
+    from .plot_spatial import PlotSpatial
+
+    PlotSpatial(obj).run(**kwargs)
+
+
 if __name__ == "__main__":
     cli()
