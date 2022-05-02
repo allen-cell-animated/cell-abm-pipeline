@@ -1,0 +1,7 @@
+# Color map for cell phases
+PHASE_COLORS = {
+    "PROLIFERATIVE_G1": "#5F4690",
+    "PROLIFERATIVE_S": "#38A6A5",
+    "PROLIFERATIVE_G2": "#73AF48",
+    "PROLIFERATIVE_M": "#CC503E",
+}
