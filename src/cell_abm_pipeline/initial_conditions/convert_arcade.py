@@ -12,12 +12,6 @@ from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
 # Critical cell height (in voxels)
 CRITICAL_HEIGHT = 5
 
-# Minimum number of voxels per cell
-MIN_VOXELS = 100
-
-# Minimum number of voxels per cell region
-MIN_REGION_VOXELS = 50
-
 
 class ConvertARCADE:
     def __init__(self, context):
@@ -118,9 +112,9 @@ class ConvertARCADE:
                 "dt": "1",
                 "ticks": "24",
                 "ds": "1",
-                "height": str(height),
-                "length": str(length),
-                "width": str(width),
+                "height": str(int(height)),
+                "length": str(int(length)),
+                "width": str(int(width)),
             },
         )
 
@@ -143,13 +137,7 @@ class ConvertARCADE:
 
     @staticmethod
     def filter_valid_samples(samples):
-        # Filter for cells less than minimum volume.
-        samples = samples.groupby("id").filter(lambda x: x["x"].count() > MIN_VOXELS)
-
         if "region" in samples.columns:
-            # Filter out cells less than minimum region volume.
-            samples = samples.groupby(["region", "id"]).filter(lambda x: len(x) > MIN_REGION_VOXELS)
-
             # Ensure that each cell has all regions.
             samples = samples.groupby("id").filter(lambda x: len(x.region.unique()) > 1)
 
@@ -159,7 +147,7 @@ class ConvertARCADE:
     def convert_to_cell(cell_id, samples):
         """Convert samples to ARCADE .CELLS json format."""
         volume, surface = ConvertARCADE.get_cell_targets(samples)
-        state, phase = ConvertARCADE.get_cell_phase()
+        state, phase = ConvertARCADE.get_cell_phase(volume)
 
         cell = {
             "id": cell_id,
@@ -207,13 +195,21 @@ class ConvertARCADE:
         return volume, surface
 
     @staticmethod
-    def get_cell_phase():
-        if random.random() < 0.1:
-            state = "APOPTOTIC"
-            phase = "APOPTOTIC_EARLY"
-        else:
-            state = "PROLIFERATIVE"
-            phase = "PROLIFERATIVE_G1"
+    def get_cell_phase(volume):
+        thresholds = [250, 1000, 1124, 1726, 1969, 2000]
+        states = [
+            "APOPTOTIC",
+            "APOPTOTIC",
+            "PROLIFERATIVE",
+            "PROLIFERATIVE",
+            "PROLIFERATIVE",
+            "PROLIFERATIVE",
+        ]
+        phases = ["LATE", "EARLY", "G1", "S", "G2", "M"]
+
+        index = next((ind for ind, thresh in enumerate(thresholds) if thresh > volume), -1)
+        state = states[index]
+        phase = f"{state}_{phases[index]}"
 
         return state, phase
 
