@@ -35,5 +35,15 @@ def plot_spatial(obj, **kwargs):
     PlotSpatial(obj).run(**kwargs)
 
 
+@cli.command()
+@click.option("--ticks", type=int, default=1)
+@click.option("--box", nargs=3, type=int, default=(100, 100, 10))
+@click.pass_obj
+def plot_projection(obj, **kwargs):
+    from .plot_projection import PlotProjection
+
+    PlotProjection(obj).run(**kwargs)
+
+
 if __name__ == "__main__":
     cli()
