@@ -28,8 +28,9 @@ class PlotSpatial:
                 file = self.folders["input"] + self.files["input"] % (key, seed)
                 data[key] = load_dataframe(self.context.working, file)
 
-            # self.plot_volume_distribution(data, seed)
+            self.plot_volume_distribution(data, seed)
             self.plot_phase_distribution(data, seed)
+            self.plot_population_distribution(data, seed)
 
     def plot_volume_distribution(self, data, seed, vmin=500, vmax=2000):
         legend = make_legend("NUM_VOXELS", [vmin, vmax])
@@ -56,7 +57,7 @@ class PlotSpatial:
         y = data.CENTER_Y
         v = data.NUM_VOXELS
 
-        ax.scatter(x, y, c=v, s=5, cmap="magma_r", vmin=vmin, vmax=vmax)
+        ax.scatter(x, y, c=v, s=10, cmap="magma_r", vmin=vmin, vmax=vmax)
 
     def plot_phase_distribution(self, data, seed):
         legend = [
@@ -95,3 +96,27 @@ class PlotSpatial:
         phases = [PHASE_COLORS[phase] for phase in data["PHASE"]]
 
         ax.scatter(x, y, c=phases, s=10)
+
+    def plot_population_distribution(self, data, seed):
+        make_plot(
+            self.context.keys,
+            data,
+            self._plot_population_distribution,
+        )
+
+        plot_key = self.folders["output"] + self.files["output"] % ("population_distribution", seed)
+        save_plot(self.context.working, plot_key)
+
+    @staticmethod
+    def _plot_population_distribution(ax, data, key):
+        ax.get_xaxis().set_ticks([])
+        ax.get_yaxis().set_ticks([])
+
+        data = data[key]
+        data = data[data.TICK == data.TICK.max()]
+
+        x = data.CENTER_X
+        y = data.CENTER_Y
+        v = data.POPULATION
+
+        ax.scatter(x, y, c=v, s=10, cmap="tab10", vmin=1, vmax=11)
