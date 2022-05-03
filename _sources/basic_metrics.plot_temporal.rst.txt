@@ -1,0 +1,7 @@
+basic\_metrics.plot\_temporal module
+====================================
+
+.. automodule:: basic_metrics.plot_temporal
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+basic\_metrics.plot\_projection module
+======================================
+
+.. automodule:: basic_metrics.plot_projection
+   :members:
+   :undoc-members:
+   :show-inheritance:
