@@ -2,6 +2,7 @@ import io
 import os
 import json
 import lzma
+import gzip
 import pickle
 import tarfile
 import warnings
@@ -71,6 +72,23 @@ def _load_buffer_from_s3(bucket, key):
         return io.BytesIO(body)
     else:
         return io.BytesIO(obj["Body"].read())
+
+
+def load_gzip(working, key):
+    if working[:5] == "s3://":
+        return _load_gzip_from_s3(working[5:], key)
+    else:
+        return _load_gzip_from_fs(working, key)
+
+
+def _load_gzip_from_fs(path, key):
+    full_path = f"{path}{key}"
+    return gzip.open(full_path, mode="rt").read()
+
+
+def _load_gzip_from_s3(bucket, key):
+    buffer = _load_buffer_from_s3(bucket, key)
+    return gzip.decompress(buffer.getbuffer()).decode("utf-8")
 
 
 def load_tar(working, key):
