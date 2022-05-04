@@ -23,5 +23,13 @@ def extract_clock(obj, **kwargs):
     ExtractClock(obj).run(**kwargs)
 
 
+@cli.command()
+@click.pass_obj
+def calculate_storage(obj, **kwargs):
+    from .calculate_storage import CalculateStorage
+
+    CalculateStorage(obj).run(**kwargs)
+
+
 if __name__ == "__main__":
     cli()
