@@ -196,16 +196,15 @@ class ConvertARCADE:
 
     @staticmethod
     def get_cell_phase(volume):
-        thresholds = [250, 1000, 1124, 1726, 1969, 2000]
+        thresholds = [250, 1000, 1124, 1726, 1969]
         states = [
             "APOPTOTIC",
             "APOPTOTIC",
             "PROLIFERATIVE",
             "PROLIFERATIVE",
             "PROLIFERATIVE",
-            "PROLIFERATIVE",
         ]
-        phases = ["LATE", "EARLY", "G1", "S", "G2", "M"]
+        phases = ["LATE", "EARLY", "G1", "S", "G2"]
 
         index = next((ind for ind, thresh in enumerate(thresholds) if thresh > volume), -1)
         state = states[index]
