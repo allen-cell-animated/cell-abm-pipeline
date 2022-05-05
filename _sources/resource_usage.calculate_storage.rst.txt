@@ -1,0 +1,7 @@
+resource\_usage.calculate\_storage module
+=========================================
+
+.. automodule:: resource_usage.calculate_storage
+   :members:
+   :undoc-members:
+   :show-inheritance:

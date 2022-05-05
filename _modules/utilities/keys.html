@@ -66,6 +66,9 @@
              
   <h1>Source code for utilities.keys</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+
+<span class="kn">import</span> <span class="nn">boto3</span>
 
 
 <div class="viewcode-block" id="make_folder_key"><a class="viewcode-back" href="../../utilities.keys.html#utilities.keys.make_folder_key">[docs]</a><span class="k">def</span> <span class="nf">make_folder_key</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">subgroup</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
@@ -87,6 +90,25 @@
     <span class="n">folder_key</span> <span class="o">=</span> <span class="n">make_folder_key</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">subgroup</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">)</span>
     <span class="n">file_key</span> <span class="o">=</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">extension</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">folder_key</span><span class="si">}{</span><span class="n">file_key</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="get_keys"><a class="viewcode-back" href="../../utilities.keys.html#utilities.keys.get_keys">[docs]</a><span class="k">def</span> <span class="nf">get_keys</span><span class="p">(</span><span class="n">working</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">working</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;s3://&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_get_keys_from_s3</span><span class="p">(</span><span class="n">working</span><span class="p">[</span><span class="mi">5</span><span class="p">:],</span> <span class="n">pattern</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_get_keys_from_fs</span><span class="p">(</span><span class="n">working</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_keys_from_fs</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+    <span class="n">file_list</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}{</span><span class="n">pattern</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">file_list</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_get_keys_from_s3</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">bucket_obj</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s2">&quot;s3&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">Bucket</span><span class="p">(</span><span class="n">bucket</span><span class="p">)</span>
+    <span class="n">objs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">bucket_obj</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">key</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs</span><span class="p">]</span>
 </pre></div>
 
            </div>

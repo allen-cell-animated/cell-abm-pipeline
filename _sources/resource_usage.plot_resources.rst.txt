@@ -1,0 +1,7 @@
+resource\_usage.plot\_resources module
+======================================
+
+.. automodule:: resource_usage.plot_resources
+   :members:
+   :undoc-members:
+   :show-inheritance:

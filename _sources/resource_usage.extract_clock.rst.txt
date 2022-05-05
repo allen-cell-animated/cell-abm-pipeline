@@ -1,0 +1,7 @@
+resource\_usage.extract\_clock module
+=====================================
+
+.. automodule:: resource_usage.extract_clock
+   :members:
+   :undoc-members:
+   :show-inheritance:

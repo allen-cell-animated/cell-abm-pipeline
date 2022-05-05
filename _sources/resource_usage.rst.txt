@@ -5,3 +5,13 @@ resource\_usage package
    :members:
    :undoc-members:
    :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   resource_usage.calculate_storage
+   resource_usage.extract_clock
+   resource_usage.plot_resources
