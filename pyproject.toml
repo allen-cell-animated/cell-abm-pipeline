@@ -41,6 +41,7 @@ resource-usage = "cell_abm_pipeline.resource_usage.__main__:cli"
 cell-shape = "cell_abm_pipeline.cell_shape.__main__:cli"
 colony-dynamics = "cell_abm_pipeline.colony_dynamics.__main__:cli"
 initial-conditions = "cell_abm_pipeline.initial_conditions.__main__:cli"
+convert-format = "cell_abm_pipeline.convert_format.__main__:cli"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
