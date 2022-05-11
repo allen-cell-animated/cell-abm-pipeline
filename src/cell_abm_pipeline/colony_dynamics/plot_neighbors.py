@@ -30,8 +30,9 @@ class PlotNeighbors:
             self.plot_neighbors(data)
 
     def plot_neighbors(self, data):
-        xlim = [data.CX.max(), data.CX.min()]
-        ylim = [data.CY.max(), data.CY.min()]
+        padding = 10
+        xlim = [data.CX.min() - padding, data.CX.max() + padding]
+        ylim = [data.CY.max() + padding, data.CY.min() - padding]
         vmax = data.GROUP.max()
         cmap = cm.get_cmap("gist_rainbow", vmax)
         seed = data.SEED.unique()[0]

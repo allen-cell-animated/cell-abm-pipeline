@@ -19,7 +19,7 @@ class PlotProjection:
             "output": make_file_key(context.name, ["BASIC", "gif"], "", "%04d"),
         }
 
-    def run(self, ticks=1, box=(100, 100, 10)):
+    def run(self, frames=[0], box=(100, 100, 10)):
         for seed in self.context.seeds:
             data = {}
 
@@ -30,14 +30,14 @@ class PlotProjection:
                     load_tar(self.context.working, file),
                 )
 
-            self.plot_projection(data, seed, ticks, box)
+            self.plot_projection(data, seed, frames, box)
 
-    def plot_projection(self, data, seed, ticks, box):
+    def plot_projection(self, data, seed, frames, box):
         frame_keys = []
 
-        for tick in range(ticks + 1):
+        for frame in frames:
             frame_group = {
-                key: load_tar_member(tar, f"{prefix}_{tick:06d}.LOCATIONS.json")
+                key: load_tar_member(tar, f"{prefix}_{frame:06d}.LOCATIONS.json")
                 for key, (prefix, tar) in data.items()
             }
 
@@ -45,10 +45,10 @@ class PlotProjection:
                 self.context.keys,
                 frame_group,
                 lambda a, d, k: self._plot_projection(a, d, k, box),
-                size=3,
+                size=5,
             )
 
-            frame_key = self.folders["output"] + self.files["output_frame"] % (seed, tick)
+            frame_key = self.folders["output"] + self.files["output_frame"] % (seed, frame)
             save_plot(self.context.working, frame_key)
             frame_keys.append(frame_key)
 
@@ -79,7 +79,7 @@ class PlotProjection:
                             for jj in [-1, 0, 1]
                             if array[i + ii][j + jj][k] == target
                         ]
-                        borders[i][j] += 9 - sum(neighbors)
+                        borders[j][i] += 9 - sum(neighbors)
 
         normalize = borders.max()
         borders = borders / normalize
