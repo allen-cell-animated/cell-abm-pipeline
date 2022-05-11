@@ -30,6 +30,7 @@ def plot_temporal(obj, **kwargs):
 
 
 @cli.command()
+@click.option("--ds", type=float, default=1)
 @click.pass_obj
 def plot_spatial(obj, **kwargs):
     from .plot_spatial import PlotSpatial

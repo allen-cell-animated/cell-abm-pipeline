@@ -20,20 +20,26 @@ class PlotSpatial:
             "output": make_file_key(context.name, ["BASIC", "png"], "%s", "%04d"),
         }
 
-    def run(self):
+    def run(self, ds=1):
         for seed in self.context.seeds:
             data = {}
 
             for key in self.context.keys:
                 file = self.folders["input"] + self.files["input"] % (key, seed)
-                data[key] = load_dataframe(self.context.working, file)
+                file_data = load_dataframe(self.context.working, file)
+                self.convert_data_units(file_data, ds)
+                data[key] = file_data
 
             self.plot_volume_distribution(data, seed)
             self.plot_phase_distribution(data, seed)
             self.plot_population_distribution(data, seed)
 
+    @staticmethod
+    def convert_data_units(data, ds):
+        data["VOLUME"] = ds * ds * ds * data["NUM_VOXELS"]
+
     def plot_volume_distribution(self, data, seed, vmin=500, vmax=2000):
-        legend = make_legend("NUM_VOXELS", [vmin, vmax])
+        legend = make_legend("VOLUME", [vmin, vmax])
 
         make_plot(
             self.context.keys,
@@ -51,11 +57,11 @@ class PlotSpatial:
         ax.get_yaxis().set_ticks([])
 
         data = data[key]
-        data = data[data.TICK == data.TICK.max()]
+        data = data[data["TICK"] == data["TICK"].max()]
 
-        x = data.CENTER_X
-        y = data.CENTER_Y
-        v = data.NUM_VOXELS
+        x = data["CENTER_X"]
+        y = data["CENTER_Y"]
+        v = data["VOLUME"]
 
         ax.scatter(x, y, c=v, s=10, cmap="magma_r", vmin=vmin, vmax=vmax)
 
@@ -89,10 +95,10 @@ class PlotSpatial:
         ax.get_yaxis().set_ticks([])
 
         data = data[key]
-        data = data[data.TICK == data.TICK.max()]
+        data = data[data["TICK"] == data["TICK"].max()]
 
-        x = data.CENTER_X
-        y = data.CENTER_Y
+        x = data["CENTER_X"]
+        y = data["CENTER_Y"]
         phases = [PHASE_COLORS[phase] for phase in data["PHASE"]]
 
         ax.scatter(x, y, c=phases, s=10)
@@ -113,10 +119,10 @@ class PlotSpatial:
         ax.get_yaxis().set_ticks([])
 
         data = data[key]
-        data = data[data.TICK == data.TICK.max()]
+        data = data[data["TICK"] == data["TICK"].max()]
 
-        x = data.CENTER_X
-        y = data.CENTER_Y
-        v = data.POPULATION
+        x = data["CENTER_X"]
+        y = data["CENTER_Y"]
+        v = data["POPULATION"]
 
         ax.scatter(x, y, c=v, s=10, cmap="tab10", vmin=1, vmax=11)
