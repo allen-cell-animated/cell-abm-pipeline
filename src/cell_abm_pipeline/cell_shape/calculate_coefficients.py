@@ -25,12 +25,12 @@ class CalculateCoefficients:
             "analysis": lambda r: make_file_key(context.name, ["SH", r, "csv"], "%s", "%04d"),
         }
 
-    def run(self, scale=1, region=None):
+    def run(self, frames=[0], scale=1, region=None):
         for key in self.context.keys:
             for seed in self.context.seeds:
-                self.calculate_coefficients(key, seed, scale, region)
+                self.calculate_coefficients(key, seed, frames, scale, region)
 
-    def calculate_coefficients(self, key, seed, scale, region):
+    def calculate_coefficients(self, key, seed, frames, scale, region):
         """
         Calculates spherical harmonics coefficients for all cells.
         """
@@ -43,8 +43,13 @@ class CalculateCoefficients:
         all_coeffs = []
         member_names = [member.name.split(".")[0] for member in cell_data_tar.getmembers()]
 
-        for member_name in tqdm(member_names):
+        progress_bar = tqdm(frames)
+        for member_name in member_names:
             frame = member_name.split("_")[-1]
+
+            if int(frame) not in frames:
+                continue
+
             cell_member = load_tar_member(cell_data_tar, f"{member_name}.CELLS.json")
             loc_member = load_tar_member(loc_data_tar, f"{member_name}.LOCATIONS.json")
 
@@ -77,6 +82,8 @@ class CalculateCoefficients:
                 coeffs["PHASE"] = cell["phase"]
 
                 all_coeffs.append(coeffs)
+
+            progress_bar.update()
 
         coeff_df = pd.DataFrame(all_coeffs)
         analysis_key = self.folders["analysis"] + self.files["analysis"](region) % (key, seed)

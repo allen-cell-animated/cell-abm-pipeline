@@ -20,6 +20,7 @@ def cli(ctx, **kwargs):
 
 
 @cli.command()
+@click.option("--frames", type=int, multiple=True, default=[0])
 @click.option("--scale", type=int, default=1)
 @click.option("--region", type=str, default=None)
 @click.pass_obj
