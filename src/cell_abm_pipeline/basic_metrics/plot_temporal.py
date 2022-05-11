@@ -23,7 +23,7 @@ class PlotTemporal:
             "output": make_file_key(context.name, ["BASIC", "png"], "%s", ""),
         }
 
-    def run(self):
+    def run(self, ds=1, dt=1):
         data = {}
 
         for key in self.context.keys:
@@ -33,6 +33,7 @@ class PlotTemporal:
                 key_file = self.folders["input"] + self.files["input"] % (key, seed)
                 seed_data = load_dataframe(self.context.working, key_file)
                 seed_data["SEED"] = seed
+                self.convert_data_units(seed_data, ds, dt)
                 key_data.append(seed_data)
 
             data[key] = pd.concat(key_data)
@@ -43,12 +44,17 @@ class PlotTemporal:
         self.plot_individual_volume(data)
         self.plot_average_volume(data)
 
+    @staticmethod
+    def convert_data_units(data, ds, dt):
+        data["TIME"] = dt * data["TICK"]
+        data["VOLUME"] = ds * ds * ds * data["NUM_VOXELS"]
+
     def plot_total_counts(self, data):
         make_plot(
             self.context.keys,
             data,
             self._plot_total_counts,
-            xlabel="Tick",
+            xlabel="Time (hrs)",
             ylabel="Number of Cells",
         )
 
@@ -57,9 +63,9 @@ class PlotTemporal:
 
     @staticmethod
     def _plot_total_counts(ax, data, key):
-        total_count = data[key].groupby(["SEED", "TICK"]).size()
-        mean = total_count.groupby(["TICK"]).mean()
-        std = total_count.groupby(["TICK"]).std()
+        total_count = data[key].groupby(["SEED", "TIME"]).size()
+        mean = total_count.groupby(["TIME"]).mean()
+        std = total_count.groupby(["TIME"]).std()
         ticks = mean.index
         ax.plot(ticks, mean, c="#000")
         ax.fill_between(ticks, mean - std, mean + std, facecolor="#bbb")
@@ -69,7 +75,7 @@ class PlotTemporal:
             self.context.keys,
             data,
             self._plot_cell_phases,
-            xlabel="Tick",
+            xlabel="Time (hrs)",
             ylabel="Fraction of Cells",
         )
 
@@ -80,35 +86,20 @@ class PlotTemporal:
     def _plot_cell_phases(ax, data, key):
         data = data[key]
         total_proliferative_count = (
-            data[data["STATE"] == "PROLIFERATIVE"].groupby(["SEED", "TICK"]).size()
+            data[data["STATE"] == "PROLIFERATIVE"].groupby(["SEED", "TIME"]).size()
         )
 
         for phase, color in PHASE_COLORS.items():
-            phase_count = data[data["PHASE"] == phase].groupby(["SEED", "TICK"]).size()
+            phase_count = data[data["PHASE"] == phase].groupby(["SEED", "TIME"]).size()
             phase_fraction = phase_count / total_proliferative_count
 
-            mean = phase_fraction.groupby("TICK").mean()
-            std = phase_fraction.groupby(["TICK"]).std()
+            mean = phase_fraction.groupby("TIME").mean()
+            std = phase_fraction.groupby(["TIME"]).std()
             ticks = mean.index
             ax.plot(ticks, mean, label=phase, color=color)
             ax.fill_between(ticks, mean - std, mean + std, alpha=0.5, color=color)
 
     def plot_phase_durations(self, data):
-        for phase in PHASE_COLORS.keys():
-            make_plot(
-                self.context.keys,
-                data,
-                lambda ax, data, key: self._plot_phase_durations(ax, data, key, phase),
-                xlabel="Duration (hours)",
-                ylabel="Frequency",
-            )
-
-            plot_key = self.folders["output"] + self.files["output"] % f"cell_phases_{phase}"
-            save_plot(self.context.working, plot_key)
-
-    @staticmethod
-    def _plot_phase_durations(ax, data, key, phase):
-        color = PHASE_COLORS[phase]
         phase_settings = {
             "PROLIFERATIVE_G1": {
                 "bins": np.arange(0, 7, 1),
@@ -132,12 +123,27 @@ class PlotTemporal:
             },
         }
 
-        phase_durations = PlotTemporal.get_phase_durations(data[key])
+        for phase, settings in phase_settings.items():
+            make_plot(
+                self.context.keys,
+                {"data": data, "settings": settings},
+                lambda ax, data, key: self._plot_phase_durations(ax, data, key, phase),
+                xlabel="Duration (hours)",
+                ylabel="Frequency",
+            )
+
+            plot_key = self.folders["output"] + self.files["output"] % f"cell_phases_{phase}"
+            save_plot(self.context.working, plot_key)
+
+    @staticmethod
+    def _plot_phase_durations(ax, data, key, phase):
+        color = PHASE_COLORS[phase]
+        phase_durations = PlotTemporal.get_phase_durations(data["data"][key])
 
         if phase not in phase_durations.keys():
             return
 
-        settings = phase_settings[phase]
+        settings = data["settings"]
         durations = np.array(phase_durations[phase])
 
         m = durations.mean()
@@ -159,15 +165,18 @@ class PlotTemporal:
 
         for name, group in data.groupby(["SEED", "ID"]):
             group.sort_values("TICK", inplace=True)
-            phase_groups = [list(g) for k, g in groupby(group["PHASE"])]
+            phase_list = group[["PHASE", "TIME"]].to_records(index=False)
+            phase_groups = [list(g) for k, g in groupby(phase_list, lambda g: g[0])]
 
-            for group in phase_groups[:-1]:
-                key = group[0]
+            for group, next_group in zip(phase_groups[:-1], phase_groups[1:]):
+                key, start_time = group[0]
+                _, stop_time = next_group[0]
 
                 if key not in phase_durations.keys():
                     phase_durations[key] = []
 
-                phase_durations[key].append(len(group))
+                duration = stop_time - start_time
+                phase_durations[key].append(duration)
 
         return phase_durations
 
@@ -176,8 +185,8 @@ class PlotTemporal:
             self.context.keys,
             data,
             self._plot_individual_volume,
-            xlabel="Tick",
-            ylabel="Volume (voxels)",
+            xlabel="Time (hrs)",
+            ylabel="Volume ($\mu m^3$)",
         )
 
         plot_key = self.folders["output"] + self.files["output"] % "individual_volume"
@@ -187,11 +196,11 @@ class PlotTemporal:
     def _plot_individual_volume(ax, data, key, num=5):
         counter = 0
         for _, group in data[key].groupby(["SEED", "ID"]):
-            group.sort_values("TICK", inplace=True)
+            group.sort_values("TIME", inplace=True)
             counter = counter + 1
 
-            volume = group["NUM_VOXELS"].values
-            ticks = group["TICK"]
+            volume = group["VOLUME"].values
+            ticks = group["TIME"]
 
             ax.plot(ticks, volume)
 
@@ -203,8 +212,8 @@ class PlotTemporal:
             self.context.keys,
             data,
             self._plot_average_volume,
-            xlabel="Tick",
-            ylabel="Average Volume (voxels)",
+            xlabel="Time (hrs)",
+            ylabel="Average Volume ($\mu m^3$)",
         )
 
         plot_key = self.folders["output"] + self.files["output"] % "average_volume"
@@ -212,9 +221,9 @@ class PlotTemporal:
 
     @staticmethod
     def _plot_average_volume(ax, data, key):
-        volume = data[key].groupby(["SEED", "TICK"]).mean()
-        mean = volume.groupby(["TICK"])["NUM_VOXELS"].mean()
-        std = volume.groupby(["TICK"])["NUM_VOXELS"].std()
+        volume = data[key].groupby(["SEED", "TIME"]).mean()
+        mean = volume.groupby(["TIME"])["VOLUME"].mean()
+        std = volume.groupby(["TIME"])["VOLUME"].std()
         ticks = mean.index
 
         ax.plot(ticks, [1000] * len(ticks), c="#555", lw=0.5)

@@ -20,6 +20,8 @@ def cli(ctx, **kwargs):
 
 
 @cli.command()
+@click.option("--ds", type=float, default=1)
+@click.option("--dt", type=float, default=1)
 @click.pass_obj
 def plot_temporal(obj, **kwargs):
     from .plot_temporal import PlotTemporal
