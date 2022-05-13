@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 from cell_abm_pipeline.utilities.load import load_buffer
 from cell_abm_pipeline.utilities.save import save_buffer
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 
 class CompressCoefficients:
@@ -28,7 +28,7 @@ class CompressCoefficients:
         Compress individual coefficients files into single archive.
         """
         file_keys = [
-            self.folders["input"] + self.files["input"](region) % (key, seed)
+            make_full_key(self.folders, self.files, "input", (key, seed), region)
             for key in self.context.keys
         ]
 
@@ -42,5 +42,5 @@ class CompressCoefficients:
 
                     tar.addfile(info, fileobj=contents)
 
-            analysis_key = self.folders["output"] + self.files["output"](region) % (seed)
+            analysis_key = make_full_key(self.folders, self.files, "output", seed, region)
             save_buffer(self.context.working, analysis_key, buffer)

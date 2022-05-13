@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 from cell_abm_pipeline.utilities.load import load_buffer
 from cell_abm_pipeline.utilities.save import save_buffer
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 
 class MergeCoefficients:
@@ -28,7 +28,7 @@ class MergeCoefficients:
         Merge individual coefficients files into single file.
         """
         file_keys = [
-            self.folders["input"] + self.files["input"](region) % (key, seed)
+            make_full_key(self.folders, self.files, "input", (key, seed), region)
             for key in self.context.keys
         ]
 
@@ -45,5 +45,5 @@ class MergeCoefficients:
                     rows = [entry.replace("0.0,", "0,") for entry in file_contents[1:]]
                     lzf.write("\n".join(rows).encode("utf-8"))
 
-            analysis_key = self.folders["output"] + self.files["output"](region) % (seed)
+            analysis_key = make_full_key(self.folders, self.files, "output", seed, region)
             save_buffer(self.context.working, analysis_key, buffer)
