@@ -20,39 +20,45 @@ class PlotSpatial:
             "output": make_file_key(context.name, ["BASIC", "png"], "%s", "%04d"),
         }
 
-    def run(self, ds=1):
+    def run(self, ds=1, region=None):
         for seed in self.context.seeds:
             data = {}
 
             for key in self.context.keys:
                 file = make_full_key(self.folders, self.files, "input", (key, seed))
                 file_data = load_dataframe(self.context.working, file)
-                self.convert_data_units(file_data, ds)
+                self.convert_data_units(file_data, ds, region)
                 data[key] = file_data
 
-            self.plot_volume_distribution(data, seed)
-            self.plot_phase_distribution(data, seed)
-            self.plot_population_distribution(data, seed)
+            self.plot_volume_distribution(data, seed, region)
+
+            if not region:
+                self.plot_phase_distribution(data, seed)
+                self.plot_population_distribution(data, seed)
 
     @staticmethod
-    def convert_data_units(data, ds):
+    def convert_data_units(data, ds, region=None):
         data["VOLUME"] = ds * ds * ds * data["NUM_VOXELS"]
 
-    def plot_volume_distribution(self, data, seed, vmin=500, vmax=2000):
+        if region:
+            data[f"VOLUME.{region}"] = ds * ds * ds * data[f"NUM_VOXELS.{region}"]
+
+    def plot_volume_distribution(self, data, seed, region=None, vmin=500, vmax=4000):
         legend = make_legend("VOLUME", [vmin, vmax])
 
         make_plot(
             self.context.keys,
             data,
-            lambda a, d, k: self._plot_volume_distribution(a, d, k, vmin, vmax),
+            lambda a, d, k: self._plot_volume_distribution(a, d, k, region, vmin, vmax),
             legend={"handles": legend},
         )
 
-        plot_key = make_full_key(self.folders, self.files, "output", ("volume_distribution", seed))
+        plot_key = make_full_key(self.folders, self.files, "output", ("volumes", seed), region)
         save_plot(self.context.working, plot_key)
 
     @staticmethod
-    def _plot_volume_distribution(ax, data, key, vmin, vmax):
+    def _plot_volume_distribution(ax, data, key, region, vmin, vmax):
+        value = f"VOLUME.{region}" if region else "VOLUME"
         ax.get_xaxis().set_ticks([])
         ax.get_yaxis().set_ticks([])
 
@@ -61,7 +67,7 @@ class PlotSpatial:
 
         x = data["CENTER_X"]
         y = data["CENTER_Y"]
-        v = data["VOLUME"]
+        v = data[value]
 
         ax.scatter(x, y, c=v, s=10, cmap="magma_r", vmin=vmin, vmax=vmax)
 
@@ -86,7 +92,7 @@ class PlotSpatial:
             legend={"handles": legend},
         )
 
-        plot_key = make_full_key(self.folders, self.files, "output", ("phase_distribution", seed))
+        plot_key = make_full_key(self.folders, self.files, "output", ("phases", seed))
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -110,7 +116,7 @@ class PlotSpatial:
             self._plot_population_distribution,
         )
 
-        plot_key = make_full_key(self.folders, self.files, "output", ("population_distribution", seed))
+        plot_key = make_full_key(self.folders, self.files, "output", ("populations", seed))
         save_plot(self.context.working, plot_key)
 
     @staticmethod

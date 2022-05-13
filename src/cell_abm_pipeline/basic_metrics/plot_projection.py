@@ -12,15 +12,15 @@ class PlotProjection:
         self.folders = {
             "input": make_folder_key(context.name, "data", "LOCATIONS", False),
             "output": make_folder_key(context.name, "plots", "BASIC", True),
-            "output_frame": make_folder_key(context.name, "plots", "BASIC", True),
+            "frame": make_folder_key(context.name, "plots", "BASIC", True),
         }
         self.files = {
             "input": make_file_key(context.name, ["LOCATIONS", "tar", "xz"], "%s", "%04d"),
-            "output": make_file_key(context.name, ["BASIC", "gif"], "", "%04d"),
-            "output_frame": make_file_key(context.name, ["BASIC", "%06d", "png"], "", "%04d"),
+            "output": lambda r: make_file_key(context.name, ["BASIC", r, "gif"], "", "%04d"),
+            "frame": lambda r: make_file_key(context.name, ["BASIC", "%06d", r, "png"], "", "%04d"),
         }
 
-    def run(self, frames=[0], box=(100, 100, 10)):
+    def run(self, region=None, frames=(0, 1, 1), box=(100, 100, 10)):
         for seed in self.context.seeds:
             data = {}
 
@@ -28,14 +28,14 @@ class PlotProjection:
                 file = make_full_key(self.folders, self.files, "input", (key, seed))
                 full_key = f"{self.context.name}_{key}_{seed:04d}"
                 full_key = full_key.replace("__", "_")
-                data[key] = (full_key,load_tar(self.context.working, file))
+                data[key] = (full_key, load_tar(self.context.working, file))
 
-            self.plot_projection(data, seed, frames, box)
+            self.plot_projection(data, seed, region, frames, box)
 
-    def plot_projection(self, data, seed, frames, box):
+    def plot_projection(self, data, seed, region, frames, box):
         frame_keys = []
 
-        for frame in frames:
+        for frame in np.arange(*frames):
             frame_group = {
                 key: load_tar_member(tar, f"{prefix}_{frame:06d}.LOCATIONS.json")
                 for key, (prefix, tar) in data.items()
@@ -44,19 +44,19 @@ class PlotProjection:
             make_plot(
                 self.context.keys,
                 frame_group,
-                lambda a, d, k: self._plot_projection(a, d, k, box),
+                lambda a, d, k: self._plot_projection(a, d, k, region, box),
                 size=5,
             )
 
-            frame_key = make_full_key(self.folders, self.files, "output_frame", (seed, frame))
+            frame_key = make_full_key(self.folders, self.files, "frame", (seed, frame), region)
             save_plot(self.context.working, frame_key)
             frame_keys.append(frame_key)
 
-        file_key = make_full_key(self.folders, self.files, "output", seed)
+        file_key = make_full_key(self.folders, self.files, "output", seed, region)
         save_gif(self.context.working, file_key, frame_keys)
 
     @staticmethod
-    def _plot_projection(ax, data, key, box):
+    def _plot_projection(ax, data, key, region, box):
         ax.get_xaxis().set_ticks([])
         ax.get_yaxis().set_ticks([])
 
@@ -65,7 +65,16 @@ class PlotProjection:
         borders = np.zeros((length, width))
 
         for cell in data[key]:
-            all_voxels = [voxels for region in cell["location"] for voxels in region["voxels"]]
+            if region:
+                all_voxels = [
+                    voxels
+                    for reg in cell["location"]
+                    for voxels in reg["voxels"]
+                    if reg["region"] == region
+                ]
+            else:
+                all_voxels = [voxels for reg in cell["location"] for voxels in reg["voxels"]]
+
             array[tuple(np.transpose(all_voxels))] = cell["id"]
 
         for i in range(length):

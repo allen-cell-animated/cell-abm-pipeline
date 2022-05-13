@@ -22,6 +22,8 @@ def cli(ctx, **kwargs):
 @cli.command()
 @click.option("--ds", type=float, default=1)
 @click.option("--dt", type=float, default=1)
+@click.option("--region", type=str, default=None)
+@click.option("--reference", type=str, default=None)
 @click.pass_obj
 def plot_temporal(obj, **kwargs):
     from .plot_temporal import PlotTemporal
@@ -31,6 +33,7 @@ def plot_temporal(obj, **kwargs):
 
 @cli.command()
 @click.option("--ds", type=float, default=1)
+@click.option("--region", type=str, default=None)
 @click.pass_obj
 def plot_spatial(obj, **kwargs):
     from .plot_spatial import PlotSpatial
@@ -39,7 +42,8 @@ def plot_spatial(obj, **kwargs):
 
 
 @cli.command()
-@click.option("--frames", type=int, multiple=True, default=[0])
+@click.option("--region", type=str, default=None)
+@click.option("--frames", nargs=3, type=int, default=(0, 1, 1))
 @click.option("--box", nargs=3, type=int, default=(100, 100, 10))
 @click.pass_obj
 def plot_projection(obj, **kwargs):

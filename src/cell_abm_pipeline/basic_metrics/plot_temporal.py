@@ -20,10 +20,10 @@ class PlotTemporal:
         }
         self.files = {
             "input": make_file_key(context.name, ["csv"], "%s", "%04d"),
-            "output": make_file_key(context.name, ["BASIC", "png"], "%s", ""),
+            "output": lambda r: make_file_key(context.name, ["BASIC", r, "png"], "%s", ""),
         }
 
-    def run(self, ds=1, dt=1):
+    def run(self, ds=1, dt=1, region=None, reference=None):
         data = {}
 
         for key in self.context.keys:
@@ -33,21 +33,30 @@ class PlotTemporal:
                 key_file = make_full_key(self.folders, self.files, "input", (key, seed))
                 seed_data = load_dataframe(self.context.working, key_file)
                 seed_data["SEED"] = seed
-                self.convert_data_units(seed_data, ds, dt)
+                self.convert_data_units(seed_data, ds, dt, region)
                 key_data.append(seed_data)
 
             data[key] = pd.concat(key_data)
 
-        self.plot_total_counts(data)
-        self.plot_cell_phases(data)
-        self.plot_phase_durations(data)
-        self.plot_individual_volume(data)
-        self.plot_average_volume(data)
+        if reference:
+            data["_reference"] = load_dataframe(self.context.working, reference)
+
+        self.plot_individual_volume(data, region)
+        self.plot_average_volume(data, region)
+        self.plot_volume_distribution(data, region)
+
+        if not region:
+            self.plot_total_counts(data)
+            self.plot_cell_phases(data)
+            self.plot_phase_durations(data)
 
     @staticmethod
-    def convert_data_units(data, ds, dt):
+    def convert_data_units(data, ds, dt, region=None):
         data["TIME"] = dt * data["TICK"]
         data["VOLUME"] = ds * ds * ds * data["NUM_VOXELS"]
+
+        if region:
+            data[f"VOLUME.{region}"] = ds * ds * ds * data[f"NUM_VOXELS.{region}"]
 
     def plot_total_counts(self, data):
         make_plot(
@@ -180,26 +189,28 @@ class PlotTemporal:
 
         return phase_durations
 
-    def plot_individual_volume(self, data):
+    def plot_individual_volume(self, data, region=None):
         make_plot(
             self.context.keys,
             data,
-            self._plot_individual_volume,
+            lambda a, d, k: self._plot_individual_volume(a, d, k, region),
             xlabel="Time (hrs)",
-            ylabel="Volume ($\mu m^3$)",
+            ylabel=f"{region} Volume ($\mu m^3$)",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "individual_volume"
+        plot_key = make_full_key(self.folders, self.files, "output", "individual_volume", region)
         save_plot(self.context.working, plot_key)
 
     @staticmethod
-    def _plot_individual_volume(ax, data, key, num=5):
+    def _plot_individual_volume(ax, data, key, region=None, num=5):
+        value = f"VOLUME.{region}" if region else "VOLUME"
         counter = 0
+
         for _, group in data[key].groupby(["SEED", "ID"]):
             group.sort_values("TIME", inplace=True)
             counter = counter + 1
 
-            volume = group["VOLUME"].values
+            volume = group[value].values
             ticks = group["TIME"]
 
             ax.plot(ticks, volume)
@@ -207,26 +218,54 @@ class PlotTemporal:
             if counter >= num:
                 break
 
-    def plot_average_volume(self, data):
+    def plot_average_volume(self, data, region=None):
         make_plot(
             self.context.keys,
             data,
-            self._plot_average_volume,
+            lambda a, d, k: self._plot_average_volume(a, d, k, region),
             xlabel="Time (hrs)",
-            ylabel="Average Volume ($\mu m^3$)",
+            ylabel=f"{region} Average Volume ($\mu m^3$)",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "average_volume"
+        plot_key = make_full_key(self.folders, self.files, "output", "average_volume", region)
         save_plot(self.context.working, plot_key)
 
     @staticmethod
-    def _plot_average_volume(ax, data, key):
+    def _plot_average_volume(ax, data, key, region=None):
+        value = f"VOLUME.{region}" if region else "VOLUME"
+
         volume = data[key].groupby(["SEED", "TIME"]).mean()
-        mean = volume.groupby(["TIME"])["VOLUME"].mean()
-        std = volume.groupby(["TIME"])["VOLUME"].std()
+        mean = volume.groupby(["TIME"])[value].mean()
+        std = volume.groupby(["TIME"])[value].std()
         ticks = mean.index
 
-        ax.plot(ticks, [1000] * len(ticks), c="#555", lw=0.5)
-        ax.plot(ticks, [2000] * len(ticks), c="#555", lw=0.5)
+        if "_reference" in data:
+            ax.plot(ticks, [data["_reference"][value].mean()] * len(ticks), c="#555", lw=0.5)
+
         ax.plot(ticks, mean, c="#000")
         ax.fill_between(ticks, mean - std, mean + std, facecolor="#bbb")
+
+    def plot_volume_distribution(self, data, region=None):
+        make_plot(
+            self.context.keys,
+            data,
+            lambda a, d, k: self._plot_volume_distribution(a, d, k, region),
+            xlabel=f"{region} Volume ($\mu m^3$)",
+            ylabel="Frequency",
+            legend=True,
+        )
+
+        plot_key = make_full_key(self.folders, self.files, "output", "volume_distribution", region)
+        save_plot(self.context.working, plot_key)
+
+    @staticmethod
+    def _plot_volume_distribution(ax, data, key, region=None):
+        value = f"VOLUME.{region}" if region else "VOLUME"
+        bins = np.arange(0, 4000, 100)
+
+        if "_reference" in data:
+            reference = data["_reference"][value]
+            ax.hist(reference, bins=bins, density=True, color="#999999", alpha=0.7, label="ref")
+
+        volumes = data[key][value]
+        ax.hist(volumes, bins=bins, density=True, histtype="step", color="k", label="sim")
