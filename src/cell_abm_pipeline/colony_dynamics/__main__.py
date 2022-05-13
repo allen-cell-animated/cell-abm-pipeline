@@ -11,7 +11,7 @@ class Context:
 
 @click.group(invoke_without_command=True)
 @click.option("-n", "--name", type=str, default="")
-@click.option("-k", "--keys", type=str, multiple=True, default=[])
+@click.option("-k", "--keys", type=str, multiple=True, default=[""])
 @click.option("-s", "--seeds", type=int, multiple=True, default=[])
 @click.option("-w", "--working", type=str, default=".")
 @click.pass_context

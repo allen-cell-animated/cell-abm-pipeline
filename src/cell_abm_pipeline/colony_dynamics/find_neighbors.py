@@ -6,7 +6,7 @@ from scipy import ndimage
 
 from cell_abm_pipeline.utilities.load import load_tar, load_tar_member
 from cell_abm_pipeline.utilities.save import save_dataframe
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 
 class FindNeighbors:
@@ -30,7 +30,7 @@ class FindNeighbors:
         """
         Finds neighbor connections for all cells.
         """
-        loc_data_key = self.folders["data.LOCATIONS"] + self.files["data.LOCATIONS"] % (key, seed)
+        loc_data_key = make_full_key(self.folders, self.files, "data.LOCATIONS", (key, seed))
         loc_data_tar = load_tar(self.context.working, loc_data_key)
 
         all_neighbors = []
@@ -50,7 +50,7 @@ class FindNeighbors:
             )
 
         neighbor_df = pd.DataFrame(all_neighbors)
-        analysis_key = self.folders["analysis"] + self.files["analysis"] % (key, seed)
+        analysis_key = make_full_key(self.folders, self.files, "analysis", (key, seed))
         save_dataframe(self.context.working, analysis_key, neighbor_df, index=False)
 
     @staticmethod
