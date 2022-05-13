@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 from cell_abm_pipeline.utilities.load import load_dataframe
 from cell_abm_pipeline.utilities.save import save_plot
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 
 class PlotResources:
@@ -22,11 +22,11 @@ class PlotResources:
         self.plot_object_storage()
 
     def plot_wall_clock(self):
-        key_file = self.folders["input"] + self.files["input"] % "clock"
+        key_file = make_full_key(self.folders, self.files, "input", "clock")
         data = load_dataframe(self.context.working, key_file)
         keys = data.KEY.unique()
 
-        fig, axs = plt.subplots(1, 1, figsize=(len(keys), 3))
+        fig, axs = plt.subplots(1, 1, figsize=(max(3, len(keys)), 3))
         values = [data[data["KEY"] == key]["CLOCK"] for key in keys]
 
         axs.boxplot(values, labels=keys, positions=range(0, len(keys)))
@@ -34,15 +34,20 @@ class PlotResources:
 
         axs.set_ylabel("Wall Clock Time (minutes)")
 
-        plot_key = self.folders["output"] + self.files["output"] % "clock"
+        plot_key = make_full_key(self.folders, self.files, "output", "clock")
+        fig.tight_layout()
         save_plot(self.context.working, plot_key)
 
     def plot_object_storage(self):
-        key_file = self.folders["input"] + self.files["input"] % "storage"
+        key_file = make_full_key(self.folders, self.files, "input", "storage")
         data = load_dataframe(self.context.working, key_file)
         keys = data.KEY.unique()
 
-        fig, axs = plt.subplots(1, 2, figsize=(len(keys) * 2, 3))
+        if data.KEY.isnull().values.any():
+            data.KEY = ""
+            keys = [""]
+
+        fig, axs = plt.subplots(1, 2, figsize=(max(3, len(keys)) * 2, 3))
 
         for i, (name, group) in enumerate(data.groupby("GROUP")):
             values = [group[group["KEY"] == key]["STORAGE"] for key in keys]
@@ -55,5 +60,6 @@ class PlotResources:
             axs[i].set_ylabel("Size (KiB)")
             axs[i].set_title(f"*.{name}.tar.xz", fontsize=16)
 
-        plot_key = self.folders["output"] + self.files["output"] % "storage"
+        plot_key = make_full_key(self.folders, self.files, "output", "storage")
+        fig.tight_layout()
         save_plot(self.context.working, plot_key)

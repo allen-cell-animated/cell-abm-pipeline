@@ -6,9 +6,9 @@ import pandas as pd
 from tqdm import tqdm
 
 from cell_abm_pipeline.resource_usage.__config__ import STORAGE_CONVERSION
-from cell_abm_pipeline.utilities.load import load_dataframe
+from cell_abm_pipeline.utilities.load import load_dataframe, load_keys
 from cell_abm_pipeline.utilities.save import save_dataframe
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, get_keys
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 
 class CalculateStorage:
@@ -24,7 +24,7 @@ class CalculateStorage:
         }
 
     def run(self):
-        file_key = self.folders["output"] + self.files["output"] % "storage"
+        file_key = make_full_key(self.folders, self.files, "output", "storage")
 
         try:
             load_dataframe(self.context.working, file_key)
@@ -36,8 +36,8 @@ class CalculateStorage:
         storage = []
 
         for group in groups:
-            key_pattern = self.folders["input"](group) + self.files["input"](group)
-            file_keys = get_keys(self.context.working, key_pattern)
+            key_pattern = make_full_key(self.folders, self.files, "input", arguments=group)
+            file_keys = load_keys(self.context.working, key_pattern)
 
             # Iterate through file keys to extract storage size.
             for file_key in tqdm(file_keys):
@@ -52,13 +52,13 @@ class CalculateStorage:
         storage_df = storage_df.astype({"STORAGE": "float64"})
         storage_df = storage_df.set_index("KEY")
 
-        file_key = self.folders["output"] + self.files["output"] % "storage"
+        file_key = make_full_key(self.folders, self.files, "output", "storage")
         save_dataframe(self.context.working, file_key, storage_df)
 
     @staticmethod
     def get_file_summary(working, name, file_key, group):
         keys = ["KEY", "SEED"]
-        pattern = "[_]*([A-z0-9\s\_]+)_([0-9]{4})\."
+        pattern = "[_]*([A-z0-9\s\_]*)_([0-9]{4})\."
         key, seed = re.findall(pattern, file_key.split(name)[-1])[0]
 
         if working[:5] == "s3://":

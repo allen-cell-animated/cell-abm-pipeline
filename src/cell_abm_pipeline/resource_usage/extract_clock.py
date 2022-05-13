@@ -3,9 +3,9 @@ import re
 import pandas as pd
 from tqdm import tqdm
 
-from cell_abm_pipeline.utilities.load import load_dataframe, load_gzip
+from cell_abm_pipeline.utilities.load import load_dataframe, load_gzip, load_keys
 from cell_abm_pipeline.utilities.save import save_dataframe
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, get_keys
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 
 class ExtractClock:
@@ -21,7 +21,7 @@ class ExtractClock:
         }
 
     def run(self):
-        file_key = self.folders["output"] + self.files["output"] % "clock"
+        file_key = make_full_key(self.folders, self.files, "output", "clock")
 
         try:
             load_dataframe(self.context.working, file_key)
@@ -29,8 +29,8 @@ class ExtractClock:
             self.extract_clock()
 
     def extract_clock(self):
-        key_pattern = self.folders["input"] + self.files["input"]
-        log_file_keys = get_keys(self.context.working, key_pattern)
+        key_pattern = make_full_key(self.folders, self.files, "input")
+        log_file_keys = load_keys(self.context.working, key_pattern)
 
         # Iterate through log file keys to extract wall clock time.
         clock = []
@@ -44,7 +44,7 @@ class ExtractClock:
         clock_df = clock_df.astype({"CLOCK": "float64"})
         clock_df = clock_df.set_index("KEY")
 
-        file_key = self.folders["output"] + self.files["output"] % "clock"
+        file_key = make_full_key(self.folders, self.files, "output", "clock")
         save_dataframe(self.context.working, file_key, clock_df)
 
     @staticmethod
