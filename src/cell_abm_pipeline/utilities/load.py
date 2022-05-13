@@ -6,6 +6,7 @@ import gzip
 import pickle
 import tarfile
 import warnings
+from glob import glob
 
 import boto3
 import pandas as pd
@@ -40,6 +41,25 @@ DTYPES = {
     "MAX_Z": "uint16",
     "KEY": "category",
 }
+
+
+def load_keys(working, pattern):
+    if working[:5] == "s3://":
+        return _load_keys_from_s3(working[5:], pattern)
+    else:
+        return _load_keys_from_fs(working, pattern)
+
+
+def _load_keys_from_fs(path, pattern):
+    file_list = glob(f"{path}{pattern}")
+    return [file.replace(path, "") for file in file_list]
+
+
+def _load_keys_from_s3(bucket, pattern):
+    prefix = pattern.split("*")[0]
+    bucket_obj = boto3.resource("s3").Bucket(bucket)
+    objs = list(bucket_obj.objects.filter(Prefix=prefix))
+    return [obj.key for obj in objs]
 
 
 def load_buffer(working, key):
