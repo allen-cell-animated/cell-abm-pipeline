@@ -4,7 +4,7 @@ from scipy.spatial import distance
 
 from cell_abm_pipeline.utilities.load import load_dataframe
 from cell_abm_pipeline.utilities.save import save_dataframe
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 
 class AnalyzeClusters:
@@ -26,13 +26,17 @@ class AnalyzeClusters:
         all_data = []
 
         for seed in self.context.seeds:
-            file_key = self.folders["input"] + self.files["input"] % (seed)
+            file_key = make_full_key(self.folders, self.files, "input", seed)
             data = load_dataframe(self.context.working, file_key)
+
+            if data.KEY.isnull().values.any():
+                data.KEY = ""
+
             data = data[data.KEY.isin(self.context.keys)]
             all_data.append(data)
 
         for key, key_group in pd.concat(all_data).groupby("KEY"):
-            output_key = self.folders["output"] + self.files["output"] % (key)
+            output_key = make_full_key(self.folders, self.files, "output", key)
             output_df = self.calculate_cluster_metrics(key_group)
             save_dataframe(self.context.working, output_key, output_df, index=False)
 

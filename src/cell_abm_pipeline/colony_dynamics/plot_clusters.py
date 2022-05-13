@@ -2,7 +2,7 @@ import ast
 
 from cell_abm_pipeline.utilities.load import load_dataframe
 from cell_abm_pipeline.utilities.save import save_plot
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 from cell_abm_pipeline.utilities.plot import make_plot
 
 
@@ -22,7 +22,7 @@ class PlotClusters:
         data = {}
 
         for key in self.context.keys:
-            key_file = self.folders["input"] + self.files["input"] % key
+            key_file = make_full_key(self.folders, self.files, "input", key)
             data[key] = load_dataframe(self.context.working, key_file)
 
         self.plot_cluster_counts(data)
@@ -43,7 +43,7 @@ class PlotClusters:
             ylabel="Number of Clusters",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "counts"
+        plot_key = make_full_key(self.folders, self.files, "output", "counts")
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -65,7 +65,7 @@ class PlotClusters:
             ylabel="Cluster Size Mean",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "size_mean"
+        plot_key = make_full_key(self.folders, self.files, "output", "size_mean")
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -84,7 +84,7 @@ class PlotClusters:
             ylabel="Cluster Size Std Dev",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "size_std"
+        plot_key = make_full_key(self.folders, self.files, "output", "size_std")
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -103,7 +103,7 @@ class PlotClusters:
             ylabel="Fraction in Clusters",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "fraction"
+        plot_key = make_full_key(self.folders, self.files, "output", "fraction")
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -123,7 +123,7 @@ class PlotClusters:
             ylabel="Intercluster Distance Mean",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "inter_distances_mean"
+        plot_key = make_full_key(self.folders, self.files, "output", "inter_distances_mean")
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -142,7 +142,7 @@ class PlotClusters:
             ylabel="Intercluster Distance Std Dev",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "inter_distances_std"
+        plot_key = make_full_key(self.folders, self.files, "output", "inter_distances_std")
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -161,7 +161,7 @@ class PlotClusters:
             ylabel="Intracluster Distance Mean",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "intra_distances_mean"
+        plot_key = make_full_key(self.folders, self.files, "output", "intra_distances_mean")
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -189,7 +189,7 @@ class PlotClusters:
             ylabel="Intracluster Distance Std Dev",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "intra_distances_std"
+        plot_key = make_full_key(self.folders, self.files, "output", "intra_distances_std")
         save_plot(self.context.working, plot_key)
 
     @staticmethod

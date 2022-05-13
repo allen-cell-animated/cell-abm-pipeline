@@ -3,7 +3,7 @@ import numpy as np
 
 from cell_abm_pipeline.utilities.load import load_dataframe
 from cell_abm_pipeline.utilities.save import save_plot
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 from cell_abm_pipeline.utilities.plot import make_plot
 
 
@@ -23,7 +23,7 @@ class PlotMeasures:
         data = {}
 
         for key in self.context.keys:
-            key_file = self.folders["input"] + self.files["input"] % key
+            key_file = make_full_key(self.folders, self.files, "input", key)
             data[key] = load_dataframe(self.context.working, key_file)
 
         self.plot_degree_distribution(data)
@@ -41,7 +41,7 @@ class PlotMeasures:
             ylabel="Frequency",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "degree_distribution"
+        plot_key = make_full_key(self.folders, self.files, "output", "degree_distribution")
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -61,7 +61,7 @@ class PlotMeasures:
             ylabel="Average Degree Mean",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "average_degree_mean"
+        plot_key = make_full_key(self.folders, self.files, "output", "average_degree_mean")
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -80,7 +80,7 @@ class PlotMeasures:
             ylabel="Cluster Size Std Dev",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "average_degree_std"
+        plot_key = make_full_key(self.folders, self.files, "output", "average_degree_std")
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -100,7 +100,7 @@ class PlotMeasures:
             legend=True,
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "distances"
+        plot_key = make_full_key(self.folders, self.files, "output", "distances")
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -127,7 +127,7 @@ class PlotMeasures:
             legend=True,
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "centrality"
+        plot_key = make_full_key(self.folders, self.files, "output", "centrality")
         save_plot(self.context.working, plot_key)
 
     @staticmethod

@@ -4,7 +4,7 @@ import networkx as nx
 
 from cell_abm_pipeline.utilities.load import load_pickle
 from cell_abm_pipeline.utilities.save import save_dataframe
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 
 class AnalyzeMeasures:
@@ -27,11 +27,11 @@ class AnalyzeMeasures:
         all_data = []
 
         for seed in self.context.seeds:
-            file_key = self.folders["input"] + self.files["input"] % (key, seed)
+            file_key = make_full_key(self.folders, self.files, "input", (key, seed))
             data = load_pickle(self.context.working, file_key)
             all_data = all_data + [(seed, key, value) for key, value in data.items()]
 
-        output_key = self.folders["output"] + self.files["output"] % (key)
+        output_key = make_full_key(self.folders, self.files, "output", key)
         output_df = self.calculate_graph_measures(all_data)
         save_dataframe(self.context.working, output_key, output_df, index=False)
 

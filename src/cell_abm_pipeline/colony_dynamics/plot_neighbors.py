@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 from cell_abm_pipeline.utilities.load import load_dataframe
 from cell_abm_pipeline.utilities.save import save_plot, save_gif
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 from cell_abm_pipeline.utilities.plot import make_plot
 
 
@@ -14,18 +14,23 @@ class PlotNeighbors:
         self.context = context
         self.folders = {
             "input": make_folder_key(context.name, "analysis", "NEIGHBORS", False),
+            "frame": make_folder_key(context.name, "plots", "NEIGHBORS", True),
             "output": make_folder_key(context.name, "plots", "NEIGHBORS", True),
         }
         self.files = {
             "input": make_file_key(context.name, ["NEIGHBORS", "csv", "xz"], "", "%04d"),
-            "output_frame": make_file_key(context.name, ["NEIGHBORS", "%06d", "png"], "", "%04d"),
+            "frame": make_file_key(context.name, ["NEIGHBORS", "%06d", "png"], "", "%04d"),
             "output": make_file_key(context.name, ["NEIGHBORS", "gif"], "", "%04d"),
         }
 
     def run(self):
         for seed in self.context.seeds:
-            key_file = self.folders["input"] + self.files["input"] % seed
+            key_file = make_full_key(self.folders, self.files, "input", seed)
             data = load_dataframe(self.context.working, key_file)
+
+            if data.KEY.isnull().values.any():
+                data.KEY = ""
+
             data = data[data.KEY.isin(self.context.keys)]
             self.plot_neighbors(data)
 
@@ -46,11 +51,11 @@ class PlotNeighbors:
                 self._plot_neighbors,
             )
 
-            frame_key = self.folders["output"] + self.files["output_frame"] % (seed, tick)
+            frame_key = make_full_key(self.folders, self.files, "frame", (seed, tick))
             save_plot(self.context.working, frame_key)
             frame_keys.append(frame_key)
 
-        file_key = self.folders["output"] + self.files["output"] % seed
+        file_key = make_full_key(self.folders, self.files, "output", seed)
         save_gif(self.context.working, file_key, frame_keys)
 
     @staticmethod
