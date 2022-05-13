@@ -6,7 +6,7 @@ from cell_abm_pipeline.cell_shape.__config__ import PCA_COMPONENTS, VALID_PHASES
 from cell_abm_pipeline.cell_shape.calculate_coefficients import CalculateCoefficients
 from cell_abm_pipeline.utilities.load import load_dataframe
 from cell_abm_pipeline.utilities.save import save_pickle
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 
 class PerformPCA:
@@ -14,6 +14,7 @@ class PerformPCA:
         self.context = context
         self.folders = {
             "input": make_folder_key(context.name, "analysis", "SH", False),
+            "region": make_folder_key(context.name, "analysis", "SH", False),
             "output": make_folder_key(context.name, "analysis", "SHPCA", True),
         }
         self.files = {
@@ -29,12 +30,18 @@ class PerformPCA:
         all_data = []
 
         for seed in self.context.seeds:
-            file_key = self.folders["input"] + self.files["input"] % (seed)
+            file_key = make_full_key(self.folders, self.files, "input", seed)
             data = load_dataframe(self.context.working, file_key)
 
+            if data.KEY.isnull().values.any():
+                data.KEY = ""
+
             if region:
-                region_file_key = self.folders["input"] + self.files["region"](region) % (seed)
+                region_file_key = make_full_key(self.folders, self.files, "region", seed, region)
                 region_data = load_dataframe(self.context.working, region_file_key)
+
+                if region_data.KEY.isnull().values.any():
+                    region_data.KEY = ""
 
                 join_columns = ["KEY", "ID", "SEED", "TICK"]
                 region_data = region_data.set_index(join_columns)
@@ -52,7 +59,7 @@ class PerformPCA:
             coeff_names = coeff_names + CalculateCoefficients.get_coeff_names(suffix=f".{region}")
 
         for key, key_group in data_df.groupby("KEY"):
-            output_key = self.folders["output"] + self.files["output"](region) % (key)
+            output_key = make_full_key(self.folders, self.files, "output", key, region)
             pca = self.fit_feature_pca(key_group[coeff_names], key_group["NUM_VOXELS"])
             output = {"data": key_group, "pca": pca}
             save_pickle(self.context.working, output_key, output)

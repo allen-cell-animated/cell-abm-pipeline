@@ -26,8 +26,8 @@ def make_full_key(folder_keys, file_keys, key_type, substitutes=None, arguments=
     if not isinstance(file_key, str):
         file_key = file_key(arguments)
 
-    if substitutes:
+    if substitutes is not None:
         file_key = file_key % substitutes
 
     full_key = folder_key + file_key
-    return full_key.replace("__", "_")
+    return full_key.replace("__", "_").replace("_.", ".")

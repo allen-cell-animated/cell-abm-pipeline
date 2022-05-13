@@ -12,7 +12,7 @@ from cell_abm_pipeline.cell_shape.__config__ import COEFF_ORDER, PCA_COMPONENTS
 from cell_abm_pipeline.cell_shape.calculate_coefficients import CalculateCoefficients
 from cell_abm_pipeline.utilities.load import load_pickle
 from cell_abm_pipeline.utilities.save import save_buffer
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 
 class ExtractShapes:
@@ -32,7 +32,7 @@ class ExtractShapes:
             self.extract_shapes(key, region, delta, scale, box)
 
     def extract_shapes(self, key, region, delta, scale, box):
-        file_key = self.folders["input"] + self.files["input"](region) % key
+        file_key = make_full_key(self.folders, self.files, "input", key, region)
         loaded = load_pickle(self.context.working, file_key)
         pca = loaded["pca"]
         data = loaded["data"]
@@ -40,7 +40,7 @@ class ExtractShapes:
         shape_svgs = self.extract_shape_svgs(pca, data, delta, region)
         svg = self.compile_shape_svg(shape_svgs, scale, box, region)
 
-        output_key = self.folders["output"] + self.files["output"](region) % key
+        output_key = make_full_key(self.folders, self.files, "output", key, region)
         save_buffer(self.context.working, output_key, svg)
 
     @staticmethod

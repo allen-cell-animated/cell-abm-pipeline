@@ -5,7 +5,7 @@ from cell_abm_pipeline.cell_shape.calculate_coefficients import CalculateCoeffic
 from cell_abm_pipeline.cell_shape.perform_pca import PerformPCA
 from cell_abm_pipeline.utilities.load import load_pickle
 from cell_abm_pipeline.utilities.save import save_plot
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 from cell_abm_pipeline.utilities.plot import make_plot, make_legend
 
 
@@ -25,7 +25,7 @@ class PlotPCA:
         data = {}
 
         for key in self.context.keys:
-            key_file = self.folders["input"] + self.files["input"](region) % key
+            key_file = make_full_key(self.folders, self.files, "input", key, region)
             data[key] = load_pickle(self.context.working, key_file)
 
         if reference:
@@ -50,7 +50,7 @@ class PlotPCA:
             legend=True,
         )
 
-        plot_key = self.folders["output"] + self.files["output"](region) % "variance_explained"
+        plot_key = make_full_key(self.folders, self.files, "output", "variance_explained", region)
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -81,7 +81,7 @@ class PlotPCA:
         )
 
         feature_key = f"transform_features_{feature}"
-        plot_key = self.folders["output"] + self.files["output"](region) % feature_key
+        plot_key = make_full_key(self.folders, self.files, "output", feature_key, region)
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -124,7 +124,7 @@ class PlotPCA:
         )
 
         component_key = f"transform_component_PC{pc}"
-        plot_key = self.folders["output"] + self.files["output"](region) % component_key
+        plot_key = make_full_key(self.folders, self.files, "output", component_key, region)
         save_plot(self.context.working, plot_key)
 
     @staticmethod
