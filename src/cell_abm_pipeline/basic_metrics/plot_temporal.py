@@ -7,7 +7,7 @@ from scipy.stats import gamma
 from cell_abm_pipeline.basic_metrics.__config__ import PHASE_COLORS
 from cell_abm_pipeline.utilities.load import load_dataframe
 from cell_abm_pipeline.utilities.save import save_plot
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 from cell_abm_pipeline.utilities.plot import make_plot
 
 
@@ -30,7 +30,7 @@ class PlotTemporal:
             key_data = []
 
             for seed in self.context.seeds:
-                key_file = self.folders["input"] + self.files["input"] % (key, seed)
+                key_file = make_full_key(self.folders, self.files, "input", (key, seed))
                 seed_data = load_dataframe(self.context.working, key_file)
                 seed_data["SEED"] = seed
                 self.convert_data_units(seed_data, ds, dt)
@@ -58,7 +58,7 @@ class PlotTemporal:
             ylabel="Number of Cells",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "total_counts"
+        plot_key = make_full_key(self.folders, self.files, "output", "total_counts")
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -79,7 +79,7 @@ class PlotTemporal:
             ylabel="Fraction of Cells",
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % "cell_phases"
+        plot_key = make_full_key(self.folders, self.files, "output", "cell_phases")
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -132,7 +132,7 @@ class PlotTemporal:
                 ylabel="Frequency",
             )
 
-            plot_key = self.folders["output"] + self.files["output"] % f"cell_phases_{phase}"
+            plot_key = make_full_key(self.folders, self.files, "output", f"cell_phases_{phase}")
             save_plot(self.context.working, plot_key)
 
     @staticmethod

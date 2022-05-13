@@ -4,7 +4,7 @@ from matplotlib.lines import Line2D
 from cell_abm_pipeline.basic_metrics.__config__ import PHASE_COLORS
 from cell_abm_pipeline.utilities.load import load_dataframe
 from cell_abm_pipeline.utilities.save import save_plot
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 from cell_abm_pipeline.utilities.plot import make_plot, make_legend
 
 
@@ -25,7 +25,7 @@ class PlotSpatial:
             data = {}
 
             for key in self.context.keys:
-                file = self.folders["input"] + self.files["input"] % (key, seed)
+                file = make_full_key(self.folders, self.files, "input", (key, seed))
                 file_data = load_dataframe(self.context.working, file)
                 self.convert_data_units(file_data, ds)
                 data[key] = file_data
@@ -48,7 +48,7 @@ class PlotSpatial:
             legend={"handles": legend},
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % ("volume_distribution", seed)
+        plot_key = make_full_key(self.folders, self.files, "output", ("volume_distribution", seed))
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -86,7 +86,7 @@ class PlotSpatial:
             legend={"handles": legend},
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % ("phase_distribution", seed)
+        plot_key = make_full_key(self.folders, self.files, "output", ("phase_distribution", seed))
         save_plot(self.context.working, plot_key)
 
     @staticmethod
@@ -110,7 +110,7 @@ class PlotSpatial:
             self._plot_population_distribution,
         )
 
-        plot_key = self.folders["output"] + self.files["output"] % ("population_distribution", seed)
+        plot_key = make_full_key(self.folders, self.files, "output", ("population_distribution", seed))
         save_plot(self.context.working, plot_key)
 
     @staticmethod

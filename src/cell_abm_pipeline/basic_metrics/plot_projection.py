@@ -2,7 +2,7 @@ import numpy as np
 
 from cell_abm_pipeline.utilities.load import load_tar, load_tar_member
 from cell_abm_pipeline.utilities.save import save_plot, save_gif
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 from cell_abm_pipeline.utilities.plot import make_plot
 
 
@@ -12,11 +12,12 @@ class PlotProjection:
         self.folders = {
             "input": make_folder_key(context.name, "data", "LOCATIONS", False),
             "output": make_folder_key(context.name, "plots", "BASIC", True),
+            "output_frame": make_folder_key(context.name, "plots", "BASIC", True),
         }
         self.files = {
             "input": make_file_key(context.name, ["LOCATIONS", "tar", "xz"], "%s", "%04d"),
-            "output_frame": make_file_key(context.name, ["BASIC", "%06d", "png"], "", "%04d"),
             "output": make_file_key(context.name, ["BASIC", "gif"], "", "%04d"),
+            "output_frame": make_file_key(context.name, ["BASIC", "%06d", "png"], "", "%04d"),
         }
 
     def run(self, frames=[0], box=(100, 100, 10)):
@@ -24,11 +25,10 @@ class PlotProjection:
             data = {}
 
             for key in self.context.keys:
-                file = self.folders["input"] + self.files["input"] % (key, seed)
-                data[key] = (
-                    f"{self.context.name}_{key}_{seed:04d}",
-                    load_tar(self.context.working, file),
-                )
+                file = make_full_key(self.folders, self.files, "input", (key, seed))
+                full_key = f"{self.context.name}_{key}_{seed:04d}"
+                full_key = full_key.replace("__", "_")
+                data[key] = (full_key,load_tar(self.context.working, file))
 
             self.plot_projection(data, seed, frames, box)
 
@@ -48,11 +48,11 @@ class PlotProjection:
                 size=5,
             )
 
-            frame_key = self.folders["output"] + self.files["output_frame"] % (seed, frame)
+            frame_key = make_full_key(self.folders, self.files, "output_frame", (seed, frame))
             save_plot(self.context.working, frame_key)
             frame_keys.append(frame_key)
 
-        file_key = self.folders["output"] + self.files["output"] % seed
+        file_key = make_full_key(self.folders, self.files, "output", seed)
         save_gif(self.context.working, file_key, frame_keys)
 
     @staticmethod
