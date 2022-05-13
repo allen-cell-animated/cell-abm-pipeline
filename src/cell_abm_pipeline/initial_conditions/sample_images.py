@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from cell_abm_pipeline.initial_conditions.__config__ import SCALE_MICRONS_XY, SCALE_MICRONS_Z
 from cell_abm_pipeline.utilities.load import load_dataframe, load_image
 from cell_abm_pipeline.utilities.save import save_dataframe, save_plot
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 from cell_abm_pipeline.utilities.plot import make_plot
 
 
@@ -35,7 +35,7 @@ class SampleImages:
                     self.plot_contact_sheet(key, channel)
 
     def sample_images(self, key, grid, resolution, channels):
-        image_key = self.folders["image"] + self.files["image"] % (key)
+        image_key = make_full_key(self.folders, self.files, "image", key)
         image = load_image(self.context.working, image_key)
 
         sample_indices = self.get_sample_indices(image, resolution, grid)
@@ -44,12 +44,12 @@ class SampleImages:
             samples = self.get_image_samples(image, sample_indices, channel)
             samples_df = pd.DataFrame(samples, columns=["id", "x", "y", "z"])
 
-            sample_key = self.folders["sample"] + self.files["sample"] % (key, channel)
+            sample_key = make_full_key(self.folders, self.files, "sample", (key, channel))
             save_dataframe(self.context.working, sample_key, samples_df, index=False)
 
     def plot_contact_sheet(self, key, channel):
         """Save contact sheet image for all z slices in samples."""
-        data_key = self.folders["sample"] + self.files["sample"] % (key, channel)
+        data_key = make_full_key(self.folders, self.files, "sample", (key, channel))
         data = load_dataframe(self.context.working, data_key)
 
         if len(data) == 0:
@@ -58,7 +58,7 @@ class SampleImages:
         make_plot(sorted(data.z.unique()), data, self._plot_contact_sheet)
 
         plt.gca().invert_yaxis()
-        plot_key = self.folders["contact"] + self.files["contact"] % (key, channel)
+        plot_key = make_full_key(self.folders, self.files, "contact", (key, channel))
         save_plot(self.context.working, plot_key)
 
     @staticmethod

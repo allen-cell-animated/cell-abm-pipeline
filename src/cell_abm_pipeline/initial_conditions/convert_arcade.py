@@ -7,7 +7,7 @@ from cell_abm_pipeline.initial_conditions.__config__ import POTTS_TERMS
 from cell_abm_pipeline.initial_conditions.process_samples import ProcessSamples
 from cell_abm_pipeline.utilities.load import load_dataframe
 from cell_abm_pipeline.utilities.save import save_json, save_buffer
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 # Critical cell height (in voxels)
 CRITICAL_HEIGHT = 5
@@ -18,7 +18,9 @@ class ConvertARCADE:
         self.context = context
         self.folders = {
             "input": make_folder_key(context.name, "samples", "PROCESSED", False),
-            "output": make_folder_key(context.name, "converted", "ARCADE", False),
+            "cells": make_folder_key(context.name, "converted", "ARCADE", False),
+            "locations": make_folder_key(context.name, "converted", "ARCADE", False),
+            "setup": make_folder_key(context.name, "converted", "ARCADE", False),
         }
         self.files = {
             "input": lambda r: make_file_key(context.name, ["PROCESSED", r, "csv"], "%s", ""),
@@ -32,14 +34,14 @@ class ConvertARCADE:
             self.convert_arcade(key, margins, region)
 
     def convert_arcade(self, key, margins, region):
-        sample_key = self.folders["input"] + self.files["input"](None) % key
+        sample_key = make_full_key(self.folders, self.files, "input", key)
         samples_df = load_dataframe(self.context.working, sample_key)
 
         steps, offsets, bounds = self.calculate_sample_transform(samples_df, margins)
         samples = self.transform_sample_voxels(samples_df, steps, offsets)
 
         if region:
-            region_key = self.folders["input"] + self.files["input"](region) % key
+            region_key = make_full_key(self.folders, self.files, "input", key, region)
             region_df = load_dataframe(self.context.working, region_key)
             region_samples = self.transform_sample_voxels(region_df, steps, offsets)
             region_samples["region"] = region
@@ -60,15 +62,15 @@ class ConvertARCADE:
             locations.append(self.convert_to_location(i + 1, group))
 
         # Save converted ARCADE files.
-        cells_key = self.folders["output"] + self.files["cells"] % key
+        cells_key = make_full_key(self.folders, self.files, "cells", key)
         save_json(self.context.working, cells_key, cells)
 
-        locations_key = self.folders["output"] + self.files["locations"] % key
+        locations_key = make_full_key(self.folders, self.files, "locations", key)
         save_json(self.context.working, locations_key, locations)
 
         # Create and save setup file.
         setup = self.make_setup_file(samples, **bounds)
-        setup_key = self.folders["output"] + self.files["setup"] % key
+        setup_key = make_full_key(self.folders, self.files, "setup", key)
         save_buffer(self.context.working, setup_key, setup)
 
     @staticmethod

@@ -12,7 +12,7 @@ from cell_abm_pipeline.initial_conditions.__config__ import (
 )
 from cell_abm_pipeline.utilities.load import load_dataframe
 from cell_abm_pipeline.utilities.save import save_dataframe, save_plot
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 from cell_abm_pipeline.utilities.plot import make_plot
 
 
@@ -38,7 +38,7 @@ class ProcessSamples:
                 self.plot_contact_sheet(key)
 
     def process_samples(self, key, grid, scale, select, edges, connected):
-        sample_key = self.folders["sample"] + self.files["sample"] % key
+        sample_key = make_full_key(self.folders, self.files, "sample", key)
         samples_df = load_dataframe(self.context.working, sample_key)
         processed_df = samples_df.copy()
 
@@ -58,22 +58,22 @@ class ProcessSamples:
             print("Selecting cell ids ...")
             processed_df = self.select_cells(processed_df, select)
 
-        processed_key = self.folders["processed"] + self.files["processed"] % key
+        processed_key = make_full_key(self.folders, self.files, "processed", key)
         save_dataframe(self.context.working, processed_key, processed_df, index=False)
 
     def plot_contact_sheet(self, key):
         """Save contact sheet image for processed samples."""
-        sample_key = self.folders["sample"] + self.files["sample"] % key
+        sample_key = make_full_key(self.folders, self.files, "sample", key)
         sample_data = load_dataframe(self.context.working, sample_key)
 
-        processed_key = self.folders["processed"] + self.files["processed"] % key
+        processed_key = make_full_key(self.folders, self.files, "processed", key)
         processed_data = load_dataframe(self.context.working, processed_key)
 
         data = {"samples": sample_data, "processed": processed_data}
         make_plot(sorted(data["samples"].z.unique()), data, self._plot_contact_sheet)
 
         plt.gca().invert_yaxis()
-        plot_key = self.folders["contact"] + self.files["contact"] % key
+        plot_key = make_full_key(self.folders, self.files, "contact", key)
         save_plot(self.context.working, plot_key)
 
     @staticmethod

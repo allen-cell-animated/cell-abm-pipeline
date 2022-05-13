@@ -2,7 +2,7 @@ from scipy.ndimage import distance_transform_edt
 
 from cell_abm_pipeline.utilities.load import load_image
 from cell_abm_pipeline.utilities.save import save_image
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 
 class CreateVoronoi:
@@ -10,6 +10,7 @@ class CreateVoronoi:
         self.context = context
         self.folders = {
             "image": make_folder_key(context.name, "images", "", False),
+            "output": make_folder_key(context.name, "images", "", False),
         }
         self.files = {
             "image": make_file_key(context.name, ["ome", "tiff"], "%s", ""),
@@ -22,7 +23,7 @@ class CreateVoronoi:
                 self.create_voronoi(key, channel)
 
     def create_voronoi(self, key, channel):
-        image_key = self.folders["image"] + self.files["image"] % (key)
+        image_key = make_full_key(self.folders, self.files, "image", key)
         image = load_image(self.context.working, image_key)
 
         array = image.get_image_data("ZYX", T=0, C=channel)
@@ -34,5 +35,5 @@ class CreateVoronoi:
         coordx = distances[2].flatten()
         voronoi = array[coordz, coordy, coordx].reshape(array.shape)
 
-        output_key = self.folders["image"] + self.files["output"] % (key, channel)
+        output_key = make_full_key(self.folders, self.files, "output", (key, channel))
         save_image(self.context.working, output_key, voronoi)

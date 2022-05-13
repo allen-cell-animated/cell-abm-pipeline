@@ -9,7 +9,7 @@ from cell_abm_pipeline.initial_conditions.__config__ import QUILT_REGISTRY, QUIL
 from cell_abm_pipeline.initial_conditions.__main__ import Context
 from cell_abm_pipeline.utilities.load import load_dataframe
 from cell_abm_pipeline.utilities.save import save_dataframe, save_buffer
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 
 class DownloadImages:
@@ -89,7 +89,7 @@ class DownloadImages:
         pkg = quilt3.Package.browse(QUILT_PACKAGE, QUILT_REGISTRY)
 
         # Get list of FOV images.
-        manifest_key = self.folders["manifest"] + self.files["manifest"]
+        manifest_key = make_full_key(self.folders, self.files, "manifest")
         fov_files = self.get_fov_files(self.context.working, manifest_key, pkg)
 
         # Iterate through downloadable images until no more images are available
@@ -106,7 +106,7 @@ class DownloadImages:
             print(f"Downloading {fov_seg_path} ...")
             contents = io.BytesIO(pkg[fov_seg_path].get_bytes())
             fov_seg_path_key = fov_seg_path.split("/")[-1]
-            image_key = self.folders["image"] + self.files["image"] % fov_seg_path_key
+            image_key = make_full_key(self.folders, self.files, "image", fov_seg_path_key)
             save_buffer(self.context.working, image_key, contents)
             downloaded_fov_files.append(fov_seg_path)
 
