@@ -8,7 +8,7 @@ from aicsshparam import shparam, shtools
 from cell_abm_pipeline.cell_shape.__config__ import COEFF_ORDER
 from cell_abm_pipeline.utilities.load import load_tar, load_tar_member
 from cell_abm_pipeline.utilities.save import save_dataframe
-from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key
+from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 
 class CalculateCoefficients:
@@ -34,10 +34,10 @@ class CalculateCoefficients:
         """
         Calculates spherical harmonics coefficients for all cells.
         """
-        cell_data_key = self.folders["data.CELLS"] + self.files["data.CELLS"] % (key, seed)
+        cell_data_key = make_full_key(self.folders, self.files, "data.CELLS", (key, seed))
         cell_data_tar = load_tar(self.context.working, cell_data_key)
 
-        loc_data_key = self.folders["data.LOCATIONS"] + self.files["data.LOCATIONS"] % (key, seed)
+        loc_data_key = make_full_key(self.folders, self.files, "data.LOCATIONS", (key, seed))
         loc_data_tar = load_tar(self.context.working, loc_data_key)
 
         all_coeffs = []
@@ -86,7 +86,7 @@ class CalculateCoefficients:
             progress_bar.update()
 
         coeff_df = pd.DataFrame(all_coeffs)
-        analysis_key = self.folders["analysis"] + self.files["analysis"](region) % (key, seed)
+        analysis_key = make_full_key(self.folders, self.files, "analysis", (key, seed), region)
         save_dataframe(self.context.working, analysis_key, coeff_df, index=False)
 
     @staticmethod

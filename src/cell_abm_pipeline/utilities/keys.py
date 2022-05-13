@@ -19,10 +19,16 @@ def make_file_key(name, extension, key, seed):
     return f"{name}{key}{seed}{extension}"
 
 
-def make_full_key(name, group, extension, subgroup="", key="", seed="", timestamp=True):
-    folder_key = make_folder_key(name, group, subgroup, timestamp)
-    file_key = make_file_key(name, extension, key, seed)
-    return f"{folder_key}{file_key}"
+def make_full_key(folder_keys, file_keys, key_type, substitutes, arguments=None):
+    folder_key = folder_keys[key_type]
+    file_key = file_keys[key_type]
+
+    if isinstance(file_key, str):
+        full_key = folder_key + file_key % substitutes
+    else:
+        full_key = folder_key + file_key(arguments) % substitutes
+
+    return full_key.replace("__", "_")
 
 
 def get_keys(working, pattern):
