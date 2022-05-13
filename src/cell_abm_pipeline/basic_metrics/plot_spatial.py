@@ -17,7 +17,7 @@ class PlotSpatial:
         }
         self.files = {
             "input": make_file_key(context.name, ["csv"], "%s", "%04d"),
-            "output": make_file_key(context.name, ["BASIC", "png"], "%s", "%04d"),
+            "output": lambda r: make_file_key(context.name, ["BASIC", r, "png"], "%s", "%04d"),
         }
 
     def run(self, ds=1, region=None):
@@ -43,7 +43,7 @@ class PlotSpatial:
         if region:
             data[f"VOLUME.{region}"] = ds * ds * ds * data[f"NUM_VOXELS.{region}"]
 
-    def plot_volume_distribution(self, data, seed, region=None, vmin=500, vmax=4000):
+    def plot_volume_distribution(self, data, seed, region=None, vmin=0, vmax=4000):
         legend = make_legend("VOLUME", [vmin, vmax])
 
         make_plot(

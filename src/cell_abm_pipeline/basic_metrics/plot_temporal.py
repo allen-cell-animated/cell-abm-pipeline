@@ -195,7 +195,7 @@ class PlotTemporal:
             data,
             lambda a, d, k: self._plot_individual_volume(a, d, k, region),
             xlabel="Time (hrs)",
-            ylabel=f"{region} Volume ($\mu m^3$)",
+            ylabel="Volume ($\mu m^3$)",
         )
 
         plot_key = make_full_key(self.folders, self.files, "output", "individual_volume", region)
@@ -224,7 +224,7 @@ class PlotTemporal:
             data,
             lambda a, d, k: self._plot_average_volume(a, d, k, region),
             xlabel="Time (hrs)",
-            ylabel=f"{region} Average Volume ($\mu m^3$)",
+            ylabel="Average Volume ($\mu m^3$)",
         )
 
         plot_key = make_full_key(self.folders, self.files, "output", "average_volume", region)
@@ -250,7 +250,7 @@ class PlotTemporal:
             self.context.keys,
             data,
             lambda a, d, k: self._plot_volume_distribution(a, d, k, region),
-            xlabel=f"{region} Volume ($\mu m^3$)",
+            xlabel="Volume ($\mu m^3$)",
             ylabel="Frequency",
             legend=True,
         )
