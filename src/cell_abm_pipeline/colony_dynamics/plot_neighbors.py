@@ -14,11 +14,13 @@ class PlotNeighbors:
         self.context = context
         self.folders = {
             "input": make_folder_key(context.name, "analysis", "NEIGHBORS", False),
+            "results": make_folder_key(context.name, "results", "", False),
             "frame": make_folder_key(context.name, "plots", "NEIGHBORS", True),
             "output": make_folder_key(context.name, "plots", "NEIGHBORS", True),
         }
         self.files = {
             "input": make_file_key(context.name, ["NEIGHBORS", "csv", "xz"], "", "%04d"),
+            "results": make_file_key(context.name, ["csv"], "%s", "%04d"),
             "frame": make_file_key(context.name, ["NEIGHBORS", "%06d", "png"], "", "%04d"),
             "output": make_file_key(context.name, ["NEIGHBORS", "gif"], "", "%04d"),
         }
@@ -28,8 +30,16 @@ class PlotNeighbors:
             key_file = make_full_key(self.folders, self.files, "input", seed)
             data = load_dataframe(self.context.working, key_file)
 
+            results_file = make_full_key(self.folders, self.files, "results", ("", seed))
+            results = load_dataframe(self.context.working, results_file)
+
             if data.KEY.isnull().values.any():
                 data.KEY = ""
+
+            join_columns = ["ID", "TICK"]
+            results = results.set_index(join_columns)
+            results = results[["PHASE"]]
+            data = data.merge(results, left_on=join_columns, right_on=join_columns)
 
             data = data[data.KEY.isin(self.context.keys)]
             self.plot_neighbors(data)
@@ -60,6 +70,15 @@ class PlotNeighbors:
 
     @staticmethod
     def _plot_neighbors(ax, data, key):
+        PHASE_COLORS = {
+            "PROLIFERATIVE_G1": "#5F4690",
+            "PROLIFERATIVE_S": "#38A6A5",
+            "PROLIFERATIVE_G2": "#73AF48",
+            "PROLIFERATIVE_M": "#CC503E",
+            "APOPTOTIC_EARLY": "#E17C05",
+            "APOPTOTIC_LATE": "#94346E",
+        }
+
         ax.get_xaxis().set_ticks([])
         ax.get_yaxis().set_ticks([])
 
@@ -80,7 +99,8 @@ class PlotNeighbors:
                 zorder=1,
             )
 
-        ax.scatter(frame.CX, frame.CY, c=frame.GROUP, s=5, cmap=data["cmap"], zorder=2)
+        colors = [PHASE_COLORS[phase] for phase in frame.PHASE]
+        ax.scatter(frame.CX, frame.CY, c=colors, s=50, zorder=2, edgecolor="#ffffff", lw=0.2)
 
         ax.set_xlim(data["xlim"])
         ax.set_ylim(data["ylim"])

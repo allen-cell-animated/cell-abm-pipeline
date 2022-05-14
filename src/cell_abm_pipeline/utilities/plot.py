@@ -6,7 +6,7 @@ from matplotlib import rc
 from matplotlib import cm
 from matplotlib.lines import Line2D
 
-PLOT_SIZE = 2
+PLOT_SIZE = 4
 
 rc("font", size=8)
 rc("axes", titlesize=10, titleweight="bold")
