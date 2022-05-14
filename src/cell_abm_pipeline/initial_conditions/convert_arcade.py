@@ -9,8 +9,45 @@ from cell_abm_pipeline.utilities.load import load_dataframe
 from cell_abm_pipeline.utilities.save import save_json, save_buffer
 from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
-# Critical cell height (in voxels)
-CRITICAL_HEIGHT = 5
+VOLUME_MU = {
+    "DEFAULT": 1848,
+    "NUCLEUS": 537,
+}
+
+VOLUME_SIGMA = {
+    "DEFAULT": 512,
+    "NUCLEUS": 155,
+}
+
+CRITICAL_VOLUME_MU = {
+    "DEFAULT": 1300,
+    "NUCLEUS": 400,
+}
+
+CRITICAL_VOLUME_SIGMA = {
+    "DEFAULT": 200,
+    "NUCLEUS": 50,
+}
+
+HEIGHT_MU = {
+    "DEFAULT": 9.6,
+    "NUCLEUS": 6.7,
+}
+
+HEIGHT_SIGMA = {
+    "DEFAULT": 2.4,
+    "NUCLEUS": 1.7,
+}
+
+CRITICAL_HEIGHT_MU = {
+    "DEFAULT": 4.75,
+    "NUCLEUS": 3.25,
+}
+
+CRITICAL_HEIGHT_SIGMA = {
+    "DEFAULT": 1,
+    "NUCLEUS": 0.75,
+}
 
 
 class ConvertARCADE:
@@ -148,8 +185,9 @@ class ConvertARCADE:
     @staticmethod
     def convert_to_cell(cell_id, samples):
         """Convert samples to ARCADE .CELLS json format."""
-        volume, surface = ConvertARCADE.get_cell_targets(samples)
-        state, phase = ConvertARCADE.get_cell_phase(volume)
+        volume = len(samples)
+        critical_volume, critical_height = ConvertARCADE.get_cell_criticals(samples)
+        state, phase = ConvertARCADE.get_cell_phase(volume, critical_volume)
 
         cell = {
             "id": cell_id,
@@ -160,7 +198,7 @@ class ConvertARCADE:
             "state": state,
             "phase": phase,
             "voxels": volume,
-            "targets": [volume, surface],
+            "criticals": [critical_volume, critical_height],
         }
 
         if "region" in samples.columns:
@@ -191,14 +229,22 @@ class ConvertARCADE:
         }
 
     @staticmethod
-    def get_cell_targets(samples):
+    def get_cell_criticals(samples, region="DEFAULT"):
         volume = len(samples)
-        surface = ConvertARCADE.calculate_surface_area(volume, CRITICAL_HEIGHT)
-        return volume, surface
+        height = samples.z.max() - samples.z.min()
+
+        z_volume = (volume - VOLUME_MU[region]) / VOLUME_SIGMA[region]
+        critical_volume = z_volume * CRITICAL_VOLUME_SIGMA[region] + CRITICAL_VOLUME_MU[region]
+
+        z_height = (height - HEIGHT_MU[region]) / HEIGHT_SIGMA[region]
+        critical_height = z_height * CRITICAL_HEIGHT_SIGMA[region] + CRITICAL_HEIGHT_MU[region]
+
+        return critical_volume, critical_height
 
     @staticmethod
-    def get_cell_phase(volume):
-        thresholds = [250, 1000, 1124, 1726, 1969]
+    def get_cell_phase(volume, critical_volume):
+        fractions = [0.25, 1, 1.124, 1.726, 1.969]
+        thresholds = [fraction * critical_volume for fraction in fractions]
         states = [
             "APOPTOTIC",
             "APOPTOTIC",
@@ -222,7 +268,7 @@ class ConvertARCADE:
                 {
                     "region": region,
                     "voxels": len(group),
-                    "targets": list(ConvertARCADE.get_cell_targets(group)),
+                    "criticals": list(ConvertARCADE.get_cell_criticals(group, region)),
                 }
             )
         return regions
