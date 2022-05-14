@@ -61,6 +61,7 @@ class PlotSpatial:
         value = f"VOLUME.{region}" if region else "VOLUME"
         ax.get_xaxis().set_ticks([])
         ax.get_yaxis().set_ticks([])
+        ax.invert_yaxis()
 
         data = data[key]
         data = data[data["TICK"] == data["TICK"].max()]
@@ -99,6 +100,7 @@ class PlotSpatial:
     def _plot_phase_distribution(ax, data, key):
         ax.get_xaxis().set_ticks([])
         ax.get_yaxis().set_ticks([])
+        ax.invert_yaxis()
 
         data = data[key]
         data = data[data["TICK"] == data["TICK"].max()]
@@ -123,6 +125,7 @@ class PlotSpatial:
     def _plot_population_distribution(ax, data, key):
         ax.get_xaxis().set_ticks([])
         ax.get_yaxis().set_ticks([])
+        ax.invert_yaxis()
 
         data = data[key]
         data = data[data["TICK"] == data["TICK"].max()]
