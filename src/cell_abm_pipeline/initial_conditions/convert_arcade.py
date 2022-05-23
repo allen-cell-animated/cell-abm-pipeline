@@ -3,6 +3,8 @@ import io
 from math import ceil, sqrt, pi
 import xml.etree.ElementTree as ET
 
+import pandas as pd
+
 from cell_abm_pipeline.initial_conditions.__config__ import POTTS_TERMS
 from cell_abm_pipeline.initial_conditions.process_samples import ProcessSamples
 from cell_abm_pipeline.utilities.load import load_dataframe
@@ -10,13 +12,13 @@ from cell_abm_pipeline.utilities.save import save_json, save_buffer
 from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 VOLUME_MU = {
-    "DEFAULT": 1848,
-    "NUCLEUS": 537,
+    "DEFAULT": 1865,
+    "NUCLEUS": 542,
 }
 
 VOLUME_SIGMA = {
-    "DEFAULT": 512,
-    "NUCLEUS": 155,
+    "DEFAULT": 517,
+    "NUCLEUS": 157,
 }
 
 CRITICAL_VOLUME_MU = {
@@ -30,8 +32,8 @@ CRITICAL_VOLUME_SIGMA = {
 }
 
 HEIGHT_MU = {
-    "DEFAULT": 9.6,
-    "NUCLEUS": 6.7,
+    "DEFAULT": 9.65,
+    "NUCLEUS": 6.75,
 }
 
 HEIGHT_SIGMA = {
@@ -40,7 +42,7 @@ HEIGHT_SIGMA = {
 }
 
 CRITICAL_HEIGHT_MU = {
-    "DEFAULT": 4.75,
+    "DEFAULT": 4.5,
     "NUCLEUS": 3.25,
 }
 
@@ -66,11 +68,17 @@ class ConvertARCADE:
             "setup": make_file_key(context.name, ["xml"], "%s", ""),
         }
 
-    def run(self, margins=[0, 0, 0], region=None):
-        for key in self.context.keys:
-            self.convert_arcade(key, margins, region)
+    def run(self, margins=[0, 0, 0], region=None, reference=None):
+        if reference:
+            reference = load_dataframe(self.context.working, reference)
+        else:
+            reference = pd.DataFrame([], columns=["key", "id"])
 
-    def convert_arcade(self, key, margins, region):
+        for key in self.context.keys:
+            key_reference = reference[reference.key == key]
+            self.convert_arcade(key, margins, region, key_reference)
+
+    def convert_arcade(self, key, margins, region, reference):
         sample_key = make_full_key(self.folders, self.files, "input", key)
         samples_df = load_dataframe(self.context.working, sample_key)
 
@@ -94,8 +102,11 @@ class ConvertARCADE:
         samples_by_id = samples.groupby("id")
 
         # Iterate through each cell in samples and convert.
-        for i, (_, group) in enumerate(samples_by_id):
-            cells.append(self.convert_to_cell(i + 1, group))
+        for i, (sample_id, group) in enumerate(samples_by_id):
+            sample_reference = reference[reference.id == sample_id].squeeze()
+            sample_reference = sample_reference.to_dict() if not sample_reference.empty else {}
+
+            cells.append(self.convert_to_cell(i + 1, group, sample_reference))
             locations.append(self.convert_to_location(i + 1, group))
 
         # Save converted ARCADE files.
@@ -183,10 +194,10 @@ class ConvertARCADE:
         return samples
 
     @staticmethod
-    def convert_to_cell(cell_id, samples):
+    def convert_to_cell(cell_id, samples, reference):
         """Convert samples to ARCADE .CELLS json format."""
         volume = len(samples)
-        critical_volume, critical_height = ConvertARCADE.get_cell_criticals(samples)
+        critical_volume, critical_height = ConvertARCADE.get_cell_criticals(samples, reference)
         state, phase = ConvertARCADE.get_cell_phase(volume, critical_volume)
 
         cell = {
@@ -202,7 +213,7 @@ class ConvertARCADE:
         }
 
         if "region" in samples.columns:
-            regions = ConvertARCADE.get_cell_regions(samples)
+            regions = ConvertARCADE.get_cell_regions(samples, reference)
             cell.update({"regions": regions})
 
         return cell
@@ -229,8 +240,9 @@ class ConvertARCADE:
         }
 
     @staticmethod
-    def get_cell_criticals(samples, region="DEFAULT"):
-        volume = len(samples)
+    def get_cell_criticals(samples, reference, region="DEFAULT"):
+        reference_key = "volume" if region == "DEFAULT" else f"volume.{region}"
+        volume = reference[reference_key] if reference_key in reference else len(samples)
         height = samples.z.max() - samples.z.min()
 
         z_volume = (volume - VOLUME_MU[region]) / VOLUME_SIGMA[region]
@@ -261,14 +273,14 @@ class ConvertARCADE:
         return state, phase
 
     @staticmethod
-    def get_cell_regions(samples):
+    def get_cell_regions(samples, reference):
         regions = []
         for region, group in samples.groupby("region"):
             regions.append(
                 {
                     "region": region,
                     "voxels": len(group),
-                    "criticals": list(ConvertARCADE.get_cell_criticals(group, region)),
+                    "criticals": list(ConvertARCADE.get_cell_criticals(group, reference, region)),
                 }
             )
         return regions
