@@ -130,6 +130,7 @@ def process_samples(obj, **kwargs):
 
 
 @cli.command()
+@click.option("-i", "--iterations", type=int, default=10)
 @click.option("-c", "--channels", type=int, multiple=True, default=[0])
 @click.pass_obj
 def create_voronoi(obj, **kwargs):
