@@ -45,6 +45,11 @@ def plot_spatial(obj, **kwargs):
 @click.option("--region", type=str, default=None)
 @click.option("--frames", nargs=3, type=int, default=(0, 1, 1))
 @click.option("--box", nargs=3, type=int, default=(100, 100, 10))
+@click.option("--ds", type=float, default=1)
+@click.option("--dt", type=float, default=1)
+@click.option("--scale", type=float, default=100)
+@click.option("--timestamp/--no-timestamp", default=True)
+@click.option("--scalebar/--no-scalebar", default=True)
 @click.pass_obj
 def plot_projection(obj, **kwargs):
     from .plot_projection import PlotProjection
