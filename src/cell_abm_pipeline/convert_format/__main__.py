@@ -26,5 +26,14 @@ def arcade_to_image(obj, **kwargs):
     ArcadeToImage(obj).run(**kwargs)
 
 
+@cli.command()
+@click.option("--frames", nargs=3, type=int, default=(0, 1, 1))
+@click.pass_obj
+def arcade_to_mesh(obj, **kwargs):
+    from .arcade_to_mesh import ArcadeToMesh
+
+    ArcadeToMesh(obj).run(**kwargs)
+
+
 if __name__ == "__main__":
     cli()

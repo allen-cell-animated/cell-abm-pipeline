@@ -46,7 +46,7 @@ class ArcadeToImage:
             location_id = location["id"]
             voxels = [(z, y, x) for region in location["location"] for x, y, z in region["voxels"]]
             voxels = tuple(np.transpose(voxels))
-            array[index, 0][voxels] = [location_id] * len(voxels[0])
+            array[index, 0][voxels] = location_id
 
     @staticmethod
     def split_array_chunks(array):
