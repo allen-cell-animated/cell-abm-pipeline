@@ -9,7 +9,7 @@ import tempfile
 import boto3
 import matplotlib.pyplot as plt
 import imageio
-from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
+import tifffile
 
 
 def save_buffer(working, key, body):
@@ -82,16 +82,15 @@ def save_image(working, key, obj):
 
 
 def _save_image_to_s3(bucket, key, obj):
-    with tempfile.NamedTemporaryFile() as temp_file:
-        OmeTiffWriter.save(obj, temp_file.name)
-        full_key = f"s3://{bucket}/{key}"
-        _save_buffer_to_s3(bucket, key, io.BytesIO(temp_file.read()))
+    with io.BytesIO() as buffer:
+        tifffile.imwrite(buffer, obj, photometric="minisblack")
+        _save_buffer_to_s3(bucket, key, buffer)
 
 
 def _save_image_to_fs(path, key, img):
     full_path = f"{path}{key}"
     make_folders(full_path)
-    OmeTiffWriter.save(img, full_path)
+    tifffile.imwrite(full_path, img, photometric="minisblack")
 
 
 def save_json(working, key, obj):
