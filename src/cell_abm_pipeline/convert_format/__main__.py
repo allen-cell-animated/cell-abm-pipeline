@@ -35,5 +35,16 @@ def arcade_to_mesh(obj, **kwargs):
     ArcadeToMesh(obj).run(**kwargs)
 
 
+@cli.command()
+@click.option("--ds", type=float, default=1)
+@click.option("--dt", type=float, default=1)
+@click.option("--box", nargs=3, type=int, default=(100, 100, 10))
+@click.pass_obj
+def arcade_to_simularium(obj, **kwargs):
+    from .arcade_to_simularium import ArcadeToSimularium
+
+    ArcadeToSimularium(obj).run(**kwargs)
+
+
 if __name__ == "__main__":
     cli()
