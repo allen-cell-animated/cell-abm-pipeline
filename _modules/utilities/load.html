@@ -13,6 +13,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -73,6 +74,7 @@
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">tarfile</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
 
 <span class="kn">import</span> <span class="nn">boto3</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -107,6 +109,25 @@
     <span class="s2">&quot;MAX_Z&quot;</span><span class="p">:</span> <span class="s2">&quot;uint16&quot;</span><span class="p">,</span>
     <span class="s2">&quot;KEY&quot;</span><span class="p">:</span> <span class="s2">&quot;category&quot;</span><span class="p">,</span>
 <span class="p">}</span>
+
+
+<div class="viewcode-block" id="load_keys"><a class="viewcode-back" href="../../utilities.load.html#utilities.load.load_keys">[docs]</a><span class="k">def</span> <span class="nf">load_keys</span><span class="p">(</span><span class="n">working</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">working</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;s3://&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_load_keys_from_s3</span><span class="p">(</span><span class="n">working</span><span class="p">[</span><span class="mi">5</span><span class="p">:],</span> <span class="n">pattern</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_load_keys_from_fs</span><span class="p">(</span><span class="n">working</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_load_keys_from_fs</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+    <span class="n">file_list</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}{</span><span class="n">pattern</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">file_list</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_load_keys_from_s3</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">bucket_obj</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s2">&quot;s3&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">Bucket</span><span class="p">(</span><span class="n">bucket</span><span class="p">)</span>
+    <span class="n">objs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">bucket_obj</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">key</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="load_buffer"><a class="viewcode-back" href="../../utilities.load.html#utilities.load.load_buffer">[docs]</a><span class="k">def</span> <span class="nf">load_buffer</span><span class="p">(</span><span class="n">working</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
