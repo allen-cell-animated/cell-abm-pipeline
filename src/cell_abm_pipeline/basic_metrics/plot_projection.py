@@ -66,7 +66,7 @@ class PlotProjection:
                 self.context.keys,
                 frame_group,
                 lambda a, d, k: self._plot_projection(a, d, k, region, box, annotations),
-                size=5,
+                size=8,
             )
 
             frame_key = make_full_key(self.folders, self.files, "frame", (seed, frame), region)
@@ -117,7 +117,7 @@ class PlotProjection:
         normalize = borders.max()
         borders = borders / normalize
 
-        ax.imshow(borders, cmap="bone", interpolation="none")
+        ax.imshow(borders, cmap="bone", interpolation="none", vmin=0, vmax=1)
 
         PlotProjection.add_frame_timestamp(ax, length, width, **annotations["timestamp"])
         PlotProjection.add_frame_scalebar(ax, length, width, **annotations["scalebar"])
@@ -134,7 +134,7 @@ class PlotProjection:
             0.96 * width,
             timestamp,
             fontfamily="monospace",
-            fontsize=10,
+            fontsize=30,
             color="w",
             fontweight="bold",
         )
@@ -147,7 +147,7 @@ class PlotProjection:
         scalebar = scale / ds
         ax.add_patch(
             Rectangle(
-                (0.97 * length - scalebar, 0.92 * width),
+                (0.95 * length - scalebar, 0.92 * width),
                 scalebar,
                 0.01 * width,
                 snap=True,
@@ -155,10 +155,10 @@ class PlotProjection:
             )
         )
         ax.text(
-            0.97 * length - scalebar / 2,
-            0.97 * width,
+            0.95 * length - scalebar / 2,
+            0.975 * width,
             f"{scale} $\mu$m",
-            fontsize=8,
+            fontsize=20,
             color="w",
             horizontalalignment="center",
         )
