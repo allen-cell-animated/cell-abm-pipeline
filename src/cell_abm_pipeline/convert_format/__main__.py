@@ -17,5 +17,14 @@ def cli(ctx, **kwargs):
     ctx.obj = Context(**kwargs)
 
 
+@cli.command()
+@click.option("--box", nargs=3, type=int, default=(100, 100, 10))
+@click.pass_obj
+def arcade_to_image(obj, **kwargs):
+    from .arcade_to_image import ArcadeToImage
+
+    ArcadeToImage(obj).run(**kwargs)
+
+
 if __name__ == "__main__":
     cli()
