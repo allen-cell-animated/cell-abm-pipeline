@@ -72,16 +72,18 @@ class TestSampleImages(unittest.TestCase):
 
     def test_get_sample_images_extract_given_samples(self):
         channel = 1
-        array = np.array([
+        array = np.array(
             [
-                [0, 1, 2],
-                [3, 4, 5],
-            ],
-            [
-                [6, 7, 8],
-                [9, 10, 11],
-            ],
-        ])
+                [
+                    [0, 1, 2],
+                    [3, 4, 5],
+                ],
+                [
+                    [6, 7, 8],
+                    [9, 10, 11],
+                ],
+            ]
+        )
         sample_indices = [
             (0, 1, 0),
             (1, 1, 2),
@@ -90,17 +92,18 @@ class TestSampleImages(unittest.TestCase):
 
         image_mock = mock.MagicMock(spec=AICSImage)
         image_mock.get_image_data.return_value = array
-        
+
         expected_samples = {
             (3, 0, 1, 0),
             (11, 1, 1, 2),
             (7, 1, 0, 1),
         }
-        
+
         samples = SampleImages.get_image_samples(image_mock, sample_indices, channel)
-        
+
         image_mock.get_image_data.assert_called_with("XYZ", T=0, C=channel)
         self.assertSetEqual(expected_samples, set(samples))
+
 
 if __name__ == "__main__":
     unittest.main()
