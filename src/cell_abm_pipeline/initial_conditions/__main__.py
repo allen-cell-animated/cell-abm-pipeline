@@ -57,29 +57,39 @@ def download_images(obj, **kwargs):
 
 
 @cli.command()
-@click.option("-c", "--channels", type=int, multiple=True, default=[0])
 @click.option(
     "-g",
     "--grid",
     type=click.Choice(["rect", "hex"], case_sensitive=False),
     default="rect",
-    help="sampling grid type (default = rect)",
+    help="Type of sampling grid.",
+    show_default=True,
 )
 @click.option(
     "-r",
     "--resolution",
     type=float,
     default=1.0,
-    help="microns between samples (default = 1.0)",
+    help="Distance between samples (um).",
+    show_default=True,
+)
+@click.option(
+    "-c",
+    "--channels",
+    type=int,
+    multiple=True,
+    default=[0],
+    help="Image channel indices.",
+    show_default=True,
 )
 @click.option(
     "--contact/--no-contact",
     default=True,
-    help="True if contact sheet of images is saved, False otherwise (default = True)",
+    help="True if contact sheet of images is saved, False otherwise.",
 )
 @click.pass_obj
 def sample_images(obj, **kwargs):
-    """Sample image into list of id and xyz coordinates."""
+    """Sample ids and coordinates from images."""
     from .sample_images import SampleImages
 
     SampleImages(obj).run(**kwargs)
@@ -157,3 +167,7 @@ def convert_arcade(obj, **kwargs):
     from .convert_arcade import ConvertARCADE
 
     ConvertARCADE(obj).run(**kwargs)
+
+
+if __name__ == "__main__":
+    cli()

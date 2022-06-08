@@ -14,7 +14,7 @@ Commands:
   create-voronoi   Create Voronoi tesselation from given starting image.
   download-images  Download images from Quilt package.
   process-samples  Process samples with selected processing steps.
-  sample-images    Sample image into list of id and xyz coordinates.
+  sample-images    Sample ids and coordinates from images.
 ```
 
 All modules require a `Context` object that defines the working context.
@@ -35,5 +35,23 @@ Usage: initial-conditions download-images [OPTIONS]
 
 Options:
   -n, --num-images INTEGER  Number of images to download.  [default: 0]
+  --help                    Show this message and exit.
+```
+
+## Sample id and coordinates from images
+
+The `SampleImages` module can be called via CLI using:
+
+```bash
+Usage: initial-conditions sample-images [OPTIONS]
+
+  Sample ids and coordinates from images.
+
+Options:
+  -g, --grid [rect|hex]     Type of sampling grid.  [default: rect]
+  -r, --resolution FLOAT    Distance between samples (um).  [default: 1.0]
+  -c, --channels INTEGER    Image channel indices.  [default: 0]
+  --contact / --no-contact  True if contact sheet of images is saved, False
+                            otherwise.
   --help                    Show this message and exit.
 ```
