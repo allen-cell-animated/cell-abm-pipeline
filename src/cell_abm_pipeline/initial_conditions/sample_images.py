@@ -230,6 +230,9 @@ class SampleImages:
         """
         Get list of (x, y, z) sample indices for hex grid.
 
+        Sample indices are offset in sets of three z slices to form a
+        face-centered cubic (FCC) packing.
+
         Parameters
         ----------
         bounds
@@ -246,7 +249,7 @@ class SampleImages:
 
         z_increment = round(resolution / SCALE_MICRONS_Z)
         z_indices = np.arange(0, z_bound, z_increment)
-        z_offsets = [(i % 2) * (z_increment / 2) for i in range(len(z_indices))]
+        z_offsets = [(i % 3) for i in range(len(z_indices))]
 
         xy_increment = round(resolution / SCALE_MICRONS_XY)
         xy_indices, _ = create_hex_grid(
@@ -257,11 +260,14 @@ class SampleImages:
             do_plot=False,
         )
 
+        x_offsets = [(xy_increment / 2) if z_offset == 1 else 0 for z_offset in z_offsets]
+        y_offsets = [(xy_increment / 2) * sqrt(3) / 3 * z_offset for z_offset in z_offsets]
+
         sample_indices = [
-            (round(x + offset), round(y + offset), z)
-            for z, offset in zip(z_indices, z_offsets)
+            (round(x + x_offset), round(y + y_offset), z)
+            for z, x_offset, y_offset in zip(z_indices, x_offsets, y_offsets)
             for x, y in xy_indices
-            if round(x + offset) < x_bound and round(y + offset) < y_bound
+            if round(x + x_offset) < x_bound and round(y + y_offset) < y_bound
         ]
 
         return sample_indices
@@ -284,7 +290,6 @@ class SampleImages:
             List of sample indices.
         """
         x_bound, y_bound, z_bound = bounds
-
         z_increment = round(resolution / SCALE_MICRONS_Z)
         z_indices = np.arange(0, z_bound, z_increment)
 
