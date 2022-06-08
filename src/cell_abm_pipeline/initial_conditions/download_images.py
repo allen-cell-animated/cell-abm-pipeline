@@ -22,11 +22,11 @@ class DownloadImages:
 
         (name)/
         ├── (name).csv
-        └── images
-            ├── (name)_(image_key_1).ome.tiff
-            ├── (name)_(image_key_2).ome.tiff
+        └── images/
+            ├── (name)_(image key 1).ome.tiff
+            ├── (name)_(image key 2).ome.tiff
             ├── ...
-            └── (name)_(image_key_n).ome.tiff
+            └── (name)_(image key n).ome.tiff
 
     The manifest ``(name).csv`` lists FOV segmentations paths (extracted from
     the Quilt package manifest) and file status ("downloaded" or "available").
@@ -62,7 +62,7 @@ class DownloadImages:
         Parameters
         ----------
         num_images
-            Number of images to download
+            Number of images to download.
         """
         self.download_images(num_images)
 
@@ -77,7 +77,7 @@ class DownloadImages:
         Parameters
         ----------
         num_images
-            Number of images to download
+            Number of images to download.
         """
 
         # Skip if requested number images is invalid.
@@ -134,11 +134,11 @@ class DownloadImages:
         Parameters
         ----------
         working
-            Working location (local path or S3 bucket)
+            Working location (local path or S3 bucket).
         key
-            Key for download manifest
+            Key for download manifest.
         pkg
-            Quilt package containing FOV image segmentation paths
+            Quilt package containing FOV image segmentation paths.
         """
         full_path = f"{working}{key}"
 
