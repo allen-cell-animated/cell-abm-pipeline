@@ -169,7 +169,7 @@ class SampleImages:
         key
             Index of z slice to plot.
         """
-        z_slice = data[data["z"] == key]
+        z_slice = data[data.z == key]
 
         max_id = int(data.id.max())
         min_id = int(data.id.min())

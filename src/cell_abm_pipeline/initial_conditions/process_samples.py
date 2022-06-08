@@ -39,27 +39,27 @@ class ProcessSamples:
 
     def process_samples(self, key, grid, scale, select, edges, connected):
         sample_key = make_full_key(self.folders, self.files, "sample", key)
-        samples_df = load_dataframe(self.context.working, sample_key)
-        processed_df = samples_df.copy()
+        raw_samples = load_dataframe(self.context.working, sample_key)
+        processed_samples = raw_samples.copy()
 
         if connected:
             print("Removing unconnected regions ...")
-            processed_df = self.remove_unconnected_regions(processed_df, grid)
+            processed_samples = self.remove_unconnected_regions(processed_samples, grid)
 
         if edges:
             print("Removing edge cells ...")
-            processed_df = self.remove_edge_cells(processed_df, grid)
+            processed_samples = self.remove_edge_cells(processed_samples, grid)
 
         if scale is not None:
             print("Scaling coordinates ...")
-            processed_df = self.scale_coordinates(processed_df, scale)
+            processed_samples = self.scale_coordinates(processed_samples, scale)
 
         if select:
             print("Selecting cell ids ...")
-            processed_df = self.select_cells(processed_df, select)
+            processed_samples = self.select_cells(processed_samples, select)
 
         processed_key = make_full_key(self.folders, self.files, "processed", key)
-        save_dataframe(self.context.working, processed_key, processed_df, index=False)
+        save_dataframe(self.context.working, processed_key, processed_samples, index=False)
 
     def plot_contact_sheet(self, key):
         """Save contact sheet image for processed samples."""
@@ -94,50 +94,51 @@ class ProcessSamples:
         ax.set_aspect("equal", adjustable="box")
 
     @staticmethod
-    def scale_coordinates(df, scale_factor):
-        df["x_scaled"] = df.x * SCALE_MICRONS_XY * scale_factor
-        df["y_scaled"] = df.y * SCALE_MICRONS_XY * scale_factor
-        df["z_scaled"] = df.z * SCALE_MICRONS_Z * scale_factor
-        return df
+    def scale_coordinates(samples, scale_factor):
+        samples["x_scaled"] = samples.x * SCALE_MICRONS_XY * scale_factor
+        samples["y_scaled"] = samples.y * SCALE_MICRONS_XY * scale_factor
+        samples["z_scaled"] = samples.z * SCALE_MICRONS_Z * scale_factor
+        return samples
 
     @staticmethod
-    def select_cells(df, select):
-        df = df[df.id.isin(select)]
-        return df
+    def select_cells(samples, select):
+        samples = samples[samples.id.isin(select)]
+        return samples
 
     @staticmethod
-    def remove_edge_cells(df, grid="rect", edge_threshold=EDGE_THRESHOLD):
+    def remove_edge_cells(samples, grid="rect", edge_threshold=EDGE_THRESHOLD):
         """Removes cells at edges of FOV."""
 
         # Get edge padding.
-        x_padding = ProcessSamples.get_step_size(df.x) if grid == "hex" else 0
-        y_padding = ProcessSamples.get_step_size(df.y) if grid == "hex" else 0
+        x_padding = ProcessSamples.get_step_size(samples.x) if grid == "hex" else 0
+        y_padding = ProcessSamples.get_step_size(samples.y) if grid == "hex" else 0
 
         # Get ids of cell at edge.
-        x_edge_ids = ProcessSamples.find_edge_ids("x", df, x_padding, edge_threshold)
-        y_edge_ids = ProcessSamples.find_edge_ids("y", df, y_padding, edge_threshold)
+        x_edge_ids = ProcessSamples.find_edge_ids("x", samples, x_padding, edge_threshold)
+        y_edge_ids = ProcessSamples.find_edge_ids("y", samples, y_padding, edge_threshold)
 
-        # Filter df for cells not at edge.
+        # Filter samples for cells not at edge.
         all_edge_ids = set(x_edge_ids + y_edge_ids)
-        df_filtered = df[~df["id"].isin(all_edge_ids)]
+        samples_filtered = samples[~samples["id"].isin(all_edge_ids)]
 
-        return df_filtered
+        return samples_filtered
 
     @staticmethod
-    def remove_unconnected_regions(df, grid, connected_threshold=CONNECTED_THRESHOLD):
+    def remove_unconnected_regions(samples, grid, connected_threshold=CONNECTED_THRESHOLD):
         """Removes unconnected regions of cells."""
         if grid == "rect":
-            return ProcessSamples.remove_unconnected_by_connectivity(df)
-        elif grid == "hex":
-            return ProcessSamples.remove_unconnected_by_distance(df, connected_threshold)
-        else:
-            raise ValueError(f"invalid grid type {grid}")
+            return ProcessSamples.remove_unconnected_by_connectivity(samples)
+
+        if grid == "hex":
+            return ProcessSamples.remove_unconnected_by_distance(samples, connected_threshold)
+
+        raise ValueError(f"invalid grid type {grid}")
 
     @staticmethod
-    def remove_unconnected_by_connectivity(df):
+    def remove_unconnected_by_connectivity(samples):
         """Removes unconnected regions based on connectivity."""
 
-        arr, steps, offsets = ProcessSamples.convert_to_integer_array(df)
+        arr, steps, offsets = ProcessSamples.convert_to_integer_array(samples)
         arr_conn = np.zeros(arr.shape, dtype="int")
         labels = measure.label(arr, connectivity=1)
 
@@ -161,22 +162,22 @@ class ProcessSamples:
                 print(f"Skipping unconnected region for cell id {cell_id}")
 
         # Convert back to dataframe.
-        df_connected = ProcessSamples.convert_to_dataframe(arr_conn, steps, offsets)
+        samples_connected = ProcessSamples.convert_to_dataframe(arr_conn, steps, offsets)
 
-        return df_connected
+        return samples_connected
 
     @staticmethod
-    def remove_unconnected_by_distance(df, threshold):
+    def remove_unconnected_by_distance(samples, threshold):
         """Removes unconnected regions based on distance."""
         all_connected = []
 
         # Rescale coordinates to um.
-        df["xs"] = df.x * SCALE_MICRONS_XY
-        df["ys"] = df.y * SCALE_MICRONS_XY
-        df["zs"] = df.z * SCALE_MICRONS_Z
+        samples["xs"] = samples.x * SCALE_MICRONS_XY
+        samples["ys"] = samples.y * SCALE_MICRONS_XY
+        samples["zs"] = samples.z * SCALE_MICRONS_Z
 
         # Iterate through each id and filter out samples above the distance threshold.
-        for name, group in df.groupby("id"):
+        for name, group in samples.groupby("id"):
             coords = group[["x", "y", "z", "xs", "ys", "zs"]].to_numpy()
             dists = [
                 [ProcessSamples.get_minimum_distance(c[3:], coords[:, 3:]), *c[:3]] for c in coords
@@ -189,9 +190,9 @@ class ProcessSamples:
             return pd.DataFrame()
 
         # Convert back to dataframe.
-        df_connected = pd.DataFrame(all_connected, columns=["id", "x", "y", "z"], dtype=int)
+        samples_connected = pd.DataFrame(all_connected, columns=["id", "x", "y", "z"], dtype=int)
 
-        return df_connected
+        return samples_connected
 
     @staticmethod
     def get_step_size(arr):
@@ -208,15 +209,15 @@ class ProcessSamples:
         return max(set(step), key=steps.count)
 
     @staticmethod
-    def find_edge_ids(axis, df, padding, threshold):
+    def find_edge_ids(axis, samples, padding, threshold):
         """Finds ids of cells at edges of given axis."""
 
         # Get min and max coordinate for given axis.
-        axis_min = df[axis].min() + padding
-        axis_max = df[axis].max() - padding
+        axis_min = samples[axis].min() + padding
+        axis_max = samples[axis].max() - padding
 
         # Check for cell ids located at edges.
-        edges = df.groupby("id").apply(
+        edges = samples.groupby("id").apply(
             lambda g: len(g[(g[axis] <= axis_min) | (g[axis] >= axis_max)])
         )
         edge_ids = edges[edges > threshold]
@@ -224,18 +225,18 @@ class ProcessSamples:
         return list(edge_ids.index)
 
     @staticmethod
-    def convert_to_integer_array(df):
+    def convert_to_integer_array(samples):
         """Converts dataframe of voxels into integer array."""
 
         # Get step size for voxels.
-        step_x = ProcessSamples.get_step_size(df.x)
-        step_y = ProcessSamples.get_step_size(df.y)
-        step_z = ProcessSamples.get_step_size(df.z)
+        step_x = ProcessSamples.get_step_size(samples.x)
+        step_y = ProcessSamples.get_step_size(samples.y)
+        step_z = ProcessSamples.get_step_size(samples.z)
 
         # Rescale integers to step size 1.
-        scaled_x = df.x.divide(step_x).astype("int32").values
-        scaled_y = df.y.divide(step_y).astype("int32").values
-        scaled_z = df.z.divide(step_z).astype("int32").values
+        scaled_x = samples.x.divide(step_x).astype("int32").values
+        scaled_y = samples.y.divide(step_y).astype("int32").values
+        scaled_z = samples.z.divide(step_z).astype("int32").values
 
         # Create integer array.
         offset_x = min(scaled_x)
@@ -247,7 +248,7 @@ class ProcessSamples:
         arr = np.zeros((height, width, length), dtype="int32")
 
         # Populate array.
-        for x, y, z, i in zip(scaled_x, scaled_y, scaled_z, df.id):
+        for x, y, z, i in zip(scaled_x, scaled_y, scaled_z, samples.id):
             arr[z - offset_z, y - offset_y, x - offset_x] = i
 
         return arr, [step_x, step_y, step_z], [offset_x, offset_y, offset_z]
