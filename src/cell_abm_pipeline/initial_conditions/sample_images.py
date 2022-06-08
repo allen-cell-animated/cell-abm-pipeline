@@ -24,19 +24,19 @@ class SampleImages:
 
     .. code-block:: bash
 
-        (name)/
-        ├── images/
+        (name)
+        ├── images
         │    ├── (name)_(image key 1).ome.tiff
         │    ├── (name)_(image key 2).ome.tiff
         │    ├── ...
         │    └── (name)_(image key n).ome.tiff
-        ├── plots/
+        ├── plots
         │    └── plots.SAMPLE
         │        ├── (name)_(image key 1)_(channel).SAMPLE.png
         │        ├── (name)_(image key 2)_(channel).SAMPLE.png
         │        ├── ...
         │        └── (name)_(image key n)_(channel).SAMPLE.png
-        └── samples/
+        └── samples
             └── samples.RAW
                 ├── (name)_(image key 1)_(channel).RAW.csv
                 ├── (name)_(image key 2)_(channel).RAW.csv

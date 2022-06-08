@@ -20,9 +20,9 @@ class DownloadImages:
 
     .. code-block:: bash
 
-        (name)/
+        (name)
         ├── (name).csv
-        └── images/
+        └── images
             ├── (name)_(image key 1).ome.tiff
             ├── (name)_(image key 2).ome.tiff
             ├── ...
