@@ -9,7 +9,7 @@ from cell_abm_pipeline.initial_conditions.process_samples import ProcessSamples
 
 
 class TestProcessSamples(unittest.TestCase):
-    def test_scale_coordinates_scales_coordinates_using_defaults(self):
+    def test_scale_coordinates_using_defaults(self):
         scale_factor = 0.75
         sample_data = np.array(
             [
@@ -37,7 +37,7 @@ class TestProcessSamples(unittest.TestCase):
         for a, b in zip(z_scaled, scaled_samples["z_scaled"]):
             self.assertAlmostEqual(a, b, places=5)
 
-    def test_scale_coordinates_scales_coordinates_all_parameters(self):
+    def test_scale_coordinates_given_all_parameters(self):
         scale_xy = 0.4
         scale_z = 1.3
         scale_factor = 0.75
@@ -69,7 +69,7 @@ class TestProcessSamples(unittest.TestCase):
         for a, b in zip(z_scaled, scaled_samples["z_scaled"]):
             self.assertAlmostEqual(a, b, places=5)
 
-    def test_select_cells_selected_correct_cells(self):
+    def test_select_cells(self):
         sample_data = np.array(
             [
                 [1, 1, 2, 3],

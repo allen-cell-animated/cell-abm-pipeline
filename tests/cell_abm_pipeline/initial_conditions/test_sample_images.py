@@ -9,7 +9,7 @@ from cell_abm_pipeline.initial_conditions.sample_images import SampleImages
 
 
 class TestSampleImages(unittest.TestCase):
-    def test_get_image_bounds_returns_bounds(self):
+    def test_get_image_bounds(self):
         image_mock = mock.MagicMock(spec=AICSImage)
         image_mock.shape = (1, 2, 3, 4, 5)
         expected_bounds = (5, 4, 3)
@@ -20,7 +20,7 @@ class TestSampleImages(unittest.TestCase):
 
     @mock.patch("cell_abm_pipeline.initial_conditions.sample_images.SCALE_MICRONS_XY", 0.5)
     @mock.patch("cell_abm_pipeline.initial_conditions.sample_images.SCALE_MICRONS_Z", 0.25)
-    def test_get_sample_indices_rect_grid_gets_indices(self):
+    def test_get_sample_indices_rect_grid(self):
         resolution = 1.0
         bounds = (4, 6, 5)
 
@@ -32,7 +32,7 @@ class TestSampleImages(unittest.TestCase):
 
     @mock.patch("cell_abm_pipeline.initial_conditions.sample_images.SCALE_MICRONS_XY", 0.5)
     @mock.patch("cell_abm_pipeline.initial_conditions.sample_images.SCALE_MICRONS_Z", 0.25)
-    def test_get_sample_indices_hex_grid_gets_indices(self):
+    def test_get_sample_indices_hex_grid(self):
         resolution = 1.0
         bounds = (4, 6, 13)
         delta = sqrt(3)
@@ -70,7 +70,7 @@ class TestSampleImages(unittest.TestCase):
             grid = "invalid_grid"
             SampleImages.get_sample_indices(bounds, grid)
 
-    def test_get_sample_images_extract_given_samples(self):
+    def test_get_image_samples(self):
         channel = 1
         array = np.array(
             [
