@@ -139,6 +139,11 @@ class DownloadImages:
             Key for download manifest.
         pkg
             Quilt package containing FOV image segmentation paths.
+
+        Returns
+        -------
+        :
+            Loaded manifest of FOV files and statuses.
         """
         full_path = f"{working}{key}"
 
