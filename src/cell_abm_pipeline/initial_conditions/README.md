@@ -1,6 +1,6 @@
 The `initial_conditions` package contains modules for sampling from images and converting into input formats for various model frameworks.
 
-```bash
+```
 Usage: initial-conditions [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -28,7 +28,7 @@ $ initial-conditions <context options> <subcommand>
 
 The `DownloadImages` module can be called via CLI using:
 
-```bash
+```
 Usage: initial-conditions download-images [OPTIONS]
 
   Download images from Quilt package.
@@ -42,7 +42,7 @@ Options:
 
 The `SampleImages` module can be called via CLI using:
 
-```bash
+```
 Usage: initial-conditions sample-images [OPTIONS]
 
   Sample ids and coordinates from images.
@@ -52,6 +52,28 @@ Options:
   -r, --resolution FLOAT    Distance between samples (um).  [default: 1.0]
   -c, --channels INTEGER    Image channel indices.  [default: 0]
   --contact / --no-contact  True if contact sheet of images is saved, False
-                            otherwise.
+                            otherwise.  [default: True]
   --help                    Show this message and exit.
+```
+
+## Process samples with selected processing steps
+
+The `ProcessSamples` module can be called via CLI using:
+
+```
+Usage: initial-conditions process-samples [OPTIONS]
+
+  Process samples with selected processing steps.
+
+Options:
+  -g, --grid [rect|hex]         Type of sampling grid.  [default: rect]
+  --scale FLOAT                 Coordinate scaling factor.
+  --select INTEGER              Specific cell ids to select.
+  --edges / --no-edges          True if cells touching edges are removed,
+                                False otherwise. [default: False]
+  --connected / --no-connected  True if unconnected voxels are removed, False
+                                otherwise. [default: False]
+  --contact / --no-contact      True if contact sheet of images is saved,
+                                False otherwise.  [default: True]
+  --help                        Show this message and exit.
 ```

@@ -85,7 +85,7 @@ def download_images(obj, **kwargs):
 @click.option(
     "--contact/--no-contact",
     default=True,
-    help="True if contact sheet of images is saved, False otherwise.",
+    help="True if contact sheet of images is saved, False otherwise.  [default: True]",
 )
 @click.pass_obj
 def sample_images(obj, **kwargs):
@@ -101,35 +101,38 @@ def sample_images(obj, **kwargs):
     "--grid",
     type=click.Choice(["rect", "hex"], case_sensitive=False),
     default="rect",
-    help="sampling grid type (default = rect)",
+    help="Type of sampling grid.",
+    show_default=True,
 )
 @click.option(
     "--scale",
     type=float,
     default=None,
-    help="Scaling factor for coordinates (default = None).",
+    help="Coordinate scaling factor.",
+    show_default=True,
 )
 @click.option(
     "--select",
     type=int,
     multiple=True,
     default=None,
-    help="Specific cell ids to select (default = None).",
+    help="Specific cell ids to select.",
+    show_default=True,
 )
 @click.option(
     "--edges/--no-edges",
     default=False,
-    help="True if cells touching edges are removed, False otherwise (default = False)",
+    help="True if cells touching edges are removed, False otherwise. [default: False]",
 )
 @click.option(
     "--connected/--no-connected",
     default=False,
-    help="True if unconnected voxels are removed, False otherwise (default = False)",
+    help="True if unconnected voxels are removed, False otherwise. [default: False]",
 )
 @click.option(
     "--contact/--no-contact",
     default=True,
-    help="True if contact sheet of images is saved, False otherwise (default = True)",
+    help="True if contact sheet of images is saved, False otherwise.  [default: True]",
 )
 @click.pass_obj
 def process_samples(obj, **kwargs):
