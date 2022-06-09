@@ -38,14 +38,14 @@ Options:
   --help                    Show this message and exit.
 ```
 
-## Sample id and coordinates from images
+## Sample cell ids and coordinates from images
 
 The `SampleImages` module can be called via CLI using:
 
 ```
 Usage: initial-conditions sample-images [OPTIONS]
 
-  Sample ids and coordinates from images.
+  Sample cell ids and coordinates from images.
 
 Options:
   -g, --grid [rect|hex]     Type of sampling grid.  [default: rect]

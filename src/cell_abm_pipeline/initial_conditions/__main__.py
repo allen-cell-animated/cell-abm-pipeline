@@ -89,7 +89,7 @@ def download_images(obj, **kwargs):
 )
 @click.pass_obj
 def sample_images(obj, **kwargs):
-    """Sample ids and coordinates from images."""
+    """Sample cell ids and coordinates from images."""
     from .sample_images import SampleImages
 
     SampleImages(obj).run(**kwargs)

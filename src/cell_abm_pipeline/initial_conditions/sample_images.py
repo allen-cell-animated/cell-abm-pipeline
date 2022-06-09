@@ -18,7 +18,7 @@ from cell_abm_pipeline.utilities.plot import make_plot
 
 class SampleImages:
     """
-    Task to sample ids and coordinates from images.
+    Task to sample cell ids and coordinates from images.
 
     Working location structure for a given context:
 
