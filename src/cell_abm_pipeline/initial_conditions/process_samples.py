@@ -246,7 +246,7 @@ class ProcessSamples:
         Returns
         -------
         :
-            Samples with scaled coordinates
+            Samples with scaled coordinates.
         """
         samples["x_scaled"] = samples.x * scale_xy * scale_factor
         samples["y_scaled"] = samples.y * scale_xy * scale_factor
@@ -263,33 +263,51 @@ class ProcessSamples:
         samples
             Sample cell ids and coordinates.
         select
-            List of ids to select
+            List of ids to select.
 
         Returns
         -------
         :
-            Samples from selected ids
+            Samples from selected ids.
         """
         samples = samples[samples.id.isin(select)]
         return samples.reset_index(drop=True)
 
     @staticmethod
-    def remove_edge_cells(samples, grid="rect", edge_threshold=EDGE_THRESHOLD):
-        """Removes cells at edges of FOV."""
+    def remove_edge_cells(
+        samples: pd.DataFrame, grid: str = "rect", threshold: float = EDGE_THRESHOLD
+    ) -> pd.DataFrame:
+        """
+        Removes cells at edges.
+
+        Parameters
+        ----------
+        samples
+            Sample cell ids and coordinates.
+        grid : {'rect', 'hex'}
+            Type of sampling grid.
+        threshold
+            Number of edge voxels to assign edge cell, default = ``EDGE_THRESHOLD``.
+
+        Returns
+        -------
+        :
+            Samples with edge cells removed.
+        """
 
         # Get edge padding.
         x_padding = ProcessSamples.get_step_size(samples.x) if grid == "hex" else 0
         y_padding = ProcessSamples.get_step_size(samples.y) if grid == "hex" else 0
 
         # Get ids of cell at edge.
-        x_edge_ids = ProcessSamples.find_edge_ids("x", samples, x_padding, edge_threshold)
-        y_edge_ids = ProcessSamples.find_edge_ids("y", samples, y_padding, edge_threshold)
+        x_edge_ids = ProcessSamples.find_edge_ids("x", samples, x_padding, threshold)
+        y_edge_ids = ProcessSamples.find_edge_ids("y", samples, y_padding, threshold)
 
         # Filter samples for cells not at edge.
         all_edge_ids = set(x_edge_ids + y_edge_ids)
         samples_filtered = samples[~samples["id"].isin(all_edge_ids)]
 
-        return samples_filtered
+        return samples_filtered.reset_index(drop=True)
 
     @staticmethod
     def remove_unconnected_regions(samples, grid, connected_threshold=CONNECTED_THRESHOLD):
@@ -361,6 +379,27 @@ class ProcessSamples:
         samples_connected = pd.DataFrame(all_connected, columns=["id", "x", "y", "z"], dtype=int)
 
         return samples_connected
+
+    @staticmethod
+    def get_step_sizes(samples: pd.DataFrame) -> Tuple[int, int, int]:
+        """
+        Gets step sizes in x, y, and z directions for samples.
+
+        Parameters
+        ----------
+        samples
+            Sample cell ids and coordinates.
+
+        Returns
+        -------
+        :
+            Tuple of step sizes.
+        """
+        step_x = ProcessSamples.get_step_size(samples.x)
+        step_y = ProcessSamples.get_step_size(samples.y)
+        step_z = ProcessSamples.get_step_size(samples.z)
+        step_sizes = (step_x, step_y, step_z)
+        return step_sizes
 
     @staticmethod
     def get_step_size(entries: List[int]) -> int:
