@@ -220,16 +220,58 @@ class ProcessSamples:
         ax.set_aspect("equal", adjustable="box")
 
     @staticmethod
-    def scale_coordinates(samples, scale_factor):
-        samples["x_scaled"] = samples.x * SCALE_MICRONS_XY * scale_factor
-        samples["y_scaled"] = samples.y * SCALE_MICRONS_XY * scale_factor
-        samples["z_scaled"] = samples.z * SCALE_MICRONS_Z * scale_factor
+    def scale_coordinates(
+        samples: pd.DataFrame,
+        scale_factor: float,
+        scale_xy: float = SCALE_MICRONS_XY,
+        scale_z: float = SCALE_MICRONS_Z,
+    ) -> pd.DataFrame:
+        """
+        Scales (x, y, z) coordinates in sample by scaling factor.
+
+        The x and y coordinates are additionally scaled by x/y resolution.
+        The z coordinates are additionally scaled z resolution.
+
+        Parameters
+        ----------
+        samples
+            Sample cell ids and coordinates.
+        scale_factor
+            Coordinate scaling factor.
+        scale_xy
+            Resolution scaling in x/y, default = ``SCALE_MICRONS_XY``.
+        scale_z
+            Resolution scaling in z, default = ``SCALE_MICRONS_Z``.
+
+        Returns
+        -------
+        :
+            Samples with scaled coordinates
+        """
+        samples["x_scaled"] = samples.x * scale_xy * scale_factor
+        samples["y_scaled"] = samples.y * scale_xy * scale_factor
+        samples["z_scaled"] = samples.z * scale_z * scale_factor
         return samples
 
     @staticmethod
-    def select_cells(samples, select):
+    def select_cells(samples: pd.DataFrame, select: List[int]) -> pd.DataFrame:
+        """
+        Filters samples to select for given ids.
+
+        Parameters
+        ----------
+        samples
+            Sample cell ids and coordinates.
+        select
+            List of ids to select
+
+        Returns
+        -------
+        :
+            Samples from selected ids
+        """
         samples = samples[samples.id.isin(select)]
-        return samples
+        return samples.reset_index(drop=True)
 
     @staticmethod
     def remove_edge_cells(samples, grid="rect", edge_threshold=EDGE_THRESHOLD):
@@ -321,11 +363,24 @@ class ProcessSamples:
         return samples_connected
 
     @staticmethod
-    def get_step_size(arr):
-        """Gets step size between array entries."""
+    def get_step_size(entries: List[int]) -> int:
+        """
+        Gets step size between ordered entries.
 
-        # Get steps between subsequent unique entries in array.
-        unique = sorted(arr.unique())
+        For arrays with multiple step sizes, the most common step size is
+        returned.
+
+        Parameters
+        ----------
+        entries
+            List of entries.
+
+        Returns
+        -------
+        :
+            Step size between entries.
+        """
+        unique = sorted(list(set(entries)))
         steps = [j - i for i, j in zip(unique[:-1], unique[1:])]
         step = set(steps)
 
@@ -335,8 +390,27 @@ class ProcessSamples:
         return max(set(step), key=steps.count)
 
     @staticmethod
-    def find_edge_ids(axis, samples, padding, threshold):
-        """Finds ids of cells at edges of given axis."""
+    def find_edge_ids(
+        axis: str, samples: pd.DataFrame, padding: float, threshold: float
+    ) -> List[int]:
+        """
+        Finds ids of cells with voxels touching edges of given axis.
+
+        Parameters
+        ----------
+        axis : {'x', 'y', 'z'}
+            The name of axis to check.
+        samples
+            Sample cell ids and coordinates.
+        padding
+            Distance from axis limits to assign edge voxels.
+        threshold
+            Number of edge voxels to assign edge cell.
+
+        Returns
+        -------
+            List of edge cell ids.
+        """
 
         # Get min and max coordinate for given axis.
         axis_min = samples[axis].min() + padding
