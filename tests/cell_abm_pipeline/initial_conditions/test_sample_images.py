@@ -18,22 +18,22 @@ class TestSampleImages(unittest.TestCase):
 
         self.assertEqual(expected_bounds, bounds)
 
-    @mock.patch("cell_abm_pipeline.initial_conditions.sample_images.SCALE_MICRONS_XY", 0.5)
-    @mock.patch("cell_abm_pipeline.initial_conditions.sample_images.SCALE_MICRONS_Z", 0.25)
     def test_get_sample_indices_rect_grid(self):
         resolution = 1.0
+        scale_xy = 0.5
+        scale_z = 0.25
         bounds = (4, 6, 5)
 
         expected_indices = [(x, y, z) for x in [0, 2] for y in [0, 2, 4] for z in [0, 4]]
 
-        indices = SampleImages.get_sample_indices(bounds, "rect", resolution)
+        indices = SampleImages.get_sample_indices(bounds, "rect", resolution, scale_xy, scale_z)
 
         self.assertSetEqual(set(expected_indices), set(indices))
 
-    @mock.patch("cell_abm_pipeline.initial_conditions.sample_images.SCALE_MICRONS_XY", 0.5)
-    @mock.patch("cell_abm_pipeline.initial_conditions.sample_images.SCALE_MICRONS_Z", 0.25)
     def test_get_sample_indices_hex_grid(self):
         resolution = 1.0
+        scale_xy = 0.5
+        scale_z = 0.25
         bounds = (4, 6, 13)
         delta = sqrt(3)
 
@@ -60,7 +60,7 @@ class TestSampleImages(unittest.TestCase):
             if round(x) < 4 and round(y) < 6
         ]
 
-        indices = SampleImages.get_sample_indices(bounds, "hex", resolution)
+        indices = SampleImages.get_sample_indices(bounds, "hex", resolution, scale_xy, scale_z)
 
         self.assertSetEqual(set(expected_indices), set(indices))
 

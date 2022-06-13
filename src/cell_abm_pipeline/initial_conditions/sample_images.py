@@ -198,7 +198,11 @@ class SampleImages:
 
     @staticmethod
     def get_sample_indices(
-        bounds: Tuple[int, int, int], grid: str = "rect", resolution: float = 1.0
+        bounds: Tuple[int, int, int],
+        grid: str = "rect",
+        resolution: float = 1.0,
+        scale_xy: float = SCALE_MICRONS_XY,
+        scale_z: float = SCALE_MICRONS_Z,
     ) -> List:
         """
         Get sample indices with given bounds for selected grid type.
@@ -211,6 +215,10 @@ class SampleImages:
             Type of sampling grid.
         resolution
             Distance between samples (um).
+        scale_xy
+            Resolution scaling in x/y, default = ``SCALE_MICRONS_XY``.
+        scale_z
+            Resolution scaling in z, default = ``SCALE_MICRONS_Z``.
 
         Returns
         -------
@@ -218,15 +226,17 @@ class SampleImages:
             List of sample indices.
         """
         if grid == "rect":
-            return SampleImages.get_rect_sample_indices(bounds, resolution)
+            return SampleImages.get_rect_sample_indices(bounds, resolution, scale_xy, scale_z)
 
         if grid == "hex":
-            return SampleImages.get_hex_sample_indices(bounds, resolution)
+            return SampleImages.get_hex_sample_indices(bounds, resolution, scale_xy, scale_z)
 
         raise ValueError(f"invalid grid type {grid}")
 
     @staticmethod
-    def get_hex_sample_indices(bounds: Tuple[int, int, int], resolution: float = 1.0) -> List:
+    def get_hex_sample_indices(
+        bounds: Tuple[int, int, int], resolution: float, scale_xy: float, scale_z: float
+    ) -> List:
         """
         Get list of (x, y, z) sample indices for hex grid.
 
@@ -239,6 +249,10 @@ class SampleImages:
             Sampling bounds in the x, y, and z directions.
         resolution
             Distance between samples (um).
+        scale_xy
+            Resolution scaling in x/y.
+        scale_z
+            Resolution scaling in z.
 
         Returns
         -------
@@ -247,11 +261,11 @@ class SampleImages:
         """
         x_bound, y_bound, z_bound = bounds
 
-        z_increment = round(resolution / SCALE_MICRONS_Z)
+        z_increment = round(resolution / scale_z)
         z_indices = np.arange(0, z_bound, z_increment)
         z_offsets = [(i % 3) for i in range(len(z_indices))]
 
-        xy_increment = round(resolution / SCALE_MICRONS_XY)
+        xy_increment = round(resolution / scale_xy)
         xy_indices, _ = create_hex_grid(
             nx=floor(x_bound / xy_increment),
             ny=floor(y_bound / xy_increment * sqrt(3)),
@@ -273,7 +287,9 @@ class SampleImages:
         return sample_indices
 
     @staticmethod
-    def get_rect_sample_indices(bounds: Tuple[int, int, int], resolution: float = 1.0) -> List:
+    def get_rect_sample_indices(
+        bounds: Tuple[int, int, int], resolution: float, scale_xy: float, scale_z: float
+    ) -> List:
         """
         Get list of (x, y, z) sample indices for rect grid.
 
@@ -283,6 +299,10 @@ class SampleImages:
             Sampling bounds in the x, y, and z directions.
         resolution
             Distance between samples (um).
+        scale_xy
+            Resolution scaling in x/y.
+        scale_z
+            Resolution scaling in z.
 
         Returns
         -------
@@ -290,10 +310,10 @@ class SampleImages:
             List of sample indices.
         """
         x_bound, y_bound, z_bound = bounds
-        z_increment = round(resolution / SCALE_MICRONS_Z)
+        z_increment = round(resolution / scale_z)
         z_indices = np.arange(0, z_bound, z_increment)
 
-        xy_increment = round(resolution / SCALE_MICRONS_XY)
+        xy_increment = round(resolution / scale_xy)
         x_indices = np.arange(0, x_bound, xy_increment)
         y_indices = np.arange(0, y_bound, xy_increment)
 
