@@ -43,14 +43,14 @@ class SampleImages:
                 ├── ...
                 └── (name)_(image key n)_(channel).RAW.csv
 
-    The ``images`` directory contains the input images to be sampled.
-    Resulting samples are placed into the ``samples/samples.RAW`` directory and
-    corresponding plots are placed into the ```plots/plots.SAMPLE`` directory.
+    The **images** directory contains the input images to be sampled.
+    Resulting samples are placed into the **samples/samples.RAW** directory and
+    corresponding plots are placed into the **`plots/plots.SAMPLE** directory.
 
     Attributes
     ----------
     context
-        ``Context`` object defining working location and name.
+        **Context** object defining working location and name.
     folders
         Dictionary of input and output folder keys.
     files
@@ -163,7 +163,7 @@ class SampleImages:
         Parameters
         ----------
         ax
-            ``Axes`` instance to plot on.
+            **Axes** instance to plot on.
         data
             Image samples.
         key

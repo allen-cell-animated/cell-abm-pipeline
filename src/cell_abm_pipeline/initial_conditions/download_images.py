@@ -28,7 +28,7 @@ class DownloadImages:
             ├── ...
             └── (name)_(image key n).ome.tiff
 
-    The manifest ``(name).csv`` lists FOV segmentations paths (extracted from
+    The manifest **(name).csv** lists FOV segmentations paths (extracted from
     the Quilt package manifest) and file status ("downloaded" or "available").
     Files that are marked as "downloaded" will not be re-downloaded.
     This file can be edited to filter for specific files to download.
@@ -37,7 +37,7 @@ class DownloadImages:
     Attributes
     ----------
     context
-        ``Context`` object defining working location and name.
+        **Context** object defining working location and name.
     folders
         Dictionary of input and output folder keys.
     files
@@ -129,7 +129,7 @@ class DownloadImages:
 
         If saved manifest exists, it is loaded directly.
         If saved manifest does not exist, the manifest is extracted from the
-        Quilt manifest column ``fov_seg_path`` and ``fov_path``.
+        Quilt manifest column **fov_seg_path** and **fov_path**.
 
         Parameters
         ----------
