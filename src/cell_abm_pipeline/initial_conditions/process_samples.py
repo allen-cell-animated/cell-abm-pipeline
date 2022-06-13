@@ -22,7 +22,7 @@ from cell_abm_pipeline.utilities.plot import make_plot
 
 class ProcessSamples:
     """
-    Task to process samples with selected processing steps
+    Task to process samples with selected processing steps.
 
     Working location structure for a given context:
 
@@ -248,9 +248,9 @@ class ProcessSamples:
         :
             Samples with scaled coordinates.
         """
-        samples["x_scaled"] = samples.x * scale_xy * scale_factor
-        samples["y_scaled"] = samples.y * scale_xy * scale_factor
-        samples["z_scaled"] = samples.z * scale_z * scale_factor
+        samples["x_scaled"] = samples.x * scale_factor * scale_xy
+        samples["y_scaled"] = samples.y * scale_factor * scale_xy
+        samples["z_scaled"] = samples.z * scale_factor * scale_z
         return samples
 
     @staticmethod
@@ -275,7 +275,7 @@ class ProcessSamples:
 
     @staticmethod
     def remove_edge_cells(
-        samples: pd.DataFrame, grid: str = "rect", threshold: float = EDGE_THRESHOLD
+        samples: pd.DataFrame, grid: str = "rect", edge_threshold: float = EDGE_THRESHOLD
     ) -> pd.DataFrame:
         """
         Removes cells at edges.
@@ -286,7 +286,7 @@ class ProcessSamples:
             Sample cell ids and coordinates.
         grid : {'rect', 'hex'}
             Type of sampling grid.
-        threshold
+        edge_threshold
             Number of edge voxels to assign edge cell, default = ``EDGE_THRESHOLD``.
 
         Returns
@@ -300,8 +300,8 @@ class ProcessSamples:
         y_padding = ProcessSamples.get_step_size(samples.y) if grid == "hex" else 0
 
         # Get ids of cell at edge.
-        x_edge_ids = ProcessSamples.find_edge_ids("x", samples, x_padding, threshold)
-        y_edge_ids = ProcessSamples.find_edge_ids("y", samples, y_padding, threshold)
+        x_edge_ids = ProcessSamples.find_edge_ids("x", samples, x_padding, edge_threshold)
+        y_edge_ids = ProcessSamples.find_edge_ids("y", samples, y_padding, edge_threshold)
 
         # Filter samples for cells not at edge.
         all_edge_ids = set(x_edge_ids + y_edge_ids)
@@ -310,8 +310,27 @@ class ProcessSamples:
         return samples_filtered.reset_index(drop=True)
 
     @staticmethod
-    def remove_unconnected_regions(samples, grid, connected_threshold=CONNECTED_THRESHOLD):
-        """Removes unconnected regions of cells."""
+    def remove_unconnected_regions(
+        samples: pd.DataFrame, grid: str, connected_threshold: float = CONNECTED_THRESHOLD
+    ) -> pd.DataFrame:
+        """
+        Removes unconnected regions of cells.
+
+        Parameters
+        ----------
+        samples
+            Sample cell ids and coordinates.
+        grid : {'rect', 'hex'}
+            Type of sampling grid.
+        connected_threshold
+            Distance for removing unconnected regions, default = ``CONNECTED_THRESHOLD``.
+
+        Returns
+        -------
+        :
+            Samples with unconnected regions removed.
+        """
+
         if grid == "rect":
             return ProcessSamples.remove_unconnected_by_connectivity(samples)
 
@@ -321,12 +340,28 @@ class ProcessSamples:
         raise ValueError(f"invalid grid type {grid}")
 
     @staticmethod
-    def remove_unconnected_by_connectivity(samples):
-        """Removes unconnected regions based on connectivity."""
+    def remove_unconnected_by_connectivity(samples: pd.DataFrame) -> pd.DataFrame:
+        """
+        Removes unconnected regions based on simple connectivity.
 
-        arr, steps, offsets = ProcessSamples.convert_to_integer_array(samples)
-        arr_conn = np.zeros(arr.shape, dtype="int")
-        labels = measure.label(arr, connectivity=1)
+        Parameters
+        ----------
+        samples
+            Sample cell ids and coordinates.
+
+        Returns
+        -------
+        :
+            Samples with unconnected regions removed.
+        """
+        steps = ProcessSamples.get_step_sizes(samples)
+        minimums = ProcessSamples.get_sample_minimums(samples)
+        maximums = ProcessSamples.get_sample_maximums(samples)
+
+        array = ProcessSamples.convert_to_integer_array(samples, steps, minimums, maximums)
+
+        array_connected = np.zeros(array.shape, dtype="int")
+        labels = measure.label(array, connectivity=1)
 
         # Sort labeled regions by size.
         regions = np.bincount(labels.flatten())[1:]
@@ -336,49 +371,57 @@ class ProcessSamples:
             reverse=True,
         )
 
-        # Iterate through all regions and copy largest connected region to array.
+        # Iterate through all regions and copy the largest connected region to array.
         ids_added = set()
         for index, _ in regions_sorted:
-            cell_id = list(set(arr[labels == index]))[0]
+            cell_id = list(set(array[labels == index]))[0]
 
             if cell_id not in ids_added:
-                arr_conn[labels == index] = cell_id
+                array_connected[labels == index] = cell_id
                 ids_added.add(cell_id)
             else:
                 print(f"Skipping unconnected region for cell id {cell_id}")
 
         # Convert back to dataframe.
-        samples_connected = ProcessSamples.convert_to_dataframe(arr_conn, steps, offsets)
-
-        return samples_connected
+        samples_connected = ProcessSamples.convert_to_dataframe(array_connected, steps, minimums)
+        return samples_connected.sort_values(by=["id", "x", "y", "z"]).reset_index(drop=True)
 
     @staticmethod
-    def remove_unconnected_by_distance(samples, threshold):
-        """Removes unconnected regions based on distance."""
+    def remove_unconnected_by_distance(samples: pd.DataFrame, threshold: float) -> pd.DataFrame:
+        """
+        Removes unconnected regions based on distance.
+
+        Parameters
+        ----------
+        samples
+            Sample cell ids and coordinates.
+        threshold
+            Distance for removing unconnected regions.
+
+        Returns
+        -------
+        :
+            Samples with unconnected regions removed.
+        """
         all_connected = []
 
-        # Rescale coordinates to um.
-        samples["xs"] = samples.x * SCALE_MICRONS_XY
-        samples["ys"] = samples.y * SCALE_MICRONS_XY
-        samples["zs"] = samples.z * SCALE_MICRONS_Z
-
         # Iterate through each id and filter out samples above the distance threshold.
-        for name, group in samples.groupby("id"):
-            coords = group[["x", "y", "z", "xs", "ys", "zs"]].to_numpy()
-            dists = [
-                [ProcessSamples.get_minimum_distance(c[3:], coords[:, 3:]), *c[:3]] for c in coords
+        for cell_id, group in samples.groupby("id"):
+            coordinates = group[["x", "y", "z"]].to_numpy()
+            distances = [
+                ProcessSamples.get_minimum_distance(np.array([coordinate]), coordinates)
+                for coordinate in coordinates
             ]
-            connected = [[name, x, y, z] for d, x, y, z in dists if d < threshold]
+            connected = [
+                (cell_id, x, y, z)
+                for distance, (x, y, z) in zip(distances, coordinates)
+                if distance < threshold
+            ]
             all_connected = all_connected + connected
 
-        if len(all_connected) == 0:
-            print("WARNING: no connected samples, try increasing connected threshold")
-            return pd.DataFrame()
-
         # Convert back to dataframe.
-        samples_connected = pd.DataFrame(all_connected, columns=["id", "x", "y", "z"], dtype=int)
-
-        return samples_connected
+        samples_connected = pd.DataFrame(all_connected, columns=["id", "x", "y", "z"])
+        return samples_connected.sort_values(by=["id", "x", "y", "z"]).reset_index(drop=True)
 
     @staticmethod
     def get_step_sizes(samples: pd.DataFrame) -> Tuple[int, int, int]:
@@ -429,6 +472,46 @@ class ProcessSamples:
         return max(set(step), key=steps.count)
 
     @staticmethod
+    def get_sample_minimums(samples: pd.DataFrame) -> Tuple[int, int, int]:
+        """
+        Gets minimums in x, y, and z directions for samples.
+
+        Parameters
+        ----------
+        samples
+            Sample cell ids and coordinates.
+
+        Returns
+        -------
+            Tuple of minimums.
+        """
+        min_x = min(samples.x)
+        min_y = min(samples.y)
+        min_z = min(samples.z)
+        minimums = (min_x, min_y, min_z)
+        return minimums
+
+    @staticmethod
+    def get_sample_maximums(samples: pd.DataFrame) -> Tuple[int, int, int]:
+        """
+        Gets maximums in x, y, and z directions for samples.
+
+        Parameters
+        ----------
+        samples
+            Sample cell ids and coordinates.
+
+        Returns
+        -------
+            Tuple of maximums.
+        """
+        max_x = max(samples.x)
+        max_y = max(samples.y)
+        max_z = max(samples.z)
+        maximums = (max_x, max_y, max_z)
+        return maximums
+
+    @staticmethod
     def find_edge_ids(
         axis: str, samples: pd.DataFrame, padding: float, threshold: float
     ) -> List[int]:
@@ -448,6 +531,7 @@ class ProcessSamples:
 
         Returns
         -------
+        :
             List of edge cell ids.
         """
 
@@ -464,53 +548,92 @@ class ProcessSamples:
         return list(edge_ids.index)
 
     @staticmethod
-    def convert_to_integer_array(samples):
-        """Converts dataframe of voxels into integer array."""
+    def convert_to_integer_array(
+        samples: pd.DataFrame,
+        steps: Tuple[int, int, int],
+        minimums: Tuple[int, int, int],
+        maximums: Tuple[int, int, int],
+    ) -> np.ndarray:
+        """
+        Converts ids and coordinate samples to integer array.
 
-        # Get step size for voxels.
-        step_x = ProcessSamples.get_step_size(samples.x)
-        step_y = ProcessSamples.get_step_size(samples.y)
-        step_z = ProcessSamples.get_step_size(samples.z)
+        Parameters
+        ----------
+        samples
+            Sample cell ids and coordinates.
+        steps
+            Step sizes in x, y, and z directions.
+        minimums
+            Minimums in x, y, and z directions.
+        maximums
+            Maximums in x, y, and z directions.
 
-        # Rescale integers to step size 1.
-        scaled_x = samples.x.divide(step_x).astype("int32").values
-        scaled_y = samples.y.divide(step_y).astype("int32").values
-        scaled_z = samples.z.divide(step_z).astype("int32").values
+        Returns
+        -------
+        :
+            Array of ids.
+        """
+        length, width, height = np.divide(np.subtract(maximums, minimums), steps).astype("int32")
+        array = np.zeros((height + 1, width + 1, length + 1), dtype="int32")
 
-        # Create integer array.
-        offset_x = min(scaled_x)
-        offset_y = min(scaled_y)
-        offset_z = min(scaled_z)
-        length = max(scaled_x) - offset_x + 1
-        width = max(scaled_y) - offset_y + 1
-        height = max(scaled_z) - offset_z + 1
-        arr = np.zeros((height, width, length), dtype="int32")
+        coordinates = (samples[["x", "y", "z"]].values - minimums) / steps
+        coordinates = coordinates.astype("int32")
+        array[tuple(np.transpose(np.flip(coordinates, axis=1)))] = samples.id
 
-        # Populate array.
-        for x, y, z, i in zip(scaled_x, scaled_y, scaled_z, samples.id):
-            arr[z - offset_z, y - offset_y, x - offset_x] = i
-
-        return arr, [step_x, step_y, step_z], [offset_x, offset_y, offset_z]
+        return array
 
     @staticmethod
-    def convert_to_dataframe(arr, steps, offsets):
-        step_x, step_y, step_z = steps
-        offset_x, offset_y, offset_z = offsets
+    def convert_to_dataframe(
+        array: np.ndarray, steps: Tuple[int, int, int], minimums: Tuple[int, int, int]
+    ) -> pd.DataFrame:
+        """
+        Converts integer array to ids and coordinate samples.
 
-        voxels = [
+        Parameters
+        ----------
+        array
+            Integer array of ids.
+        steps
+            Step sizes in x, y, and z directions.
+        minimums
+            Minimums in x, y, and z directions.
+
+        Returns
+        -------
+        :
+            Dataframe of ids and coordinates.
+        """
+        step_x, step_y, step_z = steps
+        min_x, min_y, min_z = minimums
+
+        samples = [
             (
-                arr[z, y, x],
-                step_x * (x + offset_x),
-                step_y * (y + offset_y),
-                step_z * (z + offset_z),
+                array[z, y, x],
+                (x * step_x) + min_x,
+                (y * step_y) + min_y,
+                (z * step_z) + min_z,
             )
-            for z, y, x in zip(*np.where(arr != 0))
+            for z, y, x in zip(*np.where(array != 0))
         ]
 
-        return pd.DataFrame(voxels, columns=["id", "x", "y", "z"])
+        return pd.DataFrame(samples, columns=["id", "x", "y", "z"])
 
     @staticmethod
-    def get_minimum_distance(point, points):
-        """Get minimum distance of point to array of points."""
-        dists = distance.cdist([point], points)
-        return np.min(dists[dists != 0])
+    def get_minimum_distance(source: np.ndarray, targets: np.ndarray) -> float:
+        """
+        Get the minimum distance from point to array of points.
+
+        Parameters
+        ----------
+        source
+            Coordinates of source point with shape (1, 3)
+        targets
+            Coordinates for N target points with shape (3, N)
+
+        Returns
+        -------
+        :
+            Minimum distance between source and targets.
+        """
+        distances = distance.cdist(source, targets)
+        return np.min(distances[distances != 0])
