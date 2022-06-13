@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 from scipy.ndimage import distance_transform_edt, binary_dilation, binary_fill_holes
@@ -95,21 +95,12 @@ class CreateVoronoi:
         mask_id = np.iinfo(array.dtype).max
         array[mask == 0] = mask_id
 
-        xmin, xmax, ymin, ymax, zmin, zmax = self.get_bounded_array(mask)
-        subarray = array[zmin:zmax, ymin:ymax, xmin:xmax]
-
-        distances = distance_transform_edt(
-            subarray == 0, return_distances=False, return_indices=True
-        )
-        distances = distances.astype("uint16", copy=False)
-
-        coordz = distances[0].flatten()
-        coordy = distances[1].flatten()
-        coordx = distances[2].flatten()
-        voronoi = subarray[coordz, coordy, coordx].reshape(subarray.shape)
+        # Calculate voronoi on bounded array.
+        zslice, yslice, xslice = self.get_array_slices(mask)
+        voronoi = self.calculate_voronoi_array(array[zslice, yslice, xslice])
 
         # Remove masking ids.
-        array[zmin:zmax, ymin:ymax, xmin:xmax] = voronoi
+        array[zslice, yslice, xslice] = voronoi
         array[mask == 0] = 0
         array[array == mask_id] = 0
 
@@ -146,25 +137,54 @@ class CreateVoronoi:
         return mask
 
     @staticmethod
-    def get_bounded_array(array):
-        """Finds bounding box around binary array."""
-        z, y, x = array.shape
+    def get_array_slices(array: np.ndarray) -> Tuple[slice, slice, slice]:
+        """
+        Calculate bounding box slices around binary array.
 
-        zbounds = np.any(array, axis=(1, 2))
-        ybounds = np.any(array, axis=(0, 2))
-        xbounds = np.any(array, axis=(0, 1))
+        Parameters
+        ----------
+        array
+            Binary array.
 
-        zmin, zmax = np.where(zbounds)[0][[0, -1]]
-        ymin, ymax = np.where(ybounds)[0][[0, -1]]
-        xmin, xmax = np.where(xbounds)[0][[0, -1]]
+        Returns
+        -------
+        :
+            Slices in the z, y, and x directions.
+        """
+        zsize, ysize, xsize = array.shape
 
-        xmin = max(xmin - 1, 0)
-        xmax = min(xmax + 2, x)
+        zmin, zmax = np.where(np.any(array, axis=(1, 2)))[0][[0, -1]]
+        ymin, ymax = np.where(np.any(array, axis=(0, 2)))[0][[0, -1]]
+        xmin, xmax = np.where(np.any(array, axis=(0, 1)))[0][[0, -1]]
 
-        ymin = max(ymin - 1, 0)
-        ymax = min(ymax + 2, y)
+        zslice = slice(max(zmin - 1, 0), min(zmax + 2, zsize))
+        yslice = slice(max(ymin - 1, 0), min(ymax + 2, ysize))
+        xslice = slice(max(xmin - 1, 0), min(xmax + 2, xsize))
 
-        zmin = max(zmin - 1, 0)
-        zmax = min(zmax + 2, z)
+        slices = (zslice, yslice, xslice)
+        return slices
 
-        return xmin, xmax, ymin, ymax, zmin, zmax
+    @staticmethod
+    def calculate_voronoi_array(array: np.ndarray) -> np.ndarray:
+        """
+        Calculates voronoi on image array using distance transform.
+
+        Parameters
+        ----------
+        array
+            Image array.
+
+        Returns
+        -------
+        :
+            Voronoi array.
+        """
+        distances = distance_transform_edt(array == 0, return_distances=False, return_indices=True)
+        distances = distances.astype("uint16", copy=False)
+
+        coordinates_z = distances[0].flatten()
+        coordinates_y = distances[1].flatten()
+        coordinates_x = distances[2].flatten()
+        voronoi = array[coordinates_z, coordinates_y, coordinates_x].reshape(array.shape)
+
+        return voronoi
