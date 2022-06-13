@@ -5,51 +5,21 @@ import xml.etree.ElementTree as ET
 
 import pandas as pd
 
-from cell_abm_pipeline.initial_conditions.__config__ import POTTS_TERMS
+from cell_abm_pipeline.initial_conditions.__config__ import (
+    POTTS_TERMS,
+    VOLUME_MU,
+    VOLUME_SIGMA,
+    CRITICAL_VOLUME_MU,
+    CRITICAL_VOLUME_SIGMA,
+    HEIGHT_MU,
+    HEIGHT_SIGMA,
+    CRITICAL_HEIGHT_MU,
+    CRITICAL_HEIGHT_SIGMA,
+)
 from cell_abm_pipeline.initial_conditions.process_samples import ProcessSamples
 from cell_abm_pipeline.utilities.load import load_dataframe
 from cell_abm_pipeline.utilities.save import save_json, save_buffer
 from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
-
-VOLUME_MU = {
-    "DEFAULT": 1865,
-    "NUCLEUS": 542,
-}
-
-VOLUME_SIGMA = {
-    "DEFAULT": 517,
-    "NUCLEUS": 157,
-}
-
-CRITICAL_VOLUME_MU = {
-    "DEFAULT": 1300,
-    "NUCLEUS": 400,
-}
-
-CRITICAL_VOLUME_SIGMA = {
-    "DEFAULT": 200,
-    "NUCLEUS": 50,
-}
-
-HEIGHT_MU = {
-    "DEFAULT": 9.65,
-    "NUCLEUS": 6.75,
-}
-
-HEIGHT_SIGMA = {
-    "DEFAULT": 2.4,
-    "NUCLEUS": 1.7,
-}
-
-CRITICAL_HEIGHT_MU = {
-    "DEFAULT": 4.5,
-    "NUCLEUS": 3.25,
-}
-
-CRITICAL_HEIGHT_SIGMA = {
-    "DEFAULT": 1,
-    "NUCLEUS": 0.75,
-}
 
 
 class ConvertARCADE:
