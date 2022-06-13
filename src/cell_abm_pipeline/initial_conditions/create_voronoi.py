@@ -1,13 +1,48 @@
+from typing import List
+
 import numpy as np
 from scipy.ndimage import distance_transform_edt, binary_dilation, binary_fill_holes
 
+from cell_abm_pipeline.initial_conditions.__main__ import Context
 from cell_abm_pipeline.utilities.load import load_image
 from cell_abm_pipeline.utilities.save import save_image
 from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
 
 
 class CreateVoronoi:
-    def __init__(self, context):
+    """
+    Task to create Voronoi tessellation from given starting image.
+
+    Working location structure for a given context:
+
+    .. code-block:: bash
+
+        (name)
+        └── images
+            ├── (name)_(image key 1).ome.tiff
+            ├── (name)_(image key 2).ome.tiff
+            ├── ...
+            ├── (name)_(image key n).ome.tiff
+            ├── ...
+            ├── (name)_(image key 1)_(channel)_voronoi.ome.tiff
+            ├── (name)_(image key 2)_(channel)_voronoi.ome.tiff
+            ├── ...
+            └── (name)_(image key n)_(channel)_voronoi.ome.tiff
+
+    Voronoi images are saved to the same directory as the input images with
+    appended channel value and a "voronoi" label.
+
+    Attributes
+    ----------
+    context
+        **Context** object defining working location and name.
+    folders
+        Dictionary of input and output folder keys.
+    files
+        Dictionary of input and output file keys.
+    """
+
+    def __init__(self, context: Context):
         self.context = context
         self.folders = {
             "image": make_folder_key(context.name, "images", "", False),
@@ -18,12 +53,38 @@ class CreateVoronoi:
             "output": make_file_key(context.name, ["ome", "tiff"], "%s", "%02d_voronoi"),
         }
 
-    def run(self, iterations=10, channels=[0]):
+    def run(self, iterations: int = 10, channels: List[int] = [0]) -> None:
+        """
+        Runs create voronoi task for given context.
+
+        Parameters
+        ----------
+        iterations
+            Number of boundary estimation steps.
+        channels
+            Image channel indices.
+        """
         for key in self.context.keys:
             for channel in channels:
                 self.create_voronoi(key, iterations, channel)
 
-    def create_voronoi(self, key, iterations, channel):
+    def create_voronoi(self, key: str, iterations: int, channel: int) -> None:
+        """
+        Create Voronoi task.
+
+        Loads image from working location.
+        Creates boundary for Voronoi using binary dilation, then performs
+        the Voronoi tessellation using the selected channel of the image.
+
+        Parameters
+        ----------
+        key
+            Key for image.
+        iterations
+            Number of boundary estimation steps.
+        channel
+            Image channel index.
+        """
         image_key = make_full_key(self.folders, self.files, "image", key)
         image = load_image(self.context.working, image_key)
 
@@ -56,7 +117,22 @@ class CreateVoronoi:
         save_image(self.context.working, output_key, array)
 
     @staticmethod
-    def create_boundary_mask(array, iterations=10):
+    def create_boundary_mask(array: np.ndarray, iterations: int = 10) -> np.ndarray:
+        """
+        Creates filled boundary mask around regions in array.
+
+        Parameters
+        ----------
+        array
+            Image array.
+        iterations
+            Number of boundary estimation steps.
+
+        Returns
+        -------
+        :
+            Boundary mask array.
+        """
         mask = np.zeros(array.shape, dtype="uint8")
         mask[array != 0] = 1
 

@@ -143,11 +143,26 @@ def process_samples(obj, **kwargs):
 
 
 @cli.command()
-@click.option("-i", "--iterations", type=int, default=10)
-@click.option("-c", "--channels", type=int, multiple=True, default=[0])
+@click.option(
+    "-i",
+    "--iterations",
+    type=int,
+    default=10,
+    help="Number of boundary estimation steps.",
+    show_default=True,
+)
+@click.option(
+    "-c",
+    "--channels",
+    type=int,
+    multiple=True,
+    default=[0],
+    help="Image channel indices.",
+    show_default=True,
+)
 @click.pass_obj
 def create_voronoi(obj, **kwargs):
-    """Create Voronoi tesselation from given starting image."""
+    """Create Voronoi tessellation from given starting image."""
     from .create_voronoi import CreateVoronoi
 
     CreateVoronoi(obj).run(**kwargs)

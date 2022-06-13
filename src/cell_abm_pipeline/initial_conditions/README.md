@@ -11,10 +11,10 @@ Options:
 
 Commands:
   convert-arcade   Convert samples into ARCADE input formats.
-  create-voronoi   Create Voronoi tesselation from given starting image.
+  create-voronoi   Create Voronoi tessellation from given starting image.
   download-images  Download images from Quilt package.
   process-samples  Process samples with selected processing steps.
-  sample-images    Sample ids and coordinates from images.
+  sample-images    Sample cell ids and coordinates from images.
 ```
 
 All modules require a `Context` object that defines the working context.
@@ -76,4 +76,19 @@ Options:
   --contact / --no-contact      True if contact sheet of images is saved,
                                 False otherwise.  [default: True]
   --help                        Show this message and exit.
+```
+
+## Create Voronoi tessellation from given starting image
+
+The `CreateVoronoi` module can be called via CLI using:
+
+```
+Usage: initial-conditions create-voronoi [OPTIONS]
+
+  Create Voronoi tessellation from given starting image.
+
+Options:
+  -i, --iterations INTEGER  Number of boundary estimation steps  [default: 10]
+  -c, --channels INTEGER    Image channel indices.  [default: 0]
+  --help                    Show this message and exit.
 ```
