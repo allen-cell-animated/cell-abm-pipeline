@@ -403,7 +403,7 @@ class ProcessSamples:
         :
             Samples with unconnected regions removed.
         """
-        all_connected = []
+        all_connected: List = []
 
         # Iterate through each id and filter out samples above the distance threshold.
         for cell_id, group in samples.groupby("id"):
