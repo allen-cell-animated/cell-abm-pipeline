@@ -174,11 +174,24 @@ def create_voronoi(obj, **kwargs):
     "--margins",
     nargs=3,
     type=int,
-    default=[0, 0, 0],
-    help="Margin size in x, y, and z directions (default = [0, 0, 0])",
+    default=(0, 0, 0),
+    help="Margin size in x, y, and z directions.",
+    show_default=True,
 )
-@click.option("--region", type=str, default=None)
-@click.option("--reference", type=str, default=None)
+@click.option(
+    "--region",
+    type=str,
+    default=None,
+    help="Region key to include in conversion.",
+    show_default=True,
+)
+@click.option(
+    "--reference",
+    type=str,
+    default=None,
+    help="Path to reference data for conversion.",
+    show_default=True,
+)
 @click.pass_obj
 def convert_arcade(obj, **kwargs):
     """Convert samples into ARCADE input formats."""

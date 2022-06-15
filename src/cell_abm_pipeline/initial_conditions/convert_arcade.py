@@ -23,6 +23,53 @@ from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, mak
 
 
 class ConvertARCADE:
+    """
+    Task to convert samples into ARCADE input formats.
+
+    Working location structure for a given context:
+
+    .. code-block:: bash
+
+        (name)
+        ├── converted
+        │    └── converted.ARCADE
+        │        ├── (name)_(image key 1).xml
+        │        ├── (name)_(image key 1).CELLS.json
+        │        ├── (name)_(image key 1).LOCATIONS.json
+        │        ├── (name)_(image key 2).xml
+        │        ├── (name)_(image key 2).CELLS.json
+        │        ├── (name)_(image key 2).LOCATIONS.json
+        │        ├── ...
+        │        ├── (name)_(image key n).xml
+        │        ├── (name)_(image key n).CELLS.json
+        │        └── (name)_(image key n).LOCATIONS.json
+        └── samples
+            └── samples.PROCESSED
+                ├── (name)_(image key 1).PROCESSED.csv
+                ├── (name)_(image key 2).PROCESSED.csv
+                ├── ...
+                ├── (name)_(image key n).PROCESSED.csv
+                ├── ...
+                ├── (name)_(image key 1).PROCESSED.(region).csv
+                ├── (name)_(image key 2).PROCESSED.(region).csv
+                ├── ...
+                └── (name)_(image key n).PROCESSED.(region).csv
+
+    For each image key, the conversion creates three ARCADE output files:
+    **.xml**, **.CELLS.json**, and **.LOCATIONS.json**.
+    For conversions with region, sample for the region should include the region
+    key in the extension.
+
+    Attributes
+    ----------
+    context
+        **Context** object defining working location and name.
+    folders
+        Dictionary of input and output folder keys.
+    files
+        Dictionary of input and output file keys.
+    """
+
     def __init__(self, context):
         self.context = context
         self.folders = {
@@ -38,7 +85,19 @@ class ConvertARCADE:
             "setup": make_file_key(context.name, ["xml"], "%s", ""),
         }
 
-    def run(self, margins=[0, 0, 0], region=None, reference=None):
+    def run(self, margins=(0, 0, 0), region=None, reference=None):
+        """
+        Runs convert ARCADE task for given context.
+
+        Parameters
+        ----------
+        margins
+            Margin size in x, y, and z directions.
+        region
+            Region key to include in conversion.
+        reference
+            Path to reference data for conversion.
+        """
         if reference:
             reference = load_dataframe(self.context.working, reference)
         else:
@@ -49,6 +108,25 @@ class ConvertARCADE:
             self.convert_arcade(key, margins, region, key_reference)
 
     def convert_arcade(self, key, margins, region, reference):
+        """
+        Convert ARCADE task.
+
+        Loads processed samples from working location (along with processed
+        region samples, if included).
+        Iterates through each cell id in the samples and converts in the ARCADE
+        formats for .CELLS and .LOCATIONS.
+
+        Parameters
+        ----------
+        key
+            Key for samples.
+        margins
+            Margin size in x, y, and z directions.
+        region
+            Region key to include in conversion.
+        reference
+            Path to reference data for conversion.
+        """
         sample_key = make_full_key(self.folders, self.files, "input", key)
         samples_df = load_dataframe(self.context.working, sample_key)
 

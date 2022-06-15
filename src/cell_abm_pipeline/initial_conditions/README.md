@@ -92,3 +92,20 @@ Options:
   -c, --channels INTEGER    Image channel indices.  [default: 0]
   --help                    Show this message and exit.
 ```
+
+## Convert samples into ARCADE input formats
+
+The `ConvertARCADE` module can be called via CLI using:
+
+```
+Usage: initial-conditions convert-arcade [OPTIONS]
+
+  Convert samples into ARCADE input formats.
+
+Options:
+  -m, --margins INTEGER...  Margin size in x, y, and z directions.  [default:
+                            0, 0, 0]
+  --region TEXT             Region key to include in conversion.
+  --reference TEXT          Path to reference data for conversion.
+  --help                    Show this message and exit.
+```
