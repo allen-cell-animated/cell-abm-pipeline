@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import numpy as np
 from scipy.ndimage import distance_transform_edt, binary_dilation, binary_fill_holes
@@ -53,7 +53,7 @@ class CreateVoronoi:
             "output": make_file_key(context.name, ["ome", "tiff"], "%s", "%02d_voronoi"),
         }
 
-    def run(self, iterations: int = 10, channels: List[int] = [0]) -> None:
+    def run(self, iterations: int = 10, channels: Optional[List[int]] = None) -> None:
         """
         Runs create voronoi task for given context.
 
@@ -64,6 +64,9 @@ class CreateVoronoi:
         channels
             Image channel indices.
         """
+        if channels is None:
+            channels = [0]
+
         for key in self.context.keys:
             for channel in channels:
                 self.create_voronoi(key, iterations, channel)

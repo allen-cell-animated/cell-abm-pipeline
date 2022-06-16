@@ -1,5 +1,5 @@
 from math import floor, sqrt
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import numpy as np
 import pandas as pd
@@ -74,7 +74,7 @@ class SampleImages:
         self,
         grid: str = "rect",
         resolution: float = 1.0,
-        channels: List[int] = [0],
+        channels: Optional[List[int]] = None,
         contact: bool = True,
     ) -> None:
         """
@@ -91,6 +91,9 @@ class SampleImages:
         contact
             True if contact sheet of images is saved, False otherwise.
         """
+        if channels is None:
+            channels = [0]
+
         for key in self.context.keys:
             self.sample_images(key, grid, resolution, channels)
 
