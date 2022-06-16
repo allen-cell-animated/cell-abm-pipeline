@@ -1,11 +1,12 @@
 import unittest
-
 from unittest import mock
+import xml.etree.ElementTree as ET
 
 import numpy as np
 import pandas as pd
 
 from cell_abm_pipeline.initial_conditions.__config__ import (
+    POTTS_TERMS,
     VOLUME_AVGS,
     VOLUME_STDS,
     CRITICAL_VOLUME_AVGS,
@@ -145,6 +146,141 @@ class TestConvertARCADE(unittest.TestCase):
 
         transformed = ConvertARCADE.transform_sample_voxels(samples, margins, reference)
         self.assertTrue(expected.equals(transformed))
+
+    def test_calculate_sample_voxels(self):
+        margins = (10, 20, 30)
+        samples = pd.DataFrame(
+            [
+                [1, 0, 3, 10],
+                [2, 2, 3, 20],
+                [3, 6, 6, 30],
+                [4, 4, 6, 20],
+                [5, 8, 6, 30],
+            ],
+            columns=["id", "x", "y", "z"],
+        )
+        expected_bounds = (27, 44, 65)
+
+        bounds = ConvertARCADE.calculate_sample_bounds(samples, margins)
+        self.assertTupleEqual(expected_bounds, bounds)
+
+    def test_make_setup_file_default_parameters_no_region(self):
+        init = 10
+        bounds = (20, 30, 40)
+
+        potts_terms = "".join([f'<potts.term id="{term}" />' for term in POTTS_TERMS])
+        expected_setup = f"""
+            <set>
+                <series name="ARCADE" interval="1" start="0" end="0" dt="1" ds="1"
+                    ticks="1" length="{bounds[0]}" width="{bounds[1]}" height="{bounds[2]}">
+                    <potts>{potts_terms}</potts>
+                    <agents>
+                        <populations>
+                            <population id="X" init="{init}" />
+                        </populations>
+                    </agents>
+                </series>
+            </set>
+        """
+        expected = ET.tostring(ET.fromstring(expected_setup))
+        expected = "".join(line.strip() for line in expected.decode().split("\n"))
+
+        setup = ConvertARCADE.make_setup_file(init, bounds)
+        setup = "".join(line.strip() for line in setup.decode().split("\n"))
+
+        self.assertEqual(expected, setup)
+
+    def test_make_setup_file_default_parameters_with_regions(self):
+        init = 10
+        bounds = (20, 30, 40)
+        regions = ["REGION_A", "REGION_B"]
+
+        potts_terms = "".join([f'<potts.term id="{term}" />' for term in POTTS_TERMS])
+        expected_setup = f"""
+            <set>
+                <series name="ARCADE" interval="1" start="0" end="0" dt="1" ds="1"
+                    ticks="1" length="{bounds[0]}" width="{bounds[1]}" height="{bounds[2]}">
+                    <potts>{potts_terms}</potts>
+                    <agents>
+                        <populations>
+                            <population id="X" init="{init}">
+                                <population.region id="{regions[0]}" />
+                                <population.region id="{regions[1]}" />
+                            </population>
+                        </populations>
+                    </agents>
+                </series>
+            </set>
+        """
+        expected = ET.tostring(ET.fromstring(expected_setup))
+        expected = "".join(line.strip() for line in expected.decode().split("\n"))
+
+        setup = ConvertARCADE.make_setup_file(init, bounds, regions)
+        setup = "".join(line.strip() for line in setup.decode().split("\n"))
+
+        self.assertEqual(expected, setup)
+
+    def test_make_setup_file_given_parameters_no_region(self):
+        init = 10
+        bounds = (20, 30, 40)
+        potts_terms = ("TERM_1", "TERM_2")
+
+        expected_setup = f"""
+            <set>
+                <series name="ARCADE" interval="1" start="0" end="0" dt="1" ds="1"
+                    ticks="1" length="{bounds[0]}" width="{bounds[1]}" height="{bounds[2]}">
+                    <potts>
+                        <potts.term id="{potts_terms[0]}" />
+                        <potts.term id="{potts_terms[1]}" />
+                    </potts>
+                    <agents>
+                        <populations>
+                            <population id="X" init="{init}" />
+                        </populations>
+                    </agents>
+                </series>
+            </set>
+        """
+        expected = ET.tostring(ET.fromstring(expected_setup))
+        expected = "".join(line.strip() for line in expected.decode().split("\n"))
+
+        setup = ConvertARCADE.make_setup_file(init, bounds, terms=potts_terms)
+        setup = "".join(line.strip() for line in setup.decode().split("\n"))
+
+        self.assertEqual(expected, setup)
+
+    def test_make_setup_file_given_parameters_with_regions(self):
+        init = 10
+        bounds = (20, 30, 40)
+        regions = ["REGION_A", "REGION_B"]
+        potts_terms = ("TERM_1", "TERM_2")
+
+        expected_setup = f"""
+            <set>
+                <series name="ARCADE" interval="1" start="0" end="0" dt="1" ds="1"
+                    ticks="1" length="{bounds[0]}" width="{bounds[1]}" height="{bounds[2]}">
+                    <potts>
+                        <potts.term id="{potts_terms[0]}" />
+                        <potts.term id="{potts_terms[1]}" />
+                    </potts>
+                    <agents>
+                        <populations>
+                            <population id="X" init="{init}">
+                                <population.region id="{regions[0]}" />
+                                <population.region id="{regions[1]}" />
+                            </population>
+                        </populations>
+                    </agents>
+                </series>
+            </set>
+        """
+        expected = ET.tostring(ET.fromstring(expected_setup))
+        expected = "".join(line.strip() for line in expected.decode().split("\n"))
+
+        setup = ConvertARCADE.make_setup_file(init, bounds, regions, terms=potts_terms)
+        setup = "".join(line.strip() for line in setup.decode().split("\n"))
+
+        self.assertEqual(expected, setup)
 
     def test_filter_valid_samples_no_regions_does_nothing(self):
         samples = pd.DataFrame(

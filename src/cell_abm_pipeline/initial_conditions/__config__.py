@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import Tuple, Dict
 
 # Pixel resolution for images (um/pixel) in x/y
 SCALE_MICRONS_XY: float = 0.108333
@@ -13,7 +13,7 @@ EDGE_THRESHOLD: int = 1
 CONNECTED_THRESHOLD: float = 2.0
 
 # List of Potts Hamiltonian terms for setup file
-POTTS_TERMS: List[str] = ["volume", "surface", "adhesion", "height", "substrate", "persistence"]
+POTTS_TERMS: Tuple = ("volume", "surface", "adhesion", "height", "substrate", "persistence")
 
 # Name of Quilt package for downloading images
 QUILT_PACKAGE: str = "aics/hipsc_single_cell_image_dataset"

@@ -1,5 +1,4 @@
 import io
-from math import ceil, sqrt, pi
 from typing import Dict, List, Optional, Tuple
 import xml.etree.ElementTree as ET
 
@@ -149,7 +148,7 @@ class ConvertARCADE:
             region_key = make_full_key(self.folders, self.files, "input", key, region)
             processed_region_samples = load_dataframe(self.context.working, region_key)
             region_samples = self.transform_sample_voxels(
-                processed_region_samples, margins, samples
+                processed_region_samples, margins, processed_samples
             )
             region_samples["region"] = region
 
@@ -178,9 +177,12 @@ class ConvertARCADE:
         save_json(self.context.working, locations_key, locations)
 
         # Create and save setup file.
-        setup = self.make_setup_file(samples, **bounds)
+        init = len(samples["id"].unique())
+        bounds = self.calculate_sample_bounds(processed_samples, margins)
+        regions = samples["regions"].unique() if "regions" in samples else None
+        setup = self.make_setup_file(init, bounds, regions)
         setup_key = make_full_key(self.folders, self.files, "setup", key)
-        save_buffer(self.context.working, setup_key, setup)
+        save_buffer(self.context.working, setup_key, io.BytesIO(setup))
 
     @staticmethod
     def transform_sample_voxels(
@@ -221,8 +223,57 @@ class ConvertARCADE:
         return transformed
 
     @staticmethod
-    def make_setup_file(samples, length, width, height, terms=POTTS_TERMS):
-        """Create empty setup file for converted samples."""
+    def calculate_sample_bounds(
+        samples: pd.DataFrame, margins: Tuple[int, int, int]
+    ) -> Tuple[int, int, int]:
+        """
+        Calculate transformed sample bounds including margin.
+
+        Parameters
+        ----------
+        samples
+            Sample cell ids and coordinates.
+        margins
+            Margin size in x, y, and z directions.
+
+        Returns
+        -------
+        :
+            Bounds in x, y, and z directions.
+        """
+        steps = ProcessSamples.get_step_sizes(samples)
+        mins = ProcessSamples.get_sample_minimums(samples)
+        maxs = ProcessSamples.get_sample_maximums(samples)
+
+        bound_x, bound_y, bound_z = (np.subtract(maxs, mins) / steps) + np.multiply(2, margins) + 3
+        bounds = (bound_x, bound_y, bound_z)
+        return bounds
+
+    @staticmethod
+    def make_setup_file(
+        init: int,
+        bounds: Tuple[int, int, int],
+        regions: Optional[List[str]] = None,
+        terms: Tuple = POTTS_TERMS,
+    ) -> bytes:
+        """
+        Create ARCADE setup file for converted samples.
+
+        Parameters
+        ----------
+        init
+            Number of initial cells.
+        bounds
+            Bounds in x, y, and z directions.
+        regions
+            List of regions.
+        terms
+            List of Potts Hamiltonian terms for setup file, default = ``POTTS_TERMS``.
+
+        Returns
+        -------
+            Contents of ARCADE setup file.
+        """
         root = ET.fromstring("<set></set>")
         series = ET.SubElement(
             root,
@@ -233,11 +284,11 @@ class ConvertARCADE:
                 "start": "0",
                 "end": "0",
                 "dt": "1",
-                "ticks": "24",
                 "ds": "1",
-                "height": str(int(height)),
-                "length": str(int(length)),
-                "width": str(int(width)),
+                "ticks": "1",
+                "length": str(int(bounds[0])),
+                "width": str(int(bounds[1])),
+                "height": str(int(bounds[2])),
             },
         )
 
@@ -247,16 +298,14 @@ class ConvertARCADE:
 
         agents = ET.SubElement(series, "agents")
         populations = ET.SubElement(agents, "populations")
-
-        init = len(samples.id.unique())
         population = ET.SubElement(populations, "population", {"id": "X", "init": str(init)})
 
-        if "region" in samples.columns:
-            for region in samples.region.unique():
-                ET.SubElement(population, "population.region", {"id": region, "fraction": "0.5"})
+        if regions is not None:
+            for region in regions:
+                ET.SubElement(population, "population.region", {"id": region})
 
         ET.indent(root, space="    ", level=0)
-        return io.BytesIO(ET.tostring(root))
+        return ET.tostring(root)
 
     @staticmethod
     def filter_valid_samples(samples: pd.DataFrame) -> pd.DataFrame:
