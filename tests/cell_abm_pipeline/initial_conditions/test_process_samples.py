@@ -121,30 +121,34 @@ class TestProcessSamples(unittest.TestCase):
 
     def test_remove_unconnected_regions_rect_grid(self):
         connected_threshold = 0
-        sample_data = [
-            [2, 6, 3, 10],
-            [2, 6, 6, 10],
-            [2, 6, 3, 20],
-            [2, 4, 9, 20],
-            [2, 2, 9, 20],
-            [1, 2, 3, 10],
-            [1, 2, 6, 10],
-            [1, 4, 3, 10],
-            [1, 4, 6, 10],
-            [1, 6, 9, 10],
-        ]
-        samples = pd.DataFrame(sample_data, columns=["id", "x", "y", "z"])
+        samples = pd.DataFrame(
+            [
+                [2, 6, 3, 10],
+                [2, 6, 6, 10],
+                [2, 6, 3, 20],
+                [2, 4, 9, 20],
+                [2, 2, 9, 20],
+                [1, 2, 3, 10],
+                [1, 2, 6, 10],
+                [1, 4, 3, 10],
+                [1, 4, 6, 10],
+                [1, 6, 9, 10],
+            ],
+            columns=["id", "x", "y", "z"],
+        )
 
-        expected_data = [
-            [1, 2, 3, 10],
-            [1, 2, 6, 10],
-            [1, 4, 3, 10],
-            [1, 4, 6, 10],
-            [2, 6, 3, 10],
-            [2, 6, 3, 20],
-            [2, 6, 6, 10],
-        ]
-        expected = pd.DataFrame(expected_data, columns=["id", "x", "y", "z"])
+        expected = pd.DataFrame(
+            [
+                [1, 2, 3, 10],
+                [1, 2, 6, 10],
+                [1, 4, 3, 10],
+                [1, 4, 6, 10],
+                [2, 6, 3, 10],
+                [2, 6, 3, 20],
+                [2, 6, 6, 10],
+            ],
+            columns=["id", "x", "y", "z"],
+        )
 
         filtered_samples = ProcessSamples.remove_unconnected_regions(
             samples, grid="rect", connected_threshold=connected_threshold
@@ -153,23 +157,27 @@ class TestProcessSamples(unittest.TestCase):
 
     def test_remove_unconnected_regions_hex_grid(self):
         connected_threshold = 1.5
-        sample_data = [
-            [2, 0, 0, 0],
-            [2, 1, 1, 1],
-            [2, 1, 2, 2],
-            [1, 4, 4, 4],
-            [1, 7, 5, 4],
-            [1, 4, 3, 4],
-        ]
-        samples = pd.DataFrame(sample_data, columns=["id", "x", "y", "z"])
+        samples = pd.DataFrame(
+            [
+                [2, 0, 0, 0],
+                [2, 1, 1, 1],
+                [2, 1, 2, 2],
+                [1, 4, 4, 4],
+                [1, 7, 5, 4],
+                [1, 4, 3, 4],
+            ],
+            columns=["id", "x", "y", "z"],
+        )
 
-        expected_data = [
-            [1, 4, 3, 4],
-            [1, 4, 4, 4],
-            [2, 1, 1, 1],
-            [2, 1, 2, 2],
-        ]
-        expected = pd.DataFrame(expected_data, columns=["id", "x", "y", "z"])
+        expected = pd.DataFrame(
+            [
+                [1, 4, 3, 4],
+                [1, 4, 4, 4],
+                [2, 1, 1, 1],
+                [2, 1, 2, 2],
+            ],
+            columns=["id", "x", "y", "z"],
+        )
 
         filtered_samples = ProcessSamples.remove_unconnected_regions(
             samples, grid="hex", connected_threshold=connected_threshold
@@ -183,15 +191,17 @@ class TestProcessSamples(unittest.TestCase):
             ProcessSamples.remove_unconnected_regions(samples, grid)
 
     def test_get_step_sizes(self):
-        sample_data = [
-            [1, 0, 3, 10],
-            [1, 2, 15, 40],
-            [1, 6, 6, 20],
-            [1, 4, 12, 50],
-            [1, 8, 9, 30],
-            [1, 10, 18, 60],
-        ]
-        samples = pd.DataFrame(sample_data, columns=["id", "x", "y", "z"])
+        samples = pd.DataFrame(
+            [
+                [1, 0, 3, 10],
+                [1, 2, 15, 40],
+                [1, 6, 6, 20],
+                [1, 4, 12, 50],
+                [1, 8, 9, 30],
+                [1, 10, 18, 60],
+            ],
+            columns=["id", "x", "y", "z"],
+        )
         expected_step_sizes = (2, 3, 10)
         step_sizes = ProcessSamples.get_step_sizes(samples)
         self.assertTupleEqual(expected_step_sizes, step_sizes)
@@ -207,29 +217,33 @@ class TestProcessSamples(unittest.TestCase):
         self.assertEqual(2, step_size)
 
     def test_get_sample_minimums(self):
-        sample_data = [
-            [1, 0, 3, 10],
-            [1, 2, 15, 40],
-            [1, 6, 6, 20],
-            [1, 4, 12, 50],
-            [1, 8, 9, 30],
-            [1, 10, 18, 60],
-        ]
-        samples = pd.DataFrame(sample_data, columns=["id", "x", "y", "z"])
+        samples = pd.DataFrame(
+            [
+                [1, 0, 3, 10],
+                [1, 2, 15, 40],
+                [1, 6, 6, 20],
+                [1, 4, 12, 50],
+                [1, 8, 9, 30],
+                [1, 10, 18, 60],
+            ],
+            columns=["id", "x", "y", "z"],
+        )
         expected_minimums = (0, 3, 10)
         minimums = ProcessSamples.get_sample_minimums(samples)
         self.assertTupleEqual(expected_minimums, minimums)
 
     def test_get_sample_maximums(self):
-        sample_data = [
-            [1, 0, 3, 10],
-            [1, 2, 15, 40],
-            [1, 6, 6, 20],
-            [1, 4, 12, 50],
-            [1, 8, 9, 30],
-            [1, 10, 18, 60],
-        ]
-        samples = pd.DataFrame(sample_data, columns=["id", "x", "y", "z"])
+        samples = pd.DataFrame(
+            [
+                [1, 0, 3, 10],
+                [1, 2, 15, 40],
+                [1, 6, 6, 20],
+                [1, 4, 12, 50],
+                [1, 8, 9, 30],
+                [1, 10, 18, 60],
+            ],
+            columns=["id", "x", "y", "z"],
+        )
         expected_maximums = (10, 18, 60)
         maximums = ProcessSamples.get_sample_maximums(samples)
         self.assertTupleEqual(expected_maximums, maximums)
@@ -237,20 +251,22 @@ class TestProcessSamples(unittest.TestCase):
     def test_find_edge_ids_no_padding_low_threshold(self):
         padding = 0
         threshold = 0
-        sample_data = [
-            [1, 0, 1, 1],
-            [1, 1, 1, 2],
-            [1, 2, 1, 3],
-            [1, 2, 0, 4],
-            [1, 3, 0, 5],
-            [1, 4, 0, 5],
-            [2, 0, 2, 1],
-            [2, 1, 2, 2],
-            [3, 1, 3, 1],
-            [3, 2, 3, 2],
-            [3, 2, 4, 3],
-        ]
-        samples = pd.DataFrame(sample_data, columns=["id", "x", "y", "z"])
+        samples = pd.DataFrame(
+            [
+                [1, 0, 1, 1],
+                [1, 1, 1, 2],
+                [1, 2, 1, 3],
+                [1, 2, 0, 4],
+                [1, 3, 0, 5],
+                [1, 4, 0, 5],
+                [2, 0, 2, 1],
+                [2, 1, 2, 2],
+                [3, 1, 3, 1],
+                [3, 2, 3, 2],
+                [3, 2, 4, 3],
+            ],
+            columns=["id", "x", "y", "z"],
+        )
         expected_edge_ids = [1, 2]
 
         edge_ids = ProcessSamples.find_edge_ids("x", samples, padding, threshold)
@@ -259,20 +275,22 @@ class TestProcessSamples(unittest.TestCase):
     def test_find_edge_ids_no_padding_high_threshold(self):
         padding = 0
         threshold = 3
-        sample_data = [
-            [1, 0, 1, 1],
-            [1, 1, 1, 2],
-            [1, 2, 1, 3],
-            [1, 2, 0, 4],
-            [1, 3, 0, 5],
-            [1, 4, 0, 5],
-            [2, 0, 2, 1],
-            [2, 1, 2, 2],
-            [3, 1, 3, 1],
-            [3, 2, 3, 2],
-            [3, 2, 4, 3],
-        ]
-        samples = pd.DataFrame(sample_data, columns=["id", "x", "y", "z"])
+        samples = pd.DataFrame(
+            [
+                [1, 0, 1, 1],
+                [1, 1, 1, 2],
+                [1, 2, 1, 3],
+                [1, 2, 0, 4],
+                [1, 3, 0, 5],
+                [1, 4, 0, 5],
+                [2, 0, 2, 1],
+                [2, 1, 2, 2],
+                [3, 1, 3, 1],
+                [3, 2, 3, 2],
+                [3, 2, 4, 3],
+            ],
+            columns=["id", "x", "y", "z"],
+        )
         expected_edge_ids = []
 
         edge_ids = ProcessSamples.find_edge_ids("x", samples, padding, threshold)
@@ -281,20 +299,22 @@ class TestProcessSamples(unittest.TestCase):
     def test_find_edge_ids_with_padding_low_threshold(self):
         padding = 1
         threshold = 0
-        sample_data = [
-            [1, 0, 1, 1],
-            [1, 1, 1, 2],
-            [1, 2, 1, 3],
-            [1, 2, 0, 4],
-            [1, 3, 0, 5],
-            [1, 4, 0, 5],
-            [2, 0, 2, 1],
-            [2, 1, 2, 2],
-            [3, 1, 3, 1],
-            [3, 2, 3, 2],
-            [3, 2, 4, 3],
-        ]
-        samples = pd.DataFrame(sample_data, columns=["id", "x", "y", "z"])
+        samples = pd.DataFrame(
+            [
+                [1, 0, 1, 1],
+                [1, 1, 1, 2],
+                [1, 2, 1, 3],
+                [1, 2, 0, 4],
+                [1, 3, 0, 5],
+                [1, 4, 0, 5],
+                [2, 0, 2, 1],
+                [2, 1, 2, 2],
+                [3, 1, 3, 1],
+                [3, 2, 3, 2],
+                [3, 2, 4, 3],
+            ],
+            columns=["id", "x", "y", "z"],
+        )
         expected_edge_ids = [1, 2, 3]
 
         edge_ids = ProcessSamples.find_edge_ids("x", samples, padding, threshold)
@@ -303,35 +323,39 @@ class TestProcessSamples(unittest.TestCase):
     def test_find_edge_ids_with_padding_high_threshold(self):
         padding = 1
         threshold = 3
-        sample_data = [
-            [1, 0, 1, 1],
-            [1, 1, 1, 2],
-            [1, 2, 1, 3],
-            [1, 2, 0, 4],
-            [1, 3, 0, 5],
-            [1, 4, 0, 5],
-            [2, 0, 2, 1],
-            [2, 1, 2, 2],
-            [3, 1, 3, 1],
-            [3, 2, 3, 2],
-            [3, 2, 4, 3],
-        ]
-        samples = pd.DataFrame(sample_data, columns=["id", "x", "y", "z"])
+        samples = pd.DataFrame(
+            [
+                [1, 0, 1, 1],
+                [1, 1, 1, 2],
+                [1, 2, 1, 3],
+                [1, 2, 0, 4],
+                [1, 3, 0, 5],
+                [1, 4, 0, 5],
+                [2, 0, 2, 1],
+                [2, 1, 2, 2],
+                [3, 1, 3, 1],
+                [3, 2, 3, 2],
+                [3, 2, 4, 3],
+            ],
+            columns=["id", "x", "y", "z"],
+        )
         expected_edge_ids = [1]
 
         edge_ids = ProcessSamples.find_edge_ids("x", samples, padding, threshold)
         self.assertListEqual(expected_edge_ids, edge_ids)
 
     def test_convert_to_integer_array(self):
-        sample_data = [
-            [1, 0, 3, 10],
-            [2, 2, 6, 10],
-            [3, 4, 6, 10],
-            [4, 6, 9, 10],
-            [5, 8, 9, 10],
-            [6, 10, 9, 20],
-        ]
-        samples = pd.DataFrame(sample_data, columns=["id", "x", "y", "z"])
+        samples = pd.DataFrame(
+            [
+                [1, 0, 3, 10],
+                [2, 2, 6, 10],
+                [3, 4, 6, 10],
+                [4, 6, 9, 10],
+                [5, 8, 9, 10],
+                [6, 10, 9, 20],
+            ],
+            columns=["id", "x", "y", "z"],
+        )
         steps = (2, 3, 10)
         minimums = (0, 3, 10)
         maximums = (10, 9, 20)
@@ -372,15 +396,17 @@ class TestProcessSamples(unittest.TestCase):
         steps = (2, 3, 10)
         minimums = (0, 3, 10)
 
-        expected_data = [
-            [1, 0, 3, 10],
-            [2, 2, 6, 10],
-            [3, 4, 6, 10],
-            [4, 6, 9, 10],
-            [5, 8, 9, 10],
-            [6, 10, 9, 20],
-        ]
-        expected_dataframe = pd.DataFrame(expected_data, columns=["id", "x", "y", "z"])
+        expected_dataframe = pd.DataFrame(
+            [
+                [1, 0, 3, 10],
+                [2, 2, 6, 10],
+                [3, 4, 6, 10],
+                [4, 6, 9, 10],
+                [5, 8, 9, 10],
+                [6, 10, 9, 20],
+            ],
+            columns=["id", "x", "y", "z"],
+        )
 
         dataframe = ProcessSamples.convert_to_dataframe(array, steps, minimums)
         self.assertTrue(expected_dataframe.equals(dataframe))
