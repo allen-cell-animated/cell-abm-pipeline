@@ -93,8 +93,52 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="colony-dynamics-find-neighbors-module">
-<h1>colony_dynamics.find_neighbors module<a class="headerlink" href="#colony-dynamics-find-neighbors-module" title="Permalink to this heading"></a></h1>
+  <section id="module-colony_dynamics.find_neighbors">
+<span id="colony-dynamics-find-neighbors-module"></span><h1>colony_dynamics.find_neighbors module<a class="headerlink" href="#module-colony_dynamics.find_neighbors" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="colony_dynamics.find_neighbors.FindNeighbors">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FindNeighbors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colony_dynamics/find_neighbors.html#FindNeighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colony_dynamics.find_neighbors.FindNeighbors" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="colony_dynamics.find_neighbors.FindNeighbors.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/colony_dynamics/find_neighbors.html#FindNeighbors.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colony_dynamics.find_neighbors.FindNeighbors.run" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colony_dynamics.find_neighbors.FindNeighbors.find_neighbors">
+<span class="sig-name descname"><span class="pre">find_neighbors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colony_dynamics/find_neighbors.html#FindNeighbors.find_neighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colony_dynamics.find_neighbors.FindNeighbors.find_neighbors" title="Permalink to this definition"></a></dt>
+<dd><p>Finds neighbor connections for all cells.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colony_dynamics.find_neighbors.FindNeighbors.flatten_neighbors_list">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flatten_neighbors_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neighbors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colony_dynamics/find_neighbors.html#FindNeighbors.flatten_neighbors_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colony_dynamics.find_neighbors.FindNeighbors.flatten_neighbors_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colony_dynamics.find_neighbors.FindNeighbors.make_voxels_array">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">make_voxels_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locations</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colony_dynamics/find_neighbors.html#FindNeighbors.make_voxels_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colony_dynamics.find_neighbors.FindNeighbors.make_voxels_array" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colony_dynamics.find_neighbors.FindNeighbors.get_array_neighbors">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_array_neighbors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colony_dynamics/find_neighbors.html#FindNeighbors.get_array_neighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colony_dynamics.find_neighbors.FindNeighbors.get_array_neighbors" title="Permalink to this definition"></a></dt>
+<dd><p>Get list of neighbors for each unique ID in array.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colony_dynamics.find_neighbors.FindNeighbors.get_bounding_box">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colony_dynamics/find_neighbors.html#FindNeighbors.get_bounding_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colony_dynamics.find_neighbors.FindNeighbors.get_bounding_box" title="Permalink to this definition"></a></dt>
+<dd><p>Finds bounding box around binary array.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colony_dynamics.find_neighbors.FindNeighbors.get_cropped_array">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_cropped_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_original</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colony_dynamics/find_neighbors.html#FindNeighbors.get_cropped_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colony_dynamics.find_neighbors.FindNeighbors.get_cropped_array" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 
 

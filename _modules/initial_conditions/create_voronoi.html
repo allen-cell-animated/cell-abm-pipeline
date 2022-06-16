@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>initial_conditions.create_voronoi &mdash; Cell agent-based model pipeline VERSION NUMBER X.X.X documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Cell agent-based model pipeline
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Package modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Cell agent-based model pipeline</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>initial_conditions.create_voronoi</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for initial_conditions.create_voronoi</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">distance_transform_edt</span><span class="p">,</span> <span class="n">binary_dilation</span><span class="p">,</span> <span class="n">binary_fill_holes</span>
+
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.initial_conditions.__main__</span> <span class="kn">import</span> <span class="n">Context</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.load</span> <span class="kn">import</span> <span class="n">load_image</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.save</span> <span class="kn">import</span> <span class="n">save_image</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.keys</span> <span class="kn">import</span> <span class="n">make_folder_key</span><span class="p">,</span> <span class="n">make_file_key</span><span class="p">,</span> <span class="n">make_full_key</span>
+
+
+<div class="viewcode-block" id="CreateVoronoi"><a class="viewcode-back" href="../../initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi">[docs]</a><span class="k">class</span> <span class="nc">CreateVoronoi</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Task to create Voronoi tessellation from given starting image.</span>
+
+<span class="sd">    Working location structure for a given context:</span>
+
+<span class="sd">    .. code-block:: bash</span>
+
+<span class="sd">        (name)</span>
+<span class="sd">        └── images</span>
+<span class="sd">            ├── (name)_(image key 1).ome.tiff</span>
+<span class="sd">            ├── (name)_(image key 2).ome.tiff</span>
+<span class="sd">            ├── ...</span>
+<span class="sd">            ├── (name)_(image key n).ome.tiff</span>
+<span class="sd">            ├── ...</span>
+<span class="sd">            ├── (name)_(image key 1)_(channel)_voronoi.ome.tiff</span>
+<span class="sd">            ├── (name)_(image key 2)_(channel)_voronoi.ome.tiff</span>
+<span class="sd">            ├── ...</span>
+<span class="sd">            └── (name)_(image key n)_(channel)_voronoi.ome.tiff</span>
+
+<span class="sd">    Voronoi images are saved to the same directory as the input images with</span>
+<span class="sd">    appended channel value and a &quot;voronoi&quot; label.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    context</span>
+<span class="sd">        **Context** object defining working location and name.</span>
+<span class="sd">    folders</span>
+<span class="sd">        Dictionary of input and output folder keys.</span>
+<span class="sd">    files</span>
+<span class="sd">        Dictionary of input and output file keys.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folders</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="n">make_folder_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;images&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="n">make_folder_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;images&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;ome&quot;</span><span class="p">,</span> <span class="s2">&quot;tiff&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;ome&quot;</span><span class="p">,</span> <span class="s2">&quot;tiff&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%02d</span><span class="s2">_voronoi&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="CreateVoronoi.run"><a class="viewcode-back" href="../../initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">channels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs create voronoi task for given context.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        iterations</span>
+<span class="sd">            Number of boundary estimation steps.</span>
+<span class="sd">        channels</span>
+<span class="sd">            Image channel indices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">channels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">channels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create_voronoi</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CreateVoronoi.create_voronoi"><a class="viewcode-back" href="../../initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi.create_voronoi">[docs]</a>    <span class="k">def</span> <span class="nf">create_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">channel</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create Voronoi task.</span>
+
+<span class="sd">        Loads image from working location.</span>
+<span class="sd">        Creates boundary for Voronoi using binary dilation, then performs</span>
+<span class="sd">        the Voronoi tessellation using the selected channel of the image.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key</span>
+<span class="sd">            Key for image.</span>
+<span class="sd">        iterations</span>
+<span class="sd">            Number of boundary estimation steps.</span>
+<span class="sd">        channel</span>
+<span class="sd">            Image channel index.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">image_key</span> <span class="o">=</span> <span class="n">make_full_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">load_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">image_key</span><span class="p">)</span>
+
+        <span class="n">array</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">get_image_data</span><span class="p">(</span><span class="s2">&quot;ZYX&quot;</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">C</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span>
+
+        <span class="c1"># Create artificial boundary for voronoi.</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_boundary_mask</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">iterations</span><span class="p">)</span>
+        <span class="n">mask_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">max</span>
+        <span class="n">array</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask_id</span>
+
+        <span class="c1"># Calculate voronoi on bounded array.</span>
+        <span class="n">zslice</span><span class="p">,</span> <span class="n">yslice</span><span class="p">,</span> <span class="n">xslice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_array_slices</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+        <span class="n">voronoi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_voronoi_array</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">zslice</span><span class="p">,</span> <span class="n">yslice</span><span class="p">,</span> <span class="n">xslice</span><span class="p">])</span>
+
+        <span class="c1"># Remove masking ids.</span>
+        <span class="n">array</span><span class="p">[</span><span class="n">zslice</span><span class="p">,</span> <span class="n">yslice</span><span class="p">,</span> <span class="n">xslice</span><span class="p">]</span> <span class="o">=</span> <span class="n">voronoi</span>
+        <span class="n">array</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">array</span><span class="p">[</span><span class="n">array</span> <span class="o">==</span> <span class="n">mask_id</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">output_key</span> <span class="o">=</span> <span class="n">make_full_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+        <span class="n">save_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">output_key</span><span class="p">,</span> <span class="n">array</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CreateVoronoi.create_boundary_mask"><a class="viewcode-back" href="../../initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi.create_boundary_mask">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_boundary_mask</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates filled boundary mask around regions in array.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        array</span>
+<span class="sd">            Image array.</span>
+<span class="sd">        iterations</span>
+<span class="sd">            Number of boundary estimation steps.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :</span>
+<span class="sd">            Boundary mask array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
+        <span class="n">mask</span><span class="p">[</span><span class="n">array</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># Expand using binary dilation to create a border.</span>
+        <span class="n">binary_dilation</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="n">iterations</span><span class="p">)</span>
+
+        <span class="c1"># Fill holes in the mask in each z slice.</span>
+        <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">binary_fill_holes</span><span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="n">z</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">output</span><span class="o">=</span><span class="n">mask</span><span class="p">[</span><span class="n">z</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:])</span>
+
+        <span class="k">return</span> <span class="n">mask</span></div>
+
+<div class="viewcode-block" id="CreateVoronoi.get_array_slices"><a class="viewcode-back" href="../../initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi.get_array_slices">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_array_slices</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">slice</span><span class="p">,</span> <span class="nb">slice</span><span class="p">,</span> <span class="nb">slice</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate bounding box slices around binary array.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        array</span>
+<span class="sd">            Binary array.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :</span>
+<span class="sd">            Slices in the z, y, and x directions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">zsize</span><span class="p">,</span> <span class="n">ysize</span><span class="p">,</span> <span class="n">xsize</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="n">zmin</span><span class="p">,</span> <span class="n">zmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))[</span><span class="mi">0</span><span class="p">][[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))[</span><span class="mi">0</span><span class="p">][[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))[</span><span class="mi">0</span><span class="p">][[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+        <span class="n">zslice</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">zmin</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">zmax</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">zsize</span><span class="p">))</span>
+        <span class="n">yslice</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">ymin</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">ymax</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">ysize</span><span class="p">))</span>
+        <span class="n">xslice</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">xmin</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">xmax</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">xsize</span><span class="p">))</span>
+
+        <span class="n">slices</span> <span class="o">=</span> <span class="p">(</span><span class="n">zslice</span><span class="p">,</span> <span class="n">yslice</span><span class="p">,</span> <span class="n">xslice</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">slices</span></div>
+
+<div class="viewcode-block" id="CreateVoronoi.calculate_voronoi_array"><a class="viewcode-back" href="../../initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi.calculate_voronoi_array">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">calculate_voronoi_array</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates voronoi on image array using distance transform.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        array</span>
+<span class="sd">            Image array.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :</span>
+<span class="sd">            Voronoi array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="n">distance_transform_edt</span><span class="p">(</span><span class="n">array</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">return_distances</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_indices</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="n">distances</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint16&quot;</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">coordinates_z</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">coordinates_y</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">coordinates_x</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">voronoi</span> <span class="o">=</span> <span class="n">array</span><span class="p">[</span><span class="n">coordinates_z</span><span class="p">,</span> <span class="n">coordinates_y</span><span class="p">,</span> <span class="n">coordinates_x</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">voronoi</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright YYYY, AUTHOR_NAME.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

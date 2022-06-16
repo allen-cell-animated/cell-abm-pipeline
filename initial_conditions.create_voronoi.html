@@ -89,8 +89,126 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="initial-conditions-create-voronoi-module">
-<h1>initial_conditions.create_voronoi module<a class="headerlink" href="#initial-conditions-create-voronoi-module" title="Permalink to this heading"></a></h1>
+  <section id="module-initial_conditions.create_voronoi">
+<span id="initial-conditions-create-voronoi-module"></span><h1>initial_conditions.create_voronoi module<a class="headerlink" href="#module-initial_conditions.create_voronoi" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="initial_conditions.create_voronoi.CreateVoronoi">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CreateVoronoi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/initial_conditions/create_voronoi.html#CreateVoronoi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.create_voronoi.CreateVoronoi" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Task to create Voronoi tessellation from given starting image.</p>
+<p>Working location structure for a given context:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>name<span class="o">)</span>
+└── images
+    ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">1</span><span class="o">)</span>.ome.tiff
+    ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">2</span><span class="o">)</span>.ome.tiff
+    ├── ...
+    ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key n<span class="o">)</span>.ome.tiff
+    ├── ...
+    ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">1</span><span class="o">)</span>_<span class="o">(</span>channel<span class="o">)</span>_voronoi.ome.tiff
+    ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">2</span><span class="o">)</span>_<span class="o">(</span>channel<span class="o">)</span>_voronoi.ome.tiff
+    ├── ...
+    └── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key n<span class="o">)</span>_<span class="o">(</span>channel<span class="o">)</span>_voronoi.ome.tiff
+</pre></div>
+</div>
+<p>Voronoi images are saved to the same directory as the input images with
+appended channel value and a “voronoi” label.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="initial_conditions.create_voronoi.CreateVoronoi.context">
+<span class="sig-name descname"><span class="pre">context</span></span><a class="headerlink" href="#initial_conditions.create_voronoi.CreateVoronoi.context" title="Permalink to this definition"></a></dt>
+<dd><p><strong>Context</strong> object defining working location and name.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="initial_conditions.create_voronoi.CreateVoronoi.folders">
+<span class="sig-name descname"><span class="pre">folders</span></span><a class="headerlink" href="#initial_conditions.create_voronoi.CreateVoronoi.folders" title="Permalink to this definition"></a></dt>
+<dd><p>Dictionary of input and output folder keys.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="initial_conditions.create_voronoi.CreateVoronoi.files">
+<span class="sig-name descname"><span class="pre">files</span></span><a class="headerlink" href="#initial_conditions.create_voronoi.CreateVoronoi.files" title="Permalink to this definition"></a></dt>
+<dd><p>Dictionary of input and output file keys.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.create_voronoi.CreateVoronoi.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/initial_conditions/create_voronoi.html#CreateVoronoi.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.create_voronoi.CreateVoronoi.run" title="Permalink to this definition"></a></dt>
+<dd><p>Runs create voronoi task for given context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>iterations</strong> – Number of boundary estimation steps.</p></li>
+<li><p><strong>channels</strong> – Image channel indices.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.create_voronoi.CreateVoronoi.create_voronoi">
+<span class="sig-name descname"><span class="pre">create_voronoi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/initial_conditions/create_voronoi.html#CreateVoronoi.create_voronoi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.create_voronoi.CreateVoronoi.create_voronoi" title="Permalink to this definition"></a></dt>
+<dd><p>Create Voronoi task.</p>
+<p>Loads image from working location.
+Creates boundary for Voronoi using binary dilation, then performs
+the Voronoi tessellation using the selected channel of the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – Key for image.</p></li>
+<li><p><strong>iterations</strong> – Number of boundary estimation steps.</p></li>
+<li><p><strong>channel</strong> – Image channel index.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.create_voronoi.CreateVoronoi.create_boundary_mask">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_boundary_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="_modules/initial_conditions/create_voronoi.html#CreateVoronoi.create_boundary_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.create_voronoi.CreateVoronoi.create_boundary_mask" title="Permalink to this definition"></a></dt>
+<dd><p>Creates filled boundary mask around regions in array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> – Image array.</p></li>
+<li><p><strong>iterations</strong> – Number of boundary estimation steps.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Boundary mask array.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.create_voronoi.CreateVoronoi.get_array_slices">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_array_slices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">slice</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">slice</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">slice</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/initial_conditions/create_voronoi.html#CreateVoronoi.get_array_slices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.create_voronoi.CreateVoronoi.get_array_slices" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate bounding box slices around binary array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>array</strong> – Binary array.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Slices in the z, y, and x directions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.create_voronoi.CreateVoronoi.calculate_voronoi_array">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_voronoi_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="_modules/initial_conditions/create_voronoi.html#CreateVoronoi.calculate_voronoi_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.create_voronoi.CreateVoronoi.calculate_voronoi_array" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates voronoi on image array using distance transform.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>array</strong> – Image array.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Voronoi array.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 

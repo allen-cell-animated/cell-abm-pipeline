@@ -90,8 +90,72 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="cell-shape-extract-shapes-module">
-<h1>cell_shape.extract_shapes module<a class="headerlink" href="#cell-shape-extract-shapes-module" title="Permalink to this heading"></a></h1>
+  <section id="module-cell_shape.extract_shapes">
+<span id="cell-shape-extract-shapes-module"></span><h1>cell_shape.extract_shapes module<a class="headerlink" href="#module-cell_shape.extract_shapes" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="cell_shape.extract_shapes.ExtractShapes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ExtractShapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cell_shape/extract_shapes.html#ExtractShapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_shape.extract_shapes.ExtractShapes" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cell_shape.extract_shapes.ExtractShapes.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(100,</span> <span class="pre">100)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cell_shape/extract_shapes.html#ExtractShapes.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_shape.extract_shapes.ExtractShapes.run" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cell_shape.extract_shapes.ExtractShapes.extract_shapes">
+<span class="sig-name descname"><span class="pre">extract_shapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cell_shape/extract_shapes.html#ExtractShapes.extract_shapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_shape.extract_shapes.ExtractShapes.extract_shapes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cell_shape.extract_shapes.ExtractShapes.extract_shape_svgs">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extract_shape_svgs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pca</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cell_shape/extract_shapes.html#ExtractShapes.extract_shape_svgs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_shape.extract_shapes.ExtractShapes.extract_shape_svgs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cell_shape.extract_shapes.ExtractShapes.extract_shape_svg">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extract_shape_svg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pca</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeffs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cell_shape/extract_shapes.html#ExtractShapes.extract_shape_svg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_shape.extract_shapes.ExtractShapes.extract_shape_svg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cell_shape.extract_shapes.ExtractShapes.compile_shape_svg">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compile_shape_svg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(100,</span> <span class="pre">100)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cell_shape/extract_shapes.html#ExtractShapes.compile_shape_svg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_shape.extract_shapes.ExtractShapes.compile_shape_svg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cell_shape.extract_shapes.ExtractShapes.construct_mesh_from_points">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">construct_mesh_from_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pca</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cell_shape/extract_shapes.html#ExtractShapes.construct_mesh_from_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_shape.extract_shapes.ExtractShapes.construct_mesh_from_points" title="Permalink to this definition"></a></dt>
+<dd><p>Constructs mesh given PCA transformation points.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cell_shape.extract_shapes.ExtractShapes.convert_vtk_to_trimesh">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">convert_vtk_to_trimesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cell_shape/extract_shapes.html#ExtractShapes.convert_vtk_to_trimesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_shape.extract_shapes.ExtractShapes.convert_vtk_to_trimesh" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cell_shape.extract_shapes.ExtractShapes.get_mesh_slices">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_mesh_slices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cell_shape/extract_shapes.html#ExtractShapes.get_mesh_slices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_shape.extract_shapes.ExtractShapes.get_mesh_slices" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cell_shape.extract_shapes.ExtractShapes.get_mesh_slice">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_mesh_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cell_shape/extract_shapes.html#ExtractShapes.get_mesh_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_shape.extract_shapes.ExtractShapes.get_mesh_slice" title="Permalink to this definition"></a></dt>
+<dd><p>Get svg slice of mesh along plane for given normal.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cell_shape.extract_shapes.ExtractShapes.append_svg_element">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">append_svg_element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#555'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cell_shape/extract_shapes.html#ExtractShapes.append_svg_element"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_shape.extract_shapes.ExtractShapes.append_svg_element" title="Permalink to this definition"></a></dt>
+<dd><p>Append svg element to root.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cell_shape.extract_shapes.ExtractShapes.clear_svg_namespaces">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">clear_svg_namespaces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cell_shape/extract_shapes.html#ExtractShapes.clear_svg_namespaces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_shape.extract_shapes.ExtractShapes.clear_svg_namespaces" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 
 

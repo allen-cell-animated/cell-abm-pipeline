@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cell_shape.plot_pca &mdash; Cell agent-based model pipeline VERSION NUMBER X.X.X documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Cell agent-based model pipeline
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Package modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Cell agent-based model pipeline</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>cell_shape.plot_pca</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cell_shape.plot_pca</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.cell_shape.__config__</span> <span class="kn">import</span> <span class="n">CELL_FEATURES</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.cell_shape.calculate_coefficients</span> <span class="kn">import</span> <span class="n">CalculateCoefficients</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.cell_shape.perform_pca</span> <span class="kn">import</span> <span class="n">PerformPCA</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.load</span> <span class="kn">import</span> <span class="n">load_pickle</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.save</span> <span class="kn">import</span> <span class="n">save_plot</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.keys</span> <span class="kn">import</span> <span class="n">make_folder_key</span><span class="p">,</span> <span class="n">make_file_key</span><span class="p">,</span> <span class="n">make_full_key</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.plot</span> <span class="kn">import</span> <span class="n">make_plot</span><span class="p">,</span> <span class="n">make_legend</span>
+
+
+<div class="viewcode-block" id="PlotPCA"><a class="viewcode-back" href="../../cell_shape.plot_pca.html#cell_shape.plot_pca.PlotPCA">[docs]</a><span class="k">class</span> <span class="nc">PlotPCA</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folders</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="n">make_folder_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;analysis&quot;</span><span class="p">,</span> <span class="s2">&quot;SHPCA&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+            <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="n">make_folder_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;SHPCA&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;SHPCA&quot;</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="s2">&quot;pkl&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;SHPCA&quot;</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="PlotPCA.run"><a class="viewcode-back" href="../../cell_shape.plot_pca.html#cell_shape.plot_pca.PlotPCA.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="p">[],</span> <span class="n">components</span><span class="o">=</span><span class="p">[],</span> <span class="n">region</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+            <span class="n">key_file</span> <span class="o">=</span> <span class="n">make_full_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_pickle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">key_file</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">reference</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_reference&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_pickle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">reference</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_pca_variance_explained</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">features</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_pca_transform_features</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">reference</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">plot_pca_transform_compare</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PlotPCA.plot_pca_variance_explained"><a class="viewcode-back" href="../../cell_shape.plot_pca.html#cell_shape.plot_pca.PlotPCA.plot_pca_variance_explained">[docs]</a>    <span class="k">def</span> <span class="nf">plot_pca_variance_explained</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
+        <span class="n">make_plot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plot_pca_variance_explained</span><span class="p">,</span>
+            <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Component&quot;</span><span class="p">,</span>
+            <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Explained variance (%)&quot;</span><span class="p">,</span>
+            <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_full_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="s2">&quot;variance_explained&quot;</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
+        <span class="n">save_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_plot_pca_variance_explained</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">sim_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;pca&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="n">sim_var</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#555&quot;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;_reference&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">ref_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;_reference&quot;</span><span class="p">][</span><span class="s2">&quot;pca&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="n">ref_var</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#aaa&quot;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;ref&quot;</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim_var</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim_var</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<div class="viewcode-block" id="PlotPCA.plot_pca_transform_features"><a class="viewcode-back" href="../../cell_shape.plot_pca.html#cell_shape.plot_pca.PlotPCA.plot_pca_transform_features">[docs]</a>    <span class="k">def</span> <span class="nf">plot_pca_transform_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_feature&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">feature</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_region&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">region</span>
+        <span class="n">legend</span> <span class="o">=</span> <span class="n">make_legend</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">CELL_FEATURES</span><span class="p">[</span><span class="n">feature</span><span class="p">])</span>
+
+        <span class="n">make_plot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plot_pca_transform_features</span><span class="p">,</span>
+            <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;PC 1&quot;</span><span class="p">,</span>
+            <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;PC 2&quot;</span><span class="p">,</span>
+            <span class="n">legend</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;handles&quot;</span><span class="p">:</span> <span class="n">legend</span><span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="n">feature_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;transform_features_</span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_full_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
+        <span class="n">save_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_plot_pca_transform_features</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+        <span class="n">pca</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;pca&quot;</span><span class="p">]</span>
+        <span class="n">region</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_region&quot;</span><span class="p">]</span>
+        <span class="n">feature</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_feature&quot;</span><span class="p">]</span>
+
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">CELL_FEATURES</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span>
+        <span class="n">coeff_names</span> <span class="o">=</span> <span class="n">CalculateCoefficients</span><span class="o">.</span><span class="n">get_coeff_names</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">region</span><span class="p">:</span>
+            <span class="n">feature</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">coeff_names</span> <span class="o">=</span> <span class="n">coeff_names</span> <span class="o">+</span> <span class="n">CalculateCoefficients</span><span class="o">.</span><span class="n">get_coeff_names</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">transformed</span><span class="p">,</span> <span class="n">nan_indices</span> <span class="o">=</span> <span class="n">PerformPCA</span><span class="o">.</span><span class="n">apply_data_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">coeff_names</span><span class="p">],</span> <span class="n">pca</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+            <span class="n">transformed</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">transformed</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="o">~</span><span class="n">nan_indices</span><span class="p">],</span>
+            <span class="n">vmin</span><span class="o">=</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">vmax</span><span class="o">=</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">s</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;magma_r&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="PlotPCA.plot_pca_transform_compare"><a class="viewcode-back" href="../../cell_shape.plot_pca.html#cell_shape.plot_pca.PlotPCA.plot_pca_transform_compare">[docs]</a>    <span class="k">def</span> <span class="nf">plot_pca_transform_compare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
+        <span class="n">pc</span> <span class="o">=</span> <span class="n">component</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_component&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">component</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_region&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">region</span>
+
+        <span class="n">make_plot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plot_pca_transform_compare</span><span class="p">,</span>
+            <span class="n">xlabel</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;PC </span><span class="si">{</span><span class="n">pc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">sharey</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">component_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;transform_component_PC</span><span class="si">{</span><span class="n">pc</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_full_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="n">component_key</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
+        <span class="n">save_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_plot_pca_transform_compare</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+        <span class="n">df_ref</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_reference&quot;</span><span class="p">][</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+        <span class="n">pca</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_reference&quot;</span><span class="p">][</span><span class="s2">&quot;pca&quot;</span><span class="p">]</span>
+        <span class="n">region</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_region&quot;</span><span class="p">]</span>
+        <span class="n">component</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_component&quot;</span><span class="p">]</span>
+
+        <span class="n">coeff_names</span> <span class="o">=</span> <span class="n">CalculateCoefficients</span><span class="o">.</span><span class="n">get_coeff_names</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">region</span><span class="p">:</span>
+            <span class="n">coeff_names</span> <span class="o">=</span> <span class="n">coeff_names</span> <span class="o">+</span> <span class="n">CalculateCoefficients</span><span class="o">.</span><span class="n">get_coeff_names</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">reference</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">PerformPCA</span><span class="o">.</span><span class="n">apply_data_transform</span><span class="p">(</span><span class="n">df_ref</span><span class="p">[</span><span class="n">coeff_names</span><span class="p">],</span> <span class="n">pca</span><span class="p">)</span>
+        <span class="n">transformed</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">PerformPCA</span><span class="o">.</span><span class="n">apply_data_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">coeff_names</span><span class="p">],</span> <span class="n">pca</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">reference</span><span class="p">[:,</span> <span class="n">component</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">transformed</span><span class="p">[:,</span> <span class="n">component</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s2">&quot;step&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright YYYY, AUTHOR_NAME.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

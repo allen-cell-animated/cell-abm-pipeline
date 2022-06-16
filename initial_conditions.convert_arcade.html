@@ -89,8 +89,322 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="initial-conditions-convert-arcade-module">
-<h1>initial_conditions.convert_arcade module<a class="headerlink" href="#initial-conditions-convert-arcade-module" title="Permalink to this heading"></a></h1>
+  <section id="module-initial_conditions.convert_arcade">
+<span id="initial-conditions-convert-arcade-module"></span><h1>initial_conditions.convert_arcade module<a class="headerlink" href="#module-initial_conditions.convert_arcade" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ConvertARCADE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/initial_conditions/convert_arcade.html#ConvertARCADE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Task to convert samples into ARCADE input formats.</p>
+<p>Working location structure for a given context:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>name<span class="o">)</span>
+├── converted
+│    └── converted.ARCADE
+│        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">1</span><span class="o">)</span>.xml
+│        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">1</span><span class="o">)</span>.CELLS.json
+│        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">1</span><span class="o">)</span>.LOCATIONS.json
+│        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">2</span><span class="o">)</span>.xml
+│        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">2</span><span class="o">)</span>.CELLS.json
+│        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">2</span><span class="o">)</span>.LOCATIONS.json
+│        ├── ...
+│        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key n<span class="o">)</span>.xml
+│        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key n<span class="o">)</span>.CELLS.json
+│        └── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key n<span class="o">)</span>.LOCATIONS.json
+└── samples
+    └── samples.PROCESSED
+        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">1</span><span class="o">)</span>.PROCESSED.csv
+        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">2</span><span class="o">)</span>.PROCESSED.csv
+        ├── ...
+        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key n<span class="o">)</span>.PROCESSED.csv
+        ├── ...
+        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">1</span><span class="o">)</span>.PROCESSED.<span class="o">(</span>region<span class="o">)</span>.csv
+        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">2</span><span class="o">)</span>.PROCESSED.<span class="o">(</span>region<span class="o">)</span>.csv
+        ├── ...
+        └── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key n<span class="o">)</span>.PROCESSED.<span class="o">(</span>region<span class="o">)</span>.csv
+</pre></div>
+</div>
+<p>For each image key, the conversion creates three ARCADE output files:
+<strong>.xml</strong>, <strong>.CELLS.json</strong>, and <strong>.LOCATIONS.json</strong>.
+For conversions with region, sample for the region should include the region
+key in the extension.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.context">
+<span class="sig-name descname"><span class="pre">context</span></span><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.context" title="Permalink to this definition"></a></dt>
+<dd><p><strong>Context</strong> object defining working location and name.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.folders">
+<span class="sig-name descname"><span class="pre">folders</span></span><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.folders" title="Permalink to this definition"></a></dt>
+<dd><p>Dictionary of input and output folder keys.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.files">
+<span class="sig-name descname"><span class="pre">files</span></span><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.files" title="Permalink to this definition"></a></dt>
+<dd><p>Dictionary of input and output file keys.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">margins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/initial_conditions/convert_arcade.html#ConvertARCADE.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.run" title="Permalink to this definition"></a></dt>
+<dd><p>Runs convert ARCADE task for given context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>margins</strong> – Margin size in x, y, and z directions.</p></li>
+<li><p><strong>region</strong> – Region key to include in conversion.</p></li>
+<li><p><strong>reference</strong> – Path to reference data for conversion.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.convert_arcade">
+<span class="sig-name descname"><span class="pre">convert_arcade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/initial_conditions/convert_arcade.html#ConvertARCADE.convert_arcade"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.convert_arcade" title="Permalink to this definition"></a></dt>
+<dd><p>Convert ARCADE task.</p>
+<p>Loads processed samples from working location (along with processed
+region samples, if included).
+Iterates through each cell id in the samples and converts in the ARCADE
+formats for .CELLS and .LOCATIONS file formats.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – Key for samples.</p></li>
+<li><p><strong>margins</strong> – Margin size in x, y, and z directions.</p></li>
+<li><p><strong>region</strong> – Region key to include in conversion.</p></li>
+<li><p><strong>reference</strong> – Reference data for conversion.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.transform_sample_voxels">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform_sample_voxels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pandas.DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="reference internal" href="_modules/initial_conditions/convert_arcade.html#ConvertARCADE.transform_sample_voxels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.transform_sample_voxels" title="Permalink to this definition"></a></dt>
+<dd><p>Transforms samples into centered voxel coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples</strong> – Sample cell ids and coordinates.</p></li>
+<li><p><strong>margins</strong> – Margin size in x, y, and z directions.</p></li>
+<li><p><strong>reference</strong> – Reference samples used to calculate transformation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Sample cell ids and coordinates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.calculate_sample_bounds">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_sample_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/initial_conditions/convert_arcade.html#ConvertARCADE.calculate_sample_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.calculate_sample_bounds" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate transformed sample bounds including margin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples</strong> – Sample cell ids and coordinates.</p></li>
+<li><p><strong>margins</strong> – Margin size in x, y, and z directions.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Bounds in x, y, and z directions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.make_setup_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">make_setup_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('volume',</span> <span class="pre">'surface',</span> <span class="pre">'adhesion',</span> <span class="pre">'height',</span> <span class="pre">'substrate',</span> <span class="pre">'persistence')</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="_modules/initial_conditions/convert_arcade.html#ConvertARCADE.make_setup_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.make_setup_file" title="Permalink to this definition"></a></dt>
+<dd><p>Create ARCADE setup file for converted samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>init</strong> – Number of initial cells.</p></li>
+<li><p><strong>bounds</strong> – Bounds in x, y, and z directions.</p></li>
+<li><p><strong>regions</strong> – List of regions.</p></li>
+<li><p><strong>terms</strong> – List of Potts Hamiltonian terms for setup file, default = <code class="docutils literal notranslate"><span class="pre">POTTS_TERMS</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Contents of ARCADE setup file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.filter_valid_samples">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filter_valid_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="reference internal" href="_modules/initial_conditions/convert_arcade.html#ConvertARCADE.filter_valid_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.filter_valid_samples" title="Permalink to this definition"></a></dt>
+<dd><p>Filters samples for valid cell ids.</p>
+<p>Filter conditions include:</p>
+<ul class="simple">
+<li><p>Each cell must have at least one voxel assigned to each specified region</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>samples</strong> – Sample cell ids and coordinates.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Valid Sample cell ids and coordinates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.filter_cell_reference">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filter_cell_reference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/initial_conditions/convert_arcade.html#ConvertARCADE.filter_cell_reference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.filter_cell_reference" title="Permalink to this definition"></a></dt>
+<dd><p>Filters reference data for given cell id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_id</strong> – Unique cell id.</p></li>
+<li><p><strong>reference</strong> – Reference data for conversion.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Reference data for given cell id.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.convert_to_cell">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">convert_to_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/initial_conditions/convert_arcade.html#ConvertARCADE.convert_to_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.convert_to_cell" title="Permalink to this definition"></a></dt>
+<dd><p>Convert samples to ARCADE .CELLS json format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_id</strong> – Unique cell id.</p></li>
+<li><p><strong>samples</strong> – Sample cell ids and coordinates.</p></li>
+<li><p><strong>reference</strong> – Reference data for conversion.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary in ARCADE .CELLS json format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.convert_to_location">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">convert_to_location</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/initial_conditions/convert_arcade.html#ConvertARCADE.convert_to_location"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.convert_to_location" title="Permalink to this definition"></a></dt>
+<dd><p>Convert samples to ARCADE .LOCATIONS json format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_id</strong> – Unique cell id.</p></li>
+<li><p><strong>samples</strong> – Sample cell ids and coordinates.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary in ARCADE .LOCATIONS json format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.get_cell_critical_volume">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_cell_critical_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'DEFAULT'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avgs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critical_avgs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critical_stds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/initial_conditions/convert_arcade.html#ConvertARCADE.get_cell_critical_volume"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.get_cell_critical_volume" title="Permalink to this definition"></a></dt>
+<dd><p>Estimates critical cell volume based on samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples</strong> – Sample cell ids and coordinates.</p></li>
+<li><p><strong>region</strong> – Region key.</p></li>
+<li><p><strong>avgs</strong> – Volume distribution averages, default = <code class="docutils literal notranslate"><span class="pre">VOLUME_AVGS</span></code>.</p></li>
+<li><p><strong>stds</strong> – Volume distribution standard deviations, default = <code class="docutils literal notranslate"><span class="pre">VOLUME_STDS</span></code>.</p></li>
+<li><p><strong>critical_avgs</strong> – Critical volume distribution averages, default = <code class="docutils literal notranslate"><span class="pre">CRITICAL_VOLUME_AVGS</span></code>.</p></li>
+<li><p><strong>critical_stds</strong> – Critical volume distribution deviations, default = <code class="docutils literal notranslate"><span class="pre">CRITICAL_VOLUME_STDS</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Estimated critical cell volume.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.get_cell_critical_height">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_cell_critical_height</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'DEFAULT'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avgs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critical_avgs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critical_stds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/initial_conditions/convert_arcade.html#ConvertARCADE.get_cell_critical_height"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.get_cell_critical_height" title="Permalink to this definition"></a></dt>
+<dd><p>Estimates critical cell height based on samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples</strong> – Sample cell ids and coordinates.</p></li>
+<li><p><strong>region</strong> – Region key.</p></li>
+<li><p><strong>avgs</strong> – Height distribution averages, default = <code class="docutils literal notranslate"><span class="pre">HEIGHT_AVGS</span></code>.</p></li>
+<li><p><strong>stds</strong> – Height distribution standard deviations, default = <code class="docutils literal notranslate"><span class="pre">HEIGHT_STDS</span></code>.</p></li>
+<li><p><strong>critical_avgs</strong> – Critical height distribution averages, default = <code class="docutils literal notranslate"><span class="pre">CRITICAL_HEIGHT_AVGS</span></code>.</p></li>
+<li><p><strong>critical_stds</strong> – Critical height distribution deviations, default = <code class="docutils literal notranslate"><span class="pre">CRITICAL_HEIGHT_STDS</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Estimated critical cell volume.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.get_cell_state">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_cell_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critical_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/initial_conditions/convert_arcade.html#ConvertARCADE.get_cell_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.get_cell_state" title="Permalink to this definition"></a></dt>
+<dd><p>Estimates cell state based on cell volume.</p>
+<p>The threshold fractions dictionary defines the monotonic thresholds
+between different cell states.
+For a given volume v, critical volume V, and states X1, X2, …, XN with
+corresponding, monotonic threshold fractions f1, f2, …, fN, a cell is
+assigned state Xi such that [f(i - 1) * V] &lt;= v &lt; [fi * V].
+Cells with v &lt; f1 * V are assigned state X1.
+Cells with v &gt; fN * V are assigned state XN.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>volume</strong> – Current cell volume.</p></li>
+<li><p><strong>critical_volume</strong> – Critical cell volume.</p></li>
+<li><p><strong>threshold_fractions</strong> – Critical volume fractions defining threshold between states,
+default = <code class="docutils literal notranslate"><span class="pre">CELL_STATE_THRESHOLD_FRACTIONS</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Cell state.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.get_location_center">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_location_center</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/initial_conditions/convert_arcade.html#ConvertARCADE.get_location_center"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.get_location_center" title="Permalink to this definition"></a></dt>
+<dd><p>Gets coordinates of center of samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>samples</strong> – Sample cell ids and coordinates.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Center voxel.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.convert_arcade.ConvertARCADE.get_location_voxels">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_location_voxels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/initial_conditions/convert_arcade.html#ConvertARCADE.get_location_voxels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.convert_arcade.ConvertARCADE.get_location_voxels" title="Permalink to this definition"></a></dt>
+<dd><p>Get list of voxel coordinates from samples dataframe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples</strong> – Sample cell ids and coordinates.</p></li>
+<li><p><strong>region</strong> – Region key.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of voxel coordinates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
