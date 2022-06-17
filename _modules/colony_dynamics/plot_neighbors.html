@@ -68,6 +68,7 @@
   <h1>Source code for colony_dynamics.plot_neighbors</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">ast</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
@@ -98,13 +99,19 @@
             <span class="n">key_file</span> <span class="o">=</span> <span class="n">make_full_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">load_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">key_file</span><span class="p">)</span>
 
-            <span class="n">results_file</span> <span class="o">=</span> <span class="n">make_full_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="s2">&quot;results&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="p">))</span>
-            <span class="n">results</span> <span class="o">=</span> <span class="n">load_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">results_file</span><span class="p">)</span>
+            <span class="n">all_results</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+                <span class="n">results_file</span> <span class="o">=</span> <span class="n">make_full_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="s2">&quot;results&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">seed</span><span class="p">))</span>
+                <span class="n">key_results</span> <span class="o">=</span> <span class="n">load_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">results_file</span><span class="p">)</span>
+                <span class="n">key_results</span><span class="p">[</span><span class="s2">&quot;KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+                <span class="n">all_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key_results</span><span class="p">)</span>
+
+            <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">all_results</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">KEY</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
                 <span class="n">data</span><span class="o">.</span><span class="n">KEY</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-            <span class="n">join_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="s2">&quot;TICK&quot;</span><span class="p">]</span>
+            <span class="n">join_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="s2">&quot;TICK&quot;</span><span class="p">,</span> <span class="s2">&quot;KEY&quot;</span><span class="p">]</span>
             <span class="n">results</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">join_columns</span><span class="p">)</span>
             <span class="n">results</span> <span class="o">=</span> <span class="n">results</span><span class="p">[[</span><span class="s2">&quot;PHASE&quot;</span><span class="p">]]</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="n">join_columns</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="n">join_columns</span><span class="p">)</span>
