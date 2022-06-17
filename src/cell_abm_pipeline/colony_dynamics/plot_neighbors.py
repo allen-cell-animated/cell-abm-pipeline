@@ -1,5 +1,6 @@
 import ast
 import numpy as np
+import pandas as pd
 from matplotlib import cm
 from tqdm import tqdm
 
@@ -30,13 +31,19 @@ class PlotNeighbors:
             key_file = make_full_key(self.folders, self.files, "input", seed)
             data = load_dataframe(self.context.working, key_file)
 
-            results_file = make_full_key(self.folders, self.files, "results", ("", seed))
-            results = load_dataframe(self.context.working, results_file)
+            all_results = []
+            for key in self.context.keys:
+                results_file = make_full_key(self.folders, self.files, "results", (key, seed))
+                key_results = load_dataframe(self.context.working, results_file)
+                key_results["KEY"] = key
+                all_results.append(key_results)
+
+            results = pd.concat(all_results)
 
             if data.KEY.isnull().values.any():
                 data.KEY = ""
 
-            join_columns = ["ID", "TICK"]
+            join_columns = ["ID", "TICK", "KEY"]
             results = results.set_index(join_columns)
             results = results[["PHASE"]]
             data = data.merge(results, left_on=join_columns, right_on=join_columns)
