@@ -59,14 +59,14 @@ HEIGHT_STDS: Dict[str, float] = {
 
 # Critical height distribution averages.
 CRITICAL_HEIGHT_AVGS: Dict[str, float] = {
-    "DEFAULT": 4.5,
-    "NUCLEUS": 3.25,
+    "DEFAULT": 9,
+    "NUCLEUS": 6.5,
 }
 
 # Critical height distribution standard deviations.
 CRITICAL_HEIGHT_STDS: Dict[str, float] = {
-    "DEFAULT": 1,
-    "NUCLEUS": 0.75,
+    "DEFAULT": 2,
+    "NUCLEUS": 1.5,
 }
 
 # Cell state and phase threshold fractions.
