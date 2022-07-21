@@ -434,7 +434,7 @@ class SampleImages:
         # filter to those falling within a cylindrical sample and
         # offest to fov center
         cell_indices = SampleImages.crop_sample_grid_to_cylinder(
-            sample_indices, cell_radius, cell_height, fov_xysize
+            sample_indices, cell_radius, fov_xysize
         )
 
         return cell_indices
