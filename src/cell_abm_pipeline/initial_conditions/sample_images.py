@@ -391,7 +391,7 @@ class SampleImages:
     @staticmethod
     def get_single_cell_init(
             cell_radius: float, cell_height: float, resolution: float,
-            scale_xy: float, scale_z: 1, fov_xysize: Tuple([int, int])
+            scale_xy: float, scale_z: 1, fov_xysize: Tuple[int, int]
             ) -> List:
         """
         Generates agent positions to initialize a single cylindrical cell at
