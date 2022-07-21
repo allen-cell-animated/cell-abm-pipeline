@@ -373,7 +373,7 @@ class SampleImages:
             in the center of a field of view
         """
 
-        # Get 3D offset for cell within FOV to place cell at xy-center and z bottom
+        # Get 3D offset to place cell at xy-center and z bottom
         fov_offset = (fov_xysize[0]/2 - cell_radius, fov_xysize[1]/2 - cell_radius, 0)
 
         # List of cell indices within fov to fill
@@ -387,9 +387,12 @@ class SampleImages:
                 cell_index = tuple(map(operator.add, sample_index, fov_offset))
                 cell_indices.append(cell_index)
         return cell_indices
-    
+
     @staticmethod
-    def get_single_cell_init(cell_radius: float, cell_height: float, resolution: float, scale_xy: float, scale_z: 1, fov_xysize: Tuple([int, int])) -> List:
+    def get_single_cell_init(
+            cell_radius: float, cell_height: float, resolution: float,
+            scale_xy: float, scale_z: 1, fov_xysize: Tuple([int, int])
+            ) -> List:
         """
         Generates agent positions to initialize a single cylindrical cell at
         the center of an FOV. First, we create a 3D rectangle of points
@@ -397,7 +400,8 @@ class SampleImages:
         cell radius in x and y and the desired cell height in z). Then we
         get the initial conditions for a single cylindrical cell by cropping
         the rectangle of sampled points to a cylinder and offsetting that
-        "cell" to the center (in xy) and bottom (in z) of an FOV frame of a given size 
+        "cell" to the center (in xy) and bottom (in z) of an FOV frame of
+        a given size
 
         Parameters
         ----------
@@ -423,14 +427,14 @@ class SampleImages:
 
         # Get a 3D rectangular grid of hexagonally sampled points
         sample_indices = SampleImages.get_hex_sample_indices(
-            (2*cell_radius, 2*cell_radius, cell_height), resolution, scale_xy, scale_z
+            (2*cell_radius, 2*cell_radius, cell_height),
+            resolution, scale_xy, scale_z
         )
 
-        # filter to those falling within a cylindrical sample and offest to fov center
+        # filter to those falling within a cylindrical sample and
+        # offest to fov center
         cell_indices = SampleImages.crop_sample_grid_to_cylinder(
             sample_indices, cell_radius, cell_height, fov_xysize
         )
 
         return cell_indices
-
-
