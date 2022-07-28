@@ -85,7 +85,7 @@ class FindNeighbors:
         # Create empty array.
         mins = np.min(all_xyz, axis=0)
         maxs = np.max(all_xyz, axis=0)
-        height, width, length = np.subtract(maxs, mins) + 3
+        length, width, height = np.subtract(maxs, mins) + 3
         array = np.zeros((height, width, length), dtype=np.uint16)
 
         # Return if no voxels.
@@ -94,7 +94,7 @@ class FindNeighbors:
 
         # Fill voxel array.
         all_xyz_offset = [
-            (z - mins[0] + 1, y - mins[1] + 1, x - mins[2] + 1) for z, y, x in all_xyz
+            (z - mins[2] + 1, y - mins[1] + 1, x - mins[0] + 1) for x, y, z in all_xyz
         ]
         array[tuple(np.transpose(all_xyz_offset))] = all_ids
 
