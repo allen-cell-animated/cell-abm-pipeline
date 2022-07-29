@@ -46,10 +46,10 @@ scipy = ">=1.4.1"
 vtk = ">=9.0.1"
 
 [package.extras]
-all = ["numpy (>=1.18.1)", "scipy (>=1.4.1)", "scikit-image (>=0.16.2)", "scikit-learn (>=0.22.1)", "vtk (>=9.0.1)", "pyshtools (>=4.5)", "pytest-runner (>=5.2)", "black (>=19.10b0)", "codecov (>=2.1.4)", "flake8 (>=3.8.3)", "flake8-debugger (>=3.2.1)", "pytest (>=5.4.3)", "pytest-cov (>=2.9.0)", "pytest-raises (>=0.11)", "bump2version (>=1.0.1)", "coverage (>=5.1)", "ipython (>=7.15.0)", "m2r2 (>=0.2.7)", "Sphinx (>=3.4.3)", "sphinx-rtd-theme (>=0.5.1)", "tox (>=3.15.2)", "twine (>=3.1.1)", "wheel (>=0.34.2)"]
-dev = ["pytest-runner (>=5.2)", "black (>=19.10b0)", "codecov (>=2.1.4)", "flake8 (>=3.8.3)", "flake8-debugger (>=3.2.1)", "pytest (>=5.4.3)", "pytest-cov (>=2.9.0)", "pytest-raises (>=0.11)", "bump2version (>=1.0.1)", "coverage (>=5.1)", "ipython (>=7.15.0)", "m2r2 (>=0.2.7)", "Sphinx (>=3.4.3)", "sphinx-rtd-theme (>=0.5.1)", "tox (>=3.15.2)", "twine (>=3.1.1)", "wheel (>=0.34.2)"]
+test = ["pytest-raises (>=0.11)", "pytest-cov (>=2.9.0)", "pytest (>=5.4.3)", "flake8-debugger (>=3.2.1)", "flake8 (>=3.8.3)", "codecov (>=2.1.4)", "black (>=19.10b0)"]
 setup = ["pytest-runner (>=5.2)"]
-test = ["black (>=19.10b0)", "codecov (>=2.1.4)", "flake8 (>=3.8.3)", "flake8-debugger (>=3.2.1)", "pytest (>=5.4.3)", "pytest-cov (>=2.9.0)", "pytest-raises (>=0.11)"]
+dev = ["wheel (>=0.34.2)", "twine (>=3.1.1)", "tox (>=3.15.2)", "sphinx-rtd-theme (>=0.5.1)", "Sphinx (>=3.4.3)", "m2r2 (>=0.2.7)", "ipython (>=7.15.0)", "coverage (>=5.1)", "bump2version (>=1.0.1)", "pytest-raises (>=0.11)", "pytest-cov (>=2.9.0)", "pytest (>=5.4.3)", "flake8-debugger (>=3.2.1)", "flake8 (>=3.8.3)", "codecov (>=2.1.4)", "black (>=19.10b0)", "pytest-runner (>=5.2)"]
+all = ["wheel (>=0.34.2)", "twine (>=3.1.1)", "tox (>=3.15.2)", "sphinx-rtd-theme (>=0.5.1)", "Sphinx (>=3.4.3)", "m2r2 (>=0.2.7)", "ipython (>=7.15.0)", "coverage (>=5.1)", "bump2version (>=1.0.1)", "pytest-raises (>=0.11)", "pytest-cov (>=2.9.0)", "pytest (>=5.4.3)", "flake8-debugger (>=3.2.1)", "flake8 (>=3.8.3)", "codecov (>=2.1.4)", "black (>=19.10b0)", "pytest-runner (>=5.2)", "pyshtools (>=4.5)", "vtk (>=9.0.1)", "scikit-learn (>=0.22.1)", "scikit-image (>=0.16.2)", "scipy (>=1.4.1)", "numpy (>=1.18.1)"]
 
 [[package]]
 name = "aiobotocore"
@@ -444,7 +444,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "dask"
-version = "2022.6.1"
+version = "2022.7.1"
 description = "Parallel PyData with Task Scheduling"
 category = "main"
 optional = false
@@ -461,10 +461,10 @@ toolz = ">=0.8.2"
 
 [package.extras]
 array = ["numpy (>=1.18)"]
-complete = ["bokeh (>=2.4.2)", "distributed (==2022.6.1)", "jinja2", "numpy (>=1.18)", "pandas (>=1.0)"]
+complete = ["bokeh (>=2.4.2)", "distributed (==2022.7.1)", "jinja2", "numpy (>=1.18)", "pandas (>=1.0)"]
 dataframe = ["numpy (>=1.18)", "pandas (>=1.0)"]
 diagnostics = ["bokeh (>=2.4.2)", "jinja2"]
-distributed = ["distributed (==2022.6.1)"]
+distributed = ["distributed (==2022.7.1)"]
 test = ["pytest", "pytest-rerunfailures", "pytest-xdist", "pre-commit"]
 
 [[package]]
@@ -1148,7 +1148,7 @@ python-versions = "*"
 
 [[package]]
 name = "mistune"
-version = "2.0.2"
+version = "2.0.3"
 description = "A sane Markdown parser with useful plugins and renderers"
 category = "main"
 optional = false
@@ -1314,7 +1314,7 @@ python-versions = ">=3.7"
 jupyter-server = ">=1.8,<2.0"
 
 [package.extras]
-test = ["pytest", "pytest-tornasync", "pytest-console-scripts"]
+test = ["pytest-console-scripts", "pytest-tornasync", "pytest"]
 
 [[package]]
 name = "numcodecs"
@@ -1420,7 +1420,7 @@ locket = "*"
 toolz = "*"
 
 [package.extras]
-complete = ["numpy (>=1.9.0)", "pandas (>=0.19.0)", "pyzmq", "blosc"]
+complete = ["blosc", "pyzmq", "pandas (>=0.19.0)", "numpy (>=1.9.0)"]
 
 [[package]]
 name = "pathspec"
@@ -1494,8 +1494,8 @@ optional = false
 python-versions = ">=3.6"
 
 [package.extras]
-dev = ["pre-commit", "tox"]
-testing = ["pytest", "pytest-benchmark"]
+testing = ["pytest-benchmark", "pytest"]
+dev = ["tox", "pre-commit"]
 
 [[package]]
 name = "pooch"
@@ -1511,9 +1511,9 @@ packaging = ">=20.0"
 requests = ">=2.19.0"
 
 [package.extras]
-progress = ["tqdm (>=4.41.0,<5.0.0)"]
-sftp = ["paramiko (>=2.7.0)"]
 xxhash = ["xxhash (>=1.4.3)"]
+sftp = ["paramiko (>=2.7.0)"]
+progress = ["tqdm (>=4.41.0,<5.0.0)"]
 
 [[package]]
 name = "prometheus-client"
@@ -1816,7 +1816,7 @@ python-versions = ">=3.6"
 packaging = "*"
 
 [package.extras]
-test = ["pytest (>=6.0.0)", "pytest-cov (>=3.0.0)", "pytest-qt"]
+test = ["pytest-qt", "pytest-cov (>=3.0.0)", "pytest (>=6.0.0)"]
 
 [[package]]
 name = "quilt3"
@@ -1942,10 +1942,10 @@ scipy = ">=1.1.0"
 threadpoolctl = ">=2.0.0"
 
 [package.extras]
-benchmark = ["matplotlib (>=2.2.3)", "pandas (>=0.25.0)", "memory-profiler (>=0.57.0)"]
-docs = ["matplotlib (>=2.2.3)", "scikit-image (>=0.14.5)", "pandas (>=0.25.0)", "seaborn (>=0.9.0)", "memory-profiler (>=0.57.0)", "sphinx (>=4.0.1)", "sphinx-gallery (>=0.7.0)", "numpydoc (>=1.0.0)", "Pillow (>=7.1.2)", "sphinx-prompt (>=1.3.0)", "sphinxext-opengraph (>=0.4.2)"]
-examples = ["matplotlib (>=2.2.3)", "scikit-image (>=0.14.5)", "pandas (>=0.25.0)", "seaborn (>=0.9.0)"]
-tests = ["matplotlib (>=2.2.3)", "scikit-image (>=0.14.5)", "pandas (>=0.25.0)", "pytest (>=5.0.1)", "pytest-cov (>=2.9.0)", "flake8 (>=3.8.2)", "black (>=21.6b0)", "mypy (>=0.770)", "pyamg (>=4.0.0)"]
+tests = ["pyamg (>=4.0.0)", "mypy (>=0.770)", "black (>=21.6b0)", "flake8 (>=3.8.2)", "pytest-cov (>=2.9.0)", "pytest (>=5.0.1)", "pandas (>=0.25.0)", "scikit-image (>=0.14.5)", "matplotlib (>=2.2.3)"]
+examples = ["seaborn (>=0.9.0)", "pandas (>=0.25.0)", "scikit-image (>=0.14.5)", "matplotlib (>=2.2.3)"]
+docs = ["sphinxext-opengraph (>=0.4.2)", "sphinx-prompt (>=1.3.0)", "Pillow (>=7.1.2)", "numpydoc (>=1.0.0)", "sphinx-gallery (>=0.7.0)", "sphinx (>=4.0.1)", "memory-profiler (>=0.57.0)", "seaborn (>=0.9.0)", "pandas (>=0.25.0)", "scikit-image (>=0.14.5)", "matplotlib (>=2.2.3)"]
+benchmark = ["memory-profiler (>=0.57.0)", "pandas (>=0.25.0)", "matplotlib (>=2.2.3)"]
 
 [[package]]
 name = "scipy"
@@ -1967,9 +1967,9 @@ optional = false
 python-versions = "*"
 
 [package.extras]
-nativelib = ["pyobjc-framework-cocoa", "pywin32"]
-objc = ["pyobjc-framework-cocoa"]
 win32 = ["pywin32"]
+objc = ["pyobjc-framework-cocoa"]
+nativelib = ["pywin32", "pyobjc-framework-cocoa"]
 
 [[package]]
 name = "setuptools-scm"
@@ -2105,7 +2105,7 @@ docutils = "<0.18"
 sphinx = ">=1.6"
 
 [package.extras]
-dev = ["transifex-client", "sphinxcontrib-httpdomain", "bump2version"]
+dev = ["bump2version", "sphinxcontrib-httpdomain", "transifex-client"]
 
 [[package]]
 name = "sphinxcontrib-applehelp"
@@ -2116,8 +2116,8 @@ optional = false
 python-versions = ">=3.5"
 
 [package.extras]
-lint = ["flake8", "mypy", "docutils-stubs"]
 test = ["pytest"]
+lint = ["docutils-stubs", "mypy", "flake8"]
 
 [[package]]
 name = "sphinxcontrib-devhelp"
@@ -2128,8 +2128,8 @@ optional = false
 python-versions = ">=3.5"
 
 [package.extras]
-lint = ["flake8", "mypy", "docutils-stubs"]
 test = ["pytest"]
+lint = ["docutils-stubs", "mypy", "flake8"]
 
 [[package]]
 name = "sphinxcontrib-htmlhelp"
@@ -2140,8 +2140,8 @@ optional = false
 python-versions = ">=3.6"
 
 [package.extras]
-lint = ["flake8", "mypy", "docutils-stubs"]
-test = ["pytest", "html5lib"]
+test = ["html5lib", "pytest"]
+lint = ["docutils-stubs", "mypy", "flake8"]
 
 [[package]]
 name = "sphinxcontrib-jsmath"
@@ -2152,7 +2152,7 @@ optional = false
 python-versions = ">=3.5"
 
 [package.extras]
-test = ["pytest", "flake8", "mypy"]
+test = ["mypy", "flake8", "pytest"]
 
 [[package]]
 name = "sphinxcontrib-qthelp"
@@ -2163,8 +2163,8 @@ optional = false
 python-versions = ">=3.5"
 
 [package.extras]
-lint = ["flake8", "mypy", "docutils-stubs"]
 test = ["pytest"]
+lint = ["docutils-stubs", "mypy", "flake8"]
 
 [[package]]
 name = "sphinxcontrib-serializinghtml"
@@ -2192,7 +2192,7 @@ executing = "*"
 pure-eval = "*"
 
 [package.extras]
-tests = ["pytest", "typeguard", "pygments", "littleutils", "cython"]
+tests = ["cython", "littleutils", "pygments", "typeguard", "pytest"]
 
 [[package]]
 name = "tenacity"
@@ -2430,9 +2430,9 @@ optional = false
 python-versions = ">=3.6"
 
 [package.extras]
-docs = ["Sphinx (>=3.4)", "sphinx-rtd-theme (>=0.5)"]
-optional = ["python-socks", "wsaccel"]
 test = ["websockets"]
+optional = ["wsaccel", "python-socks"]
+docs = ["sphinx-rtd-theme (>=0.5)", "Sphinx (>=3.4)"]
 
 [[package]]
 name = "widgetsnbextension"
@@ -2896,8 +2896,8 @@ cycler = [
     {file = "cycler-0.11.0.tar.gz", hash = "sha256:9c87405839a19696e837b3b818fed3f5f69f16f1eec1a1ad77e043dcea9c772f"},
 ]
 dask = [
-    {file = "dask-2022.6.1-py3-none-any.whl", hash = "sha256:fbd2707070ee8cba080a297301c3984de3d0dee211f30c81387d5fa8adc7de74"},
-    {file = "dask-2022.6.1.tar.gz", hash = "sha256:6ecc4571da3e5575dd1fa1537237434908f81b929f7f2a3493a7f6eb8507903e"},
+    {file = "dask-2022.7.1-py3-none-any.whl", hash = "sha256:501bdd2fc3f7bce7a42f4cb85a7883e831d45ce1c2be2465e5e687f9e9d35d74"},
+    {file = "dask-2022.7.1.tar.gz", hash = "sha256:a3972489c46456e54070fe140a2178e002c2e96912ed9ef85c3896b74f469194"},
 ]
 debugpy = [
     {file = "debugpy-1.5.1-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:70b422c63a833630c33e3f9cdbd9b6971f8c5afd452697e464339a21bbe862ba"},
@@ -3406,8 +3406,8 @@ mccabe = [
     {file = "mccabe-0.6.1.tar.gz", hash = "sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f"},
 ]
 mistune = [
-    {file = "mistune-2.0.2-py2.py3-none-any.whl", hash = "sha256:6bab6c6abd711c4604206c7d8cad5cd48b28f072b4bb75797d74146ba393a049"},
-    {file = "mistune-2.0.2.tar.gz", hash = "sha256:6fc88c3cb49dba8b16687b41725e661cf85784c12e8974a29b9d336dd596c3a1"},
+    {file = "mistune-2.0.3-py2.py3-none-any.whl", hash = "sha256:e3964140c0775535fba50bd616fe180920044a64bc21850253267b07bff89924"},
+    {file = "mistune-2.0.3.tar.gz", hash = "sha256:d7605b46b6156b53b7d52a465202b29a6f00f4ea4130ad5d25e9d5547d6b7e50"},
 ]
 multidict = [
     {file = "multidict-6.0.2-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:0b9e95a740109c6047602f4db4da9949e6c5945cefbad34a1299775ddc9a62e2"},
