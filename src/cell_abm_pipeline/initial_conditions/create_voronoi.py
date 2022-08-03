@@ -1,4 +1,5 @@
 from typing import List, Tuple, Optional
+from math import floor
 
 import numpy as np
 from scipy.ndimage import distance_transform_edt, binary_dilation, binary_fill_holes
@@ -102,8 +103,11 @@ class CreateVoronoi:
 
         # Create artificial boundary for voronoi.
         mask = self.create_boundary_mask(array, iterations)
+        lower_bound, upper_bound = self.adjust_mask_bounds(array, height)
         mask_id = np.iinfo(array.dtype).max
         array[mask == 0] = mask_id
+        mask[:lower_bound, :, :] = 0
+        mask[upper_bound:, :, :] = 0
 
         # Calculate voronoi on bounded array.
         zslice, yslice, xslice = self.get_array_slices(mask)
@@ -145,6 +149,22 @@ class CreateVoronoi:
             binary_fill_holes(mask[z, :, :], output=mask[z, :, :])
 
         return mask
+
+    @staticmethod
+    def adjust_mask_bounds(array: np.ndarray, target_height: int) -> Tuple[int, int]:
+        lower_bound, upper_bound = np.where(np.any(array, axis=(1, 2)))[0][[0, -1]]
+        current_height = upper_bound - lower_bound + 1
+
+        if current_height < target_height:
+            height_delta = target_height - current_height
+            lower_offset = floor(height_delta / 2)
+            upper_offset = height_delta - lower_offset
+            lower_bound = lower_bound - lower_offset
+            upper_bound = upper_bound + upper_offset + 1
+        else:
+            upper_bound = upper_bound + 1
+
+        return (lower_bound, upper_bound)
 
     @staticmethod
     def get_array_slices(array: np.ndarray) -> Tuple[slice, slice, slice]:
