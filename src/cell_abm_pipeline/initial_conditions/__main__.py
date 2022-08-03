@@ -147,7 +147,7 @@ def process_samples(obj, **kwargs):
     "-i",
     "--iterations",
     type=int,
-    default=10,
+    default=2,
     help="Number of boundary estimation steps.",
     show_default=True,
 )
@@ -158,6 +158,14 @@ def process_samples(obj, **kwargs):
     multiple=True,
     default=[0],
     help="Image channel indices.",
+    show_default=True,
+)
+@click.option(
+    "-h",
+    "--height",
+    type=int,
+    default=10,
+    help="Target height for tesselation.",
     show_default=True,
 )
 @click.pass_obj

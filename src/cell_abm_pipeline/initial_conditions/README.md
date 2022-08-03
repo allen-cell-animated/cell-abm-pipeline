@@ -88,8 +88,9 @@ Usage: initial-conditions create-voronoi [OPTIONS]
   Create Voronoi tessellation from given starting image.
 
 Options:
-  -i, --iterations INTEGER  Number of boundary estimation steps  [default: 10]
+  -i, --iterations INTEGER  Number of boundary estimation steps.  [default: 2]
   -c, --channels INTEGER    Image channel indices.  [default: 0]
+  -h, --height INTEGER      Target height for tesselation.  [default: 10]
   --help                    Show this message and exit.
 ```
 

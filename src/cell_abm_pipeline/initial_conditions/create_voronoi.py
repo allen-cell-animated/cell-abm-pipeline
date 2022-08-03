@@ -53,7 +53,9 @@ class CreateVoronoi:
             "output": make_file_key(context.name, ["ome", "tiff"], "%s", "%02d_voronoi"),
         }
 
-    def run(self, iterations: int = 10, channels: Optional[List[int]] = None) -> None:
+    def run(
+        self, iterations: int = 2, channels: Optional[List[int]] = None, height: int = 10
+    ) -> None:
         """
         Runs create voronoi task for given context.
 
@@ -63,21 +65,24 @@ class CreateVoronoi:
             Number of boundary estimation steps.
         channels
             Image channel indices.
+        height
+            Target height for tesselation.
         """
         if channels is None:
             channels = [0]
 
         for key in self.context.keys:
             for channel in channels:
-                self.create_voronoi(key, iterations, channel)
+                self.create_voronoi(key, iterations, channel, height)
 
-    def create_voronoi(self, key: str, iterations: int, channel: int) -> None:
+    def create_voronoi(self, key: str, iterations: int, channel: int, height: int) -> None:
         """
         Create Voronoi task.
 
         Loads image from working location.
-        Creates boundary for Voronoi using binary dilation, then performs
-        the Voronoi tessellation using the selected channel of the image.
+        Creates boundary for Voronoi using binary dilation, clamped to the
+        target height, then performs the Voronoi tessellation using the selected
+        channel of the image.
 
         Parameters
         ----------
@@ -87,6 +92,8 @@ class CreateVoronoi:
             Number of boundary estimation steps.
         channel
             Image channel index.
+        height
+            Target height for tesselation.
         """
         image_key = make_full_key(self.folders, self.files, "image", key)
         image = load_image(self.context.working, image_key)
