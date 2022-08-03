@@ -10,11 +10,12 @@ Options:
   --help              Show this message and exit.
 
 Commands:
-  convert-arcade   Convert samples into ARCADE input formats.
-  create-voronoi   Create Voronoi tessellation from given starting image.
-  download-images  Download images from Quilt package.
-  process-samples  Process samples with selected processing steps.
-  sample-images    Sample cell ids and coordinates from images.
+  convert-arcade        Convert samples into ARCADE input formats.
+  create-voronoi        Create Voronoi tessellation from given starting...
+  download-images       Download images from Quilt package.
+  generate-coordinates  Generate cell ids and coordinates.
+  process-samples       Process samples with selected processing steps.
+  sample-images         Sample cell ids and coordinates from images.
 ```
 
 All modules require a `Context` object that defines the working context.
@@ -35,6 +36,24 @@ Usage: initial-conditions download-images [OPTIONS]
 
 Options:
   -n, --num-images INTEGER  Number of images to download.  [default: 0]
+  --help                    Show this message and exit.
+```
+
+## Generate cell ids and coordinates
+
+The `GenerateCoordinates` module can be called via CLI using:
+
+```
+Usage: initial-conditions generate-coordinates [OPTIONS]
+
+  Generate cell ids and coordinates.
+
+Options:
+  -g, --grid [rect|hex]     Type of sampling grid.  [default: rect]
+  --ds FLOAT                Distance between elements in um.  [default: 1.0]
+  --box INTEGER...          Bounding box size in um.  [default: 100, 100, 10]
+  --contact / --no-contact  True if contact sheet of images is saved, False
+                            otherwise. [default: True]
   --help                    Show this message and exit.
 ```
 
