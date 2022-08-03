@@ -12,7 +12,7 @@ from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, mak
 
 class CreateVoronoi:
     """
-    Task to create Voronoi tessellation from given starting image.
+    Task to create Voronoi tessellation from starting image.
 
     Working location structure for a given context:
 
