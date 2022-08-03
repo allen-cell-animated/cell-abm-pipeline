@@ -108,7 +108,7 @@ class TestCreateVoronoi(unittest.TestCase):
         lower_bound = 7
         upper_bound = 11
         array = np.zeros((20, 1, 1))
-        array[lower_bound:upper_bound + 1,:,:] = 1
+        array[lower_bound : upper_bound + 1, :, :] = 1
         target_height = upper_bound - lower_bound + 1
 
         expected_bounds = (lower_bound, upper_bound + 1)
@@ -119,7 +119,7 @@ class TestCreateVoronoi(unittest.TestCase):
         lower_bound = 7
         upper_bound = 11
         array = np.zeros((20, 1, 1))
-        array[lower_bound:upper_bound + 1,:,:] = 1
+        array[lower_bound : upper_bound + 1, :, :] = 1
         target_height = upper_bound - lower_bound + 4
 
         expected_bounds = (lower_bound - 1, upper_bound + 3)
