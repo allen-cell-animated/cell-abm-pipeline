@@ -1,16 +1,13 @@
-from math import floor, sqrt
 from typing import List, Tuple, Optional
-import operator
 
-import numpy as np
 import pandas as pd
-from hexalattice.hexalattice import create_hex_grid
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from aicsimageio import AICSImage
 
 from cell_abm_pipeline.initial_conditions.__config__ import SCALE_MICRONS_XY, SCALE_MICRONS_Z
 from cell_abm_pipeline.initial_conditions.__main__ import Context
+from cell_abm_pipeline.initial_conditions.generate_coordinates import GenerateCoordinates
 from cell_abm_pipeline.utilities.load import load_dataframe, load_image
 from cell_abm_pipeline.utilities.save import save_dataframe, save_plot
 from cell_abm_pipeline.utilities.keys import make_folder_key, make_file_key, make_full_key
@@ -263,30 +260,13 @@ class SampleImages:
         :
             List of sample indices.
         """
-        x_bound, y_bound, z_bound = bounds
-
         z_increment = round(resolution / scale_z)
-        z_indices = np.arange(0, z_bound, z_increment)
-        z_offsets = [(i % 3) for i in range(len(z_indices))]
-
         xy_increment = round(resolution / scale_xy)
-        xy_indices, _ = create_hex_grid(
-            nx=floor(x_bound / xy_increment),
-            ny=floor(y_bound / xy_increment * sqrt(3)),
-            min_diam=xy_increment,
-            align_to_origin=False,
-            do_plot=False,
+
+        sample_coordinates = GenerateCoordinates.make_hex_coordinates(
+            bounds, xy_increment, z_increment
         )
-
-        x_offsets = [(xy_increment / 2) if z_offset == 1 else 0 for z_offset in z_offsets]
-        y_offsets = [(xy_increment / 2) * sqrt(3) / 3 * z_offset for z_offset in z_offsets]
-
-        sample_indices = [
-            (round(x + x_offset), round(y + y_offset), z)
-            for z, x_offset, y_offset in zip(z_indices, x_offsets, y_offsets)
-            for x, y in xy_indices
-            if round(x + x_offset) < x_bound and round(y + y_offset) < y_bound
-        ]
+        sample_indices = [(round(x), round(y), z) for x, y, z in sample_coordinates]
 
         return sample_indices
 
@@ -313,15 +293,14 @@ class SampleImages:
         :
             List of sample indices.
         """
-        x_bound, y_bound, z_bound = bounds
         z_increment = round(resolution / scale_z)
-        z_indices = np.arange(0, z_bound, z_increment)
-
         xy_increment = round(resolution / scale_xy)
-        x_indices = np.arange(0, x_bound, xy_increment)
-        y_indices = np.arange(0, y_bound, xy_increment)
 
-        sample_indices = [(x, y, z) for z in z_indices for x in x_indices for y in y_indices]
+        sample_coordinates = GenerateCoordinates.make_rect_coordinates(
+            bounds, xy_increment, z_increment
+        )
+        sample_indices = [(round(x), round(y), z) for x, y, z in sample_coordinates]
+
         return sample_indices
 
     @staticmethod
