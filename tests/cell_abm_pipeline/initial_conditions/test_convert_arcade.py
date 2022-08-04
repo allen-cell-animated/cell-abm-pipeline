@@ -344,17 +344,15 @@ class TestConvertARCADE(unittest.TestCase):
     def test_convert_to_cell_no_reference_no_region(
         self, get_cell_state, get_cell_critical_height, get_cell_critical_volume
     ):
-        critical_volume = 1000
-        critical_height = 1000
-        state = "STATE_PHASE"
-
-        get_cell_critical_volume.return_value = critical_volume
-        get_cell_critical_height.return_value = critical_height
-        get_cell_state.return_value = state
-
         cell_id = 10
+        state = "STATE_PHASE"
         num_samples = 100
+
         samples = pd.DataFrame(np.zeros((num_samples, 4)), columns=["id", "x", "y", "z"])
+
+        get_cell_critical_volume.side_effect = lambda v, *args: len(v) / 2
+        get_cell_critical_height.side_effect = lambda v, *args: len(v) / 3
+        get_cell_state.return_value = state
 
         expected_cell = {
             "id": cell_id,
@@ -365,7 +363,7 @@ class TestConvertARCADE(unittest.TestCase):
             "state": "STATE",
             "phase": "STATE_PHASE",
             "voxels": num_samples,
-            "criticals": [critical_volume, critical_height],
+            "criticals": [num_samples / 2, num_samples / 3],
         }
 
         cell = ConvertARCADE.convert_to_cell(cell_id, samples, {})
@@ -375,9 +373,6 @@ class TestConvertARCADE(unittest.TestCase):
     def test_convert_to_cell_with_reference_no_region(self, get_cell_state):
         critical_volume = 1500
         critical_height = 20
-        state = "STATE_PHASE"
-
-        get_cell_state.return_value = state
 
         reference = {
             "volume": critical_volume,
@@ -385,8 +380,11 @@ class TestConvertARCADE(unittest.TestCase):
         }
 
         cell_id = 10
+        state = "STATE_PHASE"
         num_samples = 100
         samples = pd.DataFrame(np.zeros((num_samples, 4)), columns=["id", "x", "y", "z"])
+
+        get_cell_state.return_value = state
 
         expected_cell = {
             "id": cell_id,
@@ -410,30 +408,20 @@ class TestConvertARCADE(unittest.TestCase):
     def test_convert_to_cell_no_reference_with_region(
         self, get_cell_state, get_cell_critical_height, get_cell_critical_volume
     ):
+        cell_id = 10
+        state = "STATE_PHASE"
         region_a = "REGION_A"
         region_b = "REGION_B"
-        critical_volume = 1000
-        critical_volumes = {region_a: 500, region_b: 600}
-        critical_height = 100
-        critical_heights = {region_a: 50, region_b: 60}
-
-        get_cell_critical_volume.side_effect = (
-            lambda v, *args: critical_volumes[args[0]] if args else critical_volume
-        )
-
-        get_cell_critical_height.side_effect = (
-            lambda v, *args: critical_heights[args[0]] if args else critical_height
-        )
-
-        state = "STATE_PHASE"
-        get_cell_state.return_value = state
-
-        cell_id = 10
         num_samples = 100
         num_samples_region_a = 60
         num_samples_region_b = 40
+
         samples = pd.DataFrame(np.zeros((num_samples, 4)), columns=["id", "x", "y", "z"])
         samples["region"] = [region_a] * num_samples_region_a + [region_b] * num_samples_region_b
+
+        get_cell_critical_volume.side_effect = lambda v, *args: len(v) / 2
+        get_cell_critical_height.side_effect = lambda v, *args: len(v) / 3
+        get_cell_state.return_value = state
 
         expected_cell = {
             "id": cell_id,
@@ -444,17 +432,17 @@ class TestConvertARCADE(unittest.TestCase):
             "state": "STATE",
             "phase": "STATE_PHASE",
             "voxels": num_samples,
-            "criticals": [critical_volume, critical_height],
+            "criticals": [num_samples / 2, num_samples / 3],
             "regions": [
                 {
                     "region": region_a,
                     "voxels": num_samples_region_a,
-                    "criticals": [critical_volumes[region_a], critical_heights[region_a]],
+                    "criticals": [num_samples_region_a / 2, num_samples_region_a / 3],
                 },
                 {
                     "region": region_b,
                     "voxels": num_samples_region_b,
-                    "criticals": [critical_volumes[region_b], critical_heights[region_b]],
+                    "criticals": [num_samples_region_b / 2, num_samples_region_b / 3],
                 },
             ],
         }
@@ -471,9 +459,6 @@ class TestConvertARCADE(unittest.TestCase):
         critical_height = 100
         critical_heights = {region_a: 50, region_b: 60}
 
-        state = "STATE_PHASE"
-        get_cell_state.return_value = state
-
         reference = {
             "volume": critical_volume,
             "height": critical_height,
@@ -484,11 +469,14 @@ class TestConvertARCADE(unittest.TestCase):
         }
 
         cell_id = 10
+        state = "STATE_PHASE"
         num_samples = 100
         num_samples_region_a = 60
         num_samples_region_b = 40
         samples = pd.DataFrame(np.zeros((num_samples, 4)), columns=["id", "x", "y", "z"])
         samples["region"] = [region_a] * num_samples_region_a + [region_b] * num_samples_region_b
+
+        get_cell_state.return_value = state
 
         expected_cell = {
             "id": cell_id,
