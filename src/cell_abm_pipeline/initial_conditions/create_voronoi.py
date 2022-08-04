@@ -51,7 +51,7 @@ class CreateVoronoi:
         }
         self.files = {
             "image": make_file_key(context.name, ["ome", "tiff"], "%s", ""),
-            "output": make_file_key(context.name, ["ome", "tiff"], "%s", "%02d_voronoi"),
+            "output": make_file_key(context.name, ["tiff"], "%s", "%02d_voronoi"),
         }
 
     def run(
