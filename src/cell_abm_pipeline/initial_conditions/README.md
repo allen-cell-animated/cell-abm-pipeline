@@ -10,11 +10,12 @@ Options:
   --help              Show this message and exit.
 
 Commands:
-  convert-arcade   Convert samples into ARCADE input formats.
-  create-voronoi   Create Voronoi tessellation from starting image.
-  download-images  Download images from Quilt package.
-  process-samples  Process samples with selected processing steps.
-  sample-images    Sample cell ids and coordinates from images.
+  convert-arcade        Convert samples into ARCADE input formats.
+  create-voronoi        Create Voronoi tessellation from given starting...
+  download-images       Download images from Quilt package.
+  generate-coordinates  Generate cell ids and coordinates.
+  process-samples       Process samples with selected processing steps.
+  sample-images         Sample cell ids and coordinates from images.
 ```
 
 All modules require a `Context` object that defines the working context.
