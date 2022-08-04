@@ -67,6 +67,7 @@
              
   <h1>Source code for initial_conditions.create_voronoi</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">floor</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">distance_transform_edt</span><span class="p">,</span> <span class="n">binary_dilation</span><span class="p">,</span> <span class="n">binary_fill_holes</span>
@@ -79,7 +80,7 @@
 
 <div class="viewcode-block" id="CreateVoronoi"><a class="viewcode-back" href="../../initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi">[docs]</a><span class="k">class</span> <span class="nc">CreateVoronoi</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Task to create Voronoi tessellation from given starting image.</span>
+<span class="sd">    Task to create Voronoi tessellation from starting image.</span>
 
 <span class="sd">    Working location structure for a given context:</span>
 
@@ -118,10 +119,12 @@
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;ome&quot;</span><span class="p">,</span> <span class="s2">&quot;tiff&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-            <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;ome&quot;</span><span class="p">,</span> <span class="s2">&quot;tiff&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%02d</span><span class="s2">_voronoi&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;tiff&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%02d</span><span class="s2">_voronoi&quot;</span><span class="p">),</span>
         <span class="p">}</span>
 
-<div class="viewcode-block" id="CreateVoronoi.run"><a class="viewcode-back" href="../../initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">channels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="CreateVoronoi.run"><a class="viewcode-back" href="../../initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">channels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Runs create voronoi task for given context.</span>
 
@@ -131,21 +134,24 @@
 <span class="sd">            Number of boundary estimation steps.</span>
 <span class="sd">        channels</span>
 <span class="sd">            Image channel indices.</span>
+<span class="sd">        height</span>
+<span class="sd">            Target height for tesselation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">channels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">channels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">create_voronoi</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create_voronoi</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CreateVoronoi.create_voronoi"><a class="viewcode-back" href="../../initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi.create_voronoi">[docs]</a>    <span class="k">def</span> <span class="nf">create_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">channel</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="CreateVoronoi.create_voronoi"><a class="viewcode-back" href="../../initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi.create_voronoi">[docs]</a>    <span class="k">def</span> <span class="nf">create_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">channel</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create Voronoi task.</span>
 
 <span class="sd">        Loads image from working location.</span>
-<span class="sd">        Creates boundary for Voronoi using binary dilation, then performs</span>
-<span class="sd">        the Voronoi tessellation using the selected channel of the image.</span>
+<span class="sd">        Creates boundary for Voronoi using binary dilation, clamped to the</span>
+<span class="sd">        target height, then performs the Voronoi tessellation using the selected</span>
+<span class="sd">        channel of the image.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -155,6 +161,8 @@
 <span class="sd">            Number of boundary estimation steps.</span>
 <span class="sd">        channel</span>
 <span class="sd">            Image channel index.</span>
+<span class="sd">        height</span>
+<span class="sd">            Target height for tesselation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">image_key</span> <span class="o">=</span> <span class="n">make_full_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
         <span class="n">image</span> <span class="o">=</span> <span class="n">load_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">image_key</span><span class="p">)</span>
@@ -163,8 +171,11 @@
 
         <span class="c1"># Create artificial boundary for voronoi.</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_boundary_mask</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">iterations</span><span class="p">)</span>
+        <span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjust_mask_bounds</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
         <span class="n">mask_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">max</span>
         <span class="n">array</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask_id</span>
+        <span class="n">mask</span><span class="p">[:</span><span class="n">lower_bound</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">mask</span><span class="p">[</span><span class="n">upper_bound</span><span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="c1"># Calculate voronoi on bounded array.</span>
         <span class="n">zslice</span><span class="p">,</span> <span class="n">yslice</span><span class="p">,</span> <span class="n">xslice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_array_slices</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
@@ -206,6 +217,22 @@
             <span class="n">binary_fill_holes</span><span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="n">z</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">output</span><span class="o">=</span><span class="n">mask</span><span class="p">[</span><span class="n">z</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:])</span>
 
         <span class="k">return</span> <span class="n">mask</span></div>
+
+<div class="viewcode-block" id="CreateVoronoi.adjust_mask_bounds"><a class="viewcode-back" href="../../initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi.adjust_mask_bounds">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">adjust_mask_bounds</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">target_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))[</span><span class="mi">0</span><span class="p">][[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">current_height</span> <span class="o">=</span> <span class="n">upper_bound</span> <span class="o">-</span> <span class="n">lower_bound</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">current_height</span> <span class="o">&lt;</span> <span class="n">target_height</span><span class="p">:</span>
+            <span class="n">height_delta</span> <span class="o">=</span> <span class="n">target_height</span> <span class="o">-</span> <span class="n">current_height</span>
+            <span class="n">lower_offset</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">height_delta</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">upper_offset</span> <span class="o">=</span> <span class="n">height_delta</span> <span class="o">-</span> <span class="n">lower_offset</span>
+            <span class="n">lower_bound</span> <span class="o">=</span> <span class="n">lower_bound</span> <span class="o">-</span> <span class="n">lower_offset</span>
+            <span class="n">upper_bound</span> <span class="o">=</span> <span class="n">upper_bound</span> <span class="o">+</span> <span class="n">upper_offset</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">upper_bound</span> <span class="o">=</span> <span class="n">upper_bound</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CreateVoronoi.get_array_slices"><a class="viewcode-back" href="../../initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi.get_array_slices">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_array_slices</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">slice</span><span class="p">,</span> <span class="nb">slice</span><span class="p">,</span> <span class="nb">slice</span><span class="p">]:</span>
