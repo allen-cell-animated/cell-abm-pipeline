@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>initial_conditions.generate_coordinates module &mdash; Cell agent-based model pipeline VERSION NUMBER X.X.X documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="initial_conditions.process_samples module" href="initial_conditions.process_samples.html" />
+    <link rel="prev" title="initial_conditions.download_images module" href="initial_conditions.download_images.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Cell agent-based model pipeline
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Package modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basic_metrics.html">basic_metrics package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_shape.html">cell_shape package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="colony_dynamics.html">colony_dynamics package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="convert_format.html">convert_format package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="initial_conditions.html">initial_conditions package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="initial_conditions.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="initial_conditions.convert_arcade.html">initial_conditions.convert_arcade module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="initial_conditions.create_voronoi.html">initial_conditions.create_voronoi module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="initial_conditions.download_images.html">initial_conditions.download_images module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">initial_conditions.generate_coordinates module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="initial_conditions.process_samples.html">initial_conditions.process_samples module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="initial_conditions.sample_images.html">initial_conditions.sample_images module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="resource_usage.html">resource_usage package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html">utilities package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Cell agent-based model pipeline</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="modules.html">cell_abm_pipeline</a> &raquo;</li>
+          <li><a href="initial_conditions.html">initial_conditions package</a> &raquo;</li>
+      <li>initial_conditions.generate_coordinates module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/initial_conditions.generate_coordinates.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-initial_conditions.generate_coordinates">
+<span id="initial-conditions-generate-coordinates-module"></span><h1>initial_conditions.generate_coordinates module<a class="headerlink" href="#module-initial_conditions.generate_coordinates" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="initial_conditions.generate_coordinates.GenerateCoordinates">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GenerateCoordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/initial_conditions/generate_coordinates.html#GenerateCoordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.generate_coordinates.GenerateCoordinates" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Task to generate cell ids and coordinates.</p>
+<p>Working location structure for a given context:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>name<span class="o">)</span>
+├── plots
+│    └── plots.COORDINATES
+│        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">1</span><span class="o">)</span>.COORDINATES.png
+│        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">2</span><span class="o">)</span>.COORDINATES.png
+│        ├── ...
+│        └── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key n<span class="o">)</span>.COORDINATES.png
+└── inits
+    └── inits.COORDINATES
+        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">1</span><span class="o">)</span>.COORDINATES.csv
+        ├── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key <span class="m">2</span><span class="o">)</span>.COORDINATES.csv
+        ├── ...
+        └── <span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>image key n<span class="o">)</span>.COORDINATES.csv
+</pre></div>
+</div>
+<p>Generated coordinates are placed into the <strong>inits/inits.GENERATED</strong> directory.
+Corresponding plots are placed into the <strong>plots/plots.GENERATED</strong> directory.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="initial_conditions.generate_coordinates.GenerateCoordinates.context">
+<span class="sig-name descname"><span class="pre">context</span></span><a class="headerlink" href="#initial_conditions.generate_coordinates.GenerateCoordinates.context" title="Permalink to this definition"></a></dt>
+<dd><p><strong>Context</strong> object defining working location and name.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="initial_conditions.generate_coordinates.GenerateCoordinates.folders">
+<span class="sig-name descname"><span class="pre">folders</span></span><a class="headerlink" href="#initial_conditions.generate_coordinates.GenerateCoordinates.folders" title="Permalink to this definition"></a></dt>
+<dd><p>Dictionary of input and output folder keys.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="initial_conditions.generate_coordinates.GenerateCoordinates.files">
+<span class="sig-name descname"><span class="pre">files</span></span><a class="headerlink" href="#initial_conditions.generate_coordinates.GenerateCoordinates.files" title="Permalink to this definition"></a></dt>
+<dd><p>Dictionary of input and output file keys.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.generate_coordinates.GenerateCoordinates.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'rect'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(100,</span> <span class="pre">100,</span> <span class="pre">10)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/initial_conditions/generate_coordinates.html#GenerateCoordinates.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.generate_coordinates.GenerateCoordinates.run" title="Permalink to this definition"></a></dt>
+<dd><p>Runs generate coordinates task for given context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>{'rect'</em><em>, </em><em>'hex'}</em>) – Type of sampling grid.</p></li>
+<li><p><strong>ds</strong> – Distance between elements in um.</p></li>
+<li><p><strong>box</strong> – Bounding box size in um.</p></li>
+<li><p><strong>contact</strong> – True if contact sheet of coordinates is saved, False otherwise.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.generate_coordinates.GenerateCoordinates.generate_coordinates">
+<span class="sig-name descname"><span class="pre">generate_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/initial_conditions/generate_coordinates.html#GenerateCoordinates.generate_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.generate_coordinates.GenerateCoordinates.generate_coordinates" title="Permalink to this definition"></a></dt>
+<dd><p>Generate coordinates task.</p>
+<p>Calculates and generates coordinates inside bounding box, then filters
+out coordinates outside the target radius.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – Key for output coordinates.</p></li>
+<li><p><strong>grid</strong> (<em>{'rect'</em><em>, </em><em>'hex'}</em>) – Type of coordinate grid.</p></li>
+<li><p><strong>ds</strong> – Distance between elements in um.</p></li>
+<li><p><strong>box</strong> – Bounding box size in um.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.generate_coordinates.GenerateCoordinates.plot_contact_sheet">
+<span class="sig-name descname"><span class="pre">plot_contact_sheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/initial_conditions/generate_coordinates.html#GenerateCoordinates.plot_contact_sheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.generate_coordinates.GenerateCoordinates.plot_contact_sheet" title="Permalink to this definition"></a></dt>
+<dd><p>Plot contact sheet for generated coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> – Key for coordinates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.generate_coordinates.GenerateCoordinates.plot_contact_sheet_axes">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">plot_contact_sheet_axes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">matplotlib.axes.Axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/initial_conditions/generate_coordinates.html#GenerateCoordinates.plot_contact_sheet_axes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.generate_coordinates.GenerateCoordinates.plot_contact_sheet_axes" title="Permalink to this definition"></a></dt>
+<dd><p>Plot coordinates for selected z index, colored by id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> – <strong>Axes</strong> instance to plot on.</p></li>
+<li><p><strong>data</strong> – Coordinates data.</p></li>
+<li><p><strong>key</strong> – Index of z slice to plot.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.generate_coordinates.GenerateCoordinates.get_box_coordinates">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_box_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'rect'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span></span></span><a class="reference internal" href="_modules/initial_conditions/generate_coordinates.html#GenerateCoordinates.get_box_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.generate_coordinates.GenerateCoordinates.get_box_coordinates" title="Permalink to this definition"></a></dt>
+<dd><p>Get all possible coordinates within given bounding box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bounds</strong> – Bounds in the x, y, and z directions.</p></li>
+<li><p><strong>grid</strong> (<em>{'rect'</em><em>, </em><em>'hex'}</em>) – Type of sampling grid.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of grid coordinates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.generate_coordinates.GenerateCoordinates.make_rect_coordinates">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">make_rect_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy_increment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_increment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span></span></span><a class="reference internal" href="_modules/initial_conditions/generate_coordinates.html#GenerateCoordinates.make_rect_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.generate_coordinates.GenerateCoordinates.make_rect_coordinates" title="Permalink to this definition"></a></dt>
+<dd><p>Get list of bounded (x, y, z) coordinates for rect grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bounds</strong> – Bounds in the x, y, and z directions.</p></li>
+<li><p><strong>xy_increment</strong> – Increment size in x/y.</p></li>
+<li><p><strong>z_increment</strong> – Increment size in z.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of grid coordinates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.generate_coordinates.GenerateCoordinates.make_hex_coordinates">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">make_hex_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy_increment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_increment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span></span></span><a class="reference internal" href="_modules/initial_conditions/generate_coordinates.html#GenerateCoordinates.make_hex_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.generate_coordinates.GenerateCoordinates.make_hex_coordinates" title="Permalink to this definition"></a></dt>
+<dd><p>Get list of bounded (x, y, z) coordinates for hex grid.</p>
+<p>Coordinates are offset in sets of three z slices to form a face-centered
+cubic (FCC) packing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bounds</strong> – Bounds in the x, y, and z directions.</p></li>
+<li><p><strong>xy_increment</strong> – Increment size in x/y.</p></li>
+<li><p><strong>z_increment</strong> – Increment size in z.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of grid coordinates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="initial_conditions.generate_coordinates.GenerateCoordinates.transform_cell_coordinates">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform_cell_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coordinates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offsets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span></span></span><a class="reference internal" href="_modules/initial_conditions/generate_coordinates.html#GenerateCoordinates.transform_cell_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#initial_conditions.generate_coordinates.GenerateCoordinates.transform_cell_coordinates" title="Permalink to this definition"></a></dt>
+<dd><p>Filters list for coordinates with given radius and applies offset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coordinates</strong> – List of (x, y, z) coordinates.</p></li>
+<li><p><strong>radius</strong> – Maximum valid radius of coordinate.</p></li>
+<li><p><strong>offsets</strong> – Coordinate offsets in the x and y directions.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Filtered list of coordinates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="initial_conditions.download_images.html" class="btn btn-neutral float-left" title="initial_conditions.download_images module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="initial_conditions.process_samples.html" class="btn btn-neutral float-right" title="initial_conditions.process_samples module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright YYYY, AUTHOR_NAME.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

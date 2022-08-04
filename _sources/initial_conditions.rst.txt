@@ -15,5 +15,6 @@ Submodules
    initial_conditions.convert_arcade
    initial_conditions.create_voronoi
    initial_conditions.download_images
+   initial_conditions.generate_coordinates
    initial_conditions.process_samples
    initial_conditions.sample_images

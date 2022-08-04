@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>initial_conditions.generate_coordinates &mdash; Cell agent-based model pipeline VERSION NUMBER X.X.X documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Cell agent-based model pipeline
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Package modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Cell agent-based model pipeline</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>initial_conditions.generate_coordinates</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for initial_conditions.generate_coordinates</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">floor</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">ceil</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.axes</span> <span class="kn">import</span> <span class="n">Axes</span>
+<span class="kn">from</span> <span class="nn">hexalattice.hexalattice</span> <span class="kn">import</span> <span class="n">create_hex_grid</span>
+
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.initial_conditions.__config__</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CRITICAL_VOLUME_AVGS</span><span class="p">,</span>
+    <span class="n">CRITICAL_HEIGHT_AVGS</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.initial_conditions.__main__</span> <span class="kn">import</span> <span class="n">Context</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.load</span> <span class="kn">import</span> <span class="n">load_dataframe</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.save</span> <span class="kn">import</span> <span class="n">save_dataframe</span><span class="p">,</span> <span class="n">save_plot</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.keys</span> <span class="kn">import</span> <span class="n">make_folder_key</span><span class="p">,</span> <span class="n">make_file_key</span><span class="p">,</span> <span class="n">make_full_key</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.utilities.plot</span> <span class="kn">import</span> <span class="n">make_plot</span>
+
+
+<div class="viewcode-block" id="GenerateCoordinates"><a class="viewcode-back" href="../../initial_conditions.generate_coordinates.html#initial_conditions.generate_coordinates.GenerateCoordinates">[docs]</a><span class="k">class</span> <span class="nc">GenerateCoordinates</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Task to generate cell ids and coordinates.</span>
+
+<span class="sd">    Working location structure for a given context:</span>
+
+<span class="sd">    .. code-block:: bash</span>
+
+<span class="sd">        (name)</span>
+<span class="sd">        ├── plots</span>
+<span class="sd">        │    └── plots.COORDINATES</span>
+<span class="sd">        │        ├── (name)_(image key 1).COORDINATES.png</span>
+<span class="sd">        │        ├── (name)_(image key 2).COORDINATES.png</span>
+<span class="sd">        │        ├── ...</span>
+<span class="sd">        │        └── (name)_(image key n).COORDINATES.png</span>
+<span class="sd">        └── inits</span>
+<span class="sd">            └── inits.COORDINATES</span>
+<span class="sd">                ├── (name)_(image key 1).COORDINATES.csv</span>
+<span class="sd">                ├── (name)_(image key 2).COORDINATES.csv</span>
+<span class="sd">                ├── ...</span>
+<span class="sd">                └── (name)_(image key n).COORDINATES.csv</span>
+
+<span class="sd">    Generated coordinates are placed into the **inits/inits.GENERATED** directory.</span>
+<span class="sd">    Corresponding plots are placed into the **plots/plots.GENERATED** directory.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    context</span>
+<span class="sd">        **Context** object defining working location and name.</span>
+<span class="sd">    folders</span>
+<span class="sd">        Dictionary of input and output folder keys.</span>
+<span class="sd">    files</span>
+<span class="sd">        Dictionary of input and output file keys.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folders</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="n">make_folder_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;inits&quot;</span><span class="p">,</span> <span class="s2">&quot;COORDINATES&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="s2">&quot;contact&quot;</span><span class="p">:</span> <span class="n">make_folder_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;COORDINATES&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;COORDINATES&quot;</span><span class="p">,</span> <span class="s2">&quot;csv&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;contact&quot;</span><span class="p">:</span> <span class="n">make_file_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;COORDINATES&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="GenerateCoordinates.run"><a class="viewcode-back" href="../../initial_conditions.generate_coordinates.html#initial_conditions.generate_coordinates.GenerateCoordinates.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">grid</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rect&quot;</span><span class="p">,</span>
+        <span class="n">ds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">box</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="n">contact</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs generate coordinates task for given context.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        grid : {&#39;rect&#39;, &#39;hex&#39;}</span>
+<span class="sd">            Type of sampling grid.</span>
+<span class="sd">        ds</span>
+<span class="sd">            Distance between elements in um.</span>
+<span class="sd">        box</span>
+<span class="sd">            Bounding box size in um.</span>
+<span class="sd">        contact</span>
+<span class="sd">            True if contact sheet of coordinates is saved, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">generate_coordinates</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">box</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">contact</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">plot_contact_sheet</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenerateCoordinates.generate_coordinates"><a class="viewcode-back" href="../../initial_conditions.generate_coordinates.html#initial_conditions.generate_coordinates.GenerateCoordinates.generate_coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">generate_coordinates</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">box</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate coordinates task.</span>
+
+<span class="sd">        Calculates and generates coordinates inside bounding box, then filters</span>
+<span class="sd">        out coordinates outside the target radius.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key</span>
+<span class="sd">            Key for output coordinates.</span>
+<span class="sd">        grid : {&#39;rect&#39;, &#39;hex&#39;}</span>
+<span class="sd">            Type of coordinate grid.</span>
+<span class="sd">        ds</span>
+<span class="sd">            Distance between elements in um.</span>
+<span class="sd">        box</span>
+<span class="sd">            Bounding box size in um.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Calculate cell sizes (in um).</span>
+        <span class="n">cell_height</span> <span class="o">=</span> <span class="n">CRITICAL_HEIGHT_AVGS</span><span class="p">[</span><span class="s2">&quot;DEFAULT&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">ds</span>
+        <span class="n">cell_volume</span> <span class="o">=</span> <span class="n">CRITICAL_VOLUME_AVGS</span><span class="p">[</span><span class="s2">&quot;DEFAULT&quot;</span><span class="p">]</span>
+        <span class="n">cell_radius</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">cell_volume</span> <span class="o">/</span> <span class="n">cell_height</span> <span class="o">/</span> <span class="n">pi</span><span class="p">)</span> <span class="o">/</span> <span class="n">ds</span>
+        <span class="n">cell_bounds</span> <span class="o">=</span> <span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">cell_radius</span><span class="p">),</span> <span class="n">ceil</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">cell_radius</span><span class="p">),</span> <span class="n">ceil</span><span class="p">(</span><span class="n">cell_height</span><span class="p">))</span>
+
+        <span class="c1"># Calculate cell center.</span>
+        <span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="p">[</span><span class="n">box_dim</span> <span class="o">/</span> <span class="n">ds</span> <span class="k">for</span> <span class="n">box_dim</span> <span class="ow">in</span> <span class="n">box</span><span class="p">]</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Generate coordinates for cell around centroid.</span>
+        <span class="n">coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_box_coordinates</span><span class="p">(</span><span class="n">cell_bounds</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>
+        <span class="n">coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_cell_coordinates</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">cell_radius</span><span class="p">,</span> <span class="n">center</span><span class="p">)</span>
+
+        <span class="c1"># Convert to dataframe and save.</span>
+        <span class="n">coordinates_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">])</span>
+        <span class="n">coordinates_df</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">coordinates_key</span> <span class="o">=</span> <span class="n">make_full_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="s2">&quot;coordinates&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="n">save_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">coordinates_key</span><span class="p">,</span> <span class="n">coordinates_df</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenerateCoordinates.plot_contact_sheet"><a class="viewcode-back" href="../../initial_conditions.generate_coordinates.html#initial_conditions.generate_coordinates.GenerateCoordinates.plot_contact_sheet">[docs]</a>    <span class="k">def</span> <span class="nf">plot_contact_sheet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot contact sheet for generated coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key</span>
+<span class="sd">            Key for coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">coordinates_key</span> <span class="o">=</span> <span class="n">make_full_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="s2">&quot;coordinates&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">load_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">coordinates_key</span><span class="p">)</span>
+
+        <span class="n">make_plot</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">unique</span><span class="p">()),</span> <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_contact_sheet_axes</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+        <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_full_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folders</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="s2">&quot;contact&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="n">save_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">working</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenerateCoordinates.plot_contact_sheet_axes"><a class="viewcode-back" href="../../initial_conditions.generate_coordinates.html#initial_conditions.generate_coordinates.GenerateCoordinates.plot_contact_sheet_axes">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">plot_contact_sheet_axes</span><span class="p">(</span><span class="n">ax</span><span class="p">:</span> <span class="n">Axes</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot coordinates for selected z index, colored by id.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ax</span>
+<span class="sd">            **Axes** instance to plot on.</span>
+<span class="sd">        data</span>
+<span class="sd">            Coordinates data.</span>
+<span class="sd">        key</span>
+<span class="sd">            Index of z slice to plot.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">z_slice</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">z</span> <span class="o">==</span> <span class="n">key</span><span class="p">]</span>
+
+        <span class="n">max_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+        <span class="n">min_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">z_slice</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">z_slice</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">z_slice</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">min_id</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">max_id</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;jet&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">,</span> <span class="n">adjustable</span><span class="o">=</span><span class="s2">&quot;box&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenerateCoordinates.get_box_coordinates"><a class="viewcode-back" href="../../initial_conditions.generate_coordinates.html#initial_conditions.generate_coordinates.GenerateCoordinates.get_box_coordinates">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_box_coordinates</span><span class="p">(</span>
+        <span class="n">bounds</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">grid</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rect&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all possible coordinates within given bounding box.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bounds</span>
+<span class="sd">            Bounds in the x, y, and z directions.</span>
+<span class="sd">        grid : {&#39;rect&#39;, &#39;hex&#39;}</span>
+<span class="sd">            Type of sampling grid.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :</span>
+<span class="sd">            List of grid coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">grid</span> <span class="o">==</span> <span class="s2">&quot;rect&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">GenerateCoordinates</span><span class="o">.</span><span class="n">make_rect_coordinates</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">grid</span> <span class="o">==</span> <span class="s2">&quot;hex&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">GenerateCoordinates</span><span class="o">.</span><span class="n">make_hex_coordinates</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;invalid grid type </span><span class="si">{</span><span class="n">grid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenerateCoordinates.make_rect_coordinates"><a class="viewcode-back" href="../../initial_conditions.generate_coordinates.html#initial_conditions.generate_coordinates.GenerateCoordinates.make_rect_coordinates">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">make_rect_coordinates</span><span class="p">(</span>
+        <span class="n">bounds</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">xy_increment</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">z_increment</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get list of bounded (x, y, z) coordinates for rect grid.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bounds</span>
+<span class="sd">            Bounds in the x, y, and z directions.</span>
+<span class="sd">        xy_increment</span>
+<span class="sd">            Increment size in x/y.</span>
+<span class="sd">        z_increment</span>
+<span class="sd">            Increment size in z.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :</span>
+<span class="sd">            List of grid coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x_bound</span><span class="p">,</span> <span class="n">y_bound</span><span class="p">,</span> <span class="n">z_bound</span> <span class="o">=</span> <span class="n">bounds</span>
+
+        <span class="n">z_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">z_bound</span><span class="p">,</span> <span class="n">z_increment</span><span class="p">)</span>
+        <span class="n">x_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x_bound</span><span class="p">,</span> <span class="n">xy_increment</span><span class="p">)</span>
+        <span class="n">y_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">y_bound</span><span class="p">,</span> <span class="n">xy_increment</span><span class="p">)</span>
+
+        <span class="n">coordinates</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">z_indices</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">x_indices</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">y_indices</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">coordinates</span></div>
+
+<div class="viewcode-block" id="GenerateCoordinates.make_hex_coordinates"><a class="viewcode-back" href="../../initial_conditions.generate_coordinates.html#initial_conditions.generate_coordinates.GenerateCoordinates.make_hex_coordinates">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">make_hex_coordinates</span><span class="p">(</span>
+        <span class="n">bounds</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">xy_increment</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">z_increment</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get list of bounded (x, y, z) coordinates for hex grid.</span>
+
+<span class="sd">        Coordinates are offset in sets of three z slices to form a face-centered</span>
+<span class="sd">        cubic (FCC) packing.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bounds</span>
+<span class="sd">            Bounds in the x, y, and z directions.</span>
+<span class="sd">        xy_increment</span>
+<span class="sd">            Increment size in x/y.</span>
+<span class="sd">        z_increment</span>
+<span class="sd">            Increment size in z.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :</span>
+<span class="sd">            List of grid coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x_bound</span><span class="p">,</span> <span class="n">y_bound</span><span class="p">,</span> <span class="n">z_bound</span> <span class="o">=</span> <span class="n">bounds</span>
+
+        <span class="n">z_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">z_bound</span><span class="p">,</span> <span class="n">z_increment</span><span class="p">)</span>
+        <span class="n">z_offsets</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">z_indices</span><span class="p">))]</span>
+
+        <span class="n">xy_indices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">create_hex_grid</span><span class="p">(</span>
+            <span class="n">nx</span><span class="o">=</span><span class="n">floor</span><span class="p">(</span><span class="n">x_bound</span> <span class="o">/</span> <span class="n">xy_increment</span><span class="p">),</span>
+            <span class="n">ny</span><span class="o">=</span><span class="n">floor</span><span class="p">(</span><span class="n">y_bound</span> <span class="o">/</span> <span class="n">xy_increment</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)),</span>
+            <span class="n">min_diam</span><span class="o">=</span><span class="n">xy_increment</span><span class="p">,</span>
+            <span class="n">align_to_origin</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">do_plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">x_offsets</span> <span class="o">=</span> <span class="p">[(</span><span class="n">xy_increment</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="n">z_offset</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">z_offset</span> <span class="ow">in</span> <span class="n">z_offsets</span><span class="p">]</span>
+        <span class="n">y_offsets</span> <span class="o">=</span> <span class="p">[(</span><span class="n">xy_increment</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">z_offset</span> <span class="k">for</span> <span class="n">z_offset</span> <span class="ow">in</span> <span class="n">z_offsets</span><span class="p">]</span>
+
+        <span class="n">coordinates</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">x_offset</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">y_offset</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">z</span><span class="p">,</span> <span class="n">x_offset</span><span class="p">,</span> <span class="n">y_offset</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">z_indices</span><span class="p">,</span> <span class="n">x_offsets</span><span class="p">,</span> <span class="n">y_offsets</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">xy_indices</span>
+            <span class="k">if</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">x_offset</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">x_bound</span> <span class="ow">and</span> <span class="nb">round</span><span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="n">y_offset</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">y_bound</span>
+        <span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">coordinates</span></div>
+
+<div class="viewcode-block" id="GenerateCoordinates.transform_cell_coordinates"><a class="viewcode-back" href="../../initial_conditions.generate_coordinates.html#initial_conditions.generate_coordinates.GenerateCoordinates.transform_cell_coordinates">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">transform_cell_coordinates</span><span class="p">(</span>
+        <span class="n">coordinates</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">offsets</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filters list for coordinates with given radius and applies offset.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        coordinates</span>
+<span class="sd">            List of (x, y, z) coordinates.</span>
+<span class="sd">        radius</span>
+<span class="sd">            Maximum valid radius of coordinate.</span>
+<span class="sd">        offsets</span>
+<span class="sd">            Coordinate offsets in the x and y directions.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :</span>
+<span class="sd">            Filtered list of coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x_offset</span><span class="p">,</span> <span class="n">y_offset</span> <span class="o">=</span> <span class="n">offsets</span>
+        <span class="n">filtered_coordinates</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">x_center</span><span class="p">,</span> <span class="n">y_center</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">coordinates</span><span class="p">:</span>
+            <span class="n">coordinate_radius</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_center</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_center</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="k">if</span> <span class="n">coordinate_radius</span> <span class="o">&lt;=</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span><span class="p">:</span>
+                <span class="n">filtered_coordinates</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_center</span> <span class="o">+</span> <span class="n">x_offset</span><span class="p">,</span> <span class="n">y</span> <span class="o">-</span> <span class="n">y_center</span> <span class="o">+</span> <span class="n">y_offset</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">filtered_coordinates</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright YYYY, AUTHOR_NAME.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
