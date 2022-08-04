@@ -66,6 +66,43 @@ def download_images(obj, **kwargs):
     show_default=True,
 )
 @click.option(
+    "--ds",
+    type=float,
+    default=1.0,
+    help="Distance between elements in um.",
+    show_default=True,
+)
+@click.option(
+    "--box",
+    nargs=3,
+    type=int,
+    default=(100, 100, 10),
+    help="Bounding box size in um.",
+    show_default=True,
+)
+@click.option(
+    "--contact/--no-contact",
+    default=True,
+    help="True if contact sheet of images is saved, False otherwise. [default: True]",
+)
+@click.pass_obj
+def generate_coordinates(obj, **kwargs):
+    """Generate cell ids and coordinates."""
+    from .generate_coordinates import GenerateCoordinates
+
+    GenerateCoordinates(obj).run(**kwargs)
+
+
+@cli.command()
+@click.option(
+    "-g",
+    "--grid",
+    type=click.Choice(["rect", "hex"], case_sensitive=False),
+    default="rect",
+    help="Type of sampling grid.",
+    show_default=True,
+)
+@click.option(
     "-r",
     "--resolution",
     type=float,
