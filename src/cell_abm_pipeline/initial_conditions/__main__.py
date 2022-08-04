@@ -169,7 +169,7 @@ def sample_images(obj, **kwargs):
 @click.option(
     "--contact/--no-contact",
     default=True,
-    help="True if contact sheet of images is saved, False otherwise. [default: True]",
+    help="True if contact sheet of images is saved, False otherwise.  [default: True]",
 )
 @click.pass_obj
 def process_samples(obj, **kwargs):
