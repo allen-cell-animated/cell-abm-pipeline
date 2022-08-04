@@ -1,5 +1,5 @@
 from math import floor, pi, sqrt, ceil
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -94,6 +94,23 @@ class GenerateCoordinates:
     def generate_coordinates(
         self, key: str, grid: str, ds: float, box: Tuple[int, int, int]
     ) -> None:
+        """
+        Generate coordinates task.
+
+        Calculates and generates coordinates inside bounding box, then filters
+        out coordinates outside the target radius.
+
+        Parameters
+        ----------
+        key
+            Key for output coordinates.
+        grid : {'rect', 'hex'}
+            Type of coordinate grid.
+        ds
+            Distance between elements in um.
+        box
+            Bounding box size in um.
+        """
         # Calculate cell sizes (in um).
         cell_height = CRITICAL_HEIGHT_AVGS["DEFAULT"] / ds
         cell_volume = CRITICAL_VOLUME_AVGS["DEFAULT"]
@@ -287,12 +304,13 @@ class GenerateCoordinates:
         :
             Filtered list of coordinates.
         """
-        dx, dy = offsets
+        x_offset, y_offset = offsets
         filtered_coordinates = []
+        x_center, y_center, _ = np.array(coordinates).mean(axis=0)
 
         for x, y, z in coordinates:
-            coordinate_radius = (x - radius) ** 2 + (y - radius) ** 2
+            coordinate_radius = (x - x_center) ** 2 + (y - y_center) ** 2
             if coordinate_radius <= radius**2:
-                filtered_coordinates.append((x - radius + dx, y - radius + dy, z))
+                filtered_coordinates.append((x - x_center + x_offset, y - y_center + y_offset, z))
 
         return filtered_coordinates
