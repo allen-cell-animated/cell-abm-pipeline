@@ -475,12 +475,12 @@
                 <span class="n">region_critical_volume</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">reference</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;volume.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
                     <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;volume.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">reference</span>
-                    <span class="k">else</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_critical_volume</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">))</span>
+                    <span class="k">else</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_critical_volume</span><span class="p">(</span><span class="n">region_samples</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">))</span>
                 <span class="p">)</span>
                 <span class="n">region_critical_height</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">reference</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;height.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
                     <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;height.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">reference</span>
-                    <span class="k">else</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_critical_height</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">))</span>
+                    <span class="k">else</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_critical_height</span><span class="p">(</span><span class="n">region_samples</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">))</span>
                 <span class="p">)</span>
 
                 <span class="n">regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
