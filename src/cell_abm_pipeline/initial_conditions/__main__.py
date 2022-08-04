@@ -159,12 +159,12 @@ def sample_images(obj, **kwargs):
 @click.option(
     "--edges/--no-edges",
     default=False,
-    help="True if cells touching edges are removed, False otherwise. [default: False]",
+    help="True if cells touching edges are removed, False otherwise.  [default: False]",
 )
 @click.option(
     "--connected/--no-connected",
     default=False,
-    help="True if unconnected voxels are removed, False otherwise. [default: False]",
+    help="True if unconnected voxels are removed, False otherwise.  [default: False]",
 )
 @click.option(
     "--contact/--no-contact",
@@ -184,7 +184,7 @@ def process_samples(obj, **kwargs):
     "-i",
     "--iterations",
     type=int,
-    default=10,
+    default=2,
     help="Number of boundary estimation steps.",
     show_default=True,
 )
@@ -197,9 +197,17 @@ def process_samples(obj, **kwargs):
     help="Image channel indices.",
     show_default=True,
 )
+@click.option(
+    "-h",
+    "--height",
+    type=int,
+    default=10,
+    help="Target height for tesselation.",
+    show_default=True,
+)
 @click.pass_obj
 def create_voronoi(obj, **kwargs):
-    """Create Voronoi tessellation from given starting image."""
+    """Create Voronoi tessellation from starting image."""
     from .create_voronoi import CreateVoronoi
 
     CreateVoronoi(obj).run(**kwargs)

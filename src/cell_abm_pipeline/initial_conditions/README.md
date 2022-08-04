@@ -89,9 +89,9 @@ Options:
   --scale FLOAT                 Coordinate scaling factor.
   --select INTEGER              Specific cell ids to select.
   --edges / --no-edges          True if cells touching edges are removed,
-                                False otherwise. [default: False]
+                                False otherwise.  [default: False]
   --connected / --no-connected  True if unconnected voxels are removed, False
-                                otherwise. [default: False]
+                                otherwise.  [default: False]
   --contact / --no-contact      True if contact sheet of images is saved,
                                 False otherwise.  [default: True]
   --help                        Show this message and exit.
@@ -104,11 +104,12 @@ The `CreateVoronoi` module can be called via CLI using:
 ```
 Usage: initial-conditions create-voronoi [OPTIONS]
 
-  Create Voronoi tessellation from given starting image.
+  Create Voronoi tessellation from starting image.
 
 Options:
-  -i, --iterations INTEGER  Number of boundary estimation steps  [default: 10]
+  -i, --iterations INTEGER  Number of boundary estimation steps.  [default: 2]
   -c, --channels INTEGER    Image channel indices.  [default: 0]
+  -h, --height INTEGER      Target height for tesselation.  [default: 10]
   --help                    Show this message and exit.
 ```
 

@@ -6,7 +6,7 @@ from cell_abm_pipeline.initial_conditions.create_voronoi import CreateVoronoi
 
 
 class TestCreateVoronoi(unittest.TestCase):
-    def test_get_bounded_array_without_holes(self):
+    def test_create_boundary_mask_without_holes(self):
         array = np.array(
             [
                 [
@@ -62,7 +62,7 @@ class TestCreateVoronoi(unittest.TestCase):
         mask = CreateVoronoi.create_boundary_mask(array, iterations=2)
         self.assertTrue(np.array_equal(expected_mask, mask))
 
-    def test_get_bounded_array_with_holes(self):
+    def test_create_boundary_mask_with_holes(self):
         array = np.array(
             [
                 [
@@ -104,7 +104,29 @@ class TestCreateVoronoi(unittest.TestCase):
         mask = CreateVoronoi.create_boundary_mask(array, iterations=2)
         self.assertTrue(np.array_equal(expected_mask, mask))
 
-    def test_get_array_slices_within_shape(self):
+    def test_adjust_mask_bounds_below_current_height(self):
+        lower_bound = 7
+        upper_bound = 11
+        array = np.zeros((20, 1, 1))
+        array[lower_bound : upper_bound + 1, :, :] = 1
+        target_height = upper_bound - lower_bound + 1
+
+        expected_bounds = (lower_bound, upper_bound + 1)
+        updated_bounds = CreateVoronoi.adjust_mask_bounds(array, target_height)
+        self.assertTupleEqual(expected_bounds, updated_bounds)
+
+    def test_adjust_mask_bounds_above_current_height(self):
+        lower_bound = 7
+        upper_bound = 11
+        array = np.zeros((20, 1, 1))
+        array[lower_bound : upper_bound + 1, :, :] = 1
+        target_height = upper_bound - lower_bound + 4
+
+        expected_bounds = (lower_bound - 1, upper_bound + 3)
+        updated_bounds = CreateVoronoi.adjust_mask_bounds(array, target_height)
+        self.assertTupleEqual(expected_bounds, updated_bounds)
+
+    def test_get_array_slices_bounds_within_shape(self):
         array = np.zeros((11, 11, 11))
         array[2, 5, 5] = 1
         array[7, 5, 5] = 1
@@ -117,7 +139,7 @@ class TestCreateVoronoi(unittest.TestCase):
         slices = CreateVoronoi.get_array_slices(array)
         self.assertTupleEqual(expected_slices, slices)
 
-    def test_get_array_bounds_outside_shape(self):
+    def test_get_array_slices_bounds_outside_shape(self):
         array = np.zeros((3, 5, 7))
         array[0, 2, 3] = 1
         array[2, 2, 3] = 1
