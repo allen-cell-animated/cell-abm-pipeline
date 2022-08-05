@@ -108,10 +108,10 @@ class ConvertARCADE:
         if reference:
             reference_data = load_dataframe(self.context.working, reference)
         else:
-            reference_data = pd.DataFrame([], columns=["key", "id"])
+            reference_data = pd.DataFrame([], columns=["KEY", "ID"])
 
         for key in self.context.keys:
-            key_reference_data = reference_data[reference_data.key == key]
+            key_reference_data = reference_data[reference_data["KEY"] == key]
             self.convert_arcade(key, margins, region, key_reference_data)
 
     def convert_arcade(
@@ -350,7 +350,7 @@ class ConvertARCADE:
         :
             Reference data for given cell id.
         """
-        cell_reference = reference[reference.id == cell_id].squeeze()
+        cell_reference = reference[reference["ID"] == cell_id].squeeze()
         cell_reference = cell_reference.to_dict() if not cell_reference.empty else {}
         return cell_reference
 
