@@ -325,14 +325,14 @@ class TestConvertARCADE(unittest.TestCase):
 
     def test_filter_cell_reference_invalid_id(self):
         cell_id = 3
-        reference = pd.DataFrame([{"id": 1}, {"id": 2}])
+        reference = pd.DataFrame([{"ID": 1}, {"ID": 2}])
         cell_reference = ConvertARCADE.filter_cell_reference(cell_id, reference)
         self.assertDictEqual({}, cell_reference)
 
     def test_filter_cell_reference_valid_id(self):
         cell_id = 2
-        cell_1_data = {"id": 1, "key1": "a", "key2": 2}
-        cell_2_data = {"id": 2, "key1": "b", "key2": 4}
+        cell_1_data = {"ID": 1, "key1": "a", "key2": 2}
+        cell_2_data = {"ID": 2, "key1": "b", "key2": 4}
         reference = pd.DataFrame([cell_1_data, cell_2_data])
 
         cell_reference = ConvertARCADE.filter_cell_reference(cell_id, reference)
