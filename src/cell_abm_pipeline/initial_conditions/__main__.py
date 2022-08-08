@@ -149,11 +149,11 @@ def sample_images(obj, **kwargs):
     show_default=True,
 )
 @click.option(
-    "--select",
+    "--include",
     type=int,
     multiple=True,
     default=None,
-    help="Specific cell ids to select.",
+    help="Specific cell ids to include.",
     show_default=True,
 )
 @click.option(

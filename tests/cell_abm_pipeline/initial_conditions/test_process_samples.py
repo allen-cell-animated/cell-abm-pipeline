@@ -68,18 +68,18 @@ class TestProcessSamples(unittest.TestCase):
         for a, b in zip(z_scaled, scaled_samples["z_scaled"]):
             self.assertAlmostEqual(a, b, places=5)
 
-    def test_select_cells(self):
+    def test_include_cells(self):
         cell_1_data = [[1, 1, 2, 3]]
         cell_2_data = [[2, 1, 2, 1]]
         cell_3_data = [[3, 1, 2, 2]]
         sample_data = cell_1_data + cell_2_data + cell_3_data
         samples = pd.DataFrame(sample_data, columns=["id", "x", "y", "z"])
 
-        select = [2, 3]
+        include = [2, 3]
         expected_data = cell_2_data + cell_3_data
         expected_samples = pd.DataFrame(expected_data, columns=["id", "x", "y", "z"])
 
-        selected_samples = ProcessSamples.select_cells(samples, select)
+        selected_samples = ProcessSamples.include_cells(samples, include)
 
         self.assertTrue(expected_samples.equals(selected_samples))
 

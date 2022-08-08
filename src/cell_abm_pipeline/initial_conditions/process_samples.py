@@ -81,7 +81,7 @@ class ProcessSamples:
         self,
         grid: str = "rect",
         scale: Optional[float] = None,
-        select: Optional[List[int]] = None,
+        include: Optional[List[int]] = None,
         edges: bool = False,
         connected: bool = False,
         contact: bool = True,
@@ -95,8 +95,8 @@ class ProcessSamples:
             Type of sampling grid.
         scale
             Coordinate scaling factor.
-        select
-            Specific cell ids to select
+        include
+            Specific cell ids to include.
         edges
             True if cells touching edges are removed, False otherwise.
         connected
@@ -105,7 +105,7 @@ class ProcessSamples:
             True if contact sheet of images is saved, False otherwise.
         """
         for key in self.context.keys:
-            self.process_samples(key, grid, scale, select, edges, connected)
+            self.process_samples(key, grid, scale, include, edges, connected)
 
             if contact:
                 self.plot_contact_sheet(key)
@@ -115,7 +115,7 @@ class ProcessSamples:
         key: str,
         grid: str,
         scale: Optional[float],
-        select: Optional[List[int]],
+        include: Optional[List[int]],
         edges: bool,
         connected: bool,
     ) -> None:
@@ -128,7 +128,7 @@ class ProcessSamples:
         1. Remove unconnected regions (if **connected** is True)
         2. Remove cells at the edge (if **edges** is True)
         3. Rescale sample coordinates (if **scale** is not None)
-        4. Select only samples for given cell ids (if **select** is not None)
+        4. Include only samples for given cell ids (if **include** is not None)
 
         Parameters
         ----------
@@ -138,8 +138,8 @@ class ProcessSamples:
             Type of sampling grid.
         scale
             Coordinate scaling factor.
-        select
-            Specific cell ids to select
+        include
+            Specific cell ids to include.
         edges
             True if cells touching edges are removed, False otherwise.
         connected
@@ -161,9 +161,9 @@ class ProcessSamples:
             print("Scaling coordinates ...")
             processed_samples = self.scale_coordinates(processed_samples, scale)
 
-        if select:
-            print("Selecting cell ids ...")
-            processed_samples = self.select_cells(processed_samples, select)
+        if include:
+            print("Including cell ids ...")
+            processed_samples = self.include_cells(processed_samples, include)
 
         processed_key = make_full_key(self.folders, self.files, "processed", key)
         save_dataframe(self.context.working, processed_key, processed_samples, index=False)
@@ -254,23 +254,23 @@ class ProcessSamples:
         return samples
 
     @staticmethod
-    def select_cells(samples: pd.DataFrame, select: List[int]) -> pd.DataFrame:
+    def include_cells(samples: pd.DataFrame, include: List[int]) -> pd.DataFrame:
         """
-        Filters samples to select for given ids.
+        Filters samples to include given ids.
 
         Parameters
         ----------
         samples
             Sample cell ids and coordinates.
-        select
-            List of ids to select.
+        include
+            List of ids to include.
 
         Returns
         -------
         :
-            Samples from selected ids.
+            Samples from included ids.
         """
-        samples = samples[samples.id.isin(select)]
+        samples = samples[samples.id.isin(include)]
         return samples.reset_index(drop=True)
 
     @staticmethod
