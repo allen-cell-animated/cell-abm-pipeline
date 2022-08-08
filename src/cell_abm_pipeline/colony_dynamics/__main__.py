@@ -84,6 +84,9 @@ def plot_measures(obj, **kwargs):
 
 
 @cli.command()
+@click.option(
+    "-v", "--view", type=click.Choice(["phase", "depth"], case_sensitive=False), default="phase"
+)
 @click.pass_obj
 def plot_neighbors(obj, **kwargs):
     from .plot_neighbors import PlotNeighbors

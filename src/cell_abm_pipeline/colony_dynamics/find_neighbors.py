@@ -42,11 +42,12 @@ class FindNeighbors:
 
             array = self.make_voxels_array(member)
             neighbors = self.get_array_neighbors(array)
+            depth_map = self.calculate_depth_map(array, neighbors)
 
             attributes = {"KEY": key, "SEED": seed, "TICK": frame}
             centers = {location["id"]: location["center"] for location in member}
             all_neighbors = all_neighbors + self.flatten_neighbors_list(
-                neighbors, attributes, centers
+                neighbors, attributes, centers, depth_map
             )
 
         neighbor_df = pd.DataFrame(all_neighbors)
@@ -54,7 +55,7 @@ class FindNeighbors:
         save_dataframe(self.context.working, analysis_key, neighbor_df, index=False)
 
     @staticmethod
-    def flatten_neighbors_list(neighbors, attributes, centers):
+    def flatten_neighbors_list(neighbors, attributes, centers, depth_map):
         flattened_neighbors_list = []
 
         for group, voxel_id, neighbor_list in neighbors:
@@ -64,7 +65,12 @@ class FindNeighbors:
                 neighbor_list = [0]
 
             for neighbor in neighbor_list:
-                entries = {"GROUP": group, "ID": voxel_id, "NEIGHBOR": neighbor}
+                entries = {
+                    "GROUP": group,
+                    "ID": voxel_id,
+                    "NEIGHBOR": neighbor,
+                    "DEPTH": depth_map[voxel_id],
+                }
                 entries.update(attributes)
                 entries.update({"CX": center[0], "CY": center[1], "CZ": center[2]})
                 flattened_neighbors_list.append(entries)
@@ -85,7 +91,7 @@ class FindNeighbors:
         # Create empty array.
         mins = np.min(all_xyz, axis=0)
         maxs = np.max(all_xyz, axis=0)
-        height, width, length = np.subtract(maxs, mins) + 3
+        length, width, height = np.subtract(maxs, mins) + 3
         array = np.zeros((height, width, length), dtype=np.uint16)
 
         # Return if no voxels.
@@ -94,7 +100,7 @@ class FindNeighbors:
 
         # Fill voxel array.
         all_xyz_offset = [
-            (z - mins[0] + 1, y - mins[1] + 1, x - mins[2] + 1) for z, y, x in all_xyz
+            (z - mins[2] + 1, y - mins[1] + 1, x - mins[0] + 1) for x, y, z in all_xyz
         ]
         array[tuple(np.transpose(all_xyz_offset))] = all_ids
 
@@ -136,6 +142,31 @@ class FindNeighbors:
         return neighbors
 
     @staticmethod
+    def calculate_depth_map(array, neighbors):
+        depth_map = {cell_id: 0 for cell_id in np.unique(array)}
+        edge_ids = FindNeighbors.find_edge_ids(array)
+        visited = set(edge_ids)
+        queue = edge_ids.copy()
+
+        while queue:
+            current_id = queue.pop(0)
+
+            current_neighbors = next(
+                (neighbor_list for _, cell_id, neighbor_list in neighbors if cell_id == current_id),
+                None,
+            )
+            valid_neighbors = set(current_neighbors) - visited
+            visited.update(valid_neighbors)
+            queue = queue + list(valid_neighbors)
+
+            for neighbor_id in valid_neighbors:
+                depth_map[neighbor_id] = depth_map[current_id] + 1
+
+            depth_map[current_id] = depth_map[current_id] + 1
+
+        return depth_map
+
+    @staticmethod
     def get_bounding_box(array):
         """Finds bounding box around binary array."""
         x, y, z = array.shape
@@ -173,3 +204,30 @@ class FindNeighbors:
             return array[xmin:xmax, ymin:ymax, zmin:zmax]
 
         return array_mask[xmin:xmax, ymin:ymax, zmin:zmax]
+
+    @staticmethod
+    def find_edge_ids(array):
+        slice_index = np.argmax(np.count_nonzero(array, axis=(1, 2)))
+        array_slice = array[slice_index, :, :]
+
+        # Calculate voronoi from cell shapes.
+        distances = ndimage.distance_transform_edt(
+            array_slice == 0, return_distances=False, return_indices=True
+        )
+        distances = distances.astype("uint16", copy=False)
+        coordinates_y = distances[0].flatten()
+        coordinates_x = distances[1].flatten()
+        voronoi = array_slice[coordinates_y, coordinates_x].reshape(array_slice.shape)
+
+        # Create border mask.
+        mask = np.zeros(array_slice.shape, dtype="uint8")
+        mask[array_slice != 0] = 1
+        while measure.euler_number(mask) != 1:
+            mask = ndimage.binary_dilation(mask, iterations=1)
+
+        # Filter voronoi by mask to get edge ids.
+        voronoi[mask == 1] = 0
+        edge_ids = list(np.unique(voronoi))
+        edge_ids.remove(0)
+
+        return edge_ids
