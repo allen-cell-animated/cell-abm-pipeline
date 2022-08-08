@@ -82,6 +82,7 @@ class ProcessSamples:
         grid: str = "rect",
         scale: Optional[float] = None,
         include: Optional[List[int]] = None,
+        exclude: Optional[List[int]] = None,
         edges: bool = False,
         connected: bool = False,
         contact: bool = True,
@@ -97,6 +98,8 @@ class ProcessSamples:
             Coordinate scaling factor.
         include
             Specific cell ids to include.
+        exclude
+            Specific cell ids to exclude.
         edges
             True if cells touching edges are removed, False otherwise.
         connected
@@ -105,7 +108,7 @@ class ProcessSamples:
             True if contact sheet of images is saved, False otherwise.
         """
         for key in self.context.keys:
-            self.process_samples(key, grid, scale, include, edges, connected)
+            self.process_samples(key, grid, scale, include, exclude, edges, connected)
 
             if contact:
                 self.plot_contact_sheet(key)
@@ -116,6 +119,7 @@ class ProcessSamples:
         grid: str,
         scale: Optional[float],
         include: Optional[List[int]],
+        exclude: Optional[List[int]],
         edges: bool,
         connected: bool,
     ) -> None:
@@ -128,7 +132,8 @@ class ProcessSamples:
         1. Remove unconnected regions (if **connected** is True)
         2. Remove cells at the edge (if **edges** is True)
         3. Rescale sample coordinates (if **scale** is not None)
-        4. Include only samples for given cell ids (if **include** is not None)
+        4. Include samples for given cell ids (if **include** is not None)
+        5. Exclude samples for given cell ids (if **exclude** is not None)
 
         Parameters
         ----------
@@ -140,6 +145,8 @@ class ProcessSamples:
             Coordinate scaling factor.
         include
             Specific cell ids to include.
+        exclude
+            Specific cell ids to exclude.
         edges
             True if cells touching edges are removed, False otherwise.
         connected
@@ -164,6 +171,10 @@ class ProcessSamples:
         if include:
             print("Including cell ids ...")
             processed_samples = self.include_cells(processed_samples, include)
+
+        if exclude:
+            print("Excluding cell ids ...")
+            processed_samples = self.exclude_cells(processed_samples, exclude)
 
         processed_key = make_full_key(self.folders, self.files, "processed", key)
         save_dataframe(self.context.working, processed_key, processed_samples, index=False)
@@ -268,9 +279,29 @@ class ProcessSamples:
         Returns
         -------
         :
-            Samples from included ids.
+            Samples with included ids.
         """
         samples = samples[samples.id.isin(include)]
+        return samples.reset_index(drop=True)
+
+    @staticmethod
+    def exclude_cells(samples: pd.DataFrame, exclude: List[int]) -> pd.DataFrame:
+        """
+        Filters samples to exclude given ids.
+
+        Parameters
+        ----------
+        samples
+            Sample cell ids and coordinates.
+        exclude
+            List of ids to exclude.
+
+        Returns
+        -------
+        :
+            Samples without excluded ids.
+        """
+        samples = samples[~samples.id.isin(exclude)]
         return samples.reset_index(drop=True)
 
     @staticmethod

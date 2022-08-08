@@ -88,6 +88,7 @@ Options:
   -g, --grid [rect|hex]         Type of sampling grid.  [default: rect]
   --scale FLOAT                 Coordinate scaling factor.
   --include INTEGER             Specific cell ids to include.
+  --exclude INTEGER             Specific cell ids to exclude.
   --edges / --no-edges          True if cells touching edges are removed,
                                 False otherwise.  [default: False]
   --connected / --no-connected  True if unconnected voxels are removed, False

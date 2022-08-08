@@ -157,6 +157,14 @@ def sample_images(obj, **kwargs):
     show_default=True,
 )
 @click.option(
+    "--exclude",
+    type=int,
+    multiple=True,
+    default=None,
+    help="Specific cell ids to exclude.",
+    show_default=True,
+)
+@click.option(
     "--edges/--no-edges",
     default=False,
     help="True if cells touching edges are removed, False otherwise.  [default: False]",
