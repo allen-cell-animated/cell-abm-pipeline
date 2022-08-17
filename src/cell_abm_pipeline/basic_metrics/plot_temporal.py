@@ -44,6 +44,7 @@ class PlotTemporal:
         self.plot_individual_volume(data, region)
         self.plot_average_volume(data, region)
         self.plot_volume_distribution(data, region)
+        self.plot_height_distribution(data, region)
 
         if not region:
             self.plot_total_counts(data)
@@ -54,9 +55,11 @@ class PlotTemporal:
     def convert_data_units(data, ds, dt, region=None):
         data["TIME"] = dt * data["TICK"]
         data["VOLUME"] = ds * ds * ds * data["NUM_VOXELS"]
+        data["HEIGHT"] = ds * (data["MAX_Z"] - data["MIN_Z"] + 1)
 
         if region:
             data[f"VOLUME.{region}"] = ds * ds * ds * data[f"NUM_VOXELS.{region}"]
+            data[f"HEIGHT.{region}"] = ds * (data[f"MAX_Z.{region}"] - data[f"MIN_Z.{region}"])
 
     def plot_total_counts(self, data):
         make_plot(
@@ -261,11 +264,40 @@ class PlotTemporal:
     @staticmethod
     def _plot_volume_distribution(ax, data, key, region=None):
         value = f"VOLUME.{region}" if region else "VOLUME"
-        bins = np.arange(0, 4000, 100)
+        bins = np.arange(0, 5000, 100)
 
         if "_reference" in data:
             reference = data["_reference"][value]
             ax.hist(reference, bins=bins, density=True, color="#999999", alpha=0.7, label="ref")
 
         volumes = data[key][value]
+        print(f"volume mean    = {volumes.mean()}")
+        print(f"volume std dev = {volumes.std()}")
         ax.hist(volumes, bins=bins, density=True, histtype="step", color="k", label="sim")
+
+    def plot_height_distribution(self, data, region=None):
+        make_plot(
+            self.context.keys,
+            data,
+            lambda a, d, k: self._plot_height_distribution(a, d, k, region),
+            xlabel="Height ($\mu m$)",
+            ylabel="Frequency",
+            legend=True,
+        )
+
+        plot_key = make_full_key(self.folders, self.files, "output", "height_distribution", region)
+        save_plot(self.context.working, plot_key)
+
+    @staticmethod
+    def _plot_height_distribution(ax, data, key, region=None):
+        value = f"HEIGHT.{region}" if region else "HEIGHT"
+        bins = np.arange(0, 30, 1)
+
+        if "_reference" in data:
+            reference = data["_reference"][value]
+            ax.hist(reference, bins=bins, density=True, color="#999999", alpha=0.7, label="ref")
+
+        heights = data[key][value]
+        print(f"height mean    = {heights.mean()}")
+        print(f"height std dev = {heights.std()}")
+        ax.hist(heights, bins=bins, density=True, histtype="step", color="k", label="sim")
