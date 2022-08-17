@@ -438,8 +438,8 @@ class TestConvertARCADE(unittest.TestCase):
             0, z_delta_region_b, num_samples_region_b
         )
 
-        get_cell_critical_volume.side_effect = lambda v, *args: v / 2
-        get_cell_critical_height.side_effect = lambda v, *args: v / 3
+        get_cell_critical_volume.side_effect = lambda v, *args: v / (2 if len(args) == 0 else 3)
+        get_cell_critical_height.side_effect = lambda v, *args: v / (3 if len(args) == 0 else 4)
         get_cell_state.return_value = state
 
         expected_cell = {
@@ -456,12 +456,12 @@ class TestConvertARCADE(unittest.TestCase):
                 {
                     "region": region_a,
                     "voxels": num_samples_region_a,
-                    "criticals": [num_samples_region_a / 2, z_delta_region_a / 3],
+                    "criticals": [num_samples_region_a / 3, z_delta_region_a / 4],
                 },
                 {
                     "region": region_b,
                     "voxels": num_samples_region_b,
-                    "criticals": [num_samples_region_b / 2, z_delta_region_b / 3],
+                    "criticals": [num_samples_region_b / 3, z_delta_region_b / 4],
                 },
             ],
         }
@@ -508,8 +508,8 @@ class TestConvertARCADE(unittest.TestCase):
             0, z_delta_region_b, num_samples_region_b
         )
 
-        get_cell_critical_volume.side_effect = lambda v, *args: v / 2
-        get_cell_critical_height.side_effect = lambda v, *args: v / 3
+        get_cell_critical_volume.side_effect = lambda v, *args: v / (2 if len(args) == 0 else 3)
+        get_cell_critical_height.side_effect = lambda v, *args: v / (3 if len(args) == 0 else 4)
         get_cell_state.return_value = state
 
         expected_cell = {
@@ -526,12 +526,12 @@ class TestConvertARCADE(unittest.TestCase):
                 {
                     "region": region_a,
                     "voxels": num_samples_region_a,
-                    "criticals": [critical_volumes[region_a] / 2, critical_heights[region_a] / 3],
+                    "criticals": [critical_volumes[region_a] / 3, critical_heights[region_a] / 4],
                 },
                 {
                     "region": region_b,
                     "voxels": num_samples_region_b,
-                    "criticals": [critical_volumes[region_b] / 2, critical_heights[region_b] / 3],
+                    "criticals": [critical_volumes[region_b] / 3, critical_heights[region_b] / 4],
                 },
             ],
         }

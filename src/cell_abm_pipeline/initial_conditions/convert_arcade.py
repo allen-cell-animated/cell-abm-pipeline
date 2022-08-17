@@ -407,12 +407,12 @@ class ConvertARCADE:
                 region_critical_volume = ConvertARCADE.get_cell_critical_volume(
                     reference[f"volume.{region}"]
                     if f"volume.{region}" in reference
-                    else region_volume
+                    else region_volume, str(region)
                 )
                 region_critical_height = ConvertARCADE.get_cell_critical_height(
                     reference[f"height.{region}"]
                     if f"height.{region}" in reference
-                    else region_height
+                    else region_height, str(region)
                 )
 
                 regions.append(
