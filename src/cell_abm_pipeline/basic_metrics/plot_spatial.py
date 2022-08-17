@@ -31,6 +31,7 @@ class PlotSpatial:
                 data[key] = file_data
 
             self.plot_volume_distribution(data, seed, region)
+            self.plot_height_distribution(data, seed, region)
 
             if not region:
                 self.plot_phase_distribution(data, seed)
@@ -38,13 +39,15 @@ class PlotSpatial:
 
     @staticmethod
     def convert_data_units(data, ds, region=None):
-        data["VOLUME"] = ds * ds * ds * data["NUM_VOXELS"]
+        data["volume"] = ds * ds * ds * data["NUM_VOXELS"]
+        data["height"] = ds * (data["MAX_Z"] - data["MIN_Z"] + 1)
 
         if region:
-            data[f"VOLUME.{region}"] = ds * ds * ds * data[f"NUM_VOXELS.{region}"]
+            data[f"volume.{region}"] = ds * ds * ds * data[f"NUM_VOXELS.{region}"]
+            data[f"height.{region}"] = ds * (data[f"MAX_Z.{region}"] - data[f"MIN_Z.{region}"])
 
     def plot_volume_distribution(self, data, seed, region=None, vmin=0, vmax=4000):
-        legend = make_legend("VOLUME", [vmin, vmax])
+        legend = make_legend("volume", [vmin, vmax])
 
         make_plot(
             self.context.keys,
@@ -58,7 +61,36 @@ class PlotSpatial:
 
     @staticmethod
     def _plot_volume_distribution(ax, data, key, region, vmin, vmax):
-        value = f"VOLUME.{region}" if region else "VOLUME"
+        value = f"volume.{region}" if region else "volume"
+        ax.get_xaxis().set_ticks([])
+        ax.get_yaxis().set_ticks([])
+        ax.invert_yaxis()
+
+        data = data[key]
+        data = data[data["TICK"] == data["TICK"].max()]
+
+        x = data["CENTER_X"]
+        y = data["CENTER_Y"]
+        v = data[value]
+
+        ax.scatter(x, y, c=v, s=10, cmap="magma_r", vmin=vmin, vmax=vmax)
+
+    def plot_height_distribution(self, data, seed, region=None, vmin=0, vmax=20):
+        legend = make_legend("height", [vmin, vmax])
+
+        make_plot(
+            self.context.keys,
+            data,
+            lambda a, d, k: self._plot_height_distribution(a, d, k, region, vmin, vmax),
+            legend={"handles": legend},
+        )
+
+        plot_key = make_full_key(self.folders, self.files, "output", ("heights", seed), region)
+        save_plot(self.context.working, plot_key)
+
+    @staticmethod
+    def _plot_height_distribution(ax, data, key, region, vmin, vmax):
+        value = f"height.{region}" if region else "height"
         ax.get_xaxis().set_ticks([])
         ax.get_yaxis().set_ticks([])
         ax.invert_yaxis()
