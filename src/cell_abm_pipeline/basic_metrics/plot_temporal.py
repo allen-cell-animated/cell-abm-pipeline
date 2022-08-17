@@ -42,7 +42,9 @@ class PlotTemporal:
             data["_reference"] = load_dataframe(self.context.working, reference)
 
         self.plot_individual_volume(data, region)
+        self.plot_individual_height(data, region)
         self.plot_average_volume(data, region)
+        self.plot_average_height(data, region)
         self.plot_volume_distribution(data, region)
         self.plot_height_distribution(data, region)
 
@@ -54,12 +56,12 @@ class PlotTemporal:
     @staticmethod
     def convert_data_units(data, ds, dt, region=None):
         data["TIME"] = dt * data["TICK"]
-        data["VOLUME"] = ds * ds * ds * data["NUM_VOXELS"]
-        data["HEIGHT"] = ds * (data["MAX_Z"] - data["MIN_Z"] + 1)
+        data["volume"] = ds * ds * ds * data["NUM_VOXELS"]
+        data["height"] = ds * (data["MAX_Z"] - data["MIN_Z"] + 1)
 
         if region:
-            data[f"VOLUME.{region}"] = ds * ds * ds * data[f"NUM_VOXELS.{region}"]
-            data[f"HEIGHT.{region}"] = ds * (data[f"MAX_Z.{region}"] - data[f"MIN_Z.{region}"])
+            data[f"volume.{region}"] = ds * ds * ds * data[f"NUM_VOXELS.{region}"]
+            data[f"height.{region}"] = ds * (data[f"MAX_Z.{region}"] - data[f"MIN_Z.{region}"])
 
     def plot_total_counts(self, data):
         make_plot(
@@ -206,7 +208,36 @@ class PlotTemporal:
 
     @staticmethod
     def _plot_individual_volume(ax, data, key, region=None, num=5):
-        value = f"VOLUME.{region}" if region else "VOLUME"
+        value = f"volume.{region}" if region else "volume"
+        counter = 0
+
+        for _, group in data[key].groupby(["SEED", "ID"]):
+            group.sort_values("TIME", inplace=True)
+            counter = counter + 1
+
+            volume = group[value].values
+            ticks = group["TIME"]
+
+            ax.plot(ticks, volume)
+
+            if counter >= num:
+                break
+
+    def plot_individual_height(self, data, region=None):
+        make_plot(
+            self.context.keys,
+            data,
+            lambda a, d, k: self._plot_individual_height(a, d, k, region),
+            xlabel="Time (hrs)",
+            ylabel="Height ($\mu m$)",
+        )
+
+        plot_key = make_full_key(self.folders, self.files, "output", "individual_height", region)
+        save_plot(self.context.working, plot_key)
+
+    @staticmethod
+    def _plot_individual_height(ax, data, key, region=None, num=5):
+        value = f"height.{region}" if region else "height"
         counter = 0
 
         for _, group in data[key].groupby(["SEED", "ID"]):
@@ -235,11 +266,38 @@ class PlotTemporal:
 
     @staticmethod
     def _plot_average_volume(ax, data, key, region=None):
-        value = f"VOLUME.{region}" if region else "VOLUME"
+        value = f"volume.{region}" if region else "volume"
 
         volume = data[key].groupby(["SEED", "TIME"]).mean()
         mean = volume.groupby(["TIME"])[value].mean()
         std = volume.groupby(["TIME"])[value].std()
+        ticks = mean.index
+
+        if "_reference" in data:
+            ax.plot(ticks, [data["_reference"][value].mean()] * len(ticks), c="#555", lw=0.5)
+
+        ax.plot(ticks, mean, c="#000")
+        ax.fill_between(ticks, mean - std, mean + std, facecolor="#bbb")
+
+    def plot_average_height(self, data, region=None):
+        make_plot(
+            self.context.keys,
+            data,
+            lambda a, d, k: self._plot_average_height(a, d, k, region),
+            xlabel="Time (hrs)",
+            ylabel="Average Height ($\mu m$)",
+        )
+
+        plot_key = make_full_key(self.folders, self.files, "output", "average_height", region)
+        save_plot(self.context.working, plot_key)
+
+    @staticmethod
+    def _plot_average_height(ax, data, key, region=None):
+        value = f"height.{region}" if region else "height"
+
+        height = data[key].groupby(["SEED", "TIME"]).mean()
+        mean = height.groupby(["TIME"])[value].mean()
+        std = height.groupby(["TIME"])[value].std()
         ticks = mean.index
 
         if "_reference" in data:
@@ -263,7 +321,7 @@ class PlotTemporal:
 
     @staticmethod
     def _plot_volume_distribution(ax, data, key, region=None):
-        value = f"VOLUME.{region}" if region else "VOLUME"
+        value = f"volume.{region}" if region else "volume"
         bins = np.arange(0, 5000, 100)
 
         if "_reference" in data:
@@ -290,7 +348,7 @@ class PlotTemporal:
 
     @staticmethod
     def _plot_height_distribution(ax, data, key, region=None):
-        value = f"HEIGHT.{region}" if region else "HEIGHT"
+        value = f"height.{region}" if region else "height"
         bins = np.arange(0, 30, 1)
 
         if "_reference" in data:
