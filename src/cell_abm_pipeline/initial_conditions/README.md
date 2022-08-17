@@ -11,7 +11,7 @@ Options:
 
 Commands:
   convert-arcade        Convert samples into ARCADE input formats.
-  create-voronoi        Create Voronoi tessellation from given starting...
+  create-voronoi        Create Voronoi tessellation from starting image.
   download-images       Download images from Quilt package.
   generate-coordinates  Generate cell ids and coordinates.
   process-samples       Process samples with selected processing steps.
@@ -87,7 +87,8 @@ Usage: initial-conditions process-samples [OPTIONS]
 Options:
   -g, --grid [rect|hex]         Type of sampling grid.  [default: rect]
   --scale FLOAT                 Coordinate scaling factor.
-  --select INTEGER              Specific cell ids to select.
+  --include INTEGER             Specific cell ids to include.
+  --exclude INTEGER             Specific cell ids to exclude.
   --edges / --no-edges          True if cells touching edges are removed,
                                 False otherwise.  [default: False]
   --connected / --no-connected  True if unconnected voxels are removed, False
