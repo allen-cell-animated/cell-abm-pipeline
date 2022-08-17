@@ -347,11 +347,13 @@ class TestConvertARCADE(unittest.TestCase):
         cell_id = 10
         state = "STATE_PHASE"
         num_samples = 100
+        z_delta = 10
 
         samples = pd.DataFrame(np.zeros((num_samples, 4)), columns=["id", "x", "y", "z"])
+        samples["z"] = np.linspace(0, z_delta, num_samples)
 
-        get_cell_critical_volume.side_effect = lambda v, *args: len(v) / 2
-        get_cell_critical_height.side_effect = lambda v, *args: len(v) / 3
+        get_cell_critical_volume.side_effect = lambda v, *args: v / 2
+        get_cell_critical_height.side_effect = lambda v, *args: v / 3
         get_cell_state.return_value = state
 
         expected_cell = {
@@ -363,14 +365,18 @@ class TestConvertARCADE(unittest.TestCase):
             "state": "STATE",
             "phase": "STATE_PHASE",
             "voxels": num_samples,
-            "criticals": [num_samples / 2, num_samples / 3],
+            "criticals": [num_samples / 2, z_delta / 3],
         }
 
         cell = ConvertARCADE.convert_to_cell(cell_id, samples, {})
         self.assertDictEqual(expected_cell, cell)
 
+    @mock.patch.object(ConvertARCADE, "get_cell_critical_volume")
+    @mock.patch.object(ConvertARCADE, "get_cell_critical_height")
     @mock.patch.object(ConvertARCADE, "get_cell_state")
-    def test_convert_to_cell_with_reference_no_region(self, get_cell_state):
+    def test_convert_to_cell_with_reference_no_region(
+        self, get_cell_state, get_cell_critical_height, get_cell_critical_volume
+    ):
         critical_volume = 1500
         critical_height = 20
 
@@ -382,8 +388,13 @@ class TestConvertARCADE(unittest.TestCase):
         cell_id = 10
         state = "STATE_PHASE"
         num_samples = 100
-        samples = pd.DataFrame(np.zeros((num_samples, 4)), columns=["id", "x", "y", "z"])
+        z_delta = 10
 
+        samples = pd.DataFrame(np.zeros((num_samples, 4)), columns=["id", "x", "y", "z"])
+        samples["z"] = np.linspace(0, z_delta, num_samples)
+
+        get_cell_critical_volume.side_effect = lambda v, *args: v / 2
+        get_cell_critical_height.side_effect = lambda v, *args: v / 3
         get_cell_state.return_value = state
 
         expected_cell = {
@@ -395,12 +406,12 @@ class TestConvertARCADE(unittest.TestCase):
             "state": "STATE",
             "phase": "STATE_PHASE",
             "voxels": num_samples,
-            "criticals": [critical_volume, critical_height],
+            "criticals": [critical_volume / 2, critical_height / 3],
         }
 
         cell = ConvertARCADE.convert_to_cell(cell_id, samples, reference)
         self.assertDictEqual(expected_cell, cell)
-        get_cell_state.assert_called_with(num_samples, critical_volume)
+        get_cell_state.assert_called_with(num_samples, critical_volume / 2)
 
     @mock.patch.object(ConvertARCADE, "get_cell_critical_volume")
     @mock.patch.object(ConvertARCADE, "get_cell_critical_height")
@@ -415,12 +426,20 @@ class TestConvertARCADE(unittest.TestCase):
         num_samples = 100
         num_samples_region_a = 60
         num_samples_region_b = 40
+        z_delta_region_a = 3
+        z_delta_region_b = 5
 
         samples = pd.DataFrame(np.zeros((num_samples, 4)), columns=["id", "x", "y", "z"])
         samples["region"] = [region_a] * num_samples_region_a + [region_b] * num_samples_region_b
+        samples["z"].loc[: num_samples_region_a - 1] = np.linspace(
+            0, z_delta_region_a, num_samples_region_a
+        )
+        samples["z"].loc[num_samples_region_a:num_samples] = np.linspace(
+            0, z_delta_region_b, num_samples_region_b
+        )
 
-        get_cell_critical_volume.side_effect = lambda v, *args: len(v) / 2
-        get_cell_critical_height.side_effect = lambda v, *args: len(v) / 3
+        get_cell_critical_volume.side_effect = lambda v, *args: v / 2
+        get_cell_critical_height.side_effect = lambda v, *args: v / 3
         get_cell_state.return_value = state
 
         expected_cell = {
@@ -432,17 +451,17 @@ class TestConvertARCADE(unittest.TestCase):
             "state": "STATE",
             "phase": "STATE_PHASE",
             "voxels": num_samples,
-            "criticals": [num_samples / 2, num_samples / 3],
+            "criticals": [num_samples / 2, z_delta_region_b / 3],
             "regions": [
                 {
                     "region": region_a,
                     "voxels": num_samples_region_a,
-                    "criticals": [num_samples_region_a / 2, num_samples_region_a / 3],
+                    "criticals": [num_samples_region_a / 2, z_delta_region_a / 3],
                 },
                 {
                     "region": region_b,
                     "voxels": num_samples_region_b,
-                    "criticals": [num_samples_region_b / 2, num_samples_region_b / 3],
+                    "criticals": [num_samples_region_b / 2, z_delta_region_b / 3],
                 },
             ],
         }
@@ -450,8 +469,12 @@ class TestConvertARCADE(unittest.TestCase):
         cell = ConvertARCADE.convert_to_cell(cell_id, samples, {})
         self.assertDictEqual(expected_cell, cell)
 
+    @mock.patch.object(ConvertARCADE, "get_cell_critical_volume")
+    @mock.patch.object(ConvertARCADE, "get_cell_critical_height")
     @mock.patch.object(ConvertARCADE, "get_cell_state")
-    def test_convert_to_cell_with_reference_with_region(self, get_cell_state):
+    def test_convert_to_cell_with_reference_with_region(
+        self, get_cell_state, get_cell_critical_height, get_cell_critical_volume
+    ):
         region_a = "REGION_A"
         region_b = "REGION_B"
         critical_volume = 1000
@@ -473,9 +496,20 @@ class TestConvertARCADE(unittest.TestCase):
         num_samples = 100
         num_samples_region_a = 60
         num_samples_region_b = 40
+        z_delta_region_a = 3
+        z_delta_region_b = 5
+
         samples = pd.DataFrame(np.zeros((num_samples, 4)), columns=["id", "x", "y", "z"])
         samples["region"] = [region_a] * num_samples_region_a + [region_b] * num_samples_region_b
+        samples["z"].loc[: num_samples_region_a - 1] = np.linspace(
+            0, z_delta_region_a, num_samples_region_a
+        )
+        samples["z"].loc[num_samples_region_a:num_samples] = np.linspace(
+            0, z_delta_region_b, num_samples_region_b
+        )
 
+        get_cell_critical_volume.side_effect = lambda v, *args: v / 2
+        get_cell_critical_height.side_effect = lambda v, *args: v / 3
         get_cell_state.return_value = state
 
         expected_cell = {
@@ -487,24 +521,24 @@ class TestConvertARCADE(unittest.TestCase):
             "state": "STATE",
             "phase": "STATE_PHASE",
             "voxels": num_samples,
-            "criticals": [critical_volume, critical_height],
+            "criticals": [critical_volume / 2, critical_height / 3],
             "regions": [
                 {
                     "region": region_a,
                     "voxels": num_samples_region_a,
-                    "criticals": [critical_volumes[region_a], critical_heights[region_a]],
+                    "criticals": [critical_volumes[region_a] / 2, critical_heights[region_a] / 3],
                 },
                 {
                     "region": region_b,
                     "voxels": num_samples_region_b,
-                    "criticals": [critical_volumes[region_b], critical_heights[region_b]],
+                    "criticals": [critical_volumes[region_b] / 2, critical_heights[region_b] / 3],
                 },
             ],
         }
 
         cell = ConvertARCADE.convert_to_cell(cell_id, samples, reference)
         self.assertDictEqual(expected_cell, cell)
-        get_cell_state.assert_called_with(num_samples, critical_volume)
+        get_cell_state.assert_called_with(num_samples, critical_volume / 2)
 
     @mock.patch.object(ConvertARCADE, "get_location_center")
     @mock.patch.object(ConvertARCADE, "get_location_voxels")
@@ -557,60 +591,52 @@ class TestConvertARCADE(unittest.TestCase):
         self.assertDictEqual(expected_location, location)
 
     def test_get_cell_critical_volume_default_parameters(self):
-        num_samples = 1000
-        samples = pd.DataFrame(np.zeros((num_samples, 4)), columns=["id", "x", "y", "z"])
-
+        volume = 1000
         avgs = VOLUME_AVGS["DEFAULT"]
         stds = VOLUME_STDS["DEFAULT"]
         critical_avgs = CRITICAL_VOLUME_AVGS["DEFAULT"]
         critical_stds = CRITICAL_VOLUME_STDS["DEFAULT"]
-        expected_volume = ((num_samples - avgs) / stds) * critical_stds + critical_avgs
+        expected_volume = ((volume - avgs) / stds) * critical_stds + critical_avgs
 
-        critical_volume = ConvertARCADE.get_cell_critical_volume(samples)
+        critical_volume = ConvertARCADE.get_cell_critical_volume(volume)
         self.assertAlmostEqual(expected_volume, critical_volume, places=5)
 
     def test_get_cell_critical_volume_given_parameters(self):
         region = "REGION"
-        num_samples = 1000
-        samples = pd.DataFrame(np.zeros((num_samples, 4)), columns=["id", "x", "y", "z"])
-
+        volume = 1000
         avgs = {region: 100}
         stds = {region: 10}
         critical_avgs = {region: 200}
         critical_stds = {region: 30}
-        expected_volume = ((num_samples - 100) / 10) * 30 + 200
+        expected_volume = ((volume - 100) / 10) * 30 + 200
 
         critical_volume = ConvertARCADE.get_cell_critical_volume(
-            samples, region, avgs, stds, critical_avgs, critical_stds
+            volume, region, avgs, stds, critical_avgs, critical_stds
         )
         self.assertAlmostEqual(expected_volume, critical_volume, places=5)
 
     def test_get_cell_critical_height_default_parameters(self):
-        z_delta = 10
-        samples = pd.DataFrame([[1, 0, 0, 0], [1, 0, 0, z_delta]], columns=["id", "x", "y", "z"])
-
+        height = 10
         avgs = HEIGHT_AVGS["DEFAULT"]
         stds = HEIGHT_STDS["DEFAULT"]
         critical_avgs = CRITICAL_HEIGHT_AVGS["DEFAULT"]
         critical_stds = CRITICAL_HEIGHT_STDS["DEFAULT"]
-        expected_height = ((z_delta - avgs) / stds) * critical_stds + critical_avgs
+        expected_height = ((height - avgs) / stds) * critical_stds + critical_avgs
 
-        critical_height = ConvertARCADE.get_cell_critical_height(samples)
+        critical_height = ConvertARCADE.get_cell_critical_height(height)
         self.assertAlmostEqual(expected_height, critical_height, places=5)
 
     def test_get_cell_critical_height_given_parameters(self):
         region = "REGION"
-        z_delta = 10
-        samples = pd.DataFrame([[1, 0, 0, 0], [1, 0, 0, z_delta]], columns=["id", "x", "y", "z"])
-
+        height = 10
         avgs = {region: 100}
         stds = {region: 10}
         critical_avgs = {region: 200}
         critical_stds = {region: 30}
-        expected_height = ((z_delta - 100) / 10) * 30 + 200
+        expected_height = ((height - 100) / 10) * 30 + 200
 
         critical_height = ConvertARCADE.get_cell_critical_height(
-            samples, region, avgs, stds, critical_avgs, critical_stds
+            height, region, avgs, stds, critical_avgs, critical_stds
         )
         self.assertAlmostEqual(expected_height, critical_height, places=5)
 

@@ -374,16 +374,13 @@ class ConvertARCADE:
             Dictionary in ARCADE .CELLS json format.
         """
         volume = len(samples)
+        height = samples.z.max() - samples.z.min()
 
-        critical_volume = (
-            reference["volume"]
-            if "volume" in reference
-            else ConvertARCADE.get_cell_critical_volume(samples)
+        critical_volume = ConvertARCADE.get_cell_critical_volume(
+            reference["volume"] if "volume" in reference else volume
         )
-        critical_height = (
-            reference["height"]
-            if "height" in reference
-            else ConvertARCADE.get_cell_critical_height(samples)
+        critical_height = ConvertARCADE.get_cell_critical_height(
+            reference["height"] if "height" in reference else height
         )
 
         state = ConvertARCADE.get_cell_state(volume, critical_volume)
@@ -404,15 +401,18 @@ class ConvertARCADE:
             regions: List[dict] = []
 
             for region, region_samples in samples.groupby("region"):
-                region_critical_volume = (
+                region_volume = len(region_samples)
+                region_height = region_samples.z.max() - region_samples.z.min()
+
+                region_critical_volume = ConvertARCADE.get_cell_critical_volume(
                     reference[f"volume.{region}"]
                     if f"volume.{region}" in reference
-                    else ConvertARCADE.get_cell_critical_volume(region_samples, str(region))
+                    else region_volume
                 )
-                region_critical_height = (
+                region_critical_height = ConvertARCADE.get_cell_critical_height(
                     reference[f"height.{region}"]
                     if f"height.{region}" in reference
-                    else ConvertARCADE.get_cell_critical_height(region_samples, str(region))
+                    else region_height
                 )
 
                 regions.append(
@@ -464,7 +464,7 @@ class ConvertARCADE:
 
     @staticmethod
     def get_cell_critical_volume(
-        samples: pd.DataFrame,
+        volume: float,
         region: str = "DEFAULT",
         avgs: Optional[Dict[str, float]] = None,
         stds: Optional[Dict[str, float]] = None,
@@ -472,12 +472,12 @@ class ConvertARCADE:
         critical_stds: Optional[Dict[str, float]] = None,
     ) -> float:
         """
-        Estimates critical cell volume based on samples.
+        Estimates critical cell volume based on actual volume.
 
         Parameters
         ----------
-        samples
-            Sample cell ids and coordinates.
+        volume
+            Actual cell volume.
         region
             Region key.
         avgs
@@ -506,14 +506,13 @@ class ConvertARCADE:
         if critical_stds is None:
             critical_stds = CRITICAL_VOLUME_STDS
 
-        volume = len(samples)
         z_scored_volume = (volume - avgs[region]) / stds[region]
         critical_volume = z_scored_volume * critical_stds[region] + critical_avgs[region]
         return critical_volume
 
     @staticmethod
     def get_cell_critical_height(
-        samples: pd.DataFrame,
+        height: float,
         region: str = "DEFAULT",
         avgs: Optional[Dict[str, float]] = None,
         stds: Optional[Dict[str, float]] = None,
@@ -521,12 +520,12 @@ class ConvertARCADE:
         critical_stds: Optional[Dict[str, float]] = None,
     ) -> float:
         """
-        Estimates critical cell height based on samples.
+        Estimates critical cell height based on actual height.
 
         Parameters
         ----------
-        samples
-            Sample cell ids and coordinates.
+        height
+            Actual cell height.
         region
             Region key.
         avgs
@@ -541,7 +540,7 @@ class ConvertARCADE:
         Returns
         -------
         :
-            Estimated critical cell volume.
+            Estimated critical cell height.
         """
         if avgs is None:
             avgs = HEIGHT_AVGS
@@ -555,7 +554,6 @@ class ConvertARCADE:
         if critical_stds is None:
             critical_stds = CRITICAL_HEIGHT_STDS
 
-        height = samples.z.max() - samples.z.min()
         z_scored_height = (height - avgs[region]) / stds[region]
         critical_height = z_scored_height * critical_stds[region] + critical_avgs[region]
         return critical_height
