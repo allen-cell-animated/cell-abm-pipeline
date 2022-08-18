@@ -51,9 +51,7 @@ class ExtractClock:
     def parse_log_file(contents):
         keys = ["KEY", "SEED", "CLOCK"]
 
-        pattern = (
-            "simulation \[ ([A-z0-9\s\_]+) \\| ([0-9]{4}) \] finished in ([0-9\.]+) minutes"
-        )
+        pattern = "simulation \[ ([A-z0-9\s\_]+) \\| ([0-9]{4}) \] finished in ([0-9\.]+) minutes"
         matches = re.findall(pattern, contents)
         matches_dicts = [{key: entry for key, entry in zip(keys, match)} for match in matches]
 
