@@ -103,7 +103,7 @@ class CreateVoronoi:
 
         # Create artificial boundary for voronoi.
         mask = self.create_boundary_mask(array, iterations)
-        lower_bound, upper_bound = self.adjust_mask_bounds(array, height)
+        lower_bound, upper_bound = self.get_mask_bounds(array, height)
         mask_id = np.iinfo(array.dtype).max
         array[mask == 0] = mask_id
         mask[:lower_bound, :, :] = 0
@@ -151,12 +151,31 @@ class CreateVoronoi:
         return mask
 
     @staticmethod
-    def adjust_mask_bounds(array: np.ndarray, target_height: int) -> Tuple[int, int]:
-        lower_bound, upper_bound = np.where(np.any(array, axis=(1, 2)))[0][[0, -1]]
-        current_height = upper_bound - lower_bound + 1
+    def get_mask_bounds(array: np.ndarray, target_range: int) -> Tuple[int, int]:
+        """
+        Calculates the indices of z axis bounds with given target range.
 
-        if current_height < target_height:
-            height_delta = target_height - current_height
+        If the current range between z axis bounds (the minimum and maximum
+        indicies in the z axis where there exist non-zero entries) is wider than
+        the target range, the current bound indices are returned.
+
+        Parameters
+        ----------
+        array
+            Image array.
+        target_range
+            Target distance between bounds.
+
+        Returns
+        -------
+        :
+            Lower and upper bound indices.
+        """
+        lower_bound, upper_bound = np.where(np.any(array, axis=(1, 2)))[0][[0, -1]]
+        current_range = upper_bound - lower_bound + 1
+
+        if current_range < target_range:
+            height_delta = target_range - current_range
             lower_offset = floor(height_delta / 2)
             upper_offset = height_delta - lower_offset
             lower_bound = lower_bound - lower_offset
