@@ -273,7 +273,7 @@ class PlotTemporal:
         std = volume.groupby(["TIME"])[value].std()
         ticks = mean.index
 
-        if "_reference" in data:
+        if "_reference" in data and value in data["_reference"]:
             ax.plot(ticks, [data["_reference"][value].mean()] * len(ticks), c="#555", lw=0.5)
 
         ax.plot(ticks, mean, c="#000")
@@ -300,7 +300,7 @@ class PlotTemporal:
         std = height.groupby(["TIME"])[value].std()
         ticks = mean.index
 
-        if "_reference" in data:
+        if "_reference" in data and value in data["_reference"]:
             ax.plot(ticks, [data["_reference"][value].mean()] * len(ticks), c="#555", lw=0.5)
 
         ax.plot(ticks, mean, c="#000")
@@ -324,7 +324,7 @@ class PlotTemporal:
         value = f"volume.{region}" if region else "volume"
         bins = np.arange(0, 5000, 100)
 
-        if "_reference" in data:
+        if "_reference" in data and value in data["_reference"]:
             reference = data["_reference"][value]
             ax.hist(reference, bins=bins, density=True, color="#999999", alpha=0.7, label="ref")
 
@@ -351,7 +351,7 @@ class PlotTemporal:
         value = f"height.{region}" if region else "height"
         bins = np.arange(0, 30, 1)
 
-        if "_reference" in data:
+        if "_reference" in data and value in data["_reference"]:
             reference = data["_reference"][value]
             ax.hist(reference, bins=bins, density=True, color="#999999", alpha=0.7, label="ref")
 
