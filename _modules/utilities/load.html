@@ -70,7 +70,6 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">lzma</span>
-<span class="kn">import</span> <span class="nn">gzip</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">tarfile</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -160,23 +159,6 @@
         <span class="k">return</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;Body&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
-
-
-<div class="viewcode-block" id="load_gzip"><a class="viewcode-back" href="../../utilities.load.html#utilities.load.load_gzip">[docs]</a><span class="k">def</span> <span class="nf">load_gzip</span><span class="p">(</span><span class="n">working</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">working</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;s3://&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_load_gzip_from_s3</span><span class="p">(</span><span class="n">working</span><span class="p">[</span><span class="mi">5</span><span class="p">:],</span> <span class="n">key</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_load_gzip_from_fs</span><span class="p">(</span><span class="n">working</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
-
-
-<span class="k">def</span> <span class="nf">_load_gzip_from_fs</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-    <span class="n">full_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="k">return</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">full_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-
-
-<span class="k">def</span> <span class="nf">_load_gzip_from_s3</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-    <span class="n">buffer</span> <span class="o">=</span> <span class="n">_load_buffer_from_s3</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">gzip</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">buffer</span><span class="o">.</span><span class="n">getbuffer</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="load_tar"><a class="viewcode-back" href="../../utilities.load.html#utilities.load.load_tar">[docs]</a><span class="k">def</span> <span class="nf">load_tar</span><span class="p">(</span><span class="n">working</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>

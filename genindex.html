@@ -92,8 +92,6 @@
 </li>
       <li><a href="basic_metrics.plot_projection.html#basic_metrics.plot_projection.PlotProjection.add_frame_timestamp">add_frame_timestamp() (PlotProjection static method)</a>
 </li>
-      <li><a href="initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi.adjust_mask_bounds">adjust_mask_bounds() (CreateVoronoi static method)</a>
-</li>
       <li><a href="colony_dynamics.analyze_clusters.html#colony_dynamics.analyze_clusters.AnalyzeClusters.analyze_clusters">analyze_clusters() (AnalyzeClusters method)</a>
 </li>
       <li><a href="colony_dynamics.analyze_measures.html#colony_dynamics.analyze_measures.AnalyzeMeasures.analyze_measures">analyze_measures() (AnalyzeMeasures method)</a>
@@ -102,10 +100,10 @@
 </li>
       <li><a href="colony_dynamics.analyze_measures.html#colony_dynamics.analyze_measures.AnalyzeMeasures">AnalyzeMeasures (class in colony_dynamics.analyze_measures)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cell_shape.extract_shapes.html#cell_shape.extract_shapes.ExtractShapes.append_svg_element">append_svg_element() (ExtractShapes static method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cell_shape.perform_pca.html#cell_shape.perform_pca.PerformPCA.apply_data_transform">apply_data_transform() (PerformPCA static method)</a>
 </li>
       <li><a href="convert_format.arcade_to_image.html#convert_format.arcade_to_image.ArcadeToImage.arcade_to_image">arcade_to_image() (ArcadeToImage method)</a>
@@ -549,6 +547,8 @@
         <li><a href="initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.get_location_voxels">(ConvertARCADE static method)</a>
 </li>
       </ul></li>
+      <li><a href="initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi.get_mask_bounds">get_mask_bounds() (CreateVoronoi static method)</a>
+</li>
       <li><a href="cell_shape.extract_shapes.html#cell_shape.extract_shapes.ExtractShapes.get_mesh_slice">get_mesh_slice() (ExtractShapes static method)</a>
 </li>
       <li><a href="cell_shape.extract_shapes.html#cell_shape.extract_shapes.ExtractShapes.get_mesh_slices">get_mesh_slices() (ExtractShapes static method)</a>
@@ -648,12 +648,10 @@
 </li>
       <li><a href="utilities.load.html#utilities.load.load_dataframe_object">load_dataframe_object() (in module utilities.load)</a>
 </li>
-      <li><a href="utilities.load.html#utilities.load.load_gzip">load_gzip() (in module utilities.load)</a>
+      <li><a href="utilities.load.html#utilities.load.load_image">load_image() (in module utilities.load)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="utilities.load.html#utilities.load.load_image">load_image() (in module utilities.load)</a>
-</li>
       <li><a href="utilities.load.html#utilities.load.load_keys">load_keys() (in module utilities.load)</a>
 </li>
       <li><a href="utilities.load.html#utilities.load.load_pickle">load_pickle() (in module utilities.load)</a>
@@ -813,6 +811,8 @@
 </li>
       <li><a href="colony_dynamics.plot_measures.html#colony_dynamics.plot_measures.PlotMeasures.plot_average_degree_std">plot_average_degree_std() (PlotMeasures method)</a>
 </li>
+      <li><a href="basic_metrics.plot_temporal.html#basic_metrics.plot_temporal.PlotTemporal.plot_average_height">plot_average_height() (PlotTemporal method)</a>
+</li>
       <li><a href="basic_metrics.plot_temporal.html#basic_metrics.plot_temporal.PlotTemporal.plot_average_volume">plot_average_volume() (PlotTemporal method)</a>
 </li>
       <li><a href="basic_metrics.plot_temporal.html#basic_metrics.plot_temporal.PlotTemporal.plot_cell_phases">plot_cell_phases() (PlotTemporal method)</a>
@@ -843,7 +843,13 @@
       </ul></li>
       <li><a href="colony_dynamics.plot_measures.html#colony_dynamics.plot_measures.PlotMeasures.plot_degree_distribution">plot_degree_distribution() (PlotMeasures method)</a>
 </li>
-      <li><a href="basic_metrics.plot_temporal.html#basic_metrics.plot_temporal.PlotTemporal.plot_height_distribution">plot_height_distribution() (PlotTemporal method)</a>
+      <li><a href="basic_metrics.plot_spatial.html#basic_metrics.plot_spatial.PlotSpatial.plot_height_distribution">plot_height_distribution() (PlotSpatial method)</a>
+
+      <ul>
+        <li><a href="basic_metrics.plot_temporal.html#basic_metrics.plot_temporal.PlotTemporal.plot_height_distribution">(PlotTemporal method)</a>
+</li>
+      </ul></li>
+      <li><a href="basic_metrics.plot_temporal.html#basic_metrics.plot_temporal.PlotTemporal.plot_individual_height">plot_individual_height() (PlotTemporal method)</a>
 </li>
       <li><a href="basic_metrics.plot_temporal.html#basic_metrics.plot_temporal.PlotTemporal.plot_individual_volume">plot_individual_volume() (PlotTemporal method)</a>
 </li>
@@ -853,10 +859,10 @@
 </li>
       <li><a href="colony_dynamics.plot_clusters.html#colony_dynamics.plot_clusters.PlotClusters.plot_intra_cluster_distances_mean">plot_intra_cluster_distances_mean() (PlotClusters method)</a>
 </li>
-      <li><a href="colony_dynamics.plot_clusters.html#colony_dynamics.plot_clusters.PlotClusters.plot_intra_cluster_distances_std">plot_intra_cluster_distances_std() (PlotClusters method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="colony_dynamics.plot_clusters.html#colony_dynamics.plot_clusters.PlotClusters.plot_intra_cluster_distances_std">plot_intra_cluster_distances_std() (PlotClusters method)</a>
+</li>
       <li><a href="colony_dynamics.plot_neighbors.html#colony_dynamics.plot_neighbors.PlotNeighbors.plot_neighbors">plot_neighbors() (PlotNeighbors method)</a>
 </li>
       <li><a href="colony_dynamics.plot_measures.html#colony_dynamics.plot_measures.PlotMeasures.plot_network_centrality">plot_network_centrality() (PlotMeasures method)</a>

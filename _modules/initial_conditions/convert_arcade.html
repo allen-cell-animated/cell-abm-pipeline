@@ -442,16 +442,13 @@
 <span class="sd">            Dictionary in ARCADE .CELLS json format.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">volume</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">samples</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
 
-        <span class="n">critical_volume</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">reference</span><span class="p">[</span><span class="s2">&quot;volume&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s2">&quot;volume&quot;</span> <span class="ow">in</span> <span class="n">reference</span>
-            <span class="k">else</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_critical_volume</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+        <span class="n">critical_volume</span> <span class="o">=</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_critical_volume</span><span class="p">(</span>
+            <span class="n">reference</span><span class="p">[</span><span class="s2">&quot;volume&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;volume&quot;</span> <span class="ow">in</span> <span class="n">reference</span> <span class="k">else</span> <span class="n">volume</span>
         <span class="p">)</span>
-        <span class="n">critical_height</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">reference</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s2">&quot;height&quot;</span> <span class="ow">in</span> <span class="n">reference</span>
-            <span class="k">else</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_critical_height</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+        <span class="n">critical_height</span> <span class="o">=</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_critical_height</span><span class="p">(</span>
+            <span class="n">reference</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;height&quot;</span> <span class="ow">in</span> <span class="n">reference</span> <span class="k">else</span> <span class="n">height</span>
         <span class="p">)</span>
 
         <span class="n">state</span> <span class="o">=</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_state</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">critical_volume</span><span class="p">)</span>
@@ -472,15 +469,20 @@
             <span class="n">regions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
             <span class="k">for</span> <span class="n">region</span><span class="p">,</span> <span class="n">region_samples</span> <span class="ow">in</span> <span class="n">samples</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;region&quot;</span><span class="p">):</span>
-                <span class="n">region_critical_volume</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">region_volume</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">region_samples</span><span class="p">)</span>
+                <span class="n">region_height</span> <span class="o">=</span> <span class="n">region_samples</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">region_samples</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+
+                <span class="n">region_critical_volume</span> <span class="o">=</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_critical_volume</span><span class="p">(</span>
                     <span class="n">reference</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;volume.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
                     <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;volume.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">reference</span>
-                    <span class="k">else</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_critical_volume</span><span class="p">(</span><span class="n">region_samples</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">))</span>
+                    <span class="k">else</span> <span class="n">region_volume</span><span class="p">,</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">),</span>
                 <span class="p">)</span>
-                <span class="n">region_critical_height</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">region_critical_height</span> <span class="o">=</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_critical_height</span><span class="p">(</span>
                     <span class="n">reference</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;height.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
                     <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;height.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">reference</span>
-                    <span class="k">else</span> <span class="n">ConvertARCADE</span><span class="o">.</span><span class="n">get_cell_critical_height</span><span class="p">(</span><span class="n">region_samples</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">))</span>
+                    <span class="k">else</span> <span class="n">region_height</span><span class="p">,</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">),</span>
                 <span class="p">)</span>
 
                 <span class="n">regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -532,7 +534,7 @@
 
 <div class="viewcode-block" id="ConvertARCADE.get_cell_critical_volume"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.get_cell_critical_volume">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_cell_critical_volume</span><span class="p">(</span>
-        <span class="n">samples</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">volume</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;DEFAULT&quot;</span><span class="p">,</span>
         <span class="n">avgs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">stds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -540,12 +542,12 @@
         <span class="n">critical_stds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Estimates critical cell volume based on samples.</span>
+<span class="sd">        Estimates critical cell volume based on actual volume.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        samples</span>
-<span class="sd">            Sample cell ids and coordinates.</span>
+<span class="sd">        volume</span>
+<span class="sd">            Actual cell volume.</span>
 <span class="sd">        region</span>
 <span class="sd">            Region key.</span>
 <span class="sd">        avgs</span>
@@ -574,14 +576,13 @@
         <span class="k">if</span> <span class="n">critical_stds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">critical_stds</span> <span class="o">=</span> <span class="n">CRITICAL_VOLUME_STDS</span>
 
-        <span class="n">volume</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
         <span class="n">z_scored_volume</span> <span class="o">=</span> <span class="p">(</span><span class="n">volume</span> <span class="o">-</span> <span class="n">avgs</span><span class="p">[</span><span class="n">region</span><span class="p">])</span> <span class="o">/</span> <span class="n">stds</span><span class="p">[</span><span class="n">region</span><span class="p">]</span>
         <span class="n">critical_volume</span> <span class="o">=</span> <span class="n">z_scored_volume</span> <span class="o">*</span> <span class="n">critical_stds</span><span class="p">[</span><span class="n">region</span><span class="p">]</span> <span class="o">+</span> <span class="n">critical_avgs</span><span class="p">[</span><span class="n">region</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">critical_volume</span></div>
 
 <div class="viewcode-block" id="ConvertARCADE.get_cell_critical_height"><a class="viewcode-back" href="../../initial_conditions.convert_arcade.html#initial_conditions.convert_arcade.ConvertARCADE.get_cell_critical_height">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_cell_critical_height</span><span class="p">(</span>
-        <span class="n">samples</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;DEFAULT&quot;</span><span class="p">,</span>
         <span class="n">avgs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">stds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -589,12 +590,12 @@
         <span class="n">critical_stds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Estimates critical cell height based on samples.</span>
+<span class="sd">        Estimates critical cell height based on actual height.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        samples</span>
-<span class="sd">            Sample cell ids and coordinates.</span>
+<span class="sd">        height</span>
+<span class="sd">            Actual cell height.</span>
 <span class="sd">        region</span>
 <span class="sd">            Region key.</span>
 <span class="sd">        avgs</span>
@@ -609,7 +610,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :</span>
-<span class="sd">            Estimated critical cell volume.</span>
+<span class="sd">            Estimated critical cell height.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">avgs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">avgs</span> <span class="o">=</span> <span class="n">HEIGHT_AVGS</span>
@@ -623,7 +624,6 @@
         <span class="k">if</span> <span class="n">critical_stds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">critical_stds</span> <span class="o">=</span> <span class="n">CRITICAL_HEIGHT_STDS</span>
 
-        <span class="n">height</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">samples</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
         <span class="n">z_scored_height</span> <span class="o">=</span> <span class="p">(</span><span class="n">height</span> <span class="o">-</span> <span class="n">avgs</span><span class="p">[</span><span class="n">region</span><span class="p">])</span> <span class="o">/</span> <span class="n">stds</span><span class="p">[</span><span class="n">region</span><span class="p">]</span>
         <span class="n">critical_height</span> <span class="o">=</span> <span class="n">z_scored_height</span> <span class="o">*</span> <span class="n">critical_stds</span><span class="p">[</span><span class="n">region</span><span class="p">]</span> <span class="o">+</span> <span class="n">critical_avgs</span><span class="p">[</span><span class="n">region</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">critical_height</span></div>

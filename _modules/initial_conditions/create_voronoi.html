@@ -171,7 +171,7 @@
 
         <span class="c1"># Create artificial boundary for voronoi.</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_boundary_mask</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">iterations</span><span class="p">)</span>
-        <span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjust_mask_bounds</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+        <span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mask_bounds</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
         <span class="n">mask_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">max</span>
         <span class="n">array</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask_id</span>
         <span class="n">mask</span><span class="p">[:</span><span class="n">lower_bound</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
@@ -218,13 +218,32 @@
 
         <span class="k">return</span> <span class="n">mask</span></div>
 
-<div class="viewcode-block" id="CreateVoronoi.adjust_mask_bounds"><a class="viewcode-back" href="../../initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi.adjust_mask_bounds">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">adjust_mask_bounds</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">target_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-        <span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))[</span><span class="mi">0</span><span class="p">][[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
-        <span class="n">current_height</span> <span class="o">=</span> <span class="n">upper_bound</span> <span class="o">-</span> <span class="n">lower_bound</span> <span class="o">+</span> <span class="mi">1</span>
+<div class="viewcode-block" id="CreateVoronoi.get_mask_bounds"><a class="viewcode-back" href="../../initial_conditions.create_voronoi.html#initial_conditions.create_voronoi.CreateVoronoi.get_mask_bounds">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_mask_bounds</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">target_range</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the indices of z axis bounds with given target range.</span>
 
-        <span class="k">if</span> <span class="n">current_height</span> <span class="o">&lt;</span> <span class="n">target_height</span><span class="p">:</span>
-            <span class="n">height_delta</span> <span class="o">=</span> <span class="n">target_height</span> <span class="o">-</span> <span class="n">current_height</span>
+<span class="sd">        If the current range between z axis bounds (the minimum and maximum</span>
+<span class="sd">        indicies in the z axis where there exist non-zero entries) is wider than</span>
+<span class="sd">        the target range, the current bound indices are returned.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        array</span>
+<span class="sd">            Image array.</span>
+<span class="sd">        target_range</span>
+<span class="sd">            Target distance between bounds.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :</span>
+<span class="sd">            Lower and upper bound indices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))[</span><span class="mi">0</span><span class="p">][[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">current_range</span> <span class="o">=</span> <span class="n">upper_bound</span> <span class="o">-</span> <span class="n">lower_bound</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">current_range</span> <span class="o">&lt;</span> <span class="n">target_range</span><span class="p">:</span>
+            <span class="n">height_delta</span> <span class="o">=</span> <span class="n">target_range</span> <span class="o">-</span> <span class="n">current_range</span>
             <span class="n">lower_offset</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">height_delta</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
             <span class="n">upper_offset</span> <span class="o">=</span> <span class="n">height_delta</span> <span class="o">-</span> <span class="n">lower_offset</span>
             <span class="n">lower_bound</span> <span class="o">=</span> <span class="n">lower_bound</span> <span class="o">-</span> <span class="n">lower_offset</span>
