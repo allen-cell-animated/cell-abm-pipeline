@@ -10,7 +10,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-prefect = "^2.4.5"
+prefect = "^2.6.0"
 hydra-core = "^1.2.0"
 numpy = "^1.22.0"
 tifffile = ">=2021.8.30"
