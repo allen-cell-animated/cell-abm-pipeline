@@ -11,13 +11,13 @@ FROM base as builder
 ENV PIP_NO_CACHE_DIR=1 \
 	PIP_DISABLE_PIP_VERSION_CHECK=1 \
 	PIP_DEFAULT_TIMEOUT=100 \
-	POETRY_VERSION=1.1.7
+	POETRY_VERSION=1.2.0
 
 RUN pip install "poetry==$POETRY_VERSION"
 RUN python -m venv /venv
 
 COPY pyproject.toml poetry.lock ./
-RUN . /venv/bin/activate && poetry install --no-dev --no-root
+RUN . /venv/bin/activate && poetry install --without dev --no-root
 
 COPY src/ .
 RUN . /venv/bin/activate && poetry build
@@ -34,6 +34,5 @@ COPY --from=builder /venv /venv
 COPY --from=builder /home/dist .
 RUN . /venv/bin/activate && pip install *.whl
 
-ENV PATH="/venv/bin:${PATH}" 
+ENV PATH="/venv/bin:${PATH}"
 ENV VIRTUAL_ENV="/venv"
-
