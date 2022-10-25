@@ -183,8 +183,12 @@ class TemplateRenderer:
         of the parameter values from the CSV.
         """
         param_sets = self._read_parameters_csv()
+        param_set_names = []
         for param_set in param_sets:
+            param_set_names.append(param_set["output_name"])
             self._render_template(param_set)
+        param_set_names_df = pd.DataFrame(param_set_names)
+        param_set_names_df.to_csv(os.path.join(self.output_dir, "manifest.csv"), index=False)
         
 
 if __name__ == "__main__":
