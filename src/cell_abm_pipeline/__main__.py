@@ -3,6 +3,7 @@ import os
 import importlib
 
 from omegaconf import OmegaConf
+from prefect.blocks.system import Secret
 from prefect.deployments import Deployment
 
 from cell_abm_pipeline.__config__ import (
@@ -15,6 +16,8 @@ from cell_abm_pipeline.__config__ import (
 def main():
     if len(sys.argv) < 2:
         return
+
+    OmegaConf.register_new_resolver("secret", lambda secret: Secret.load(secret).get())
 
     module_name = sys.argv[1].replace("-", "_")
     module = get_module(module_name)
