@@ -19,7 +19,7 @@ RUN python -m venv /venv
 COPY pyproject.toml poetry.lock ./
 RUN . /venv/bin/activate && poetry install --without dev --no-root
 
-COPY src/ .
+COPY src/ README.md ./
 RUN . /venv/bin/activate && poetry build
 
 FROM base as final
@@ -36,3 +36,7 @@ RUN . /venv/bin/activate && pip install *.whl
 
 ENV PATH="/venv/bin:${PATH}"
 ENV VIRTUAL_ENV="/venv"
+
+RUN useradd -ms /bin/bash nonroot
+RUN chown nonroot /mnt/
+USER nonroot
