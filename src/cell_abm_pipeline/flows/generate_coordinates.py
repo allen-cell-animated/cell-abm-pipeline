@@ -13,8 +13,8 @@ Working location structure:
         └── inits.COORDINATES
             └── (name).COORDINATES.csv
 
-Generated coordinates are placed into the **inits/inits.GENERATED** directory.
-Corresponding plots are placed into the **plots/plots.GENERATED** directory.
+Generated coordinates are placed into the **inits/inits.COORDINATES** directory.
+Corresponding plots are placed into the **plots/plots.COORDINATES** directory.
 """
 
 from dataclasses import dataclass
