@@ -1,32 +1,58 @@
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import Tuple, Dict, Optional
 from prefect import flow, get_run_logger
 
 from io_collection.keys import make_key, check_key, change_key
 from io_collection.load import load_dataframe
-from io_collection.quilt import load_quilt_package, save_quilt_item
+from io_collection.save import save_text, save_json
 from container_collection.docker import run_docker_command
-from abm_initialization_collection.image import select_fov_images
+from arcade_collection.input import (
+    merge_region_samples,
+    convert_to_cells_file,
+    convert_to_locations_file,
+    generate_setup_file,
+)
+
+from cell_abm_pipeline.flows.initialize_arcade_simulations_local import (
+    VOLUME_DISTRIBUTIONS,
+    HEIGHT_DISTRIBUTIONS,
+    CRITICAL_VOLUME_DISTRIBUTIONS,
+    CRITICAL_HEIGHT_DISTRIBUTIONS,
+    STATE_THRESHOLDS,
+    POTTS_TERMS,
+)
 
 
 @dataclass
 class ParametersConfig:
-    cells_per_fov: int
-
-    num_fovs: int
-
     image: str
 
-    quilt_package: str = "aics/hipsc_single_cell_image_dataset"
+    channels: list
 
-    quilt_registry: str = "s3://allencell"
+    margins: Tuple[int, int, int] = (0, 0, 0)
+
+    volume_distributions: dict = field(default_factory=lambda: VOLUME_DISTRIBUTIONS)
+
+    height_distributions: dict = field(default_factory=lambda: HEIGHT_DISTRIBUTIONS)
+
+    critical_volume_distributions: dict = field(
+        default_factory=lambda: CRITICAL_VOLUME_DISTRIBUTIONS
+    )
+
+    critical_height_distributions: dict = field(
+        default_factory=lambda: CRITICAL_HEIGHT_DISTRIBUTIONS
+    )
+
+    state_thresholds: Dict[str, float] = field(default_factory=lambda: STATE_THRESHOLDS)
+
+    potts_terms: list[str] = field(default_factory=lambda: POTTS_TERMS)
 
 
 @dataclass
 class ContextConfig:
     working_location: str
 
-    metadata_location: str
+    reference_location: str
 
     access_key_id: Optional[str] = None
 
@@ -37,29 +63,22 @@ class ContextConfig:
 class SeriesConfig:
     name: str
 
-    metadata_key: str
+    reference_key: str
+
+    conditions: list
 
 
 @flow(name="initialize-arcade-simulations-aws")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     if not context.working_location.startswith("s3://"):
         logger = get_run_logger()
-        logger.error("AWS ARCADE simulations can only be initialized with S3 working location.")
+        logger.error("AWS ARCADE simulations must be initialized with S3 working location.")
         return
 
-    package = load_quilt_package(parameters.quilt_package, parameters.quilt_registry)
-    key_exists = check_key(context.metadata_location, series.metadata_key)
-
-    if not key_exists:
-        save_quilt_item(context.metadata_location, series.metadata_key, package, "metadata.csv")
-
-    metadata = load_dataframe(
-        context.metadata_location,
-        series.metadata_key,
-        usecols=["CellId", "cell_stage", "outlier", "fov_seg_path", "this_cell_index"],
-    )
-
-    selected_fovs = select_fov_images(metadata, parameters.cells_per_fov, parameters.num_fovs)
+    if check_key(context.reference_location, series.reference_key):
+        reference = load_dataframe(context.reference_location, series.reference_key)
+    else:
+        reference = None
 
     environment = []
 
@@ -69,19 +88,16 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     if context.secret_access_key is not None:
         environment.append(f"AWS_SECRET_ACCESS_KEY={context.secret_access_key}")
 
-    for fov in selected_fovs:
-        fov_key = make_key(series.name, "images", f"{fov['key']}.ome.tiff")
-        key_exists = check_key(context.working_location, fov_key)
+    channel_indices = [str(channel["index"]) for channel in parameters.channels]
+    wait_for_fovs = []
 
-        if not key_exists:
-            save_quilt_item.submit(context.working_location, fov_key, package, fov["item"])
-
+    for fov in series.conditions:
         sample_image_command = [
             "abmpipe",
             "sample-image",
             "::",
-            f"parameters.key={fov['key']}",
-            "parameters.channels=[0,1]",
+            f"parameters.key={series.name}_{fov['key']}",
+            f"parameters.channels=[{','.join(channel_indices)}]",
             "parameters.resolution=1.0",
             "parameters.grid=rect",
             "parameters.coordinate_type=step",
@@ -92,17 +108,22 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
             parameters.image, sample_image_command, environment=environment
         )
 
-        for channel in [0, 1]:
+        samples = {}
+        wait_for_samples = []
+
+        for channel in parameters.channels:
+            cell_ids = [str(cell_id) for cell_id in fov["cell_ids"]]
+
             process_samples_command = [
                 "abmpipe",
                 "process-sample",
                 "::",
-                f"parameters.key={fov['key']}",
-                f"parameters.channel={channel}",
+                f"parameters.key={series.name}_{fov['key']}",
+                f"parameters.channel={channel['index']}",
                 "parameters.remove_unconnected=True",
                 "parameters.unconnected_filter=connectivity",
                 "parameters.remove_edges=False",
-                f"parameters.include_ids=[{','.join([str(cell_id) for cell_id in fov['cell_ids']])}]",
+                f"parameters.include_ids=[{','.join(cell_ids)}]",
                 f"context.working_location={context.working_location}",
                 f"series.name={series.name}",
             ]
@@ -112,19 +133,58 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
                 environment=environment,
                 wait_for=[sample_image],
             )
+            wait_for_fovs.append(process_samples)
 
             old_key = make_key(
                 series.name,
                 "samples",
                 "samples.PROCESSED",
-                f"{fov['key']}_channel_{channel}.PROCESSED.csv",
+                f"{series.name}_{fov['key']}_channel_{channel['index']}.PROCESSED.csv",
             )
             new_key = make_key(
                 series.name,
                 "samples",
                 "samples.PROCESSED",
-                f"{fov['key']}.PROCESSED{'.NUCLEUS' if channel == 0 else ''}.csv",
+                f"{series.name}_{fov['key']}.PROCESSED.{channel['name']}.csv",
             )
             rename = change_key.submit(
                 context.working_location, old_key, new_key, wait_for=[process_samples]
             )
+
+            channel_samples = load_dataframe.submit(
+                context.working_location, new_key, wait_for=[rename]
+            )
+            samples[channel["name"]] = channel_samples
+            wait_for_samples.append(channel_samples)
+
+        merged_samples = merge_region_samples.submit(
+            samples, parameters.margins, wait_for=wait_for_samples
+        )
+
+        cells = convert_to_cells_file.submit(
+            merged_samples,
+            reference[reference["KEY"] == fov["key"]],
+            parameters.volume_distributions,
+            parameters.height_distributions,
+            parameters.critical_volume_distributions,
+            parameters.critical_height_distributions,
+            parameters.state_thresholds,
+        )
+        cells_key = make_key(
+            series.name, "inits", "inits.ARCADE", f"{series.name}_{fov['key']}.CELLS.json"
+        )
+        save_json.submit(context.working_location, cells_key, cells)
+
+        locations = convert_to_locations_file.submit(merged_samples)
+        locations_key = make_key(
+            series.name, "inits", "inits.ARCADE", f"{series.name}_{fov['key']}.LOCATIONS.json"
+        )
+        save_json.submit(context.working_location, locations_key, locations)
+
+        setup = generate_setup_file.submit(
+            merged_samples, parameters.margins, parameters.potts_terms
+        )
+        setup_key = make_key(
+            series.name, "inits", "inits.ARCADE", f"{series.name}_{fov['key']}.xml"
+        )
+        save_text.submit(context.working_location, setup_key, setup)
