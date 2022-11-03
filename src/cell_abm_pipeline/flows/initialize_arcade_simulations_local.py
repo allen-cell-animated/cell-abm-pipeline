@@ -193,13 +193,13 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
             parameters.state_thresholds,
         )
         cells_key = make_key(
-            series.name, "inits", "inits.ARCADE", f"{series.name}_{fov['key']}.CELLS.json"
+            series.name, "converted", "converted.ARCADE", f"{series.name}_{fov['key']}.CELLS.json"
         )
         save_json.submit(context.working_location, cells_key, cells)
 
         locations = convert_to_locations_file.submit(merged_samples)
         locations_key = make_key(
-            series.name, "inits", "inits.ARCADE", f"{series.name}_{fov['key']}.LOCATIONS.json"
+            series.name, "converted", "converted.ARCADE", f"{series.name}_{fov['key']}.LOCATIONS.json"
         )
         save_json.submit(context.working_location, locations_key, locations)
 
@@ -207,7 +207,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
             merged_samples, parameters.margins, parameters.potts_terms
         )
         setup_key = make_key(
-            series.name, "inits", "inits.ARCADE", f"{series.name}_{fov['key']}.xml"
+            series.name, "converted", "converted.ARCADE", f"{series.name}_{fov['key']}.xml"
         )
         save_text.submit(context.working_location, setup_key, setup)
 
