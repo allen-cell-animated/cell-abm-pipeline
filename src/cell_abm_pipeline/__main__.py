@@ -17,8 +17,16 @@ def main():
     if len(sys.argv) < 2:
         return
 
+    if "--dryrun" in sys.argv:
+        sys.argv.remove("--dryrun")
+        dryrun = True
+    else:
+        dryrun = False
+
     OmegaConf.register_new_resolver("secret", lambda secret: Secret.load(secret).get())
-    OmegaConf.register_new_resolver("home", lambda path: os.path.join(os.path.expanduser("~"), path))
+    OmegaConf.register_new_resolver(
+        "home", lambda path: os.path.join(os.path.expanduser("~"), path)
+    )
 
     module_name = sys.argv[1].replace("-", "_")
     module = get_module(module_name)
@@ -32,6 +40,10 @@ def main():
         config = make_config_from_yaml(module, sys.argv[2:])
 
     display_config(config)
+
+    if dryrun:
+        return
+
     run_flow(module, config)
 
 

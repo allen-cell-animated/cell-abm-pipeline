@@ -48,3 +48,19 @@ Then use:
 ```bash
 $ abmpipe demo parameters=demo context=demo series=demo
 ```
+
+Use the flag `--dryrun` to display the composed configuration without running the workflow.
+
+## Adding secrets
+
+Configs can use [Secret](https://docs.prefect.io/concepts/blocks/?h=secret#secret-fields) fields.
+In configs, any field in the form `${secret:name-of-secret}` will be resolved using the Prefect Secret loader.
+These values must be configured as a Secret Block in Prefect via a script:
+
+```python
+from prefect.blocks.system import Secret
+
+Secret(value="secret-value").save(name="name-of-secret")
+```
+
+or in the Prefect UI under Blocks.
