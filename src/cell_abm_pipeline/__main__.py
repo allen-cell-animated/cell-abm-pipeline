@@ -18,9 +18,13 @@ def main():
         return
 
     OmegaConf.register_new_resolver("secret", lambda secret: Secret.load(secret).get())
+    OmegaConf.register_new_resolver("home", lambda path: os.path.join(os.path.expanduser("~"), path))
 
     module_name = sys.argv[1].replace("-", "_")
     module = get_module(module_name)
+
+    if module is None:
+        return
 
     if len(sys.argv) > 2 and sys.argv[2] == "::":
         config = make_config_from_dotlist(module, sys.argv[3:])
