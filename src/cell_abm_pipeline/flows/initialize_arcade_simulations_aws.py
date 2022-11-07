@@ -177,7 +177,10 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
         locations = convert_to_locations_file.submit(merged_samples)
         locations_key = make_key(
-            series.name, "converted", "converted.ARCADE", f"{series.name}_{fov['key']}.LOCATIONS.json"
+            series.name,
+            "converted",
+            "converted.ARCADE",
+            f"{series.name}_{fov['key']}.LOCATIONS.json",
         )
         save_json.submit(context.working_location, locations_key, locations)
 
