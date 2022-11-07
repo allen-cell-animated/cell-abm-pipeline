@@ -436,7 +436,7 @@ test = ["flake8 (==3.7.8)", "hypothesis (==3.55.3)"]
 
 [[package]]
 name = "container-collection"
-version = "0.4.1"
+version = "0.4.2"
 description = "Collection of tasks for running containerized models."
 category = "main"
 optional = false
@@ -2477,7 +2477,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "e520b57e5dc20701a22b6c2b48f0a7743d14ac5ce95f4de57e956ac456ec0d6f"
+content-hash = "b00b47fe4e587e7f190ac66457d46071c0c55b19f39398702d5801435c8228e7"
 
 [metadata.files]
 abm-initialization-collection = [
@@ -2796,8 +2796,8 @@ commonmark = [
     {file = "commonmark-0.9.1.tar.gz", hash = "sha256:452f9dc859be7f06631ddcb328b6919c67984aca654e5fefb3914d54691aed60"},
 ]
 container-collection = [
-    {file = "container_collection-0.4.1-py3-none-any.whl", hash = "sha256:430c75de8862d48bcfa0fb8e8fd3129bf30955e2d9c31b4d0ac0112b244205b3"},
-    {file = "container_collection-0.4.1.tar.gz", hash = "sha256:7e035cade474ee94b7ab628b4056ce47e42b0b88d87c62f8075e4e06dbafaaa3"},
+    {file = "container_collection-0.4.2-py3-none-any.whl", hash = "sha256:1064cddb3da4ea12fb81767443f06197222168a9b99d3ddf65340a6864352329"},
+    {file = "container_collection-0.4.2.tar.gz", hash = "sha256:248067ea251b24ef2ab5b09b2bd3d1c4c6a12a7ff993339babc0137848608305"},
 ]
 contourpy = [
     {file = "contourpy-1.0.5-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:87121b9428ac568fb84fae4af5e7852fc34f02eadc4e3e91f6c8989327692186"},
