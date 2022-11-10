@@ -1,6 +1,6 @@
 [[package]]
 name = "abm-initialization-collection"
-version = "0.1.0"
+version = "0.2.0"
 description = "Collection of tasks for initializing abm simulations."
 category = "main"
 optional = false
@@ -997,7 +997,7 @@ python-versions = "*"
 
 [[package]]
 name = "io-collection"
-version = "0.3.0"
+version = "0.4.0"
 description = "Collection of tasks for I/O."
 category = "main"
 optional = false
@@ -2477,12 +2477,12 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "b00b47fe4e587e7f190ac66457d46071c0c55b19f39398702d5801435c8228e7"
+content-hash = "8740e4d45c12200b3d73fcd635d2bf8daec9d930a6248438156d8280dfb51282"
 
 [metadata.files]
 abm-initialization-collection = [
-    {file = "abm_initialization_collection-0.1.0-py3-none-any.whl", hash = "sha256:52a65dd90b3fbfdc9d0a359809389d630a8299debfa62340705f7fbd749ca628"},
-    {file = "abm_initialization_collection-0.1.0.tar.gz", hash = "sha256:31d0f9210ddf042a5237dc1a6b9d46f2bdbc3d948a01c39e348372a6fa2771cb"},
+    {file = "abm_initialization_collection-0.2.0-py3-none-any.whl", hash = "sha256:b618c0d7c3bb47ed71f8b4f1c4ca0738d6efdbcfdf71f7807fd69a6badeac5c5"},
+    {file = "abm_initialization_collection-0.2.0.tar.gz", hash = "sha256:ad286f09a100d5581b0dc4d26ddf1d956375e076bfbc867aa58b63bbe1762703"},
 ]
 aicsimageio = [
     {file = "aicsimageio-4.9.2-py2.py3-none-any.whl", hash = "sha256:073718f6072f0d6efde1af851cfc72d91d064099f3ec3babe90c5257cb065b87"},
@@ -3236,8 +3236,8 @@ iniconfig = [
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
 io-collection = [
-    {file = "io_collection-0.3.0-py3-none-any.whl", hash = "sha256:0da52d4cfd105b698379e41ef5cd03e58afcf11ff76153af1b5705ee6eaac456"},
-    {file = "io_collection-0.3.0.tar.gz", hash = "sha256:49c4a148fd036e0ca0c3267783e670a24feade11e00caeedc38017d8baaf8f48"},
+    {file = "io_collection-0.4.0-py3-none-any.whl", hash = "sha256:176485599a1d1325837657e0922750e970cfa400f5817bdc851584a5f35ccc50"},
+    {file = "io_collection-0.4.0.tar.gz", hash = "sha256:32d4617bad9399eae4b736a2bfaec9a2b80bd6638b06cd2499b87b2675d7fa8f"},
 ]
 isort = [
     {file = "isort-5.10.1-py3-none-any.whl", hash = "sha256:6f62d78e2f89b4500b080fe3a81690850cd254227f27f75c3a0c491a1f351ba7"},
