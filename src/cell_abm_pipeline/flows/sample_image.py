@@ -59,6 +59,8 @@ class ParametersConfig:
 
     contact_sheet: bool = True
 
+    extension: str = ".ome.tiff"
+
 
 @dataclass
 class ContextConfig:
@@ -72,8 +74,12 @@ class SeriesConfig:
 
 @flow(name="sample-image")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    image_key = make_key(series.name, "images", f"{parameters.key}.ome.tiff")
-    image = load_image(context.working_location, image_key)
+    image_key = make_key(series.name, "images", f"{parameters.key}{parameters.extension}")
+    image = load_image(
+        context.working_location,
+        image_key,
+        dim_order="ZYX" if parameters.extension == ".tiff" else None,
+    )
     image_bounds = get_image_bounds(image)
 
     sample_indices = get_sample_indices(
