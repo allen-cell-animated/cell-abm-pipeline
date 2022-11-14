@@ -74,7 +74,9 @@ class SeriesConfig:
 
 @flow(name="sample-image")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    image_key = make_key(series.name, "images", f"{series.name}_{parameters.key}{parameters.extension}")
+    image_key = make_key(
+        series.name, "images", f"{series.name}_{parameters.key}{parameters.extension}"
+    )
     image = load_image(
         context.working_location,
         image_key,
