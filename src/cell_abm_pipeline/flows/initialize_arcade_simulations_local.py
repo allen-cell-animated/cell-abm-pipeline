@@ -17,64 +17,31 @@ from arcade_collection.input import (
     generate_setup_file,
 )
 
-
-VOLUME_DISTRIBUTIONS: Dict[str, Tuple[float, float]] = {
-    "DEFAULT": (1865.0, 517.0),
-    "NUCLEUS": (542.0, 157.0),
-}
-
-HEIGHT_DISTRIBUTIONS: Dict[str, Tuple[float, float]] = {
-    "DEFAULT": (9.65, 2.4),
-    "NUCLEUS": (6.75, 1.7),
-}
-
-CRITICAL_VOLUME_DISTRIBUTIONS: Dict[str, Tuple[float, float]] = {
-    "DEFAULT": (1300.0, 200.0),
-    "NUCLEUS": (400.0, 50.0),
-}
-
-CRITICAL_HEIGHT_DISTRIBUTIONS: Dict[str, Tuple[float, float]] = {
-    "DEFAULT": (9.0, 2.0),
-    "NUCLEUS": (6.5, 1.5),
-}
-
-STATE_THRESHOLDS: Dict[str, float] = {
-    "APOPTOTIC_LATE": 0.25,
-    "APOPTOTIC_EARLY": 1,
-    "PROLIFERATIVE_G1": 1.124,
-    "PROLIFERATIVE_S": 1.726,
-    "PROLIFERATIVE_G2": 1.969,
-}
-
-POTTS_TERMS: list[str] = [
-    "volume",
-    "surface",
-    "adhesion",
-    "height",
-    "substrate",
-    "persistence",
-]
+from cell_abm_pipeline.flows.initialize_voronoi_simulations import (
+    VOLUMES,
+    HEIGHTS,
+    CRITICAL_VOLUMES,
+    CRITICAL_HEIGHTS,
+    STATE_THRESHOLDS,
+    POTTS_TERMS,
+)
 
 
 @dataclass
 class ParametersConfig:
     image: str
 
-    channels: list
+    channels: dict
 
     margins: Tuple[int, int, int] = (0, 0, 0)
 
-    volume_distributions: dict = field(default_factory=lambda: VOLUME_DISTRIBUTIONS)
+    volumes: dict = field(default_factory=lambda: VOLUMES)
 
-    height_distributions: dict = field(default_factory=lambda: HEIGHT_DISTRIBUTIONS)
+    heights: dict = field(default_factory=lambda: HEIGHTS)
 
-    critical_volume_distributions: dict = field(
-        default_factory=lambda: CRITICAL_VOLUME_DISTRIBUTIONS
-    )
+    critical_volumes: dict = field(default_factory=lambda: CRITICAL_VOLUMES)
 
-    critical_height_distributions: dict = field(
-        default_factory=lambda: CRITICAL_HEIGHT_DISTRIBUTIONS
-    )
+    critical_heights: dict = field(default_factory=lambda: CRITICAL_HEIGHTS)
 
     state_thresholds: Dict[str, float] = field(default_factory=lambda: STATE_THRESHOLDS)
 
@@ -110,108 +77,117 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         reference = None
 
     volume = create_docker_volume(context.working_location)
-    channel_indices = [str(channel["index"]) for channel in parameters.channels]
-    wait_for_fovs = []
 
     for fov in series.conditions:
-        sample_image_command = [
-            "abmpipe",
-            "sample-image",
-            "::",
-            f"parameters.key={series.name}_{fov['key']}",
-            f"parameters.channels=[{','.join(channel_indices)}]",
-            "parameters.resolution=1.0",
-            "parameters.grid=rect",
-            "parameters.coordinate_type=step",
-            "context.working_location=/mnt",
-            f"series.name={series.name}",
-        ]
-        sample_image = run_docker_command.submit(
-            parameters.image, sample_image_command, volume=volume
+        sample_images(
+            series.name,
+            fov["key"],
+            parameters.image,
+            volume,
+            parameters.channels.keys(),
         )
 
         samples = {}
-        wait_for_samples = []
-
-        for channel in parameters.channels:
-            cell_ids = [str(cell_id) for cell_id in fov["cell_ids"]]
-
-            process_samples_command = [
-                "abmpipe",
-                "process-sample",
-                "::",
-                f"parameters.key={series.name}_{fov['key']}",
-                f"parameters.channel={channel['index']}",
-                "parameters.remove_unconnected=True",
-                "parameters.unconnected_filter=connectivity",
-                "parameters.remove_edges=False",
-                f"parameters.include_ids=[{','.join(cell_ids)}]",
-                "context.working_location=/mnt",
-                f"series.name={series.name}",
-            ]
-            process_samples = run_docker_command.submit(
+        for channel_index, channel_name in parameters.channels.items():
+            process_samples(
+                series.name,
+                fov["key"],
                 parameters.image,
-                process_samples_command,
-                volume=volume,
-                wait_for=[sample_image],
-            )
-            wait_for_fovs.append(process_samples)
-
-            old_key = make_key(
-                series.name,
-                "samples",
-                "samples.PROCESSED",
-                f"{series.name}_{fov['key']}_channel_{channel['index']}.PROCESSED.csv",
-            )
-            new_key = make_key(
-                series.name,
-                "samples",
-                "samples.PROCESSED",
-                f"{series.name}_{fov['key']}.PROCESSED.{channel['name']}.csv",
-            )
-            rename = change_key.submit(
-                context.working_location, old_key, new_key, wait_for=[process_samples]
+                volume,
+                channel_index,
+                fov["include_ids"],
             )
 
-            channel_samples = load_dataframe.submit(
-                context.working_location, new_key, wait_for=[rename]
+            sample_key = rename_samples(
+                series.name, fov["key"], context.working_location, channel_index, channel_name
             )
-            samples[channel["name"]] = channel_samples
-            wait_for_samples.append(channel_samples)
+            channel_samples = load_dataframe(context.working_location, sample_key)
+            samples[channel_name] = channel_samples
 
-        merged_samples = merge_region_samples.submit(
-            samples, parameters.margins, wait_for=wait_for_samples
-        )
+        merged_samples = merge_region_samples(samples, parameters.margins)
 
-        cells = convert_to_cells_file.submit(
+        cells = convert_to_cells_file(
             merged_samples,
             reference[reference["KEY"] == fov["key"]],
-            parameters.volume_distributions,
-            parameters.height_distributions,
-            parameters.critical_volume_distributions,
-            parameters.critical_height_distributions,
+            parameters.volumes,
+            parameters.heights,
+            parameters.critical_volumes,
+            parameters.critical_heights,
             parameters.state_thresholds,
         )
         cells_key = make_key(
             series.name, "converted", "converted.ARCADE", f"{series.name}_{fov['key']}.CELLS.json"
         )
-        save_json.submit(context.working_location, cells_key, cells)
+        save_json(context.working_location, cells_key, cells)
 
-        locations = convert_to_locations_file.submit(merged_samples)
+        locations = convert_to_locations_file(merged_samples)
         locations_key = make_key(
             series.name,
             "converted",
             "converted.ARCADE",
             f"{series.name}_{fov['key']}.LOCATIONS.json",
         )
-        save_json.submit(context.working_location, locations_key, locations)
+        save_json(context.working_location, locations_key, locations)
 
-        setup = generate_setup_file.submit(
-            merged_samples, parameters.margins, parameters.potts_terms
-        )
+        setup = generate_setup_file(merged_samples, parameters.margins, parameters.potts_terms)
         setup_key = make_key(
             series.name, "converted", "converted.ARCADE", f"{series.name}_{fov['key']}.xml"
         )
-        save_text.submit(context.working_location, setup_key, setup)
+        save_text(context.working_location, setup_key, setup)
 
-    remove_docker_volume.submit(volume, wait_for=wait_for_fovs)
+    remove_docker_volume(volume)
+
+
+@flow(name="sample-images")
+def sample_images(name, key, image, volume, channels):
+    sample_image_command = [
+        "abmpipe",
+        "sample-image",
+        "::",
+        f"parameters.key={key}",
+        f"parameters.channels=[{','.join([channel for channel in channels])}]",
+        "parameters.resolution=1.0",
+        "parameters.grid=rect",
+        "parameters.coordinate_type=step",
+        f"context.working_location=/mnt",
+        f"series.name={name}",
+    ]
+    sample_image = run_docker_command(image, sample_image_command, volume=volume)
+
+
+@flow(name="process-samples")
+def process_samples(name, key, image, volume, channel_index, include_ids):
+    process_samples_command = [
+        "abmpipe",
+        "process-sample",
+        "::",
+        f"parameters.key={key}",
+        f"parameters.channel={channel_index}",
+        "parameters.remove_unconnected=True",
+        "parameters.unconnected_filter=connectivity",
+        "parameters.remove_edges=False",
+        f"parameters.include_ids=[{','.join([str(id) for id in include_ids])}]",
+        f"context.working_location=/mnt",
+        f"series.name={name}",
+    ]
+    process_samples = run_docker_command(image, process_samples_command, volume=volume)
+
+
+@flow(name="rename-samples")
+def rename_samples(name, key, working_location, channel_index, channel_name):
+    old_key = make_key(
+        name,
+        "samples",
+        "samples.PROCESSED",
+        f"{name}_{key}_channel_{channel_index}.PROCESSED.csv",
+    )
+    new_key = make_key(
+        name,
+        "samples",
+        "samples.PROCESSED",
+        f"{name}_{key}.PROCESSED.{channel_name}.csv",
+    )
+
+    change_key(working_location, old_key, new_key)
+
+    return new_key
