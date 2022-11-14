@@ -7,13 +7,13 @@ Working location structure:
 
     (name)
     ├── images
-    │    └── (key).ome.tiff
+    │    └── (name)_(key).ome.tiff
     ├── plots
     │    └── plots.SAMPLE
-    │        └── (key)_channel_(channel).SAMPLE.png
+    │        └── (name)_(key)_channel_(channel).SAMPLE.png
     └── samples
         └── samples.RAW
-            └── (key)_channel_(channel).RAW.csv
+            └── (name)_(key)_channel_(channel).RAW.csv
 
 The **images** directory contains the input image to be sampled.
 Resulting sample(s) are placed into the **samples/samples.RAW** directory and
@@ -74,7 +74,7 @@ class SeriesConfig:
 
 @flow(name="sample-image")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    image_key = make_key(series.name, "images", f"{parameters.key}{parameters.extension}")
+    image_key = make_key(series.name, "images", f"{series.name}_{parameters.key}{parameters.extension}")
     image = load_image(
         context.working_location,
         image_key,
@@ -91,7 +91,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     )
 
     for channel in parameters.channels:
-        channel_key = f"{parameters.key}_channel_{channel}"
+        channel_key = f"{series.name}_{parameters.key}_channel_{channel}"
         samples = get_image_samples(image, sample_indices, channel)
         samples = scale_sample_coordinates(
             samples,

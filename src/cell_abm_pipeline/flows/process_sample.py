@@ -8,12 +8,12 @@ Working location structure:
     (name)
     ├── plots
     │    └── plots.SAMPLE
-    │        └── (key)_channel_(channel).SAMPLE.png
+    │        └── (name)_(key)_channel_(channel).SAMPLE.png
     └── samples
         ├── samples.PROCESSED
-        │    └── (key)_channel_(channel).PROCESSED.csv
+        │    └── (name)_(key)_channel_(channel).PROCESSED.csv
         └── samples.RAW
-            └── (key)_channel_(channel).RAW.csv
+            └── (name)_(key)_channel_(channel).RAW.csv
 
 Samples to be processed are loaded from the **samples/samples.RAW**
 directory.
@@ -80,7 +80,7 @@ class SeriesConfig:
 
 @flow(name="process-sample")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    channel_key = f"{parameters.key}_channel_{parameters.channel}"
+    channel_key = f"{series.name}_{parameters.key}_channel_{parameters.channel}"
     sample_key = make_key(series.name, "samples", "samples.RAW", f"{channel_key}.RAW.csv")
 
     raw_samples = load_dataframe(context.working_location, sample_key)
