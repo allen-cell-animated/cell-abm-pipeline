@@ -145,14 +145,14 @@ def sample_images(name, key, image, volume, channels):
         "sample-image",
         "::",
         f"parameters.key={key}",
-        f"parameters.channels=[{','.join([channel for channel in channels])}]",
+        f"parameters.channels=[{','.join(channels)}]",
         "parameters.resolution=1.0",
         "parameters.grid=rect",
         "parameters.coordinate_type=step",
-        f"context.working_location=/mnt",
+        "context.working_location=/mnt",
         f"series.name={name}",
     ]
-    sample_image = run_docker_command(image, sample_image_command, volume=volume)
+    run_docker_command(image, sample_image_command, volume=volume)
 
 
 @flow(name="process-samples")
@@ -167,10 +167,10 @@ def process_samples(name, key, image, volume, channel_index, include_ids):
         "parameters.unconnected_filter=connectivity",
         "parameters.remove_edges=False",
         f"parameters.include_ids=[{','.join([str(id) for id in include_ids])}]",
-        f"context.working_location=/mnt",
+        "context.working_location=/mnt",
         f"series.name={name}",
     ]
-    process_samples = run_docker_command(image, process_samples_command, volume=volume)
+    run_docker_command(image, process_samples_command, volume=volume)
 
 
 @flow(name="rename-samples")

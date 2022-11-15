@@ -172,7 +172,7 @@ def sample_nucleus_image(name, key, image, volume):
         "sample-image",
         "::",
         f"parameters.key={key}_T0000",
-        f"parameters.channels=[0]",
+        "parameters.channels=[0]",
         "parameters.resolution=1.0",
         "parameters.grid=rect",
         "parameters.coordinate_type=step",
@@ -180,7 +180,7 @@ def sample_nucleus_image(name, key, image, volume):
         "context.working_location=/mnt",
         f"series.name={name}",
     ]
-    sample_image = run_docker_command(image, sample_image_command, volume=volume)
+    run_docker_command(image, sample_image_command, volume=volume)
 
 
 @flow(name="sample-voronoi-image")
@@ -190,14 +190,14 @@ def sample_voronoi_image(name, key, image, volume):
         "sample-image",
         "::",
         f"parameters.key={key}_T0000_C00_voronoi",
-        f"parameters.channels=[0]",
+        "parameters.channels=[0]",
         "parameters.resolution=1.0",
         "parameters.grid=rect",
         "parameters.coordinate_type=step",
         "context.working_location=/mnt",
         f"series.name={name}",
     ]
-    sample_image = run_docker_command(image, sample_image_command, volume=volume)
+    run_docker_command(image, sample_image_command, volume=volume)
 
 
 @flow(name="process-nucleus-samples")
@@ -207,14 +207,14 @@ def process_nucleus_samples(name, key, image, volume):
         "process-sample",
         "::",
         f"parameters.key={key}_T0000",
-        f"parameters.channel=0",
+        "parameters.channel=0",
         "parameters.remove_unconnected=True",
         "parameters.unconnected_filter=connectivity",
         "parameters.remove_edges=False",
         "context.working_location=/mnt",
         f"series.name={name}",
     ]
-    process_samples = run_docker_command(image, process_samples_command, volume=volume)
+    run_docker_command(image, process_samples_command, volume=volume)
 
 
 @flow(name="process-voronoi-samples")
@@ -224,7 +224,7 @@ def process_voronoi_samples(name, key, image, volume, exclude_ids):
         "process-sample",
         "::",
         f"parameters.key={key}_T0000_C00_voronoi",
-        f"parameters.channel=0",
+        "parameters.channel=0",
         "parameters.remove_unconnected=True",
         "parameters.unconnected_filter=connectivity",
         "parameters.remove_edges=True",
@@ -233,7 +233,7 @@ def process_voronoi_samples(name, key, image, volume, exclude_ids):
         "context.working_location=/mnt",
         f"series.name={name}",
     ]
-    process_samples = run_docker_command(image, process_samples_command, volume=volume)
+    run_docker_command(image, process_samples_command, volume=volume)
 
 
 @flow(name="rename-nucleus-samples")
