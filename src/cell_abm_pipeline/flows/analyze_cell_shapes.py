@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 from prefect import flow
 
 from io_collection.keys import make_key, check_key
@@ -17,6 +18,8 @@ class ParametersConfig:
     frames: list[int]
 
     scale: int
+
+    region: Optional[str] = None
 
 
 @dataclass
@@ -79,60 +82,36 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
                 if frame in existing_frames:
                     continue
 
+                region_key = f"_{parameters.region}" if parameters.region is not None else ""
                 frame_key = make_key(
-                    series.name, "analysis", "analysis.SH", f"{series_key}_{frame:06d}.SH.csv"
+                    series.name, "analysis", "analysis.SH", f"{series_key}_{frame:06d}{region_key}.SH.csv"
                 )
                 frame_key_exists = check_key(context.working_location, frame_key)
 
                 if frame_key_exists:
                     continue
 
-                calculate_coefficients(
-                    series.name,
-                    condition["key"],
-                    context.working_location,
-                    seed,
-                    parameters.scale,
-                    frame,
+                calculate_coefficients_command = [
+                    "abmpipe",
+                    "calculate-coefficients",
+                    "::",
+                    f"parameters.key={condition['key']}",
+                    f"parameters.seed={seed}",
+                    f"parameters.scale={parameters.scale}",
+                    f"parameters.frame={frame}",
+                    f"context.working_location={context.working_location}",
+                    f"series.name={series.name}",
+                ]
+
+                if parameters.region:
+                    calculate_coefficients_command.append(f"parameters.region={parameters.region}")
+
+                submit_fargate_task(
+                    "cell_shape",
                     task_definition_arn,
                     context.user,
                     context.cluster,
                     context.security_groups.split(":"),
                     context.subnets.split(":"),
+                    calculate_coefficients_command,
                 )
-
-
-@flow(name="calculate-coefficients")
-def calculate_coefficients(
-    name,
-    key,
-    working_location,
-    seed,
-    scale,
-    frame,
-    task_definition_arn,
-    user,
-    cluster,
-    security_groups,
-    subnets,
-):
-    calculate_coefficients_command = [
-        "abmpipe",
-        "calculate-coefficients",
-        "::",
-        f"parameters.key={key}",
-        f"parameters.seed={seed}",
-        f"parameters.scale={scale}",
-        f"parameters.frame={frame}",
-        f"context.working_location={working_location}",
-        f"series.name={name}",
-    ]
-    submit_fargate_task(
-        "cell_shape",
-        task_definition_arn,
-        user,
-        cluster,
-        security_groups,
-        subnets,
-        calculate_coefficients_command,
-    )
