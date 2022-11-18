@@ -74,7 +74,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     coeffs_key = make_key(
         series.name,
         "analysis",
-        "analysis.SH",
-        f"{series_key}_{parameters.frame:06d}{region_key}.SH.csv",
+        "analysis.COEFFS",
+        f"{series_key}_{parameters.frame:06d}{region_key}.COEFFS.csv",
     )
     save_dataframe(context.working_location, coeffs_key, coeffs_dataframe, index=False)

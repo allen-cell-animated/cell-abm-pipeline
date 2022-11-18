@@ -68,7 +68,9 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     for condition in series.conditions:
         for seed in series.seeds:
             series_key = f"{series.name}_{condition['key']}_{seed:04d}"
-            coeff_key = make_key(series.name, "analysis", "analysis.SH", f"{series_key}.SH.csv")
+            coeff_key = make_key(
+                series.name, "analysis", "analysis.COEFFS", f"{series_key}.COEFFS.csv"
+            )
             coeff_key_exists = check_key(context.working_location, coeff_key)
 
             existing_frames = []
@@ -84,7 +86,10 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
                 region_key = f"_{parameters.region}" if parameters.region is not None else ""
                 frame_key = make_key(
-                    series.name, "analysis", "analysis.SH", f"{series_key}_{frame:06d}{region_key}.SH.csv"
+                    series.name,
+                    "analysis",
+                    "analysis.COEFFS",
+                    f"{series_key}_{frame:06d}{region_key}.COEFFS.csv",
                 )
                 frame_key_exists = check_key(context.working_location, frame_key)
 
