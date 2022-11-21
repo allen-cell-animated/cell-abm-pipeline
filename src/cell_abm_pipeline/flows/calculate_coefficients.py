@@ -7,7 +7,7 @@ from io_collection.keys import make_key
 from io_collection.load import load_tar
 from io_collection.save import save_dataframe
 from arcade_collection.output import extract_tick_json, get_location_voxels
-from cell_abm_pipeline.flows.tasks import make_voxels_array, get_spherical_harmonic_coefficients
+from abm_shape_collection.coefficient import make_voxels_array, calculate_sh_coefficients
 
 
 @dataclass
@@ -58,9 +58,9 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         if parameters.region is not None:
             region_voxels = get_location_voxels(location, parameters.region)
             region_array = make_voxels_array(region_voxels, parameters.scale)
-            coeffs = get_spherical_harmonic_coefficients(region_array, array, parameters.lmax)
+            coeffs = calculate_sh_coefficients(region_array, array, parameters.lmax)
         else:
-            coeffs = get_spherical_harmonic_coefficients(array, array, parameters.lmax)
+            coeffs = calculate_sh_coefficients(array, array, parameters.lmax)
 
         coeffs["KEY"] = parameters.key
         coeffs["ID"] = location["id"]

@@ -1,4 +1,18 @@
 [[package]]
+name = "abm-colony-collection"
+version = "0.1.0"
+description = "Collection of tasks for analyzing colony dynamics."
+category = "main"
+optional = false
+python-versions = ">=3.9,<4.0"
+
+[package.dependencies]
+numpy = ">=1.23.4,<2.0.0"
+prefect = ">=2.6.0,<3.0.0"
+scikit-image = ">=0.19.3,<0.20.0"
+scipy = ">=1.9.3,<2.0.0"
+
+[[package]]
 name = "abm-initialization-collection"
 version = "0.2.0"
 description = "Collection of tasks for initializing abm simulations."
@@ -15,6 +29,20 @@ pandas = ">=1.5.1,<2.0.0"
 prefect = ">=2.6.0,<3.0.0"
 scikit-image = ">=0.19.3,<0.20.0"
 scipy = ">=1.9.3,<2.0.0"
+
+[[package]]
+name = "abm-shape-collection"
+version = "0.1.0"
+description = "Collection of tasks for analyzing cell shapes."
+category = "main"
+optional = false
+python-versions = ">=3.9,<4.0"
+
+[package.dependencies]
+aicsshparam = ">=0.1.1,<0.2.0"
+numpy = ">=1.23.4,<2.0.0"
+pandas = ">=1.5.1,<2.0.0"
+prefect = ">=2.6.0,<3.0.0"
 
 [[package]]
 name = "aicsimageio"
@@ -479,7 +507,7 @@ test = ["flake8 (==3.7.8)", "hypothesis (==3.55.3)"]
 
 [[package]]
 name = "container-collection"
-version = "0.4.2"
+version = "0.4.3"
 description = "Collection of tasks for running containerized models."
 category = "main"
 optional = false
@@ -979,7 +1007,7 @@ all = ["matplotlib (>=3.3)", "numcodecs", "tifffile (>=2021.11.2)"]
 
 [[package]]
 name = "imageio"
-version = "2.22.2"
+version = "2.22.4"
 description = "Library for reading and writing a wide range of image, video, scientific, and volumetric data formats."
 category = "main"
 optional = false
@@ -990,19 +1018,19 @@ numpy = "*"
 pillow = ">=8.3.2"
 
 [package.extras]
-all-plugins = ["astropy", "av", "imageio-ffmpeg", "opencv-python", "psutil", "tifffile"]
-all-plugins-pypy = ["av", "imageio-ffmpeg", "psutil", "tifffile"]
+all-plugins = ["astropy", "av (!=10.0.0)", "imageio-ffmpeg", "opencv-python", "psutil", "tifffile"]
+all-plugins-pypy = ["av (!=10.0.0)", "imageio-ffmpeg", "psutil", "tifffile"]
 build = ["wheel"]
 dev = ["black", "flake8", "fsspec[github]", "invoke", "pytest", "pytest-cov"]
 docs = ["numpydoc", "pydata-sphinx-theme", "sphinx"]
 ffmpeg = ["imageio-ffmpeg", "psutil"]
 fits = ["astropy"]
-full = ["astropy", "av", "black", "flake8", "fsspec[github]", "gdal", "imageio-ffmpeg", "invoke", "itk", "numpydoc", "opencv-python", "psutil", "pydata-sphinx-theme", "pytest", "pytest-cov", "sphinx", "tifffile", "wheel"]
+full = ["astropy", "av (!=10.0.0)", "black", "flake8", "fsspec[github]", "gdal", "imageio-ffmpeg", "invoke", "itk", "numpydoc", "opencv-python", "psutil", "pydata-sphinx-theme", "pytest", "pytest-cov", "sphinx", "tifffile", "wheel"]
 gdal = ["gdal"]
 itk = ["itk"]
 linting = ["black", "flake8"]
 opencv = ["opencv-python"]
-pyav = ["av"]
+pyav = ["av (!=10.0.0)"]
 test = ["fsspec[github]", "invoke", "pytest", "pytest-cov"]
 tifffile = ["tifffile"]
 
@@ -1317,7 +1345,7 @@ python-versions = "*"
 
 [[package]]
 name = "networkx"
-version = "2.8.7"
+version = "2.8.8"
 description = "Python package for creating and manipulating graphs and networks"
 category = "main"
 optional = false
@@ -1325,10 +1353,10 @@ python-versions = ">=3.8"
 
 [package.extras]
 default = ["matplotlib (>=3.4)", "numpy (>=1.19)", "pandas (>=1.3)", "scipy (>=1.8)"]
-developer = ["mypy (>=0.981)", "pre-commit (>=2.20)"]
-doc = ["nb2plots (>=0.6)", "numpydoc (>=1.4)", "pillow (>=9.1)", "pydata-sphinx-theme (>=0.9)", "sphinx (>=5)", "sphinx-gallery (>=0.10)", "texext (>=0.6.6)"]
+developer = ["mypy (>=0.982)", "pre-commit (>=2.20)"]
+doc = ["nb2plots (>=0.6)", "numpydoc (>=1.5)", "pillow (>=9.2)", "pydata-sphinx-theme (>=0.11)", "sphinx (>=5.2)", "sphinx-gallery (>=0.11)", "texext (>=0.6.6)"]
 extra = ["lxml (>=4.6)", "pydot (>=1.4.2)", "pygraphviz (>=1.9)", "sympy (>=1.10)"]
-test = ["codecov (>=2.1)", "pytest (>=7.1)", "pytest-cov (>=3.0)"]
+test = ["codecov (>=2.1)", "pytest (>=7.2)", "pytest-cov (>=4.0)"]
 
 [[package]]
 name = "numcodecs"
@@ -2642,12 +2670,20 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "7357e16fd648eed664c5fb814d8d99aae511ffd28905718881277d327d78d1d3"
+content-hash = "3c664f4777ddc3cb4cae307986e94260bade55d167b24c308c8d53d56a4b67a0"
 
 [metadata.files]
+abm-colony-collection = [
+    {file = "abm_colony_collection-0.1.0-py3-none-any.whl", hash = "sha256:951a436dfcdde04488a53e9560501d906c0aea15d860f35050867ab7a5aadfdf"},
+    {file = "abm_colony_collection-0.1.0.tar.gz", hash = "sha256:bd2cff4ea7cad4cbb730606460de9a8893337379aacd55d80c4c317590539716"},
+]
 abm-initialization-collection = [
     {file = "abm_initialization_collection-0.2.0-py3-none-any.whl", hash = "sha256:b618c0d7c3bb47ed71f8b4f1c4ca0738d6efdbcfdf71f7807fd69a6badeac5c5"},
     {file = "abm_initialization_collection-0.2.0.tar.gz", hash = "sha256:ad286f09a100d5581b0dc4d26ddf1d956375e076bfbc867aa58b63bbe1762703"},
+]
+abm-shape-collection = [
+    {file = "abm_shape_collection-0.1.0-py3-none-any.whl", hash = "sha256:c53424b67ec8aa6743704cea285f0a6ece62c6dbbaaf1fe66170ea86df4ece9f"},
+    {file = "abm_shape_collection-0.1.0.tar.gz", hash = "sha256:20c6e937c4fdb31016c45b3798a07fc1e6ae828338dbced160708d347fa8a593"},
 ]
 aicsimageio = [
     {file = "aicsimageio-4.9.2-py2.py3-none-any.whl", hash = "sha256:073718f6072f0d6efde1af851cfc72d91d064099f3ec3babe90c5257cb065b87"},
@@ -2998,8 +3034,8 @@ commonmark = [
     {file = "commonmark-0.9.1.tar.gz", hash = "sha256:452f9dc859be7f06631ddcb328b6919c67984aca654e5fefb3914d54691aed60"},
 ]
 container-collection = [
-    {file = "container_collection-0.4.2-py3-none-any.whl", hash = "sha256:1064cddb3da4ea12fb81767443f06197222168a9b99d3ddf65340a6864352329"},
-    {file = "container_collection-0.4.2.tar.gz", hash = "sha256:248067ea251b24ef2ab5b09b2bd3d1c4c6a12a7ff993339babc0137848608305"},
+    {file = "container_collection-0.4.3-py3-none-any.whl", hash = "sha256:c1ce6455a10f121ec78b251cdde0ac039ad6087d4621cd6bbbb091b1d8bb4ded"},
+    {file = "container_collection-0.4.3.tar.gz", hash = "sha256:0e33e74098fa3f1a75b22d709a4ee6f2f820ed5b162929ccf300473d18d0a854"},
 ]
 contourpy = [
     {file = "contourpy-1.0.5-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:87121b9428ac568fb84fae4af5e7852fc34f02eadc4e3e91f6c8989327692186"},
@@ -3422,8 +3458,8 @@ imagecodecs = [
     {file = "imagecodecs-2022.9.26.tar.gz", hash = "sha256:04d5757d8fd7819844b0f8d9eed05025dca4962f280d0010b42c7c9c993fe371"},
 ]
 imageio = [
-    {file = "imageio-2.22.2-py3-none-any.whl", hash = "sha256:9bdafe9c5a3d336a187f3f554f3e30bcdbf8a1d7d46f0e4d94e4a535adfb64c7"},
-    {file = "imageio-2.22.2.tar.gz", hash = "sha256:db7010cd10712518819a4187baf61b05988361ea20c23e829918727b27acb977"},
+    {file = "imageio-2.22.4-py3-none-any.whl", hash = "sha256:bb173f8af27e4921f59539c4d45068fcedb892e58261fce8253f31c9a0ff9ccf"},
+    {file = "imageio-2.22.4.tar.gz", hash = "sha256:0fae027addf02bc89c73a56cc157ad84557f8b8b84aa19b4cb706fefca2d88ff"},
 ]
 imagesize = [
     {file = "imagesize-1.4.1-py2.py3-none-any.whl", hash = "sha256:0d8d18d08f840c19d0ee7ca1fd82490fdc3729b7ac93f49870406ddde8ef8d8b"},
@@ -3854,8 +3890,8 @@ mypy-extensions = [
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
 ]
 networkx = [
-    {file = "networkx-2.8.7-py3-none-any.whl", hash = "sha256:15cdf7f7c157637107ea690cabbc488018f8256fa28242aed0fb24c93c03a06d"},
-    {file = "networkx-2.8.7.tar.gz", hash = "sha256:815383fd52ece0a7024b5fd8408cc13a389ea350cd912178b82eed8b96f82cd3"},
+    {file = "networkx-2.8.8-py3-none-any.whl", hash = "sha256:e435dfa75b1d7195c7b8378c3859f0445cd88c6b0375c181ed66823a9ceb7524"},
+    {file = "networkx-2.8.8.tar.gz", hash = "sha256:230d388117af870fce5647a3c52401fcf753e94720e6ea6b4197a5355648885e"},
 ]
 numcodecs = [
     {file = "numcodecs-0.10.2-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:a813bdc8b7d1f488562c34b9c6ae65a418008cc05a095c9b04f5aec937646b6a"},
