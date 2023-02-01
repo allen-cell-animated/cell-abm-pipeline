@@ -79,10 +79,4 @@ def generate_config(config_class, group, arguments):
 
 
 def display_config(config):
-    entries = {
-        "context": [OmegaConf.to_yaml(config.context)],
-        "series": [OmegaConf.to_yaml(config.series)],
-        "parameters": [OmegaConf.to_yaml(config.parameters)],
-    }
-
-    print(tabulate(entries, headers="keys", tablefmt="grid"))
+    print(OmegaConf.to_yaml(config, resolve=True))
