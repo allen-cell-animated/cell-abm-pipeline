@@ -32,126 +32,131 @@ class SeriesConfig:
 
 @flow(name="merge-cell-shape")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    merge_cell_shapes(context, series, parameters)
-    compress_cell_shapes(context, series, parameters)
-    remove_cell_shapes(context, series, parameters)
+    region_key = f"_{parameters.region}" if parameters.region is not None else ""
+
+    for condition in series.conditions:
+        for seed in series.seeds:
+            merge_cell_shapes(
+                series.name,
+                region_key,
+                condition["key"],
+                seed,
+                context.working_location,
+                parameters.frames,
+            )
+            compress_cell_shapes(
+                series.name,
+                region_key,
+                condition["key"],
+                seed,
+                context.working_location,
+                parameters.frames,
+            )
+            remove_cell_shapes(
+                series.name,
+                region_key,
+                condition["key"],
+                seed,
+                context.working_location,
+            )
 
 
 @flow(name="merge-cell-shapes")
-def merge_cell_shapes(
-    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
-) -> None:
-    region_key = f"_{parameters.region}" if parameters.region is not None else ""
+def merge_cell_shapes(name, region_key, condition, seed, working_location, frames) -> None:
+    series_key = f"{name}_{condition}_{seed:04d}"
+    coeff_key = make_key(
+        name, "analysis", "analysis.COEFFS", f"{series_key}{region_key}.COEFFS.csv"
+    )
+    coeff_key_exists = check_key(working_location, coeff_key)
 
-    for condition in series.conditions:
-        for seed in series.seeds:
-            series_key = f"{series.name}_{condition['key']}_{seed:04d}"
-            coeff_key = make_key(
-                series.name, "analysis", "analysis.COEFFS", f"{series_key}{region_key}.COEFFS.csv"
-            )
-            coeff_key_exists = check_key(context.working_location, coeff_key)
+    existing_frames = []
+    if coeff_key_exists:
+        existing_coeffs = load_dataframe(working_location, coeff_key)
+        existing_frames = list(existing_coeffs["TICK"].unique())
 
-            existing_frames = []
-            if coeff_key_exists:
-                existing_coeffs = load_dataframe(context.working_location, coeff_key)
-                existing_frames = list(existing_coeffs["TICK"].unique())
+    frame_coeffs = []
 
-            frame_coeffs = []
+    for frame in frames:
+        if frame in existing_frames:
+            continue
 
-            for frame in parameters.frames:
-                if frame in existing_frames:
-                    continue
+        frame_key = make_key(
+            name,
+            "analysis",
+            "analysis.COEFFS",
+            f"{series_key}_{frame:06d}{region_key}.COEFFS.csv",
+        )
 
-                frame_key = make_key(
-                    series.name,
-                    "analysis",
-                    "analysis.COEFFS",
-                    f"{series_key}_{frame:06d}{region_key}.COEFFS.csv",
-                )
+        frame_coeffs.append(load_dataframe(working_location, frame_key))
 
-                frame_coeffs.append(load_dataframe(context.working_location, frame_key))
+    if not frame_coeffs:
+        return
 
-            if not frame_coeffs:
-                continue
+    coeff_dataframe = pd.concat(frame_coeffs, ignore_index=True)
 
-            coeff_dataframe = pd.concat(frame_coeffs, ignore_index=True)
+    if coeff_key_exists:
+        coeff_dataframe = pd.concat([existing_coeffs, coeff_dataframe], ignore_index=True)
 
-            if coeff_key_exists:
-                coeff_dataframe = pd.concat([existing_coeffs, coeff_dataframe], ignore_index=True)
-
-            save_dataframe(context.working_location, coeff_key, coeff_dataframe, index=False)
+    save_dataframe(working_location, coeff_key, coeff_dataframe, index=False)
 
 
 @flow(name="compress-cell-shapes")
-def compress_cell_shapes(
-    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
-) -> None:
-    region_key = f"_{parameters.region}" if parameters.region is not None else ""
+def compress_cell_shapes(name, region_key, condition, seed, working_location, frames) -> None:
+    series_key = f"{name}_{condition}_{seed:04d}"
+    coeff_key = make_key(
+        name,
+        "analysis",
+        "analysis.COEFFS",
+        f"{series_key}{region_key}.COEFFS.tar.xz",
+    )
+    coeff_key_exists = check_key(working_location, coeff_key)
 
-    for condition in series.conditions:
-        for seed in series.seeds:
-            series_key = f"{series.name}_{condition['key']}_{seed:04d}"
-            coeff_key = make_key(
-                series.name,
-                "analysis",
-                "analysis.COEFFS",
-                f"{series_key}{region_key}.COEFFS.tar.xz",
-            )
-            coeff_key_exists = check_key(context.working_location, coeff_key)
+    existing_frames = []
+    if coeff_key_exists:
+        existing_coeffs = load_tar(working_location, coeff_key)
+        existing_frames = [
+            int(re.findall(r"[0-9]{6}", member.name)[0]) for member in existing_coeffs.getmembers()
+        ]
 
-            existing_frames = []
-            if coeff_key_exists:
-                existing_coeffs = load_tar(context.working_location, coeff_key)
-                existing_frames = [
-                    int(re.findall(r"[0-9]{6}", member.name)[0])
-                    for member in existing_coeffs.getmembers()
-                ]
+    contents = []
 
-            contents = []
+    for frame in frames:
+        if frame in existing_frames:
+            continue
 
-            for frame in parameters.frames:
-                if frame in existing_frames:
-                    continue
+        frame_key = make_key(
+            name,
+            "analysis",
+            "analysis.COEFFS",
+            f"{series_key}_{frame:06d}{region_key}.COEFFS.csv",
+        )
 
-                frame_key = make_key(
-                    series.name,
-                    "analysis",
-                    "analysis.COEFFS",
-                    f"{series_key}_{frame:06d}{region_key}.COEFFS.csv",
-                )
+        contents.append(frame_key)
 
-                contents.append(frame_key)
+    if not contents:
+        return
 
-            if not contents:
-                continue
-
-            save_tar(context.working_location, coeff_key, contents)
+    save_tar(working_location, coeff_key, contents)
 
 
 @flow(name="remove-cell-shapes")
-def remove_cell_shapes(
-    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
-) -> None:
-    region_key = f"_{parameters.region}" if parameters.region is not None else ""
+def remove_cell_shapes(name, region_key, condition, seed, working_location) -> None:
+    series_key = f"{name}_{condition}_{seed:04d}"
+    coeff_key = make_key(
+        name,
+        "analysis",
+        "analysis.COEFFS",
+        f"{series_key}{region_key}.COEFFS.tar.xz",
+    )
+    coeff_key_exists = check_key(working_location, coeff_key)
 
-    for condition in series.conditions:
-        for seed in series.seeds:
-            series_key = f"{series.name}_{condition['key']}_{seed:04d}"
-            coeff_key = make_key(
-                series.name,
-                "analysis",
-                "analysis.COEFFS",
-                f"{series_key}{region_key}.COEFFS.tar.xz",
-            )
-            coeff_key_exists = check_key(context.working_location, coeff_key)
+    if not coeff_key_exists:
+        return
 
-            if not coeff_key_exists:
-                continue
+    existing_coeffs = load_tar(working_location, coeff_key)
 
-            existing_coeffs = load_tar(context.working_location, coeff_key)
+    for member in existing_coeffs.getmembers():
+        frame_key = make_key(name, "analysis", "analysis.COEFFS", member.name)
 
-            for member in existing_coeffs.getmembers():
-                frame_key = make_key(series.name, "analysis", "analysis.COEFFS", member.name)
-
-                if check_key.fn(context.working_location, frame_key):
-                    remove_key(context.working_location, frame_key)
+        if check_key.fn(working_location, frame_key):
+            remove_key(working_location, frame_key)
