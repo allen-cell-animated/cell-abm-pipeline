@@ -41,11 +41,13 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 def merge_cell_shapes(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    region_key = f"_{parameters.region}" if parameters.region is not None else ""
+
     for condition in series.conditions:
         for seed in series.seeds:
             series_key = f"{series.name}_{condition['key']}_{seed:04d}"
             coeff_key = make_key(
-                series.name, "analysis", "analysis.COEFFS", f"{series_key}.COEFFS.csv"
+                series.name, "analysis", "analysis.COEFFS", f"{series_key}{region_key}.COEFFS.csv"
             )
             coeff_key_exists = check_key(context.working_location, coeff_key)
 
@@ -60,7 +62,6 @@ def merge_cell_shapes(
                 if frame in existing_frames:
                     continue
 
-                region_key = f"_{parameters.region}" if parameters.region is not None else ""
                 frame_key = make_key(
                     series.name,
                     "analysis",
@@ -78,23 +79,23 @@ def merge_cell_shapes(
             if coeff_key_exists:
                 coeff_dataframe = pd.concat([existing_coeffs, coeff_dataframe], ignore_index=True)
 
-            coeff_key_timestamp = make_key(
-                series.name, "analysis", "analysis.COEFFS", f"{series_key}.COEFFS.csv"
-            )
-            save_dataframe(
-                context.working_location, coeff_key_timestamp, coeff_dataframe, index=False
-            )
+            save_dataframe(context.working_location, coeff_key, coeff_dataframe, index=False)
 
 
 @flow(name="compress-cell-shapes")
 def compress_cell_shapes(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    region_key = f"_{parameters.region}" if parameters.region is not None else ""
+
     for condition in series.conditions:
         for seed in series.seeds:
             series_key = f"{series.name}_{condition['key']}_{seed:04d}"
             coeff_key = make_key(
-                series.name, "analysis", "analysis.COEFFS", f"{series_key}.COEFFS.tar.xz"
+                series.name,
+                "analysis",
+                "analysis.COEFFS",
+                f"{series_key}{region_key}.COEFFS.tar.xz",
             )
             coeff_key_exists = check_key(context.working_location, coeff_key)
 
@@ -112,7 +113,6 @@ def compress_cell_shapes(
                 if frame in existing_frames:
                     continue
 
-                region_key = f"_{parameters.region}" if parameters.region is not None else ""
                 frame_key = make_key(
                     series.name,
                     "analysis",
@@ -132,11 +132,16 @@ def compress_cell_shapes(
 def remove_cell_shapes(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    region_key = f"_{parameters.region}" if parameters.region is not None else ""
+
     for condition in series.conditions:
         for seed in series.seeds:
             series_key = f"{series.name}_{condition['key']}_{seed:04d}"
             coeff_key = make_key(
-                series.name, "analysis", "analysis.COEFFS", f"{series_key}.COEFFS.tar.xz"
+                series.name,
+                "analysis",
+                "analysis.COEFFS",
+                f"{series_key}{region_key}.COEFFS.tar.xz",
             )
             coeff_key_exists = check_key(context.working_location, coeff_key)
 
