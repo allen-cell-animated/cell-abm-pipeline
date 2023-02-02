@@ -52,7 +52,7 @@ class SeriesConfig:
     conditions: list[dict]
 
 
-@flow(name="analyze-cell-shape")
+@flow(name="analyze-cell-shapes")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     task_definition = make_fargate_task(
         "cell_shape",
