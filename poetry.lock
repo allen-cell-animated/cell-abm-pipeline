@@ -1068,7 +1068,7 @@ python-versions = "*"
 
 [[package]]
 name = "io-collection"
-version = "0.4.0"
+version = "0.5.0"
 description = "Collection of tasks for I/O."
 category = "main"
 optional = false
@@ -2670,7 +2670,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "3c664f4777ddc3cb4cae307986e94260bade55d167b24c308c8d53d56a4b67a0"
+content-hash = "794c17807d18df6f3f18e56580e8260217f5dcb49b378bd66bf7c5e6f0e63106"
 
 [metadata.files]
 abm-colony-collection = [
@@ -3474,8 +3474,8 @@ iniconfig = [
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
 io-collection = [
-    {file = "io_collection-0.4.0-py3-none-any.whl", hash = "sha256:176485599a1d1325837657e0922750e970cfa400f5817bdc851584a5f35ccc50"},
-    {file = "io_collection-0.4.0.tar.gz", hash = "sha256:32d4617bad9399eae4b736a2bfaec9a2b80bd6638b06cd2499b87b2675d7fa8f"},
+    {file = "io_collection-0.5.0-py3-none-any.whl", hash = "sha256:4650727456113cff95cfee87b7bf83eecf85ff4c138c0b6f5929eb995640a1e4"},
+    {file = "io_collection-0.5.0.tar.gz", hash = "sha256:5f8ab820a81610bc0ea882bdb2cb3db39fced86a81cb45def4a61a9021ee3f41"},
 ]
 isort = [
     {file = "isort-5.10.1-py3-none-any.whl", hash = "sha256:6f62d78e2f89b4500b080fe3a81690850cd254227f27f75c3a0c491a1f351ba7"},
