@@ -1,6 +1,5 @@
 import re
 from dataclasses import dataclass
-from typing import Optional
 from prefect import flow
 import pandas as pd
 
@@ -12,8 +11,6 @@ from io_collection.save import save_dataframe, save_tar
 @dataclass
 class ParametersConfig:
     frames: list[int]
-
-    region: Optional[str] = None
 
 
 @dataclass
@@ -30,92 +27,78 @@ class SeriesConfig:
     conditions: list[dict]
 
 
-@flow(name="process-cell-shapes")
+@flow(name="process-colony-dynamics")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    region_key = f"_{parameters.region}" if parameters.region is not None else ""
-
     for condition in series.conditions:
         for seed in series.seeds:
-            merge_cell_shapes(
+            merge_colony_dynamics(
                 series.name,
-                region_key,
                 condition["key"],
                 seed,
                 context.working_location,
                 parameters.frames,
             )
-            compress_cell_shapes(
+            compress_colony_dynamics(
                 series.name,
-                region_key,
                 condition["key"],
                 seed,
                 context.working_location,
                 parameters.frames,
             )
-            remove_cell_shapes(
+            remove_colony_dynamics(
                 series.name,
-                region_key,
                 condition["key"],
                 seed,
                 context.working_location,
             )
 
 
-@flow(name="merge-cell-shapes")
-def merge_cell_shapes(name, region_key, condition, seed, working_location, frames) -> None:
+@flow(name="merge-colony-dynamics")
+def merge_colony_dynamics(name, condition, seed, working_location, frames) -> None:
     series_key = f"{name}_{condition}_{seed:04d}"
-    coeff_key = make_key(
-        name, "analysis", "analysis.COEFFS", f"{series_key}{region_key}.COEFFS.csv"
-    )
+    coeff_key = make_key(name, "analysis", "analysis.NEIGHBORS", f"{series_key}.NEIGHBORS.csv")
     coeff_key_exists = check_key(working_location, coeff_key)
 
     existing_frames = []
     if coeff_key_exists:
-        existing_coeffs = load_dataframe(working_location, coeff_key)
-        existing_frames = list(existing_coeffs["TICK"].unique())
+        existing_neighbors = load_dataframe(working_location, coeff_key)
+        existing_frames = list(existing_neighbors["TICK"].unique())
 
-    frame_coeffs = []
+    frame_neighbors = []
 
     for frame in frames:
         if frame in existing_frames:
             continue
 
         frame_key = make_key(
-            name,
-            "analysis",
-            "analysis.COEFFS",
-            f"{series_key}_{frame:06d}{region_key}.COEFFS.csv",
+            name, "analysis", "analysis.NEIGHBORS", f"{series_key}_{frame:06d}.NEIGHBORS.csv"
         )
 
-        frame_coeffs.append(load_dataframe(working_location, frame_key))
+        frame_neighbors.append(load_dataframe(working_location, frame_key))
 
-    if not frame_coeffs:
+    if not frame_neighbors:
         return
 
-    coeff_dataframe = pd.concat(frame_coeffs, ignore_index=True)
+    coeff_dataframe = pd.concat(frame_neighbors, ignore_index=True)
 
     if coeff_key_exists:
-        coeff_dataframe = pd.concat([existing_coeffs, coeff_dataframe], ignore_index=True)
+        coeff_dataframe = pd.concat([existing_neighbors, coeff_dataframe], ignore_index=True)
 
     save_dataframe(working_location, coeff_key, coeff_dataframe, index=False)
 
 
-@flow(name="compress-cell-shapes")
-def compress_cell_shapes(name, region_key, condition, seed, working_location, frames) -> None:
+@flow(name="compress-colony-dynamics")
+def compress_colony_dynamics(name, condition, seed, working_location, frames) -> None:
     series_key = f"{name}_{condition}_{seed:04d}"
-    coeff_key = make_key(
-        name,
-        "analysis",
-        "analysis.COEFFS",
-        f"{series_key}{region_key}.COEFFS.tar.xz",
-    )
+    coeff_key = make_key(name, "analysis", "analysis.NEIGHBORS", f"{series_key}.NEIGHBORS.tar.xz")
     coeff_key_exists = check_key(working_location, coeff_key)
 
     existing_frames = []
     if coeff_key_exists:
-        existing_coeffs = load_tar(working_location, coeff_key)
+        existing_neighbors = load_tar(working_location, coeff_key)
         existing_frames = [
-            int(re.findall(r"[0-9]{6}", member.name)[0]) for member in existing_coeffs.getmembers()
+            int(re.findall(r"[0-9]{6}", member.name)[0])
+            for member in existing_neighbors.getmembers()
         ]
 
     contents = []
@@ -125,10 +108,7 @@ def compress_cell_shapes(name, region_key, condition, seed, working_location, fr
             continue
 
         frame_key = make_key(
-            name,
-            "analysis",
-            "analysis.COEFFS",
-            f"{series_key}_{frame:06d}{region_key}.COEFFS.csv",
+            name, "analysis", "analysis.NEIGHBORS", f"{series_key}_{frame:06d}.NEIGHBORS.csv"
         )
 
         contents.append(frame_key)
@@ -139,24 +119,19 @@ def compress_cell_shapes(name, region_key, condition, seed, working_location, fr
     save_tar(working_location, coeff_key, contents)
 
 
-@flow(name="remove-cell-shapes")
-def remove_cell_shapes(name, region_key, condition, seed, working_location) -> None:
+@flow(name="remove-colony-dynamics")
+def remove_colony_dynamics(name, condition, seed, working_location) -> None:
     series_key = f"{name}_{condition}_{seed:04d}"
-    coeff_key = make_key(
-        name,
-        "analysis",
-        "analysis.COEFFS",
-        f"{series_key}{region_key}.COEFFS.tar.xz",
-    )
+    coeff_key = make_key(name, "analysis", "analysis.NEIGHBORS", f"{series_key}.NEIGHBORS.tar.xz")
     coeff_key_exists = check_key(working_location, coeff_key)
 
     if not coeff_key_exists:
         return
 
-    existing_coeffs = load_tar(working_location, coeff_key)
+    existing_neighbors = load_tar(working_location, coeff_key)
 
-    for member in existing_coeffs.getmembers():
-        frame_key = make_key(name, "analysis", "analysis.COEFFS", member.name)
+    for member in existing_neighbors.getmembers():
+        frame_key = make_key(name, "analysis", "analysis.NEIGHBORS", member.name)
 
         if check_key(working_location, frame_key):
             remove_key(working_location, frame_key)
