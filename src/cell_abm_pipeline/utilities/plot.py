@@ -1,6 +1,8 @@
 from math import sqrt, ceil, floor
+from typing import Optional, Union
 
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import rc
 from matplotlib import cm
@@ -8,9 +10,28 @@ from matplotlib.lines import Line2D
 
 PLOT_SIZE = 4
 
-rc("font", size=8)
-rc("axes", titlesize=10, titleweight="bold")
+mpl.use("Agg")
+mpl.rc("figure", dpi=200)
+mpl.rc("font", size=8)
+mpl.rc("axes", titlesize=10, titleweight="bold")
 
+
+def make_grid_figure(keys):
+    n_rows, n_cols, indices = separate_rows_cols(keys)
+    fig = plt.figure(figsize=(n_cols * 4, n_rows * 4), constrained_layout=True)
+    gs = fig.add_gridspec(n_rows, n_cols)
+    return fig, gs, indices
+
+
+def separate_rows_cols(keys: list[str]) -> tuple[int, int, list[tuple[int, int, Optional[int]]]]:
+    n_items = len(keys)
+    n_cols = ceil(sqrt(n_items))
+    n_rows = ceil(n_items / n_cols)
+
+    all_indices = [(i, j, i * n_cols + j) for i in range(n_rows) for j in range(n_cols)]
+    indices = [(i, j, keys[k]) for i, j, k in all_indices if k < n_items]
+
+    return n_rows, n_cols, indices
 
 def make_plot(
     keys, data, func, size=PLOT_SIZE, xlabel="", ylabel="", sharex="all", sharey="all", legend=False
