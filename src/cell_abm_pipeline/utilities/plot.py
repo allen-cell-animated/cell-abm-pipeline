@@ -13,6 +13,7 @@ PLOT_SIZE = 4
 mpl.use("Agg")
 mpl.rc("figure", dpi=200)
 mpl.rc("font", size=8)
+mpl.rc("legend", fontsize=6)
 mpl.rc("axes", titlesize=10, titleweight="bold")
 
 
