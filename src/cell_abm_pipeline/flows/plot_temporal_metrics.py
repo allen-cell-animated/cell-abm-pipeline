@@ -100,28 +100,28 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     if "counts_total" in parameters.plots and parameters.region is None:
         save_figure(
             context.working_location,
-            make_key(plot_key, "counts_total"),
+            make_key(plot_key, "counts_total.png"),
             plot_counts_total(keys, all_results),
         )
 
     if "height_average" in parameters.plots:
         save_figure(
             context.working_location,
-            make_key(plot_key, f"height_average{region_key}"),
+            make_key(plot_key, f"height_average{region_key}.png"),
             plot_height_average(keys, all_results, reference_dataframe, parameters.region),
         )
 
     if "height_individual" in parameters.plots:
         save_figure(
             context.working_location,
-            make_key(plot_key, f"height_individual{region_key}"),
+            make_key(plot_key, f"height_individual{region_key}.png"),
             plot_height_individual(keys, all_results, parameters.region),
         )
 
     if "height_distribution" in parameters.plots:
         save_figure(
             context.working_location,
-            make_key(plot_key, f"height_distribution{region_key}"),
+            make_key(plot_key, f"height_distribution{region_key}.png"),
             plot_height_distribution(keys, all_results, reference_dataframe, parameters.region),
         )
 
@@ -134,34 +134,34 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
             save_figure(
                 context.working_location,
-                make_key(plot_key, f"phase_durations_{phase}"),
+                make_key(plot_key, f"phase_durations_{phase}.png"),
                 phase_plot,
             )
 
     if "phase_fractions" in parameters.plots and parameters.region is None:
         save_figure(
             context.working_location,
-            make_key(plot_key, "phase_fractions"),
+            make_key(plot_key, "phase_fractions.png"),
             plot_phase_fractions(keys, all_results, parameters.phases),
         )
 
     if "volume_average" in parameters.plots:
         save_figure(
             context.working_location,
-            make_key(plot_key, f"volume_average{region_key}"),
+            make_key(plot_key, f"volume_average{region_key}.png"),
             plot_volume_average(keys, all_results, reference_dataframe, parameters.region),
         )
 
     if "volume_distribution" in parameters.plots:
         save_figure(
             context.working_location,
-            make_key(plot_key, f"volume_distribution{region_key}"),
+            make_key(plot_key, f"volume_distribution{region_key}.png"),
             plot_volume_distribution(keys, all_results, reference_dataframe, parameters.region),
         )
 
     if "volume_individual" in parameters.plots:
         save_figure(
             context.working_location,
-            make_key(plot_key, f"volume_individual{region_key}"),
+            make_key(plot_key, f"volume_individual{region_key}.png"),
             plot_volume_individual(keys, all_results, parameters.region),
         )

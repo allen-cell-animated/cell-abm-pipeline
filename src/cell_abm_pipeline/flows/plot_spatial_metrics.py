@@ -74,7 +74,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     if "height_locations" in parameters.plots:
         save_figure(
             context.working_location,
-            make_key(plot_key, f"height_locations_T{parameters.tick:06d}{region_key}"),
+            make_key(plot_key, f"height_locations_T{parameters.tick:06d}{region_key}.png"),
             plot_height_locations(
                 keys, all_results, parameters.tick, reference_dataframe, parameters.region
             ),
@@ -83,21 +83,21 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     if "phase_locations" in parameters.plots and parameters.region is None:
         save_figure(
             context.working_location,
-            make_key(plot_key, f"phase_locations_T{parameters.tick:06d}"),
+            make_key(plot_key, f"phase_locations_T{parameters.tick:06d}.png"),
             plot_phase_locations(keys, all_results, parameters.tick),
         )
 
     if "population_locations" in parameters.plots and parameters.region is None:
         save_figure(
             context.working_location,
-            make_key(plot_key, f"population_locations_T{parameters.tick:06d}"),
+            make_key(plot_key, f"population_locations_T{parameters.tick:06d}.png"),
             plot_population_locations(keys, all_results, parameters.tick),
         )
 
     if "volume_locations" in parameters.plots:
         save_figure(
             context.working_location,
-            make_key(plot_key, f"volume_locations_T{parameters.tick:06d}{region_key}"),
+            make_key(plot_key, f"volume_locations_T{parameters.tick:06d}{region_key}.png"),
             plot_volume_locations(
                 keys, all_results, parameters.tick, reference_dataframe, parameters.region
             ),
