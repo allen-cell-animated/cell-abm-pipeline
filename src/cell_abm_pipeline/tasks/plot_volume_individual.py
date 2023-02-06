@@ -4,7 +4,7 @@ from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 
 @task
-def plot_volume_individual(keys, results, region=None):
+def plot_volume_individual(keys, data, region=None):
     fig, gridspec, indices = make_grid_figure(keys)
     value = f"volume.{region}" if region else "volume"
 
@@ -14,12 +14,10 @@ def plot_volume_individual(keys, results, region=None):
         ax.set_xlabel("Time (hrs)")
         ax.set_ylabel("Volume ($\mu m^3$)")
 
-        key_results = results[key]
-        counter = 0
+        key_data = data[key]
 
-        for _, group in key_results.groupby(["SEED", "ID"]):
+        for _, group in key_data.groupby(["SEED", "ID"]):
             group.sort_values("time", inplace=True)
-            counter = counter + 1
 
             volume = group[value].values
             time = group["time"]
