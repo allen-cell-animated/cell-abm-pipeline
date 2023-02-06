@@ -8,6 +8,7 @@ from io_collection.load import load_dataframe
 from io_collection.save import save_figure
 
 from cell_abm_pipeline.tasks import (
+    convert_data_units,
     plot_counts_total,
     plot_height_average,
     plot_height_distribution,
@@ -165,13 +166,3 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
             make_key(plot_key, f"volume_individual{region_key}"),
             plot_volume_individual(keys, all_results, parameters.region),
         )
-
-
-def convert_data_units(data, ds, dt, region=None):
-    data["time"] = dt * data["TICK"]
-    data["volume"] = ds * ds * ds * data["NUM_VOXELS"]
-    data["height"] = ds * (data["MAX_Z"] - data["MIN_Z"] + 1)
-
-    if region:
-        data[f"volume.{region}"] = ds * ds * ds * data[f"NUM_VOXELS.{region}"]
-        data[f"height.{region}"] = ds * (data[f"MAX_Z.{region}"] - data[f"MIN_Z.{region}"])
