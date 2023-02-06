@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 from typing import Optional
-from prefect import flow
 
-from io_collection.keys import make_key, check_key
-from io_collection.load import load_dataframe
 from container_collection.fargate import (
     make_fargate_task,
     register_fargate_task,
     submit_fargate_task,
 )
+from io_collection.keys import check_key, make_key
+from io_collection.load import load_dataframe
+from prefect import flow
 
 
 @dataclass

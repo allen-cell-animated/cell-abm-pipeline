@@ -1,6 +1,6 @@
 from prefect import flow
 
-from cell_abm_pipeline.__config__ import ParametersConfig, ContextConfig, SeriesConfig
+from cell_abm_pipeline.__config__ import ContextConfig, ParametersConfig, SeriesConfig
 
 
 @flow(name="demo")

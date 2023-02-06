@@ -1,11 +1,12 @@
-from math import sqrt
 from itertools import groupby
-from prefect import task
+from math import sqrt
+
 import numpy as np
+from prefect import task
 from scipy.stats import gamma
 
-from cell_abm_pipeline.utilities.plot import make_grid_figure
 from cell_abm_pipeline.tasks.plot_phase_fractions import PHASE_COLORS
+from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 PHASE_SETTINGS = {
     "PROLIFERATIVE_G1": {

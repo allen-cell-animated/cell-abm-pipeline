@@ -18,14 +18,14 @@ Corresponding plots are placed into the **plots/plots.COORDINATES** directory.
 """
 
 from dataclasses import dataclass
-from math import ceil, sqrt, pi
+from math import ceil, pi, sqrt
 from typing import Tuple
-from prefect import flow
 
+from abm_initialization_collection.coordinate import filter_coordinate_bounds, make_grid_coordinates
+from abm_initialization_collection.image import plot_contact_sheet
 from io_collection.keys import make_key
 from io_collection.save import save_dataframe, save_figure
-from abm_initialization_collection.coordinate import make_grid_coordinates, filter_coordinate_bounds
-from abm_initialization_collection.image import plot_contact_sheet
+from prefect import flow
 
 AVERAGE_CELL_HEIGHT = 9.0
 

@@ -1,10 +1,10 @@
 from dataclasses import dataclass
-from prefect import flow
 
-from io_collection.keys import make_key, check_key
+from abm_initialization_collection.image import select_fov_images
+from io_collection.keys import check_key, make_key
 from io_collection.load import load_dataframe
 from io_collection.quilt import load_quilt_package, save_quilt_item
-from abm_initialization_collection.image import select_fov_images
+from prefect import flow
 
 
 @dataclass

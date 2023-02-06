@@ -21,18 +21,17 @@ corresponding plot(s) are placed into the **plots/plots.SAMPLE** directory.
 """
 
 from dataclasses import dataclass, field
-from prefect import flow
 
+from abm_initialization_collection.image import get_image_bounds, plot_contact_sheet
+from abm_initialization_collection.sample import (
+    get_image_samples,
+    get_sample_indices,
+    scale_sample_coordinates,
+)
 from io_collection.keys import make_key
 from io_collection.load import load_image
 from io_collection.save import save_dataframe, save_figure
-from abm_initialization_collection.image import get_image_bounds, plot_contact_sheet
-from abm_initialization_collection.sample import (
-    get_sample_indices,
-    get_image_samples,
-    scale_sample_coordinates,
-)
-
+from prefect import flow
 
 # Pixel resolution for images (um/pixel) in x/y
 SCALE_MICRONS_XY: float = 0.108333

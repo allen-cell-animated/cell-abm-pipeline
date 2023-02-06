@@ -1,10 +1,10 @@
 from dataclasses import dataclass
-from prefect import flow
 
+from abm_initialization_collection.image import create_voronoi_image
 from io_collection.keys import make_key
 from io_collection.load import load_image
 from io_collection.save import save_image
-from abm_initialization_collection.image import create_voronoi_image
+from prefect import flow
 
 
 @dataclass

@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
 from typing import Optional
-from prefect import flow
-import pandas as pd
 
+import pandas as pd
 from io_collection.keys import make_key
 from io_collection.load import load_dataframe
 from io_collection.save import save_figure
+from prefect import flow
 
 from cell_abm_pipeline.tasks import (
     convert_data_units,
@@ -19,7 +19,6 @@ from cell_abm_pipeline.tasks import (
     plot_volume_distribution,
     plot_volume_individual,
 )
-
 
 PLOTS = [
     "counts_total",
