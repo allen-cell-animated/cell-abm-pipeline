@@ -74,7 +74,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     if "height_locations" in parameters.plots:
         save_figure(
             context.working_location,
-            make_key(plot_key, f"height_locations{region_key}_T{parameters.tick:06d}"),
+            make_key(plot_key, f"height_locations_T{parameters.tick:06d}{region_key}"),
             plot_height_locations(
                 keys, all_results, parameters.tick, reference_dataframe, parameters.region
             ),
@@ -97,7 +97,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     if "volume_locations" in parameters.plots:
         save_figure(
             context.working_location,
-            make_key(plot_key, f"volume_locations{region_key}_T{parameters.tick:06d}"),
+            make_key(plot_key, f"volume_locations_T{parameters.tick:06d}{region_key}"),
             plot_volume_locations(
                 keys, all_results, parameters.tick, reference_dataframe, parameters.region
             ),
