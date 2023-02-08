@@ -12,7 +12,7 @@ def plot_height_distribution(keys, data, reference=None, region=None):
     for i, j, key in indices:
         ax = fig.add_subplot(gridspec[i, j])
         ax.set_title(key)
-        ax.set_xlabel("Volume ($\mu m$)")
+        ax.set_xlabel("Height ($\mu m$)")
         ax.set_ylabel("Frequency")
 
         if reference is not None:
