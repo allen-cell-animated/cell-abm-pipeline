@@ -21,6 +21,23 @@ PLOTS = [
     "variance_explained",
 ]
 
+PLOTS_PCA = [
+    "transform_compare",
+    "variance_explained",
+]
+
+PLOTS_STATS = [
+    "ks_stats",
+]
+
+PLOTS_SHAPES = [
+    "shape_modes_compile",
+    "shape_modes_merge",
+]
+
+
+PLOTS = PLOTS_PCA + PLOTS_STATS + PLOTS_SHAPES
+
 
 REGION_COLORS = {"DEFAULT": "#F200FF", "NUCLEUS": "#3AADA7"}
 
@@ -68,13 +85,16 @@ class SeriesConfig:
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     # Make plots for PCA results including variance explained and comparisons of
     # distributions in PC space using the given reference model.
-    run_flow_plot_pca(context, series, parameters)
+    if any(plot in parameters.plots for plot in PLOTS_PCA):
+        run_flow_plot_pca(context, series, parameters)
 
     # Make plots for statistical comparisons of shape distributions.
-    run_flow_plot_stats(context, series, parameters)
+    if any(plot in parameters.plots for plot in PLOTS_STATS):
+        run_flow_plot_stats(context, series, parameters)
 
     # Make plots showing shape modes.
-    run_flow_plot_shapes(context, series, parameters)
+    if any(plot in parameters.plots for plot in PLOTS_SHAPES):
+        run_flow_plot_shapes(context, series, parameters)
 
 
 @flow(name="plot-shape-analysis_plot_pca")
