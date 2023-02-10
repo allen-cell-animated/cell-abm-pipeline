@@ -13,7 +13,7 @@ def plot_ks_all_ticks(keys, stats, ref_stats=None):
     ax.set_xlabel("Key")
     ax.set_ylabel("Kolmogorov–Smirnov statistic")
 
-    stats_all_ticks = stats[stats["SUBSET"] == "all_ticks"]
+    stats_all_ticks = stats[stats["TICK"].isna()]
 
     for index, (feature, group) in enumerate(stats_all_ticks.groupby("FEATURE")):
         ax.plot(
@@ -28,7 +28,7 @@ def plot_ks_all_ticks(keys, stats, ref_stats=None):
         )
 
     if ref_stats is not None:
-        ref_stats_all_ticks = ref_stats[ref_stats["SUBSET"] == "all_ticks"]
+        ref_stats_all_ticks = ref_stats[ref_stats["TICK"].isna()]
         for index, (feature, group) in enumerate(ref_stats_all_ticks.groupby("FEATURE")):
             value = group["KS_STATISTIC"]
             ax.plot([-0.2], [value], marker=">", color=cmap(index), markersize=5)

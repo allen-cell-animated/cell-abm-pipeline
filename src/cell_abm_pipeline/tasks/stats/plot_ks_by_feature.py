@@ -9,7 +9,7 @@ def plot_ks_by_feature(keys, stats, ref_stats=None):
     fig, gridspec, indices = make_grid_figure(stats["FEATURE"].unique())
     cmap = cm.get_cmap("tab20")
 
-    stats_by_tick = stats[stats["SUBSET"] != "all_ticks"]
+    stats_by_tick = stats[~stats["TICK"].isna()]
 
     for i, j, feature_key in indices:
         ax = fig.add_subplot(gridspec[i, j])
@@ -24,7 +24,7 @@ def plot_ks_by_feature(keys, stats, ref_stats=None):
                 continue
 
             ax.plot(
-                group["TIME"] / 24,
+                group["time"] / 24,
                 group["KS_STATISTIC"],
                 marker="o",
                 linewidth=0.5,
@@ -34,11 +34,11 @@ def plot_ks_by_feature(keys, stats, ref_stats=None):
             )
 
         if ref_stats is not None:
-            ref_stats_by_tick = ref_stats[ref_stats["SUBSET"] != "all_ticks"]
+            ref_stats_by_tick = ref_stats[~ref_stats["TICK"].isna()]
             ref_group = ref_stats_by_tick[ref_stats_by_tick["FEATURE"] == feature_key]
 
             ax.plot(
-                ref_group["TIME"] / 24,
+                ref_group["time"] / 24,
                 ref_group["KS_STATISTIC"],
                 marker="o",
                 markersize=2,

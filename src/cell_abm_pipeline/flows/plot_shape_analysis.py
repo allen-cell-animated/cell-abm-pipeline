@@ -13,14 +13,6 @@ from cell_abm_pipeline.flows.run_shape_analysis import PCA_COMPONENTS
 from cell_abm_pipeline.tasks.pca import plot_transform_compare, plot_variance_explained
 from cell_abm_pipeline.tasks.stats import plot_ks_all_ticks, plot_ks_by_feature, plot_ks_by_key
 
-PLOTS = [
-    "ks_stats",
-    "shape_modes_compile",
-    "shape_modes_merge",
-    "transform_compare",
-    "variance_explained",
-]
-
 PLOTS_PCA = [
     "transform_compare",
     "variance_explained",
@@ -37,7 +29,6 @@ PLOTS_SHAPES = [
 
 
 PLOTS = PLOTS_PCA + PLOTS_STATS + PLOTS_SHAPES
-
 
 REGION_COLORS = {"DEFAULT": "#F200FF", "NUCLEUS": "#3AADA7"}
 
