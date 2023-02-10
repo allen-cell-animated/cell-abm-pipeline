@@ -88,7 +88,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         run_flow_plot_shapes(context, series, parameters)
 
 
-@flow(name="plot-shape-analysis_plot_pca")
+@flow(name="plot-shape-analysis_plot-pca")
 def run_flow_plot_pca(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
@@ -133,7 +133,7 @@ def run_flow_plot_pca(
             )
 
 
-@flow(name="plot-shape-analysis_plot_stats")
+@flow(name="plot-shape-analysis_plot-stats")
 def run_flow_plot_stats(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
@@ -177,7 +177,7 @@ def run_flow_plot_stats(
         )
 
 
-@flow(name="plot-shape-analysis_plot_shapes")
+@flow(name="plot-shape-analysis_plot-shapes")
 def run_flow_plot_shapes(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
