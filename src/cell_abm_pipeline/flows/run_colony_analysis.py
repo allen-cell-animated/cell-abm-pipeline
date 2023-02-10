@@ -107,6 +107,7 @@ def run_flow_analyze_measures(
 
         measures = degree_measures.merge(distance_measures, on=["SEED", "TICK"])
         measures = measures.merge(centrality_measures, on=["SEED", "TICK"])
+        convert_model_units(measures, parameters.ds, parameters.dt)
 
         save_dataframe(context.working_location, measures_key, measures, index=False)
 
@@ -143,5 +144,6 @@ def run_flow_analyze_clusters(
         cluster_distances = calculate_cluster_distances(neighbors_data)
 
         clusters = cluster_sizes.merge(cluster_distances, on=["SEED", "TICK"])
+        convert_model_units(clusters, parameters.ds, parameters.dt)
 
         save_dataframe(context.working_location, clusters_key, clusters, index=False)
