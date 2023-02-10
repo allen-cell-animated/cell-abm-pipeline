@@ -2,12 +2,14 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pandas as pd
-from abm_shape_collection.coefficient import calculate_sh_coefficients, make_voxels_array
+from abm_shape_collection import get_shape_coefficients, make_voxels_array
 from arcade_collection.output import extract_tick_json, get_location_voxels
 from io_collection.keys import make_key
 from io_collection.load import load_tar
 from io_collection.save import save_dataframe
 from prefect import flow
+
+COEFFICIENT_ORDER = 16
 
 
 @dataclass
@@ -22,7 +24,8 @@ class ParametersConfig:
 
     region: Optional[str] = None
 
-    lmax: int = 16
+    order: int = COEFFICIENT_ORDER
+    """Order of the spherical harmonics coefficient parametrization."""
 
 
 @dataclass
@@ -57,10 +60,14 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
         if parameters.region is not None:
             region_voxels = get_location_voxels(location, parameters.region)
+
+            if len(region_voxels) == 0:
+                continue
+
             region_array = make_voxels_array(region_voxels, parameters.scale)
-            coeffs = calculate_sh_coefficients(region_array, array, parameters.lmax)
+            coeffs = get_shape_coefficients(region_array, array, parameters.order)
         else:
-            coeffs = calculate_sh_coefficients(array, array, parameters.lmax)
+            coeffs = get_shape_coefficients(array, array, parameters.order)
 
         coeffs["KEY"] = parameters.key
         coeffs["ID"] = location["id"]
