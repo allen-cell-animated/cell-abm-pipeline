@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 import pandas as pd
-from abm_colony_collection.neighbor import get_depth_map, get_neighbors_map, make_voxels_array
+from abm_colony_collection import get_depth_map, get_neighbors_map, make_voxels_array
 from arcade_collection.output import extract_tick_json
 from io_collection.keys import make_key
 from io_collection.load import load_tar
