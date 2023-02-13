@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
 
 from container_collection.fargate import (
     make_fargate_task,

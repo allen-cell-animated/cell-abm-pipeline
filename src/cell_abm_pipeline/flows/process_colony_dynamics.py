@@ -29,109 +29,107 @@ class SeriesConfig:
 
 @flow(name="process-colony-dynamics")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    run_flow_merge_colonies(context, series, parameters)
+
+    run_flow_compress_colonies(context, series, parameters)
+
+    run_flow_remove_colonies(context, series, parameters)
+
+
+@flow(name="process-colony-dynamics_merge-colonies")
+def run_flow_merge_colonies(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
+) -> None:
+    analysis_key = make_key(series.name, "analysis", "analysis.NEIGHBORS")
+
     for condition in series.conditions:
         for seed in series.seeds:
-            merge_colony_dynamics(
-                series.name,
-                condition["key"],
-                seed,
-                context.working_location,
-                parameters.frames,
-            )
-            compress_colony_dynamics(
-                series.name,
-                condition["key"],
-                seed,
-                context.working_location,
-                parameters.frames,
-            )
-            remove_colony_dynamics(
-                series.name,
-                condition["key"],
-                seed,
-                context.working_location,
-            )
+            series_key = f"{series.name}_{condition['key']}_{seed:04d}"
+            neighbor_key = make_key(analysis_key, f"{series_key}.NEIGHBORS.csv")
+            neighbor_key_exists = check_key(context.working_location, neighbor_key)
+
+            existing_frames = []
+            if neighbor_key_exists:
+                existing_neighbors = load_dataframe(context.working_location, neighbor_key)
+                existing_frames = list(existing_neighbors["TICK"].unique())
+
+            frame_neighbors = []
+
+            for frame in parameters.frames:
+                if frame in existing_frames:
+                    continue
+
+                frame_key = make_key(analysis_key, f"{series_key}_{frame:06d}.NEIGHBORS.csv")
+                frame_neighbors.append(load_dataframe(context.working_location, frame_key))
+
+            if not frame_neighbors:
+                return
+
+            neighbor_dataframe = pd.concat(frame_neighbors, ignore_index=True)
+
+            if neighbor_key_exists:
+                neighbor_dataframe = pd.concat(
+                    [existing_neighbors, neighbor_dataframe], ignore_index=True
+                )
+
+            save_dataframe(context.working_location, neighbor_key, neighbor_dataframe, index=False)
 
 
-@flow(name="merge-colony-dynamics")
-def merge_colony_dynamics(name, condition, seed, working_location, frames) -> None:
-    series_key = f"{name}_{condition}_{seed:04d}"
-    coeff_key = make_key(name, "analysis", "analysis.NEIGHBORS", f"{series_key}.NEIGHBORS.csv")
-    coeff_key_exists = check_key(working_location, coeff_key)
+@flow(name="process-colony-dynamics_compress-colonies")
+def run_flow_compress_colonies(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
+) -> None:
+    analysis_key = make_key(series.name, "analysis", "analysis.NEIGHBORS")
 
-    existing_frames = []
-    if coeff_key_exists:
-        existing_neighbors = load_dataframe(working_location, coeff_key)
-        existing_frames = list(existing_neighbors["TICK"].unique())
+    for condition in series.conditions:
+        for seed in series.seeds:
+            series_key = f"{series.name}_{condition['key']}_{seed:04d}"
+            neighbor_key = make_key(analysis_key, f"{series_key}.NEIGHBORS.tar.xz")
+            neighbor_key_exists = check_key(context.working_location, neighbor_key)
 
-    frame_neighbors = []
+            existing_frames = []
+            if neighbor_key_exists:
+                existing_neighbors = load_tar(context.working_location, neighbor_key)
+                existing_frames = [
+                    int(re.findall(r"[0-9]{6}", member.name)[0])
+                    for member in existing_neighbors.getmembers()
+                ]
 
-    for frame in frames:
-        if frame in existing_frames:
-            continue
+            contents = []
 
-        frame_key = make_key(
-            name, "analysis", "analysis.NEIGHBORS", f"{series_key}_{frame:06d}.NEIGHBORS.csv"
-        )
+            for frame in parameters.frames:
+                if frame in existing_frames:
+                    continue
 
-        frame_neighbors.append(load_dataframe(working_location, frame_key))
+                frame_key = make_key(analysis_key, f"{series_key}_{frame:06d}.NEIGHBORS.csv")
 
-    if not frame_neighbors:
-        return
+                contents.append(frame_key)
 
-    coeff_dataframe = pd.concat(frame_neighbors, ignore_index=True)
+            if not contents:
+                return
 
-    if coeff_key_exists:
-        coeff_dataframe = pd.concat([existing_neighbors, coeff_dataframe], ignore_index=True)
-
-    save_dataframe(working_location, coeff_key, coeff_dataframe, index=False)
-
-
-@flow(name="compress-colony-dynamics")
-def compress_colony_dynamics(name, condition, seed, working_location, frames) -> None:
-    series_key = f"{name}_{condition}_{seed:04d}"
-    coeff_key = make_key(name, "analysis", "analysis.NEIGHBORS", f"{series_key}.NEIGHBORS.tar.xz")
-    coeff_key_exists = check_key(working_location, coeff_key)
-
-    existing_frames = []
-    if coeff_key_exists:
-        existing_neighbors = load_tar(working_location, coeff_key)
-        existing_frames = [
-            int(re.findall(r"[0-9]{6}", member.name)[0])
-            for member in existing_neighbors.getmembers()
-        ]
-
-    contents = []
-
-    for frame in frames:
-        if frame in existing_frames:
-            continue
-
-        frame_key = make_key(
-            name, "analysis", "analysis.NEIGHBORS", f"{series_key}_{frame:06d}.NEIGHBORS.csv"
-        )
-
-        contents.append(frame_key)
-
-    if not contents:
-        return
-
-    save_tar(working_location, coeff_key, contents)
+            save_tar(context.working_location, neighbor_key, contents)
 
 
-@flow(name="remove-colony-dynamics")
-def remove_colony_dynamics(name, condition, seed, working_location) -> None:
-    series_key = f"{name}_{condition}_{seed:04d}"
-    coeff_key = make_key(name, "analysis", "analysis.NEIGHBORS", f"{series_key}.NEIGHBORS.tar.xz")
-    coeff_key_exists = check_key(working_location, coeff_key)
+@flow(name="process-colony-dynamics_remove-colonies")
+def run_flow_remove_colonies(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
+) -> None:
+    analysis_key = make_key(series.name, "analysis", "analysis.NEIGHBORS")
 
-    if not coeff_key_exists:
-        return
+    for condition in series.conditions:
+        for seed in series.seeds:
+            series_key = f"{series.name}_{condition['key']}_{seed:04d}"
+            neighbor_key = make_key(analysis_key, f"{series_key}.NEIGHBORS.tar.xz")
+            neighbor_key_exists = check_key(context.working_location, neighbor_key)
 
-    existing_neighbors = load_tar(working_location, coeff_key)
+            if not neighbor_key_exists:
+                return
 
-    for member in existing_neighbors.getmembers():
-        frame_key = make_key(name, "analysis", "analysis.NEIGHBORS", member.name)
+            existing_neighbors = load_tar(context.working_location, neighbor_key)
 
-        if check_key(working_location, frame_key):
-            remove_key(working_location, frame_key)
+            for member in existing_neighbors.getmembers():
+                frame_key = make_key(analysis_key, member.name)
+
+                if check_key(context.working_location, frame_key):
+                    remove_key(context.working_location, frame_key)

@@ -27,7 +27,6 @@ PLOTS_SHAPES = [
     "shape_modes_merge",
 ]
 
-
 PLOTS = PLOTS_PCA + PLOTS_STATS + PLOTS_SHAPES
 
 REGION_COLORS = {"DEFAULT": "#F200FF", "NUCLEUS": "#3AADA7"}

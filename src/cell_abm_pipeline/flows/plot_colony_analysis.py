@@ -37,15 +37,12 @@ PLOTS_CLUSTERS = [
     "size_stds",
 ]
 
-
 PLOTS = PLOTS_MEASURES + PLOTS_CLUSTERS
 
 
 @dataclass
 class ParametersConfig:
     plots: list[str] = field(default_factory=lambda: PLOTS)
-
-    box: tuple[int, int, int] = (1, 1, 1)
 
 
 @dataclass
