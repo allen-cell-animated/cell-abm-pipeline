@@ -84,32 +84,50 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     if context.secret_access_key is not None:
         environment.append(f"AWS_SECRET_ACCESS_KEY={context.secret_access_key}")
 
+    samples_key = make_key(series.name, "samples", "samples.PROCESSED")
+    converted_key = make_key(series.name, "converted", "converted.ARCADE")
+
     for fov in series.conditions:
-        sample_images(
-            series.name,
-            fov["key"],
-            context.working_location,
-            parameters.image,
-            environment,
-            parameters.channels.keys(),
-        )
+        sample_image_command = [
+            "abmpipe",
+            "sample-image",
+            "::",
+            f"parameters.key={fov['key']}",
+            f"parameters.channels=[{','.join(parameters.channels.keys())}]",
+            "parameters.resolution=1.0",
+            "parameters.grid=rect",
+            "parameters.coordinate_type=step",
+            f"context.working_location={context.working_location}",
+            f"series.name={series.name}",
+        ]
+        run_docker_command(parameters.image, sample_image_command, environment=environment)
 
         samples = {}
         for channel_index, channel_name in parameters.channels.items():
-            process_samples(
-                series.name,
-                fov["key"],
-                context.working_location,
-                parameters.image,
-                environment,
-                channel_index,
-                fov["include_ids"],
-            )
+            process_samples_command = [
+                "abmpipe",
+                "process-sample",
+                "::",
+                f"parameters.key={fov['key']}",
+                f"parameters.channel={channel_index}",
+                "parameters.remove_unconnected=True",
+                "parameters.unconnected_filter=connectivity",
+                "parameters.remove_edges=False",
+                f"parameters.include_ids=[{','.join([str(id) for id in fov['include_ids']])}]",
+                f"context.working_location={context.working_location}",
+                f"series.name={series.name}",
+            ]
+            run_docker_command(parameters.image, process_samples_command, environment=environment)
 
-            sample_key = rename_samples(
-                series.name, fov["key"], context.working_location, channel_index, channel_name
+            old_key = make_key(
+                samples_key, f"{series.name}_{fov['key']}_channel_{channel_index}.PROCESSED.csv"
             )
-            channel_samples = load_dataframe(context.working_location, sample_key)
+            new_key = make_key(
+                samples_key, f"{series.name}_{fov['key']}.PROCESSED.{channel_name}.csv"
+            )
+            change_key(context.working_location, old_key, new_key)
+
+            channel_samples = load_dataframe(context.working_location, new_key)
             samples[channel_name] = channel_samples
 
         merged_samples = merge_region_samples(samples, parameters.margins)
@@ -123,77 +141,13 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
             parameters.critical_heights,
             parameters.state_thresholds,
         )
-        cells_key = make_key(
-            series.name, "converted", "converted.ARCADE", f"{series.name}_{fov['key']}.CELLS.json"
-        )
+        cells_key = make_key(converted_key, f"{series.name}_{fov['key']}.CELLS.json")
         save_json(context.working_location, cells_key, cells)
 
         locations = convert_to_locations_file(merged_samples)
-        locations_key = make_key(
-            series.name,
-            "converted",
-            "converted.ARCADE",
-            f"{series.name}_{fov['key']}.LOCATIONS.json",
-        )
+        locations_key = make_key(converted_key, f"{series.name}_{fov['key']}.LOCATIONS.json")
         save_json(context.working_location, locations_key, locations)
 
         setup = generate_setup_file(merged_samples, parameters.margins, parameters.potts_terms)
-        setup_key = make_key(
-            series.name, "converted", "converted.ARCADE", f"{series.name}_{fov['key']}.xml"
-        )
+        setup_key = make_key(converted_key, f"{series.name}_{fov['key']}.xml")
         save_text(context.working_location, setup_key, setup)
-
-
-@flow(name="sample-images")
-def sample_images(name, key, working_location, image, environment, channels):
-    sample_image_command = [
-        "abmpipe",
-        "sample-image",
-        "::",
-        f"parameters.key={key}",
-        f"parameters.channels=[{','.join(channels)}]",
-        "parameters.resolution=1.0",
-        "parameters.grid=rect",
-        "parameters.coordinate_type=step",
-        f"context.working_location={working_location}",
-        f"series.name={name}",
-    ]
-    run_docker_command(image, sample_image_command, environment=environment)
-
-
-@flow(name="process-samples")
-def process_samples(name, key, working_location, image, environment, channel_index, include_ids):
-    process_samples_command = [
-        "abmpipe",
-        "process-sample",
-        "::",
-        f"parameters.key={key}",
-        f"parameters.channel={channel_index}",
-        "parameters.remove_unconnected=True",
-        "parameters.unconnected_filter=connectivity",
-        "parameters.remove_edges=False",
-        f"parameters.include_ids=[{','.join([str(id) for id in include_ids])}]",
-        f"context.working_location={working_location}",
-        f"series.name={name}",
-    ]
-    run_docker_command(image, process_samples_command, environment=environment)
-
-
-@flow(name="rename-samples")
-def rename_samples(name, key, working_location, channel_index, channel_name):
-    old_key = make_key(
-        name,
-        "samples",
-        "samples.PROCESSED",
-        f"{name}_{key}_channel_{channel_index}.PROCESSED.csv",
-    )
-    new_key = make_key(
-        name,
-        "samples",
-        "samples.PROCESSED",
-        f"{name}_{key}.PROCESSED.{channel_name}.csv",
-    )
-
-    change_key(working_location, old_key, new_key)
-
-    return new_key

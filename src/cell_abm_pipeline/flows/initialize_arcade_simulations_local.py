@@ -78,30 +78,50 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     volume = create_docker_volume(context.working_location)
 
+    samples_key = make_key(series.name, "samples", "samples.PROCESSED")
+    converted_key = make_key(series.name, "converted", "converted.ARCADE")
+
     for fov in series.conditions:
-        sample_images(
-            series.name,
-            fov["key"],
-            parameters.image,
-            volume,
-            parameters.channels.keys(),
-        )
+        sample_image_command = [
+            "abmpipe",
+            "sample-image",
+            "::",
+            f"parameters.key={fov['key']}",
+            f"parameters.channels=[{','.join(parameters.channels.keys())}]",
+            "parameters.resolution=1.0",
+            "parameters.grid=rect",
+            "parameters.coordinate_type=step",
+            "context.working_location=/mnt",
+            f"series.name={series.name}",
+        ]
+        run_docker_command(parameters.image, sample_image_command, volume=volume)
 
         samples = {}
         for channel_index, channel_name in parameters.channels.items():
-            process_samples(
-                series.name,
-                fov["key"],
-                parameters.image,
-                volume,
-                channel_index,
-                fov["include_ids"],
-            )
+            process_samples_command = [
+                "abmpipe",
+                "process-sample",
+                "::",
+                f"parameters.key={fov['key']}",
+                f"parameters.channel={channel_index}",
+                "parameters.remove_unconnected=True",
+                "parameters.unconnected_filter=connectivity",
+                "parameters.remove_edges=False",
+                f"parameters.include_ids=[{','.join([str(id) for id in fov['include_ids']])}]",
+                "context.working_location=/mnt",
+                f"series.name={series.name}",
+            ]
+            run_docker_command(parameters.image, process_samples_command, volume=volume)
 
-            sample_key = rename_samples(
-                series.name, fov["key"], context.working_location, channel_index, channel_name
+            old_key = make_key(
+                samples_key, f"{series.name}_{fov['key']}_channel_{channel_index}.PROCESSED.csv"
             )
-            channel_samples = load_dataframe(context.working_location, sample_key)
+            new_key = make_key(
+                samples_key, f"{series.name}_{fov['key']}.PROCESSED.{channel_name}.csv"
+            )
+            change_key(context.working_location, old_key, new_key)
+
+            channel_samples = load_dataframe(context.working_location, new_key)
             samples[channel_name] = channel_samples
 
         merged_samples = merge_region_samples(samples, parameters.margins)
@@ -115,79 +135,15 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
             parameters.critical_heights,
             parameters.state_thresholds,
         )
-        cells_key = make_key(
-            series.name, "converted", "converted.ARCADE", f"{series.name}_{fov['key']}.CELLS.json"
-        )
+        cells_key = make_key(converted_key, f"{series.name}_{fov['key']}.CELLS.json")
         save_json(context.working_location, cells_key, cells)
 
         locations = convert_to_locations_file(merged_samples)
-        locations_key = make_key(
-            series.name,
-            "converted",
-            "converted.ARCADE",
-            f"{series.name}_{fov['key']}.LOCATIONS.json",
-        )
+        locations_key = make_key(converted_key, f"{series.name}_{fov['key']}.LOCATIONS.json")
         save_json(context.working_location, locations_key, locations)
 
         setup = generate_setup_file(merged_samples, parameters.margins, parameters.potts_terms)
-        setup_key = make_key(
-            series.name, "converted", "converted.ARCADE", f"{series.name}_{fov['key']}.xml"
-        )
+        setup_key = make_key(converted_key, f"{series.name}_{fov['key']}.xml")
         save_text(context.working_location, setup_key, setup)
 
     remove_docker_volume(volume)
-
-
-@flow(name="sample-images")
-def sample_images(name, key, image, volume, channels):
-    sample_image_command = [
-        "abmpipe",
-        "sample-image",
-        "::",
-        f"parameters.key={key}",
-        f"parameters.channels=[{','.join(channels)}]",
-        "parameters.resolution=1.0",
-        "parameters.grid=rect",
-        "parameters.coordinate_type=step",
-        "context.working_location=/mnt",
-        f"series.name={name}",
-    ]
-    run_docker_command(image, sample_image_command, volume=volume)
-
-
-@flow(name="process-samples")
-def process_samples(name, key, image, volume, channel_index, include_ids):
-    process_samples_command = [
-        "abmpipe",
-        "process-sample",
-        "::",
-        f"parameters.key={key}",
-        f"parameters.channel={channel_index}",
-        "parameters.remove_unconnected=True",
-        "parameters.unconnected_filter=connectivity",
-        "parameters.remove_edges=False",
-        f"parameters.include_ids=[{','.join([str(id) for id in include_ids])}]",
-        "context.working_location=/mnt",
-        f"series.name={name}",
-    ]
-    run_docker_command(image, process_samples_command, volume=volume)
-
-
-@flow(name="rename-samples")
-def rename_samples(name, key, working_location, channel_index, channel_name):
-    old_key = make_key(
-        name,
-        "samples",
-        "samples.PROCESSED",
-        f"{name}_{key}_channel_{channel_index}.PROCESSED.csv",
-    )
-    new_key = make_key(
-        name,
-        "samples",
-        "samples.PROCESSED",
-        f"{name}_{key}.PROCESSED.{channel_name}.csv",
-    )
-
-    change_key(working_location, old_key, new_key)
-
-    return new_key

@@ -54,8 +54,6 @@ POTTS_TERMS: list[str] = [
     "persistence",
 ]
 
-# ==============================================================================
-
 
 @dataclass
 class ParametersConfig:
@@ -90,7 +88,37 @@ class SeriesConfig:
     conditions: list
 
 
-# ==============================================================================
+SAMPLE_IMAGE_FLOW = ["abmpipe", "sample-image", "::"]
+
+SAMPLE_IMAGE_DOTLIST = [
+    "parameters.channels=[0]",
+    "parameters.resolution=1.0",
+    "parameters.grid=rect",
+    "parameters.coordinate_type=step",
+    "context.working_location=/mnt",
+]
+
+SAMPLE_IMAGE_DOTLIST_NUCLEUS = SAMPLE_IMAGE_DOTLIST + [
+    "parameters.extension=.tiff",
+]
+
+PROCESS_SAMPLE_FLOW = ["abmpipe", "process-sample", "::"]
+
+PROCESS_SAMPLE_DOTLIST = [
+    "parameters.channel=0",
+    "parameters.remove_unconnected=True",
+    "parameters.unconnected_filter=connectivity",
+    "context.working_location=/mnt",
+]
+
+PROCESS_SAMPLE_DOTLIST_NUCLEUS = PROCESS_SAMPLE_DOTLIST + [
+    "parameters.remove_edges=False",
+]
+
+PROCESS_SAMPLE_DOTLIST_VORONOI = PROCESS_SAMPLE_DOTLIST + [
+    "parameters.remove_edges=True",
+    "parameters.edge_threshold=100",
+]
 
 
 @flow(name="initialize-voronoi-simulations")
@@ -105,30 +133,54 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     else:
         reference = None
 
+    samples_key = make_key(series.name, "samples", "samples.PROCESSED")
+    converted_key = make_key(series.name, "converted", "converted.ARCADE")
+
     docker_volume = create_docker_volume(context.working_location)
 
     for fov in series.conditions:
-        sample_nucleus_image(series.name, fov["key"], parameters.image, docker_volume)
-        sample_voronoi_image(series.name, fov["key"], parameters.image, docker_volume)
+        fov_key = fov["key"]
+        nucleus_key = [f"series.name={series.name}", f"parameters.key={fov_key}_T0000"]
+        voronoi_key = [f"series.name={series.name}", f"parameters.key={fov_key}_T0000_C00_voronoi"]
 
-        process_nucleus_samples(series.name, fov["key"], parameters.image, docker_volume)
-        process_voronoi_samples(
-            series.name, fov["key"], parameters.image, docker_volume, fov["exclude_ids"]
-        )
+        # Sample nucleus and voronoi images
+        sample_nucleus_command = SAMPLE_IMAGE_FLOW + SAMPLE_IMAGE_DOTLIST_NUCLEUS + nucleus_key
+        run_docker_command(parameters.image, sample_nucleus_command, volume=docker_volume)
+        sample_voronoi_command = SAMPLE_IMAGE_FLOW + SAMPLE_IMAGE_DOTLIST + voronoi_key
+        run_docker_command(parameters.image, sample_voronoi_command, volume=docker_volume)
 
-        nucleus_sample_key = rename_nucleus_samples(
-            series.name, fov["key"], context.working_location
+        # Process nucleus and voronoi samples
+        process_nucleus_command = PROCESS_SAMPLE_FLOW + PROCESS_SAMPLE_DOTLIST_NUCLEUS + nucleus_key
+        run_docker_command(parameters.image, process_nucleus_command, volume=docker_volume)
+        process_voronoi_command = (
+            PROCESS_SAMPLE_FLOW
+            + PROCESS_SAMPLE_DOTLIST_VORONOI
+            + voronoi_key
+            + [f"parameters.exclude_ids=[{','.join([str(id) for id in fov['exclude_ids']])}]"]
         )
-        default_sample_key = rename_voronoi_samples(
-            series.name, fov["key"], context.working_location
-        )
+        run_docker_command(parameters.image, process_voronoi_command, volume=docker_volume)
 
+        # Rename processed nucleus and voronoi samples
+        old_nucleus_key = make_key(
+            samples_key, f"{series.name}_{fov_key}_T0000_channel_0.PROCESSED.csv"
+        )
+        new_nucleus_key = make_key(samples_key, f"{series.name}_{fov_key}.PROCESSED.NUCLEUS.csv")
+        change_key(context.working_location, old_nucleus_key, new_nucleus_key)
+
+        old_voronoi_key = make_key(
+            samples_key, f"{series.name}_{fov_key}_T0000_C00_voronoi_channel_0.PROCESSED.csv"
+        )
+        new_default_key = make_key(samples_key, f"{series.name}_{fov_key}.PROCESSED.DEFAULT.csv")
+        change_key(context.working_location, old_voronoi_key, new_default_key)
+
+        # Merge samples between regions
         samples = {
-            "DEFAULT": load_dataframe(context.working_location, default_sample_key),
-            "NUCLEUS": load_dataframe(context.working_location, nucleus_sample_key),
+            "DEFAULT": load_dataframe(context.working_location, new_default_key),
+            "NUCLEUS": load_dataframe(context.working_location, new_nucleus_key),
         }
         merged_samples = merge_region_samples(samples, fov["margins"])
 
+        # Convert samples to CELLS file
         cells = convert_to_cells_file(
             merged_samples,
             reference[reference["KEY"] == fov["key"]],
@@ -138,138 +190,17 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
             parameters.critical_heights,
             parameters.state_thresholds,
         )
-        cells_key = make_key(
-            series.name, "converted", "converted.ARCADE", f"{series.name}_{fov['key']}.CELLS.json"
-        )
+        cells_key = make_key(converted_key, f"{series.name}_{fov['key']}.CELLS.json")
         save_json(context.working_location, cells_key, cells)
 
+        # Convert samples to LOCATIONS file
         locations = convert_to_locations_file(merged_samples)
-        locations_key = make_key(
-            series.name,
-            "converted",
-            "converted.ARCADE",
-            f"{series.name}_{fov['key']}.LOCATIONS.json",
-        )
+        locations_key = make_key(converted_key, f"{series.name}_{fov['key']}.LOCATIONS.json")
         save_json(context.working_location, locations_key, locations)
 
+        # Generate ARCADE setup file
         setup = generate_setup_file(merged_samples, fov["margins"], parameters.potts_terms)
-        setup_key = make_key(
-            series.name, "converted", "converted.ARCADE", f"{series.name}_{fov['key']}.xml"
-        )
+        setup_key = make_key(converted_key, f"{series.name}_{fov['key']}.xml")
         save_text(context.working_location, setup_key, setup)
 
     remove_docker_volume(docker_volume)
-
-
-# ==============================================================================
-
-
-@flow(name="sample-nucleus-image")
-def sample_nucleus_image(name, key, image, volume):
-    sample_image_command = [
-        "abmpipe",
-        "sample-image",
-        "::",
-        f"parameters.key={key}_T0000",
-        "parameters.channels=[0]",
-        "parameters.resolution=1.0",
-        "parameters.grid=rect",
-        "parameters.coordinate_type=step",
-        "parameters.extension=.tiff",
-        "context.working_location=/mnt",
-        f"series.name={name}",
-    ]
-    run_docker_command(image, sample_image_command, volume=volume)
-
-
-@flow(name="sample-voronoi-image")
-def sample_voronoi_image(name, key, image, volume):
-    sample_image_command = [
-        "abmpipe",
-        "sample-image",
-        "::",
-        f"parameters.key={key}_T0000_C00_voronoi",
-        "parameters.channels=[0]",
-        "parameters.resolution=1.0",
-        "parameters.grid=rect",
-        "parameters.coordinate_type=step",
-        "context.working_location=/mnt",
-        f"series.name={name}",
-    ]
-    run_docker_command(image, sample_image_command, volume=volume)
-
-
-@flow(name="process-nucleus-samples")
-def process_nucleus_samples(name, key, image, volume):
-    process_samples_command = [
-        "abmpipe",
-        "process-sample",
-        "::",
-        f"parameters.key={key}_T0000",
-        "parameters.channel=0",
-        "parameters.remove_unconnected=True",
-        "parameters.unconnected_filter=connectivity",
-        "parameters.remove_edges=False",
-        "context.working_location=/mnt",
-        f"series.name={name}",
-    ]
-    run_docker_command(image, process_samples_command, volume=volume)
-
-
-@flow(name="process-voronoi-samples")
-def process_voronoi_samples(name, key, image, volume, exclude_ids):
-    process_samples_command = [
-        "abmpipe",
-        "process-sample",
-        "::",
-        f"parameters.key={key}_T0000_C00_voronoi",
-        "parameters.channel=0",
-        "parameters.remove_unconnected=True",
-        "parameters.unconnected_filter=connectivity",
-        "parameters.remove_edges=True",
-        f"parameters.exclude_ids=[{','.join([str(id) for id in exclude_ids])}]",
-        "parameters.edge_threshold=100",
-        "context.working_location=/mnt",
-        f"series.name={name}",
-    ]
-    run_docker_command(image, process_samples_command, volume=volume)
-
-
-@flow(name="rename-nucleus-samples")
-def rename_nucleus_samples(name, key, working_location):
-    old_key = make_key(
-        name,
-        "samples",
-        "samples.PROCESSED",
-        f"{name}_{key}_T0000_channel_0.PROCESSED.csv",
-    )
-    new_key = make_key(
-        name,
-        "samples",
-        "samples.PROCESSED",
-        f"{name}_{key}.PROCESSED.NUCLEUS.csv",
-    )
-
-    change_key(working_location, old_key, new_key)
-
-    return new_key
-
-
-@flow(name="rename-voronoi-samples")
-def rename_voronoi_samples(name, key, working_location):
-    old_key = make_key(
-        name,
-        "samples",
-        "samples.PROCESSED",
-        f"{name}_{key}_T0000_C00_voronoi_channel_0.PROCESSED.csv",
-    )
-    new_key = make_key(
-        name,
-        "samples",
-        "samples.PROCESSED",
-        f"{name}_{key}.PROCESSED.DEFAULT.csv",
-    )
-
-    change_key(working_location, old_key, new_key)
-
-    return new_key
