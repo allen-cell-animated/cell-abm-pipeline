@@ -32,10 +32,20 @@ class SeriesConfig:
 
 @flow(name="process-cell-shapes")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    # Iterate through conditions and seeds to merge contents of individual
+    # frames into a single csv. If merged csv exists and the specified frame
+    # does not exist in the csv, the frame is appended. If the merged csv exists
+    # and specified frame exists in the csv, the frame is skipped.
     run_flow_merge_shapes(context, series, parameters)
 
+    # Iterate through conditions and seeds to combine and compress individual
+    # frames into a .tar.xz archive. If the archive exists and the specified
+    # frame is not in the archive, the frame is appended. If the archive exists
+    # and specified frame exists in the archive, the frame is skipped.
     run_flow_compress_shapes(context, series, parameters)
 
+    # Iterate through conditions and seeds to remove individual frames if the
+    # frame exists in the corresponding .tar.xz archive.
     run_flow_remove_shapes(context, series, parameters)
 
 
