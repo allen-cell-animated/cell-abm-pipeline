@@ -2,7 +2,7 @@ import pandas as pd
 from matplotlib.lines import Line2D
 from prefect import task
 
-from cell_abm_pipeline.tasks.plot_phase_fractions import PHASE_COLORS
+from cell_abm_pipeline.tasks.basic.plot_phase_fractions import PHASE_COLORS
 from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 
