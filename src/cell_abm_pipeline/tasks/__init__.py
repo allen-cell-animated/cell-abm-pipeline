@@ -1,4 +1,3 @@
-from .convert_data_units import convert_data_units
 from .make_projection_frame import make_projection_frame
 from .plot_counts_total import plot_counts_total
 from .plot_height_average import plot_height_average
@@ -13,4 +12,3 @@ from .plot_volume_average import plot_volume_average
 from .plot_volume_distribution import plot_volume_distribution
 from .plot_volume_individual import plot_volume_individual
 from .plot_volume_locations import plot_volume_locations
-from .save_gif import save_gif
