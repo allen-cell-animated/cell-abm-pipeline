@@ -1,13 +1,15 @@
 [[package]]
 name = "abm-colony-collection"
-version = "0.1.0"
+version = "0.2.0"
 description = "Collection of tasks for analyzing colony dynamics."
 category = "main"
 optional = false
 python-versions = ">=3.9,<4.0"
 
 [package.dependencies]
+networkx = ">=3.0,<4.0"
 numpy = ">=1.23.4,<2.0.0"
+pandas = ">=1.5.1,<2.0.0"
 prefect = ">=2.6.0,<3.0.0"
 scikit-image = ">=0.19.3,<0.20.0"
 scipy = ">=1.9.3,<2.0.0"
@@ -32,7 +34,7 @@ scipy = ">=1.9.3,<2.0.0"
 
 [[package]]
 name = "abm-shape-collection"
-version = "0.1.0"
+version = "0.2.0"
 description = "Collection of tasks for analyzing cell shapes."
 category = "main"
 optional = false
@@ -43,6 +45,8 @@ aicsshparam = ">=0.1.1,<0.2.0"
 numpy = ">=1.23.4,<2.0.0"
 pandas = ">=1.5.1,<2.0.0"
 prefect = ">=2.6.0,<3.0.0"
+trimesh = ">=3.18.3,<4.0.0"
+vtk = ">=9.2.5,<10.0.0"
 
 [[package]]
 name = "aicsimageio"
@@ -251,7 +255,7 @@ requests-oauthlib = "*"
 
 [[package]]
 name = "arcade-collection"
-version = "0.4.0"
+version = "0.5.0"
 description = "Collection of tasks for working with ARCADE."
 category = "main"
 optional = false
@@ -1068,7 +1072,7 @@ python-versions = "*"
 
 [[package]]
 name = "io-collection"
-version = "0.5.0"
+version = "0.6.0"
 description = "Collection of tasks for I/O."
 category = "main"
 optional = false
@@ -1345,17 +1349,17 @@ python-versions = "*"
 
 [[package]]
 name = "networkx"
-version = "2.8.8"
+version = "3.0"
 description = "Python package for creating and manipulating graphs and networks"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 
 [package.extras]
-default = ["matplotlib (>=3.4)", "numpy (>=1.19)", "pandas (>=1.3)", "scipy (>=1.8)"]
-developer = ["mypy (>=0.982)", "pre-commit (>=2.20)"]
-doc = ["nb2plots (>=0.6)", "numpydoc (>=1.5)", "pillow (>=9.2)", "pydata-sphinx-theme (>=0.11)", "sphinx (>=5.2)", "sphinx-gallery (>=0.11)", "texext (>=0.6.6)"]
-extra = ["lxml (>=4.6)", "pydot (>=1.4.2)", "pygraphviz (>=1.9)", "sympy (>=1.10)"]
+default = ["matplotlib (>=3.4)", "numpy (>=1.20)", "pandas (>=1.3)", "scipy (>=1.8)"]
+developer = ["mypy (>=0.991)", "pre-commit (>=2.20)"]
+doc = ["nb2plots (>=0.6)", "numpydoc (>=1.5)", "pillow (>=9.2)", "pydata-sphinx-theme (>=0.11)", "sphinx (==5.2.3)", "sphinx-gallery (>=0.11)", "texext (>=0.6.7)"]
+extra = ["lxml (>=4.6)", "pydot (>=1.4.2)", "pygraphviz (>=1.10)", "sympy (>=1.10)"]
 test = ["codecov (>=2.1)", "pytest (>=7.2)", "pytest-cov (>=4.0)"]
 
 [[package]]
@@ -1794,7 +1798,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.
 
 [[package]]
 name = "pytest-cov"
-version = "3.0.0"
+version = "4.0.0"
 description = "Pytest plugin for measuring coverage."
 category = "dev"
 optional = false
@@ -2470,6 +2474,22 @@ slack = ["slack-sdk"]
 telegram = ["requests"]
 
 [[package]]
+name = "trimesh"
+version = "3.19.4"
+description = "Import, export, process, analyze and view triangular meshes."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+numpy = "*"
+
+[package.extras]
+all = ["chardet", "colorlog", "glooey", "jsonschema", "lxml", "mapbox-earcut", "meshio", "msgpack", "networkx", "pillow", "psutil", "pycollada", "pyglet (<2)", "python-fcl", "requests", "rtree", "scikit-image", "scipy", "setuptools", "shapely", "svg.path", "sympy", "xatlas", "xxhash"]
+easy = ["chardet", "colorlog", "jsonschema", "lxml", "mapbox-earcut", "msgpack", "networkx", "pillow", "pycollada", "requests", "rtree", "scipy", "setuptools", "shapely", "svg.path", "sympy", "xxhash"]
+test = ["autopep8", "coveralls", "ezdxf", "pyinstrument", "pytest", "pytest-cov", "ruff"]
+
+[[package]]
 name = "typer"
 version = "0.6.1"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
@@ -2541,7 +2561,7 @@ testing = ["coverage (>=6.2)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7
 
 [[package]]
 name = "vtk"
-version = "9.2.2"
+version = "9.2.5"
 description = "VTK is an open-source toolkit for 3D computer graphics, image processing, and visualization"
 category = "main"
 optional = false
@@ -2549,10 +2569,10 @@ python-versions = "*"
 
 [package.dependencies]
 matplotlib = ">=2.0.0"
-wslink = ">=1.0.4"
 
 [package.extras]
 numpy = ["numpy (>=1.9)"]
+web = ["wslink (>=1.0.4)"]
 
 [[package]]
 name = "websocket-client"
@@ -2574,20 +2594,6 @@ description = "Module for decorators, wrappers and monkey patching."
 category = "main"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
-
-[[package]]
-name = "wslink"
-version = "1.9.1"
-description = "Python/JavaScript library for communicating over WebSocket"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-aiohttp = "<4"
-
-[package.extras]
-ssl = ["cryptography"]
 
 [[package]]
 name = "xarray"
@@ -2670,20 +2676,20 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "54f8469c86eb5488d6403775339b58ac7bb9b8579b46848422ad3eb16dae3a2f"
+content-hash = "1ea573d8467060014ae96f1dda8de6e87e7dc7cae680442902b723e25a84a911"
 
 [metadata.files]
 abm-colony-collection = [
-    {file = "abm_colony_collection-0.1.0-py3-none-any.whl", hash = "sha256:951a436dfcdde04488a53e9560501d906c0aea15d860f35050867ab7a5aadfdf"},
-    {file = "abm_colony_collection-0.1.0.tar.gz", hash = "sha256:bd2cff4ea7cad4cbb730606460de9a8893337379aacd55d80c4c317590539716"},
+    {file = "abm_colony_collection-0.2.0-py3-none-any.whl", hash = "sha256:d09e2e6c0c1a34aee526e38bb9ef1d36fa8eab113901c0a150abbd33089a6925"},
+    {file = "abm_colony_collection-0.2.0.tar.gz", hash = "sha256:e065c6e00fb112160fb28b362e598376a7ee1fb711c0aeb00a4047b3304038ca"},
 ]
 abm-initialization-collection = [
     {file = "abm_initialization_collection-0.2.0-py3-none-any.whl", hash = "sha256:b618c0d7c3bb47ed71f8b4f1c4ca0738d6efdbcfdf71f7807fd69a6badeac5c5"},
     {file = "abm_initialization_collection-0.2.0.tar.gz", hash = "sha256:ad286f09a100d5581b0dc4d26ddf1d956375e076bfbc867aa58b63bbe1762703"},
 ]
 abm-shape-collection = [
-    {file = "abm_shape_collection-0.1.0-py3-none-any.whl", hash = "sha256:c53424b67ec8aa6743704cea285f0a6ece62c6dbbaaf1fe66170ea86df4ece9f"},
-    {file = "abm_shape_collection-0.1.0.tar.gz", hash = "sha256:20c6e937c4fdb31016c45b3798a07fc1e6ae828338dbced160708d347fa8a593"},
+    {file = "abm_shape_collection-0.2.0-py3-none-any.whl", hash = "sha256:0fba61a9e29560c8c806c535db172e3947a6c53410243fe96f21b422e6a09725"},
+    {file = "abm_shape_collection-0.2.0.tar.gz", hash = "sha256:2f61617c6b46c4ae4b0bbac75905422c1b95c376023b3af5ddc4d07842607ef1"},
 ]
 aicsimageio = [
     {file = "aicsimageio-4.9.2-py2.py3-none-any.whl", hash = "sha256:073718f6072f0d6efde1af851cfc72d91d064099f3ec3babe90c5257cb065b87"},
@@ -2826,8 +2832,8 @@ apprise = [
     {file = "apprise-1.1.0.tar.gz", hash = "sha256:f767a8070a777dc29bf7308179e0b69dd2de65e66933ed89b1999e7ffe723b60"},
 ]
 arcade-collection = [
-    {file = "arcade_collection-0.4.0-py3-none-any.whl", hash = "sha256:6d174ccfab588754328add8af71906f6011e8925d101122d540bf0fe91a8e169"},
-    {file = "arcade_collection-0.4.0.tar.gz", hash = "sha256:2a21e845967ca3ade86212cea16bcdfe8b81acaf65ec2bd3c254a7de0c5e359d"},
+    {file = "arcade_collection-0.5.0-py3-none-any.whl", hash = "sha256:526fa426b34e341f344f0e1952170a1123fea592b1dbf5d7dfe48f5de8fc8365"},
+    {file = "arcade_collection-0.5.0.tar.gz", hash = "sha256:92122bee8cb80b9111f1a97b4873bfe10b1813d0b10e9840b3efdbc940f90ef2"},
 ]
 asciitree = [
     {file = "asciitree-0.3.3.tar.gz", hash = "sha256:4aa4b9b649f85e3fcb343363d97564aa1fb62e249677f2e18a96765145cc0f6e"},
@@ -3474,8 +3480,8 @@ iniconfig = [
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
 io-collection = [
-    {file = "io_collection-0.5.0-py3-none-any.whl", hash = "sha256:4650727456113cff95cfee87b7bf83eecf85ff4c138c0b6f5929eb995640a1e4"},
-    {file = "io_collection-0.5.0.tar.gz", hash = "sha256:5f8ab820a81610bc0ea882bdb2cb3db39fced86a81cb45def4a61a9021ee3f41"},
+    {file = "io_collection-0.6.0-py3-none-any.whl", hash = "sha256:5a79ff82129a90376868b8a17270226055f27298410ed34d2fa80e72d628f960"},
+    {file = "io_collection-0.6.0.tar.gz", hash = "sha256:8a764386f122b0c95ded85aa366413a9e7d05b82cc76d291dea987d6e3d023b0"},
 ]
 isort = [
     {file = "isort-5.12.0-py3-none-any.whl", hash = "sha256:f84c2818376e66cf843d497486ea8fed8700b340f308f076c6fb1229dff318b6"},
@@ -3890,8 +3896,8 @@ mypy-extensions = [
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
 ]
 networkx = [
-    {file = "networkx-2.8.8-py3-none-any.whl", hash = "sha256:e435dfa75b1d7195c7b8378c3859f0445cd88c6b0375c181ed66823a9ceb7524"},
-    {file = "networkx-2.8.8.tar.gz", hash = "sha256:230d388117af870fce5647a3c52401fcf753e94720e6ea6b4197a5355648885e"},
+    {file = "networkx-3.0-py3-none-any.whl", hash = "sha256:58058d66b1818043527244fab9d41a51fcd7dcc271748015f3c181b8a90c8e2e"},
+    {file = "networkx-3.0.tar.gz", hash = "sha256:9a9992345353618ae98339c2b63d8201c381c2944f38a2ab49cb45a4c667e412"},
 ]
 numcodecs = [
     {file = "numcodecs-0.10.2-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:a813bdc8b7d1f488562c34b9c6ae65a418008cc05a095c9b04f5aec937646b6a"},
@@ -4300,8 +4306,8 @@ pytest = [
     {file = "pytest-7.2.0.tar.gz", hash = "sha256:c4014eb40e10f11f355ad4e3c2fb2c6c6d1919c73f3b5a433de4708202cade59"},
 ]
 pytest-cov = [
-    {file = "pytest-cov-3.0.0.tar.gz", hash = "sha256:e7f0f5b1617d2210a2cabc266dfe2f4c75a8d32fb89eafb7ad9d06f6d076d470"},
-    {file = "pytest_cov-3.0.0-py3-none-any.whl", hash = "sha256:578d5d15ac4a25e5f961c938b85a05b09fdaae9deef3bb6de9a6e766622ca7a6"},
+    {file = "pytest-cov-4.0.0.tar.gz", hash = "sha256:996b79efde6433cdbd0088872dbc5fb3ed7fe1578b68cdbba634f14bb8dd0470"},
+    {file = "pytest_cov-4.0.0-py3-none-any.whl", hash = "sha256:2feb1b751d66a8bd934e5edfa2e961d11309dc37b73b0eabe73b5945fee20f6b"},
 ]
 pytest-subtests = [
     {file = "pytest-subtests-0.8.0.tar.gz", hash = "sha256:46eb376022e926950816ccc23502de3277adcc1396652ddb3328ce0289052c4d"},
@@ -4665,6 +4671,10 @@ tqdm = [
     {file = "tqdm-4.64.1-py2.py3-none-any.whl", hash = "sha256:6fee160d6ffcd1b1c68c65f14c829c22832bc401726335ce92c52d395944a6a1"},
     {file = "tqdm-4.64.1.tar.gz", hash = "sha256:5f4f682a004951c1b450bc753c710e9280c5746ce6ffedee253ddbcbf54cf1e4"},
 ]
+trimesh = [
+    {file = "trimesh-3.19.4-py3-none-any.whl", hash = "sha256:06199c880a782277f6880c828fed64877ffaecab9238f94e5dc9349d331735ca"},
+    {file = "trimesh-3.19.4.tar.gz", hash = "sha256:bcfd4a8655482e59fa03475f8e73284ae213e145ea7661311309bf7807013888"},
+]
 typer = [
     {file = "typer-0.6.1-py3-none-any.whl", hash = "sha256:54b19e5df18654070a82f8c2aa1da456a4ac16a2a83e6dcd9f170e291c56338e"},
     {file = "typer-0.6.1.tar.gz", hash = "sha256:2d5720a5e63f73eaf31edaa15f6ab87f35f0690f8ca233017d7d23d743a91d73"},
@@ -4686,23 +4696,27 @@ virtualenv = [
     {file = "virtualenv-20.16.5.tar.gz", hash = "sha256:227ea1b9994fdc5ea31977ba3383ef296d7472ea85be9d6732e42a91c04e80da"},
 ]
 vtk = [
-    {file = "vtk-9.2.2-cp310-cp310-macosx_10_10_x86_64.whl", hash = "sha256:7d144aa36514f68d5dd8a42db5f65adc5c0a4c1d90dd8e70f3e8ee672a9c6dfb"},
-    {file = "vtk-9.2.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:74b5361e9d3c66d5fd5ecee2a99aa108a176322f45782822da20b4c69a366859"},
-    {file = "vtk-9.2.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8d2d11eee60aa1f3089f0ec17f966c626eb4ddae3b99fe7637c2e9940738dd25"},
-    {file = "vtk-9.2.2-cp310-cp310-win_amd64.whl", hash = "sha256:80a72131a68e2cf7af96b57db324b1849cb6d4d485dded04c599dce2fd13ccae"},
-    {file = "vtk-9.2.2-cp36-cp36m-macosx_10_10_x86_64.whl", hash = "sha256:22082699b6e7c9d9048b34929ab3635574b68bb721985efde23d5c98532647b1"},
-    {file = "vtk-9.2.2-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f9d7400ce3cb1a22d9c4110c10388a6bbdaa2fa0c603b9da925e3d39a51dc0c0"},
-    {file = "vtk-9.2.2-cp36-cp36m-win_amd64.whl", hash = "sha256:486a3f33085932d5e97ad0b44c676c993b4a571172f910cb96abd77a1ff33c84"},
-    {file = "vtk-9.2.2-cp37-cp37m-macosx_10_10_x86_64.whl", hash = "sha256:621e2ab68ad6c411f8479d79bf240eac304607d56b6de3b5d4767bd4c4104686"},
-    {file = "vtk-9.2.2-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:61148bfc384d7b1faa2ae64c5bc2011fcd53046884efcb44fb65fd0aae9c78fb"},
-    {file = "vtk-9.2.2-cp37-cp37m-win_amd64.whl", hash = "sha256:e4061240ae41a1e6326b6e15e6225a05d99ed258af5f5c98dce994a9f46e5384"},
-    {file = "vtk-9.2.2-cp38-cp38-macosx_10_10_x86_64.whl", hash = "sha256:4eab0a9000e9c5de8ff2bc02aee0886bf8c49a61a5050eae59d661d25c1adb8e"},
-    {file = "vtk-9.2.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:46111c19c4fa4410550c860f90fcba823ea5b99864d3fde34c70bbcc8744d024"},
-    {file = "vtk-9.2.2-cp38-cp38-win_amd64.whl", hash = "sha256:f4657dabb56e7c207bedad036ef7d15de4cffd3b955b62ad5cd88410ede871e5"},
-    {file = "vtk-9.2.2-cp39-cp39-macosx_10_10_x86_64.whl", hash = "sha256:a15f87583525e3df94ab2920946fc4aa7ace93167940b881aebfe1755a569818"},
-    {file = "vtk-9.2.2-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:0cc964a9f55764bd99b37356c6f8d986c2a232539479c8b96d8a95b55fd076ca"},
-    {file = "vtk-9.2.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:21896c72040b25cd2c1934e8b413663b156392ddf9c158014b35f5496da776c3"},
-    {file = "vtk-9.2.2-cp39-cp39-win_amd64.whl", hash = "sha256:f1fc1a5da51fc3d9cd668fe6e06f5f8b57c77fefa5369fac3551083d83a1b4f5"},
+    {file = "vtk-9.2.5-cp310-cp310-macosx_10_10_x86_64.whl", hash = "sha256:3915fb5f18dc584542ae5cdf1e714c0674a9203b4811111200bd274332613907"},
+    {file = "vtk-9.2.5-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:e9c1fd142da329eb644f0f94be6c0161600a20d75b324ac050c62e63614c710a"},
+    {file = "vtk-9.2.5-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:51935533a7588f8416de814ca771f97921616012d33b9f4738bf95c909d282e9"},
+    {file = "vtk-9.2.5-cp310-cp310-win_amd64.whl", hash = "sha256:9a52064278f65d2b8b19946f9a642de48725525dbb5acd06bbcea1dd827526a3"},
+    {file = "vtk-9.2.5-cp311-cp311-macosx_10_10_x86_64.whl", hash = "sha256:18bb1957c212d444da3e77a2c344f1239f935b92487595fb3e1fd1a704c65d85"},
+    {file = "vtk-9.2.5-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:1c01c653eb6d924b8a6c3c2e6ebbca18acdf0d46e03fb72c3fb16880101e5fc1"},
+    {file = "vtk-9.2.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1fe655edbce73dc91ef1ea9aa7f5cf778e499506a459d2da383b466d31aabb66"},
+    {file = "vtk-9.2.5-cp311-cp311-win_amd64.whl", hash = "sha256:3a1d19353011deef7e35f3d006fdb448a60b494615005eca90ca80c887358925"},
+    {file = "vtk-9.2.5-cp36-cp36m-macosx_10_10_x86_64.whl", hash = "sha256:d8cc4e522954789dcc01e84acb17e504feaf4a91a241857d17957657c4aade73"},
+    {file = "vtk-9.2.5-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:98ddedefd9d35434f2a2155af2c4e4b5cf5c91a4ac78e22cdb43092bba05d349"},
+    {file = "vtk-9.2.5-cp36-cp36m-win_amd64.whl", hash = "sha256:f226aeffba53b3a1a294061664feafd1185c400e7740197340e67b8bf215afd9"},
+    {file = "vtk-9.2.5-cp37-cp37m-macosx_10_10_x86_64.whl", hash = "sha256:459438cb313ff1ffb276b84c7d9a7da17a309b3d9cc3b5c6dd722cbc80fcfa74"},
+    {file = "vtk-9.2.5-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e8c93cdd320d33f5c9bd28d2feee42db682bf51ecf210eea84efd7b3cfd88c2a"},
+    {file = "vtk-9.2.5-cp37-cp37m-win_amd64.whl", hash = "sha256:5dea24ef072a40921a0d7b2dd6f53baab416df6811d2b8a306a501eb95a4f9a4"},
+    {file = "vtk-9.2.5-cp38-cp38-macosx_10_10_x86_64.whl", hash = "sha256:a59a758f99b172867ba6663680598de5bf7daddb5cd84e71e47b0165eb41deb2"},
+    {file = "vtk-9.2.5-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0b5a7236ef712c2d829c66985a8f4eff7bcc781af3c141ecaa247eb8c6ec9217"},
+    {file = "vtk-9.2.5-cp38-cp38-win_amd64.whl", hash = "sha256:494708e54a2176d88615763022a21be9cf51b092a6599ebeedbb3c18523e014c"},
+    {file = "vtk-9.2.5-cp39-cp39-macosx_10_10_x86_64.whl", hash = "sha256:af074f8d876c369a3378a62253ed25bb419a9b0400b59a8b05cf1683a405d812"},
+    {file = "vtk-9.2.5-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:6aae3fa1d0b1a7e60b30f84033b234202e8f26f01d4df7ca1cb6fff0d65c46c5"},
+    {file = "vtk-9.2.5-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:bedadbf2f69b58b7da35fc65d55f038c6433054604d90c414b10f605cb08bba7"},
+    {file = "vtk-9.2.5-cp39-cp39-win_amd64.whl", hash = "sha256:4d115bd8ef4585a1e0da390dfc77d58a300c9279204b9cff4c9b5e4ee66fe261"},
 ]
 websocket-client = [
     {file = "websocket-client-1.4.1.tar.gz", hash = "sha256:f9611eb65c8241a67fb373bef040b3cf8ad377a9f6546a12b620b6511e8ea9ef"},
@@ -4773,10 +4787,6 @@ wrapt = [
     {file = "wrapt-1.14.1-cp39-cp39-win32.whl", hash = "sha256:dee0ce50c6a2dd9056c20db781e9c1cfd33e77d2d569f5d1d9321c641bb903d5"},
     {file = "wrapt-1.14.1-cp39-cp39-win_amd64.whl", hash = "sha256:dee60e1de1898bde3b238f18340eec6148986da0455d8ba7848d50470a7a32fb"},
     {file = "wrapt-1.14.1.tar.gz", hash = "sha256:380a85cf89e0e69b7cfbe2ea9f765f004ff419f34194018a6827ac0e3edfed4d"},
-]
-wslink = [
-    {file = "wslink-1.9.1-py3-none-any.whl", hash = "sha256:74d39acf3f6ca8631c470f35dd8e3e0f4520d642ad92d993524de94907663a6f"},
-    {file = "wslink-1.9.1.tar.gz", hash = "sha256:6d4f644ca05b6f6349f8830b666a9081988ccd23318b69fdad261b77e812f0f0"},
 ]
 xarray = [
     {file = "xarray-2022.10.0-py3-none-any.whl", hash = "sha256:e4e574820ff8eb7dbc119c5089d30860b73160bd587cc045ae37a128b8eb4fc2"},
