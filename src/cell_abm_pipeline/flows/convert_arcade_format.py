@@ -1,15 +1,25 @@
 from dataclasses import dataclass, field
 
-from arcade_collection.output import convert_to_images, convert_to_meshes
+from arcade_collection.output import convert_to_images, convert_to_meshes, convert_to_simularium
 from io_collection.keys import make_key
 from io_collection.load import load_tar
 from io_collection.save import save_image, save_text
 from prefect import flow
 
-FORMATS = [
-    "images",
-    "meshes",
+FORMATS: list[str] = [
+    "image",
+    "mesh",
+    "simularium",
 ]
+
+PHASE_COLORS: dict[str, str] = {
+    "PROLIFERATIVE_G1": "#73af48",
+    "PROLIFERATIVE_S": "#52a14c",
+    "PROLIFERATIVE_G2": "#309350",
+    "PROLIFERATIVE_M": "#0f8554",
+    "APOPTOTIC_EARLY": "#edad08",
+    "APOPTOTIC_LATE": "#775704",
+}
 
 
 @dataclass
@@ -22,9 +32,15 @@ class ParametersConfig:
 
     formats: list[str] = field(default_factory=lambda: FORMATS)
 
-    regions: list[str] = field(default_factory=lambda: ["DEFAULT", "NUCLEUS"])
+    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
 
     binary: bool = False
+
+    ds: float = 1.0
+
+    dt: float = 1.0
+
+    phase_colors: dict = field(default_factory=lambda: PHASE_COLORS)
 
 
 @dataclass
@@ -43,31 +59,33 @@ class SeriesConfig:
 
 @flow(name="convert-arcade-format")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    if "images" in parameters.formats:
+    if "image" in parameters.formats:
         run_flow_convert_to_images(context, series, parameters)
 
-    if "meshes" in parameters.formats:
+    if "mesh" in parameters.formats:
         run_flow_convert_to_meshes(context, series, parameters)
 
+    if "simularium" in parameters.formats:
+        run_flow_convert_to_simularium(context, series, parameters)
 
-@flow(name="convert-arcade-format_convert_to_images")
+
+@flow(name="convert-arcade-format_convert-to-images")
 def run_flow_convert_to_images(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    data_key = make_key(series.name, "data", "data.LOCATIONS")
     converted_key = make_key(series.name, "converted", "converted.IMAGE")
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
         for seed in series.seeds:
             series_key = f"{series.name}_{key}_{seed:04d}"
-            data_key = make_key(
-                series.name, "data", "data.LOCATIONS", f"{series_key}.LOCATIONS.tar.xz"
-            )
-            data = load_tar(context.working_location, data_key)
+            tar_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
+            tar = load_tar(context.working_location, tar_key)
 
             chunks = convert_to_images(
                 series_key,
-                data,
+                tar,
                 parameters.frame_spec,
                 parameters.regions,
                 parameters.box,
@@ -80,22 +98,21 @@ def run_flow_convert_to_images(
                 save_image(context.working_location, image_key, chunk)
 
 
-@flow(name="convert-arcade-format_convert_to_meshes")
+@flow(name="convert-arcade-format_convert-to-meshes")
 def run_flow_convert_to_meshes(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    data_key = make_key(series.name, "data", "data.LOCATIONS")
     converted_key = make_key(series.name, "converted", "converted.MESH")
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
         for seed in series.seeds:
             series_key = f"{series.name}_{key}_{seed:04d}"
-            data_key = make_key(
-                series.name, "data", "data.LOCATIONS", f"{series_key}.LOCATIONS.tar.xz"
-            )
-            data = load_tar(context.working_location, data_key)
+            tar_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
+            tar = load_tar(context.working_location, tar_key)
 
-            meshes = convert_to_meshes(series_key, data, parameters.frame_spec, parameters.regions)
+            meshes = convert_to_meshes(series_key, tar, parameters.frame_spec, parameters.regions)
 
             for frame, cell_id, region, mesh in meshes:
                 region_key = f"_{region}" if region != "DEFAULT" else ""
@@ -103,3 +120,34 @@ def run_flow_convert_to_meshes(
                     converted_key, f"{series_key}_{frame:06d}_{cell_id:02d}{region_key}.MESH.obj"
                 )
                 save_text(context.working_location, mesh_key, mesh)
+
+
+@flow(name="convert-arcade-format_convert-to-simularium")
+def run_flow_convert_to_simularium(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
+) -> None:
+    cells_data_key = make_key(series.name, "data", "data.CELLS")
+    locs_data_key = make_key(series.name, "data", "data.LOCATIONS")
+    converted_key = make_key(series.name, "converted", "converted.SIMULARIUM")
+    keys = [condition["key"] for condition in series.conditions]
+
+    for key in keys:
+        for seed in series.seeds:
+            series_key = f"{series.name}_{key}_{seed:04d}"
+            cells_tar_key = make_key(cells_data_key, f"{series_key}.CELLS.tar.xz")
+            cells_tar = load_tar(context.working_location, cells_tar_key)
+            locs_tar_key = make_key(locs_data_key, f"{series_key}.LOCATIONS.tar.xz")
+            locs_tar = load_tar(context.working_location, locs_tar_key)
+
+            simularium = convert_to_simularium(
+                series_key,
+                cells_tar,
+                locs_tar,
+                parameters.frame_spec,
+                parameters.box,
+                parameters.ds,
+                parameters.dt,
+                parameters.phase_colors,
+            )
+            simularium_key = make_key(converted_key, f"{series_key}.simularium")
+            save_text(context.working_location, simularium_key, simularium)
