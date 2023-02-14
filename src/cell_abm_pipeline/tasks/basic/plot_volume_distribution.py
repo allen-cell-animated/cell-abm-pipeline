@@ -12,13 +12,13 @@ def plot_volume_distribution(keys, data, reference=None, region=None):
     for i, j, key in indices:
         ax = fig.add_subplot(gridspec[i, j])
         ax.set_title(key)
-        ax.set_xlabel("Volume ($\mu m^3$)")
+        ax.set_xlabel("Volume ($\\mu m^3$)")
         ax.set_ylabel("Frequency")
 
         if reference is not None:
             ref_volumes = reference[value]
             ref_label = (
-                f"reference ({ref_volumes.mean():.1f} $\pm$ {ref_volumes.std():.1f} $\mu m^3$)"
+                f"reference ({ref_volumes.mean():.1f} $\\pm$ {ref_volumes.std():.1f} $\\mu m^3$)"
             )
             ax.hist(
                 reference[value],
@@ -30,7 +30,7 @@ def plot_volume_distribution(keys, data, reference=None, region=None):
             )
 
         volumes = data[key][value]
-        label = f"simulated ({volumes.mean():.1f} $\pm$ {volumes.std():.1f} $\mu m^3$)"
+        label = f"simulated ({volumes.mean():.1f} $\\pm$ {volumes.std():.1f} $\\mu m^3$)"
         ax.hist(volumes, bins=bins, density=True, histtype="step", color="k", label=label)
 
         ax.legend()

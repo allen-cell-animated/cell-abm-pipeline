@@ -12,7 +12,7 @@ def plot_volume_individual(keys, data, region=None):
         ax = fig.add_subplot(gridspec[i, j])
         ax.set_title(key)
         ax.set_xlabel("Time (hrs)")
-        ax.set_ylabel("Volume ($\mu m^3$)")
+        ax.set_ylabel("Volume ($\\mu m^3$)")
 
         key_data = data[key]
 

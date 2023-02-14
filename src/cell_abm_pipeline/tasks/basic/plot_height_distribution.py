@@ -12,13 +12,13 @@ def plot_height_distribution(keys, data, reference=None, region=None):
     for i, j, key in indices:
         ax = fig.add_subplot(gridspec[i, j])
         ax.set_title(key)
-        ax.set_xlabel("Height ($\mu m$)")
+        ax.set_xlabel("Height ($\\mu m$)")
         ax.set_ylabel("Frequency")
 
         if reference is not None:
             ref_heights = reference[value]
             ref_label = (
-                f"reference ({ref_heights.mean():.1f} $\pm$ {ref_heights.std():.1f} $\mu m$)"
+                f"reference ({ref_heights.mean():.1f} $\\pm$ {ref_heights.std():.1f} $\\mu m$)"
             )
             ax.hist(
                 reference[value],
@@ -30,7 +30,7 @@ def plot_height_distribution(keys, data, reference=None, region=None):
             )
 
         heights = data[key][value]
-        label = f"simulated ({heights.mean():.1f} $\pm$ {heights.std():.1f} $\mu m$)"
+        label = f"simulated ({heights.mean():.1f} $\\pm$ {heights.std():.1f} $\\mu m$)"
         ax.hist(heights, bins=bins, density=True, histtype="step", color="k", label=label)
 
         ax.legend()

@@ -12,7 +12,7 @@ def plot_volume_average(keys, data, reference=None, region=None):
         ax = fig.add_subplot(gridspec[i, j])
         ax.set_title(key)
         ax.set_xlabel("Time (hrs)")
-        ax.set_ylabel("Average volume ($\mu m^3$)")
+        ax.set_ylabel("Average volume ($\\mu m^3$)")
 
         volume = data[key].groupby(["SEED", "time"])[value].mean()
         mean = volume.groupby(["time"]).mean()
@@ -22,10 +22,10 @@ def plot_volume_average(keys, data, reference=None, region=None):
         if reference is not None:
             ref_volume_mean = reference[value].mean()
             ref_volume_std = reference[value].std()
-            ref_label = f"reference ({ref_volume_mean:.1f} $\pm$ {ref_volume_std:.1f} $\mu m^3$)"
+            ref_label = f"reference ({ref_volume_mean:.1f} $\\pm$ {ref_volume_std:.1f} $\\mu m^3$)"
             ax.plot(time, [reference[value].mean()] * len(time), c="#555", lw=0.5, label=ref_label)
 
-        label = f"simulated ({mean.mean():.1f} $\pm$ {std.mean():.1f} $\mu m^3$)"
+        label = f"simulated ({mean.mean():.1f} $\\pm$ {std.mean():.1f} $\\mu m^3$)"
         ax.plot(time, mean, c="#000", label=label)
         ax.fill_between(time, mean - std, mean + std, facecolor="#bbb")
 

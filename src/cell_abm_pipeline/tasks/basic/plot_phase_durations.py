@@ -53,7 +53,7 @@ def plot_phase_durations(keys, data, phase):
 
         counts, labels = np.histogram(durations, bins=settings["bins"])
         counts = counts / np.sum(counts)
-        label = f"simulated ({durations.mean():.2f} $\pm$ {durations.std():.2f} hr)"
+        label = f"simulated ({durations.mean():.2f} $\\pm$ {durations.std():.2f} hr)"
         ax.bar(labels[:-1], counts, align="center", color=color, alpha=0.7, label=label)
 
         scale = 1.0 / settings["lambda"]
@@ -63,8 +63,8 @@ def plot_phase_durations(keys, data, phase):
         ref_mean = k / settings["lambda"]
         ref_std = sqrt(k / settings["lambda"] ** 2)
         ref_label = (
-            f"reference ({ref_mean:.2f} $\pm$ {ref_std:.2f} hr)"
-            + f"\nk = {k}, $\lambda$ = {settings['lambda']}"
+            f"reference ({ref_mean:.2f} $\\pm$ {ref_std:.2f} hr)"
+            + f"\nk = {k}, $\\lambda$ = {settings['lambda']}"
         )
         ax.plot(x, gamma.pdf(x, k, scale=scale), color=color, lw=2, label=ref_label)
 

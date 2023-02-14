@@ -12,7 +12,7 @@ def plot_height_individual(keys, data, region=None):
         ax = fig.add_subplot(gridspec[i, j])
         ax.set_title(key)
         ax.set_xlabel("Time (hrs)")
-        ax.set_ylabel("Height ($\mu m$)")
+        ax.set_ylabel("Height ($\\mu m$)")
 
         key_data = data[key]
 
