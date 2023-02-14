@@ -9,7 +9,7 @@ from io_collection.load import load_text
 from io_collection.save import save_dataframe
 from prefect import flow
 
-DEFAULT_GROUPS = ["LOCATIONS", "CELLS"]
+STORAGE_GROUPS = ["CELLS", "LOCATIONS"]
 
 STORAGE_PATTERN = r"[_]*([A-z0-9\s\_]*)_([0-9]{4})\."
 
@@ -18,7 +18,7 @@ CLOCK_PATTERN = r"simulation \[ ([A-z0-9\s\_]+) \| ([0-9]{4}) \] finished in ([0
 
 @dataclass
 class ParametersConfig:
-    groups: list[str] = field(default_factory=lambda: DEFAULT_GROUPS)
+    groups: list[str] = field(default_factory=lambda: STORAGE_GROUPS)
 
     search_locations: list[str] = field(default_factory=lambda: [])
 
@@ -51,7 +51,7 @@ def run_flow_analyze_storage(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     resources_key = make_key(series.name, "analysis", "analysis.RESOURCES")
-    storage_key = make_key(resources_key, f"{series.name}_storage.RESOURCES.csv")
+    storage_key = make_key(resources_key, f"{series.name}_object_storage.RESOURCES.csv")
 
     if check_key(context.working_location, storage_key):
         return
@@ -63,7 +63,7 @@ def run_flow_analyze_storage(
             file_keys = get_keys(location, make_key(series.name, "data", f"data.{group}"))
 
             for file_key in file_keys:
-                key, seed = re.findall(STORAGE_PATTERN, file_key.split("/")[-1])[0]
+                key, seed = re.findall(STORAGE_PATTERN, file_key.split(series.name)[-1])[0]
 
                 if location.startswith("s3://"):
                     summary = boto3.resource("s3").ObjectSummary(location[5:], file_key)
@@ -84,7 +84,7 @@ def run_flow_analyze_clock(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     resources_key = make_key(series.name, "analysis", "analysis.RESOURCES")
-    clock_key = make_key(resources_key, f"{series.name}_clock.RESOURCES.csv")
+    clock_key = make_key(resources_key, f"{series.name}_wall_clock.RESOURCES.csv")
 
     if check_key(context.working_location, clock_key):
         return
@@ -99,7 +99,7 @@ def run_flow_analyze_clock(
             matches = re.findall(CLOCK_PATTERN, contents)
 
             for key, seed, clock in matches:
-                all_clock.append({"KEY": f"{series.name}_{key}", "SEED": seed, "CLOCK": clock})
+                all_clock.append({"KEY": key, "SEED": seed, "CLOCK": clock})
 
     clock_df = pd.DataFrame(all_clock)
     clock_df.sort_values(by=["KEY", "SEED"], ignore_index=True, inplace=True)
