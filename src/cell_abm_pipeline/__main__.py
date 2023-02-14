@@ -24,6 +24,7 @@ def main():
         dryrun = False
 
     OmegaConf.register_new_resolver("secret", lambda secret: Secret.load(secret).get())
+    OmegaConf.register_new_resolver("concat", lambda items: ":".join(sorted(items)))
     OmegaConf.register_new_resolver(
         "home", lambda path: os.path.join(os.path.expanduser("~"), path)
     )
