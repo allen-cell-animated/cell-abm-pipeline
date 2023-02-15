@@ -1,11 +1,10 @@
 import os
-from typing import List, Any
 from dataclasses import dataclass, field, make_dataclass
+from typing import Any, List
 
-from omegaconf import OmegaConf, MISSING
 from hydra import compose, initialize_config_dir
 from hydra.core.config_store import ConfigStore
-from tabulate import tabulate
+from omegaconf import MISSING, OmegaConf
 
 defaults = [
     "_self_",

@@ -1,15 +1,15 @@
-import sys
-import os
 import importlib
+import os
+import sys
 
 from omegaconf import OmegaConf
 from prefect.blocks.system import Secret
 from prefect.deployments import Deployment
 
 from cell_abm_pipeline.__config__ import (
+    display_config,
     make_config_from_dotlist,
     make_config_from_yaml,
-    display_config,
 )
 
 
