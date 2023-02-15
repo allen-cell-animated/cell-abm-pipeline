@@ -68,8 +68,8 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     )
 
     # Make coordinates and filter for coordinates within cell radius.
-    coordinates = make_grid_coordinates(parameters.grid, cell_bounds, 1, 1)
-    coordinates = filter_coordinate_bounds(coordinates, cell_radius)
+    coordinates_list = make_grid_coordinates(parameters.grid, cell_bounds, 1, 1)
+    coordinates = filter_coordinate_bounds(coordinates_list, cell_radius)
 
     # Recenter coordinates.
     coordinates["x"] = coordinates["x"] + parameters.bounding_box[0] / parameters.ds / 2
