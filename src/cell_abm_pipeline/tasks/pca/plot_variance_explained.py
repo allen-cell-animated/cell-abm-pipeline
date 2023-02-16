@@ -1,11 +1,18 @@
+from typing import Optional
+
+import matplotlib.figure as mpl
 import numpy as np
+import pandas as pd
 from prefect import task
+from sklearn.decomposition import PCA
 
 from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 
 @task
-def plot_variance_explained(keys, models, ref_model=None):
+def plot_variance_explained(
+    keys: list[str], models: dict[str, PCA], ref_model: Optional[PCA] = None
+) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
 
     for i, j, key in indices:

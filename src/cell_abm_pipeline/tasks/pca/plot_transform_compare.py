@@ -1,10 +1,19 @@
+import matplotlib.figure as mpl
+import pandas as pd
 from prefect import task
+from sklearn.decomposition import PCA
 
 from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 
 @task
-def plot_transform_compare(keys, component, model, data, ref_data):
+def plot_transform_compare(
+    keys: list[str],
+    component: int,
+    model: PCA,
+    data: dict[str, pd.DataFrame],
+    ref_data: pd.DataFrame,
+) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
 
     ref_transform = model.transform(ref_data.filter(like="shcoeffs").values)

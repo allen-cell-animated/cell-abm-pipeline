@@ -1,3 +1,7 @@
+from typing import Optional
+
+import matplotlib.figure as mpl
+import pandas as pd
 from matplotlib import cm
 from prefect import task
 
@@ -5,7 +9,9 @@ from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 
 @task
-def plot_ks_by_feature(keys, stats, ref_stats=None):
+def plot_ks_by_feature(
+    keys: list[str], stats: pd.DataFrame, ref_stats: Optional[pd.DataFrame] = None
+) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(stats["FEATURE"].unique())
     cmap = cm.get_cmap("tab20")
 
