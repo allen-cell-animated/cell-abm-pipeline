@@ -1,10 +1,14 @@
+import matplotlib.figure as mpl
+import pandas as pd
 from prefect import task
 
 from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 
 @task
-def plot_cluster_trajectory(keys, clusters, summary):
+def plot_cluster_trajectory(
+    keys: list[str], clusters: dict[str, pd.DataFrame], summary: str
+) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
 
     for i, j, key in indices:

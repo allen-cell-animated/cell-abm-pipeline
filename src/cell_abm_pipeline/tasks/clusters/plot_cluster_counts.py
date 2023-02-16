@@ -1,10 +1,12 @@
+import matplotlib.figure as mpl
+import pandas as pd
 from prefect import task
 
 from cell_abm_pipeline.utilities.plot import make_grid_figure, remove_duplicate_legend
 
 
 @task
-def plot_cluster_counts(keys, clusters):
+def plot_cluster_counts(keys: list[str], clusters: dict[str, pd.DataFrame]) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
 
     for i, j, key in indices:
