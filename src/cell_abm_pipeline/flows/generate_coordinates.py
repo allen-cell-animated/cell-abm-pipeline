@@ -19,7 +19,6 @@ Corresponding plots are placed into the **plots/plots.COORDINATES** directory.
 
 from dataclasses import dataclass
 from math import ceil, pi, sqrt
-from typing import Tuple
 
 from abm_initialization_collection.coordinate import filter_coordinate_bounds, make_grid_coordinates
 from abm_initialization_collection.image import plot_contact_sheet
@@ -38,7 +37,7 @@ class ParametersConfig:
 
     ds: float = 1.0  # um/voxel
 
-    bounding_box: Tuple[int, int] = (100, 100)  # um
+    bounding_box: tuple[int, int] = (100, 100)  # um
 
     cell_height: float = AVERAGE_CELL_HEIGHT
 

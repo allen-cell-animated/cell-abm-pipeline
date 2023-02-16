@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass, field, make_dataclass
-from typing import Any, List
+from typing import Any
 
 from hydra import compose, initialize_config_dir
 from hydra.core.config_store import ConfigStore
@@ -52,7 +52,7 @@ def make_config_from_yaml(module, args):
     config = make_dataclass(
         "Config",
         [
-            ("defaults", List[Any], field(default_factory=lambda: defaults)),
+            ("defaults", list[Any], field(default_factory=lambda: defaults)),
             ("deploy", bool, field(default=False)),
             ("context", module.ContextConfig, MISSING),
             ("series", module.SeriesConfig, MISSING),

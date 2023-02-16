@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Dict, Tuple
 
 from arcade_collection.input import (
     convert_to_cells_file,
@@ -17,27 +16,27 @@ from io_collection.load import load_dataframe
 from io_collection.save import save_json, save_text
 from prefect import flow, get_run_logger
 
-VOLUMES: Dict[str, Tuple[float, float]] = {
+VOLUMES: dict[str, tuple[float, float]] = {
     "DEFAULT": (1865.0, 517.0),
     "NUCLEUS": (542.0, 157.0),
 }
 
-HEIGHTS: Dict[str, Tuple[float, float]] = {
+HEIGHTS: dict[str, tuple[float, float]] = {
     "DEFAULT": (9.65, 2.4),
     "NUCLEUS": (6.75, 1.7),
 }
 
-CRITICAL_VOLUMES: Dict[str, Tuple[float, float]] = {
+CRITICAL_VOLUMES: dict[str, tuple[float, float]] = {
     "DEFAULT": (1300.0, 200.0),
     "NUCLEUS": (400.0, 50.0),
 }
 
-CRITICAL_HEIGHTS: Dict[str, Tuple[float, float]] = {
+CRITICAL_HEIGHTS: dict[str, tuple[float, float]] = {
     "DEFAULT": (9.0, 2.0),
     "NUCLEUS": (6.5, 1.5),
 }
 
-STATE_THRESHOLDS: Dict[str, float] = {
+STATE_THRESHOLDS: dict[str, float] = {
     "APOPTOTIC_LATE": 0.25,
     "APOPTOTIC_EARLY": 1,
     "PROLIFERATIVE_G1": 1.124,
@@ -67,7 +66,7 @@ class ParametersConfig:
 
     critical_heights: dict = field(default_factory=lambda: CRITICAL_HEIGHTS)
 
-    state_thresholds: Dict[str, float] = field(default_factory=lambda: STATE_THRESHOLDS)
+    state_thresholds: dict[str, float] = field(default_factory=lambda: STATE_THRESHOLDS)
 
     potts_terms: list[str] = field(default_factory=lambda: POTTS_TERMS)
 

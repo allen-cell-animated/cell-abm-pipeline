@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Dict, Optional, Tuple
+from typing import Optional
 
 from arcade_collection.input import (
     convert_to_cells_file,
@@ -29,7 +29,7 @@ class ParametersConfig:
 
     channels: dict
 
-    margins: Tuple[int, int, int] = (0, 0, 0)
+    margins: tuple[int, int, int] = (0, 0, 0)
 
     volumes: dict = field(default_factory=lambda: VOLUMES)
 
@@ -39,7 +39,7 @@ class ParametersConfig:
 
     critical_heights: dict = field(default_factory=lambda: CRITICAL_HEIGHTS)
 
-    state_thresholds: Dict[str, float] = field(default_factory=lambda: STATE_THRESHOLDS)
+    state_thresholds: dict[str, float] = field(default_factory=lambda: STATE_THRESHOLDS)
 
     potts_terms: list[str] = field(default_factory=lambda: POTTS_TERMS)
 
