@@ -4,7 +4,7 @@
 disable=missing-module-docstring
 
 # Set good names.
-good-names=i,j,x,y,z,ax,ds,dt
+good-names=i,j,k,x,y,z,ax,ds,dt
 
 [DESIGN]
 
@@ -14,4 +14,4 @@ max-args=10
 [SIMILARITIES]
 
 # Minimum lines number of a similarity.
-min-similarity-lines=7
+min-similarity-lines=10
