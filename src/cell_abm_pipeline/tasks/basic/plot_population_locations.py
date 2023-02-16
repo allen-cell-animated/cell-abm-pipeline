@@ -21,11 +21,11 @@ def plot_population_locations(
     for i, j, (key, seed) in indices:
         ax = fig.add_subplot(gridspec[i, j])
         ax.set_title(f"{key} [{seed}]")
-        ax.invert_yaxis()
         ax.get_xaxis().set_ticks([])
         ax.get_yaxis().set_ticks([])
         ax.set_xlim((min_x - padding, max_x + padding))
         ax.set_ylim((min_y - padding, max_y + padding))
+        ax.invert_yaxis()
 
         key_seed_data = data[(key, seed)]
         tick_data = key_seed_data[key_seed_data["TICK"] == tick]
