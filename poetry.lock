@@ -2823,7 +2823,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "ea86eadcec815216fc4afd5bd15c18a97b6924a438cd9cc7be322b3d29e0c86b"
+content-hash = "ae4ed8930ea16b39dbcc8160ba8afe2af79f2794d95b8328b15815ae7eb91a95"
 
 [metadata.files]
 abm-colony-collection = [
