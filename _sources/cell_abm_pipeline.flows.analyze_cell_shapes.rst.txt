@@ -1,0 +1,7 @@
+cell\_abm\_pipeline.flows.analyze\_cell\_shapes module
+======================================================
+
+.. automodule:: cell_abm_pipeline.flows.analyze_cell_shapes
+   :members:
+   :undoc-members:
+   :show-inheritance:

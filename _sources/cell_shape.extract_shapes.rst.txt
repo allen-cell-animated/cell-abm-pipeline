@@ -1,7 +1,0 @@
-cell\_shape.extract\_shapes module
-==================================
-
-.. automodule:: cell_shape.extract_shapes
-   :members:
-   :undoc-members:
-   :show-inheritance:

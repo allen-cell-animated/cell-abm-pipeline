@@ -1,7 +1,0 @@
-utilities.load module
-=====================
-
-.. automodule:: utilities.load
-   :members:
-   :undoc-members:
-   :show-inheritance:

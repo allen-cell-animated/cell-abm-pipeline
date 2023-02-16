@@ -1,0 +1,7 @@
+cell\_abm\_pipeline.tasks.make\_projection\_frame module
+========================================================
+
+.. automodule:: cell_abm_pipeline.tasks.make_projection_frame
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,7 +1,0 @@
-cell\_shape.compress\_coefficients module
-=========================================
-
-.. automodule:: cell_shape.compress_coefficients
-   :members:
-   :undoc-members:
-   :show-inheritance:

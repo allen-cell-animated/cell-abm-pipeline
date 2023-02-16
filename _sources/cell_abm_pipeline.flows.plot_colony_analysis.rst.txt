@@ -1,0 +1,7 @@
+cell\_abm\_pipeline.flows.plot\_colony\_analysis module
+=======================================================
+
+.. automodule:: cell_abm_pipeline.flows.plot_colony_analysis
+   :members:
+   :undoc-members:
+   :show-inheritance:

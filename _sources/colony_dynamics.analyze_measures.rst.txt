@@ -1,7 +1,0 @@
-colony\_dynamics.analyze\_measures module
-=========================================
-
-.. automodule:: colony_dynamics.analyze_measures
-   :members:
-   :undoc-members:
-   :show-inheritance:

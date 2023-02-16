@@ -1,21 +1,20 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cell agent-based model pipeline &mdash; Cell agent-based model pipeline VERSION NUMBER X.X.X documentation</title>
+  <title>Installation &mdash; Cell agent-based model pipeline VERSION NUMBER X.X.X documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -27,11 +26,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="#" class="icon icon-home"> Cell agent-based model pipeline
+
+          
+          
+          <a href="#" class="icon icon-home">
+            Cell agent-based model pipeline
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -56,8 +59,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
-      <li>Cell agent-based model pipeline</li>
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installation</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -69,69 +72,61 @@
              
   <div class="toctree-wrapper compound">
 </div>
-<section id="cell-agent-based-model-pipeline">
-<h1>Cell agent-based model pipeline<a class="headerlink" href="#cell-agent-based-model-pipeline" title="Permalink to this heading"></a></h1>
-<a class="reference external image-reference" href="https://github.com/allen-cell-animated/cell-abm-pipeline/actions/workflows/build.yml"><img alt="Build Status" src="https://github.com/allen-cell-animated/cell-abm-pipeline/actions/workflows/build.yml/badge.svg" /></a>
-<a class="reference external image-reference" href="https://github.com/allen-cell-animated/cell-abm-pipeline/actions/workflows/lint.yml"><img alt="Lint Status" src="https://github.com/allen-cell-animated/cell-abm-pipeline/actions/workflows/lint.yml/badge.svg" /></a>
-<a class="reference external image-reference" href="https://codecov.io/gh/allen-cell-animated/cell-abm-pipeline"><img alt="Codecov" src="https://codecov.io/gh/allen-cell-animated/cell-abm-pipeline/branch/main/graph/badge.svg?token=1S5ZKVET7T" /></a>
-<a class="reference external image-reference" href="https://allen-cell-animated.github.io/cell-abm-pipeline/"><img alt="Documentation" src="https://github.com/allen-cell-animated/cell-abm-pipeline/actions/workflows/documentation.yml/badge.svg" /></a>
+<a class="reference external image-reference" href="https://github.com/allen-cell-animated/cell-abm-pipeline/actions?query=workflow%3Abuild"><img alt="Build Status" src="https://github.com/allen-cell-animated/cell-abm-pipeline/workflows/build/badge.svg" /></a>
+<a class="reference external image-reference" href="https://codecov.io/gh/allen-cell-animated/cell-abm-pipeline"><img alt="Codecov" src="https://img.shields.io/codecov/c/gh/allen-cell-animated/cell-abm-pipeline?token=1S5ZKVET7T" /></a>
+<a class="reference external image-reference" href="https://github.com/allen-cell-animated/cell-abm-pipeline/actions?query=workflow%3Alint"><img alt="Lint Status" src="https://github.com/allen-cell-animated/cell-abm-pipeline/workflows/lint/badge.svg" /></a>
+<a class="reference external image-reference" href="https://allen-cell-animated.github.io/cell-abm-pipeline/"><img alt="Documentation" src="https://github.com/allen-cell-animated/cell-abm-pipeline/workflows/documentation/badge.svg" /></a>
 <a class="reference external image-reference" href="https://github.com/psf/black"><img alt="Code style" src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a>
-<p>This repository contains useful modules for working with cell agent-based models.
-Modules can be called via CLI or imported into a Python project.
-Top-level subpackages include:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">basic_metrics</span></code> includes modules for calculating and plotting basic simulation metrics</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">resource_usage</span></code> includes modules for quantifying resource usage (wall clock and object storage) for simulation sets</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">cell_shape</span></code> includes modules for calculating spherical harmonic coefficients and extracting cell shapes via dimensionality reduction</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">colony_dynamics</span></code> includes modules for calculating cell neighbors and quantifying colony dynamics from cell neighbor graphs</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">initial_conditions</span></code> includes modules for sampling from images and converting into input formats for various model frameworks</p></li>
-</ul>
-<p>See relevant subpackage README for details.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">utilities</span></code> subpackage contains various utility functions for saving and loading files (locally and on the cloud), plotting, and key management.</p>
-<section id="features">
-<h2>Features<a class="headerlink" href="#features" title="Permalink to this heading"></a></h2>
-<p>This repository uses the following tools for managing Python projects:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://python-poetry.org/">Poetry</a> for packaging and dependency management</p></li>
-<li><p><a class="reference external" href="https://tox.readthedocs.io/en/latest/">Tox</a> for automated testing</p></li>
-<li><p><a class="reference external" href="https://black.readthedocs.io/en/stable/">Black</a> for code formatting</p></li>
-<li><p><a class="reference external" href="https://www.pylint.org/">Pylint</a> for linting</p></li>
-</ul>
-<p>as well as GitHub Actions to automatically build, test, lint, and generate documentation.</p>
-</section>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
+<p>This project uses <a class="reference external" href="https://python-poetry.org/">Poetry</a> to manage dependencies and virtual environments.</p>
 <ol class="arabic simple">
-<li><p>Clone the repo.</p></li>
-<li><p>Initialize the repository with Poetry by running:</p></li>
+<li><p>Create the virtual environment:</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ poetry init
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>poetry<span class="w"> </span>install
 </pre></div>
 </div>
 <ol class="arabic simple">
-<li><p>Install dependencies.</p></li>
+<li><p>Activate the environment:</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ poetry install
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>poetry<span class="w"> </span>shell
 </pre></div>
 </div>
-<ol class="arabic simple">
-<li><p>Activate the environment.</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ poetry shell
-</pre></div>
-</div>
-<ol class="arabic simple">
-<li><p>Run the CLI</p></li>
-</ol>
 </section>
-<section id="commands">
-<h2>Commands<a class="headerlink" href="#commands" title="Permalink to this heading"></a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> include three commands for working with the project.</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">clean</span></code> will clean all the build and testing files</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">build</span></code> will run tests, lint, and type check your code (you can also just run <code class="docutils literal notranslate"><span class="pre">tox</span></code>)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">docs</span></code> will generate documentation</p></li>
-</ul>
+<section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h1>
+<p>The pipeline uses <a class="reference external" href="https://docs.prefect.io/">Prefect</a> for workflows and <a class="reference external" href="https://hydra.cc/docs/intro/">Hydra</a> for composable configuration.</p>
+<p>Run the demo workflow using:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>abmpipe<span class="w"> </span>demo<span class="w"> </span>::<span class="w"> </span>parameters.name<span class="o">=</span>demo<span class="w"> </span>context.name<span class="o">=</span>demo<span class="w"> </span>series.name<span class="o">=</span>demo
+</pre></div>
+</div>
+<p>To use config files, create a <code class="docutils literal notranslate"><span class="pre">configs</span></code> directory with the following structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>configs
+├── context
+│   └── demo.yaml
+├── parameters
+│   └── demo.yaml
+└── series
+    └── demo.yaml
+</pre></div>
+</div>
+<p>Each <code class="docutils literal notranslate"><span class="pre">demo.yaml</span></code> should contain the field <code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">&lt;name&gt;</span></code>.
+Then use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>abmpipe<span class="w"> </span>demo<span class="w"> </span><span class="nv">parameters</span><span class="o">=</span>demo<span class="w"> </span><span class="nv">context</span><span class="o">=</span>demo<span class="w"> </span><span class="nv">series</span><span class="o">=</span>demo
+</pre></div>
+</div>
+<p>Use the flag <code class="docutils literal notranslate"><span class="pre">--dryrun</span></code> to display the composed configuration without running the workflow.</p>
+<section id="adding-secrets">
+<h2>Adding secrets<a class="headerlink" href="#adding-secrets" title="Permalink to this heading"></a></h2>
+<p>Configs can use <a class="reference external" href="https://docs.prefect.io/concepts/blocks/?h=secret#secret-fields">Secret</a> fields.
+In configs, any field in the form <code class="docutils literal notranslate"><span class="pre">${secret:name-of-secret}</span></code> will be resolved using the Prefect Secret loader.
+These values must be configured as a Secret Block in Prefect via a script:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">prefect.blocks.system</span> <span class="kn">import</span> <span class="n">Secret</span>
+
+<span class="n">Secret</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;secret-value&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;name-of-secret&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or in the Prefect UI under Blocks.</p>
 </section>
 </section>
 <section id="indices-and-tables">

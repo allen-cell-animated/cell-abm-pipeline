@@ -1,0 +1,7 @@
+cell\_abm\_pipeline.tasks.resources.plot\_wall\_clock module
+============================================================
+
+.. automodule:: cell_abm_pipeline.tasks.resources.plot_wall_clock
+   :members:
+   :undoc-members:
+   :show-inheritance:

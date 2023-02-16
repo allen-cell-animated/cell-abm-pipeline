@@ -1,0 +1,16 @@
+cell\_abm\_pipeline.tasks.resources package
+===========================================
+
+.. automodule:: cell_abm_pipeline.tasks.resources
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   cell_abm_pipeline.tasks.resources.plot_object_storage
+   cell_abm_pipeline.tasks.resources.plot_wall_clock

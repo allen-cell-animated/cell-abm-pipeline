@@ -1,7 +1,0 @@
-basic\_metrics.plot\_spatial module
-===================================
-
-.. automodule:: basic_metrics.plot_spatial
-   :members:
-   :undoc-members:
-   :show-inheritance:

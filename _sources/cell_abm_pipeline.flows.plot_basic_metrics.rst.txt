@@ -1,0 +1,7 @@
+cell\_abm\_pipeline.flows.plot\_basic\_metrics module
+=====================================================
+
+.. automodule:: cell_abm_pipeline.flows.plot_basic_metrics
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,7 +1,0 @@
-utilities.plot module
-=====================
-
-.. automodule:: utilities.plot
-   :members:
-   :undoc-members:
-   :show-inheritance:

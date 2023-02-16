@@ -1,7 +1,0 @@
-convert\_format.arcade\_to\_image module
-========================================
-
-.. automodule:: convert_format.arcade_to_image
-   :members:
-   :undoc-members:
-   :show-inheritance:

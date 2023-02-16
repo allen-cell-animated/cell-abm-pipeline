@@ -1,0 +1,7 @@
+cell\_abm\_pipeline.tasks.measures.plot\_degree\_trajectory module
+==================================================================
+
+.. automodule:: cell_abm_pipeline.tasks.measures.plot_degree_trajectory
+   :members:
+   :undoc-members:
+   :show-inheritance:

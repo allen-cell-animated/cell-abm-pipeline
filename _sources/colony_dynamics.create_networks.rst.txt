@@ -1,7 +1,0 @@
-colony\_dynamics.create\_networks module
-========================================
-
-.. automodule:: colony_dynamics.create_networks
-   :members:
-   :undoc-members:
-   :show-inheritance:

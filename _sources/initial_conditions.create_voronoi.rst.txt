@@ -1,7 +1,0 @@
-initial\_conditions.create\_voronoi module
-==========================================
-
-.. automodule:: initial_conditions.create_voronoi
-   :members:
-   :undoc-members:
-   :show-inheritance:

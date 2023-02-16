@@ -1,7 +1,0 @@
-colony\_dynamics.compress\_neighbors module
-===========================================
-
-.. automodule:: colony_dynamics.compress_neighbors
-   :members:
-   :undoc-members:
-   :show-inheritance:

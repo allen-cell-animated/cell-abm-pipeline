@@ -1,7 +1,0 @@
-cell\_shape.plot\_pca module
-============================
-
-.. automodule:: cell_shape.plot_pca
-   :members:
-   :undoc-members:
-   :show-inheritance:

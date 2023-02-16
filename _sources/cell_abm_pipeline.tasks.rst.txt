@@ -1,0 +1,29 @@
+cell\_abm\_pipeline.tasks package
+=================================
+
+.. automodule:: cell_abm_pipeline.tasks
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   cell_abm_pipeline.tasks.basic
+   cell_abm_pipeline.tasks.clusters
+   cell_abm_pipeline.tasks.measures
+   cell_abm_pipeline.tasks.pca
+   cell_abm_pipeline.tasks.resources
+   cell_abm_pipeline.tasks.stats
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   cell_abm_pipeline.tasks.make_graph_frame
+   cell_abm_pipeline.tasks.make_projection_frame

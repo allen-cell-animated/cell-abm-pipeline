@@ -1,7 +1,0 @@
-colony\_dynamics.plot\_clusters module
-======================================
-
-.. automodule:: colony_dynamics.plot_clusters
-   :members:
-   :undoc-members:
-   :show-inheritance:

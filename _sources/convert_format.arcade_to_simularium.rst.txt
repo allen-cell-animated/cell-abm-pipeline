@@ -1,7 +1,0 @@
-convert\_format.arcade\_to\_simularium module
-=============================================
-
-.. automodule:: convert_format.arcade_to_simularium
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -1,7 +1,0 @@
-colony\_dynamics.find\_neighbors module
-=======================================
-
-.. automodule:: colony_dynamics.find_neighbors
-   :members:
-   :undoc-members:
-   :show-inheritance:

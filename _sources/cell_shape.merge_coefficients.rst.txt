@@ -1,7 +1,0 @@
-cell\_shape.merge\_coefficients module
-======================================
-
-.. automodule:: cell_shape.merge_coefficients
-   :members:
-   :undoc-members:
-   :show-inheritance:

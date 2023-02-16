@@ -1,0 +1,7 @@
+cell\_abm\_pipeline.flows.process\_sample module
+================================================
+
+.. automodule:: cell_abm_pipeline.flows.process_sample
+   :members:
+   :undoc-members:
+   :show-inheritance:

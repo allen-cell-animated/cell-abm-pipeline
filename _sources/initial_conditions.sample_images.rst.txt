@@ -1,7 +1,0 @@
-initial\_conditions.sample\_images module
-=========================================
-
-.. automodule:: initial_conditions.sample_images
-   :members:
-   :undoc-members:
-   :show-inheritance:

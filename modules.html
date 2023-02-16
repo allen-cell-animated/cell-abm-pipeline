@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>cell_abm_pipeline &mdash; Cell agent-based model pipeline VERSION NUMBER X.X.X documentation</title>
@@ -11,16 +11,15 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="basic_metrics package" href="basic_metrics.html" />
-    <link rel="prev" title="Cell agent-based model pipeline" href="index.html" /> 
+    <link rel="next" title="cell_abm_pipeline package" href="cell_abm_pipeline.html" />
+    <link rel="prev" title="Installation" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -28,11 +27,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Cell agent-based model pipeline
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Cell agent-based model pipeline
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -42,13 +45,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Package modules</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="basic_metrics.html">basic_metrics package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_shape.html">cell_shape package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="colony_dynamics.html">colony_dynamics package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="convert_format.html">convert_format package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="initial_conditions.html">initial_conditions package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="resource_usage.html">resource_usage package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utilities.html">utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.html">cell_abm_pipeline package</a></li>
 </ul>
 </li>
 </ul>
@@ -66,8 +63,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>cell_abm_pipeline</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">cell_abm_pipeline</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -81,78 +78,21 @@
 <h1>cell_abm_pipeline<a class="headerlink" href="#cell-abm-pipeline" title="Permalink to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="basic_metrics.html">basic_metrics package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="basic_metrics.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="basic_metrics.plot_projection.html">basic_metrics.plot_projection module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="basic_metrics.plot_spatial.html">basic_metrics.plot_spatial module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="basic_metrics.plot_temporal.html">basic_metrics.plot_temporal module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cell_abm_pipeline.html">cell_abm_pipeline package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cell_abm_pipeline.flows.html">cell_abm_pipeline.flows package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cell_abm_pipeline.flows.html#submodules">Submodules</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="cell_abm_pipeline.tasks.html">cell_abm_pipeline.tasks package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cell_abm_pipeline.tasks.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cell_abm_pipeline.tasks.html#submodules">Submodules</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="cell_shape.html">cell_shape package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cell_shape.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cell_shape.calculate_coefficients.html">cell_shape.calculate_coefficients module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cell_shape.compress_coefficients.html">cell_shape.compress_coefficients module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cell_shape.extract_shapes.html">cell_shape.extract_shapes module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cell_shape.merge_coefficients.html">cell_shape.merge_coefficients module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cell_shape.perform_pca.html">cell_shape.perform_pca module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cell_shape.plot_pca.html">cell_shape.plot_pca module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cell_abm_pipeline.utilities.html">cell_abm_pipeline.utilities package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cell_abm_pipeline.utilities.html#submodules">Submodules</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="colony_dynamics.html">colony_dynamics package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="colony_dynamics.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="colony_dynamics.analyze_clusters.html">colony_dynamics.analyze_clusters module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="colony_dynamics.analyze_measures.html">colony_dynamics.analyze_measures module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="colony_dynamics.compress_neighbors.html">colony_dynamics.compress_neighbors module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="colony_dynamics.create_networks.html">colony_dynamics.create_networks module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="colony_dynamics.find_neighbors.html">colony_dynamics.find_neighbors module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="colony_dynamics.merge_neighbors.html">colony_dynamics.merge_neighbors module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="colony_dynamics.plot_clusters.html">colony_dynamics.plot_clusters module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="colony_dynamics.plot_measures.html">colony_dynamics.plot_measures module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="colony_dynamics.plot_neighbors.html">colony_dynamics.plot_neighbors module</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="convert_format.html">convert_format package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="convert_format.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="convert_format.arcade_to_image.html">convert_format.arcade_to_image module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="convert_format.arcade_to_mesh.html">convert_format.arcade_to_mesh module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="convert_format.arcade_to_simularium.html">convert_format.arcade_to_simularium module</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="initial_conditions.html">initial_conditions package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="initial_conditions.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="initial_conditions.convert_arcade.html">initial_conditions.convert_arcade module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="initial_conditions.create_voronoi.html">initial_conditions.create_voronoi module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="initial_conditions.download_images.html">initial_conditions.download_images module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="initial_conditions.generate_coordinates.html">initial_conditions.generate_coordinates module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="initial_conditions.process_samples.html">initial_conditions.process_samples module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="initial_conditions.sample_images.html">initial_conditions.sample_images module</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="resource_usage.html">resource_usage package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="resource_usage.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="resource_usage.calculate_storage.html">resource_usage.calculate_storage module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="resource_usage.extract_clock.html">resource_usage.extract_clock module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="resource_usage.plot_resources.html">resource_usage.plot_resources module</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="utilities.html">utilities package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="utilities.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="utilities.keys.html">utilities.keys module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="utilities.load.html">utilities.load module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="utilities.plot.html">utilities.plot module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="utilities.save.html">utilities.save module</a></li>
 </ul>
 </li>
 </ul>
@@ -165,8 +105,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Cell agent-based model pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="basic_metrics.html" class="btn btn-neutral float-right" title="basic_metrics package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cell_abm_pipeline.html" class="btn btn-neutral float-right" title="cell_abm_pipeline package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

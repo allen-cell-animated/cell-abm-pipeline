@@ -1,0 +1,27 @@
+cell\_abm\_pipeline.tasks.basic package
+=======================================
+
+.. automodule:: cell_abm_pipeline.tasks.basic
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   cell_abm_pipeline.tasks.basic.plot_counts_total
+   cell_abm_pipeline.tasks.basic.plot_height_average
+   cell_abm_pipeline.tasks.basic.plot_height_distribution
+   cell_abm_pipeline.tasks.basic.plot_height_individual
+   cell_abm_pipeline.tasks.basic.plot_height_locations
+   cell_abm_pipeline.tasks.basic.plot_phase_durations
+   cell_abm_pipeline.tasks.basic.plot_phase_fractions
+   cell_abm_pipeline.tasks.basic.plot_phase_locations
+   cell_abm_pipeline.tasks.basic.plot_population_locations
+   cell_abm_pipeline.tasks.basic.plot_volume_average
+   cell_abm_pipeline.tasks.basic.plot_volume_distribution
+   cell_abm_pipeline.tasks.basic.plot_volume_individual
+   cell_abm_pipeline.tasks.basic.plot_volume_locations
