@@ -1,13 +1,16 @@
 import numpy as np
 from arcade_collection.output import extract_tick_json, get_location_voxels
-from matplotlib.patches import Rectangle
 from prefect import task
 
-from cell_abm_pipeline.utilities.plot import make_grid_figure
+from cell_abm_pipeline.utilities.plot import (
+    add_frame_scalebar,
+    add_frame_timestamp,
+    make_grid_figure,
+)
 
 
 @task
-def make_projection_frame(keys, data, name, tick, scale, ds, dt, box, region=None):
+def make_projection_frame(keys, locations, name, tick, scale, ds, dt, box, region=None):
     fig, gridspec, indices = make_grid_figure(keys)
     length, width, height = box
 
@@ -21,25 +24,25 @@ def make_projection_frame(keys, data, name, tick, scale, ds, dt, box, region=Non
         ax.set_ylim([width - 1, 0])
 
         tick_json = extract_tick_json.fn(
-            data[(key, seed)], f"{name}_{key}_{seed:04d}", tick, "LOCATIONS"
+            locations[(key, seed)], f"{name}_{key}_{seed:04d}", tick, "LOCATIONS"
         )
         array = create_projection_array(tick_json, length, width, height, region)
 
         ax.imshow(array, cmap="bone", interpolation="none", vmin=0, vmax=1)
 
-        add_frame_timestamp(ax, length, width, dt, tick)
-        add_frame_scalebar(ax, length, width, ds, scale)
+        add_frame_timestamp(ax, length, width, dt, tick, "#ffffff")
+        add_frame_scalebar(ax, length, width, ds, scale, "#ffffff")
 
     return fig
 
 
-def create_projection_array(data, length, width, height, region=None):
+def create_projection_array(locations, length, width, height, region=None):
     array = np.zeros((length, width, height))
     borders = np.zeros((width, length))
 
-    for cell in data:
-        voxels = get_location_voxels.fn(cell, region)
-        array[tuple(np.transpose(voxels))] = cell["id"]
+    for location in locations:
+        voxels = get_location_voxels.fn(location, region)
+        array[tuple(np.transpose(voxels))] = location["id"]
 
     for i in range(length):
         for j in range(width):
@@ -59,41 +62,3 @@ def create_projection_array(data, length, width, height, region=None):
     borders = borders / normalize
 
     return borders
-
-
-def add_frame_timestamp(ax, length, width, dt, frame):
-    hours, minutes = divmod(round(frame * dt), 1)
-    timestamp = f"{int(hours):02d}H:{int(minutes*60):02d}M"
-
-    ax.text(
-        0.03 * length,
-        0.96 * width,
-        timestamp,
-        fontfamily="monospace",
-        fontsize=20,
-        color="w",
-        fontweight="bold",
-    )
-
-
-def add_frame_scalebar(ax, length, width, ds, scale):
-    scalebar = scale / ds
-
-    ax.add_patch(
-        Rectangle(
-            (0.95 * length - scalebar, 0.92 * width),
-            scalebar,
-            0.01 * width,
-            snap=True,
-            color="w",
-        )
-    )
-
-    ax.text(
-        0.95 * length - scalebar / 2,
-        0.975 * width,
-        f"{scale} $\mu$m",
-        fontsize=10,
-        color="w",
-        horizontalalignment="center",
-    )
