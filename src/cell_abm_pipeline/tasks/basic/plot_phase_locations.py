@@ -1,3 +1,4 @@
+import matplotlib.figure as mpl
 import pandas as pd
 from matplotlib.lines import Line2D
 from prefect import task
@@ -6,7 +7,12 @@ from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 
 @task
-def plot_phase_locations(keys, data, phase_colors, tick=0, padding=50):
+def plot_phase_locations(
+    keys: list[tuple[str, int]],
+    data: dict[tuple[str, int], pd.DataFrame],
+    phase_colors: dict[str, str],
+    tick: int = 0,
+) -> mpl.Figure:
     handles = [
         Line2D(
             [0],
@@ -27,6 +33,7 @@ def plot_phase_locations(keys, data, phase_colors, tick=0, padding=50):
     min_x = all_data["CENTER_X"].min()
     max_y = all_data["CENTER_Y"].max()
     min_y = all_data["CENTER_Y"].min()
+    padding = 0.5 * max((max_x - min_x), (max_y - min_y))
 
     for i, j, (key, seed) in indices:
         ax = fig.add_subplot(gridspec[i, j])

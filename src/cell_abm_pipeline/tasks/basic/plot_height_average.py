@@ -1,10 +1,19 @@
+from typing import Optional
+
+import matplotlib.figure as mpl
+import pandas as pd
 from prefect import task
 
 from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 
 @task
-def plot_height_average(keys, data, reference=None, region=None):
+def plot_height_average(
+    keys: list[str],
+    data: dict[str, pd.DataFrame],
+    reference: Optional[pd.DataFrame] = None,
+    region: Optional[str] = None,
+) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
     value = f"height.{region}" if region else "height"
 

@@ -1,7 +1,9 @@
 from itertools import groupby
 from math import sqrt
 
+import matplotlib.figure as mpl
 import numpy as np
+import pandas as pd
 from prefect import task
 from scipy.stats import gamma
 
@@ -32,7 +34,9 @@ PHASE_SETTINGS = {
 
 
 @task
-def plot_phase_durations(keys, data, phase, phase_colors):
+def plot_phase_durations(
+    keys: list[str], data: dict[str, pd.DataFrame], phase: str, phase_colors: dict[str, str]
+) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
 
     for i, j, key in indices:
@@ -72,9 +76,9 @@ def plot_phase_durations(keys, data, phase, phase_colors):
     return fig
 
 
-def get_phase_durations(data):
+def get_phase_durations(data: pd.DataFrame) -> dict[str, list[float]]:
     """Calculates phase durations for given dataframe."""
-    phase_durations = {}
+    phase_durations: dict[str, list[float]] = {}
 
     for _, group in data.groupby(["SEED", "ID"]):
         group.sort_values("TICK", inplace=True)

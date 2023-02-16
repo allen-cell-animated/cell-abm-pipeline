@@ -1,3 +1,6 @@
+from typing import Optional
+
+import matplotlib.figure as mpl
 import pandas as pd
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from prefect import task
@@ -6,13 +9,22 @@ from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 
 @task
-def plot_volume_locations(keys, data, tick=0, reference=None, region=None, padding=50):
+def plot_volume_locations(
+    keys: list[tuple[str, int]],
+    data: dict[tuple[str, int], pd.DataFrame],
+    tick: int = 0,
+    reference: Optional[pd.DataFrame] = None,
+    region: Optional[str] = None,
+) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
     value = f"volume.{region}" if region else "volume"
 
     all_data = pd.concat(data.values())
-    xlim = (all_data["CENTER_X"].min() - padding, all_data["CENTER_X"].max() + padding)
-    ylim = (all_data["CENTER_Y"].min() - padding, all_data["CENTER_Y"].max() + padding)
+    max_x = all_data["CENTER_X"].max()
+    min_x = all_data["CENTER_X"].min()
+    max_y = all_data["CENTER_Y"].max()
+    min_y = all_data["CENTER_Y"].min()
+    padding = 0.5 * max((max_x - min_x), (max_y - min_y))
 
     if reference is not None:
         reference_volume = reference[value].mean()
@@ -25,8 +37,8 @@ def plot_volume_locations(keys, data, tick=0, reference=None, region=None, paddi
         ax.invert_yaxis()
         ax.get_xaxis().set_ticks([])
         ax.get_yaxis().set_ticks([])
-        ax.set_xlim(xlim)
-        ax.set_ylim(ylim)
+        ax.set_xlim((min_x - padding, max_x + padding))
+        ax.set_ylim((min_y - padding, max_y + padding))
 
         key_seed_data = data[(key, seed)]
         tick_data = key_seed_data[key_seed_data["TICK"] == tick]
