@@ -2,12 +2,11 @@ import pandas as pd
 from matplotlib.lines import Line2D
 from prefect import task
 
-from cell_abm_pipeline.tasks.basic.plot_phase_fractions import PHASE_COLORS
 from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 
 @task
-def plot_phase_locations(keys, data, tick=0, padding=50):
+def plot_phase_locations(keys, data, phase_colors, tick=0, padding=50):
     handles = [
         Line2D(
             [0],
@@ -18,7 +17,7 @@ def plot_phase_locations(keys, data, tick=0, padding=50):
             markerfacecolor=color,
             markersize=5,
         )
-        for phase, color in PHASE_COLORS.items()
+        for phase, color in phase_colors.items()
     ]
 
     fig, gridspec, indices = make_grid_figure(keys)
@@ -43,7 +42,7 @@ def plot_phase_locations(keys, data, tick=0, padding=50):
 
         x = tick_data["CENTER_X"]
         y = tick_data["CENTER_Y"]
-        phases = [PHASE_COLORS[phase] for phase in tick_data["PHASE"]]
+        phases = [phase_colors[phase] for phase in tick_data["PHASE"]]
 
         ax.scatter(x, y, c=phases, s=20)
         ax.legend(handles=handles, loc="upper right")

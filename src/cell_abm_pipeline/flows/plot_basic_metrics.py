@@ -54,6 +54,15 @@ CELL_PHASES = [
     "APOPTOTIC_LATE",
 ]
 
+PHASE_COLORS: dict[str, str] = {
+    "PROLIFERATIVE_G1": "#5F4690",
+    "PROLIFERATIVE_S": "#38A6A5",
+    "PROLIFERATIVE_G2": "#73AF48",
+    "PROLIFERATIVE_M": "#CC503E",
+    "APOPTOTIC_EARLY": "#E17C05",
+    "APOPTOTIC_LATE": "#94346E",
+}
+
 
 @dataclass
 class ParametersConfig:
@@ -70,6 +79,8 @@ class ParametersConfig:
     plots: list[str] = field(default_factory=lambda: PLOTS)
 
     phases: list[str] = field(default_factory=lambda: CELL_PHASES)
+
+    phase_colors: dict[str, str] = field(default_factory=lambda: PHASE_COLORS)
 
 
 @dataclass
@@ -154,7 +165,7 @@ def run_flow_plot_temporal(
 
     if "phase_durations" in parameters.plots and parameters.region is None:
         for phase in parameters.phases:
-            phase_plot = plot_phase_durations(keys, all_results, phase)
+            phase_plot = plot_phase_durations(keys, all_results, phase, parameters.phase_colors)
 
             if phase_plot is None:
                 continue
@@ -169,7 +180,7 @@ def run_flow_plot_temporal(
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_phase_fractions.BASIC.png"),
-            plot_phase_fractions(keys, all_results, parameters.phases),
+            plot_phase_fractions(keys, all_results, parameters.phases, parameters.phase_colors),
         )
 
     if "volume_average" in parameters.plots:
@@ -229,7 +240,7 @@ def run_flow_plot_spatial(
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_phase_locations_{tick_key}.BASIC.png"),
-            plot_phase_locations(keys, all_results, parameters.tick),
+            plot_phase_locations(keys, all_results, parameters.tick, parameters.phase_colors),
         )
 
     if "population_locations" in parameters.plots and parameters.region is None:

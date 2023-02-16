@@ -6,20 +6,13 @@ from io_collection.load import load_tar
 from io_collection.save import save_image, save_text
 from prefect import flow
 
+from cell_abm_pipeline.flows.plot_basic_metrics import PHASE_COLORS
+
 FORMATS: list[str] = [
     "image",
     "mesh",
     "simularium",
 ]
-
-PHASE_COLORS: dict[str, str] = {
-    "PROLIFERATIVE_G1": "#73af48",
-    "PROLIFERATIVE_S": "#52a14c",
-    "PROLIFERATIVE_G2": "#309350",
-    "PROLIFERATIVE_M": "#0f8554",
-    "APOPTOTIC_EARLY": "#edad08",
-    "APOPTOTIC_LATE": "#775704",
-}
 
 
 @dataclass

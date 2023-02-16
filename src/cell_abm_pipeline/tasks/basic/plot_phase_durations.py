@@ -5,7 +5,6 @@ import numpy as np
 from prefect import task
 from scipy.stats import gamma
 
-from cell_abm_pipeline.tasks.basic.plot_phase_fractions import PHASE_COLORS
 from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 PHASE_SETTINGS = {
@@ -33,7 +32,7 @@ PHASE_SETTINGS = {
 
 
 @task
-def plot_phase_durations(keys, data, phase):
+def plot_phase_durations(keys, data, phase, phase_colors):
     fig, gridspec, indices = make_grid_figure(keys)
 
     for i, j, key in indices:
@@ -49,7 +48,7 @@ def plot_phase_durations(keys, data, phase):
 
         durations = np.array(phase_durations[phase])
         settings = PHASE_SETTINGS[phase]
-        color = PHASE_COLORS[phase]
+        color = phase_colors[phase]
 
         counts, labels = np.histogram(durations, bins=settings["bins"])
         counts = counts / np.sum(counts)

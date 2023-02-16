@@ -2,18 +2,9 @@ from prefect import task
 
 from cell_abm_pipeline.utilities.plot import make_grid_figure
 
-PHASE_COLORS = {
-    "PROLIFERATIVE_G1": "#5F4690",
-    "PROLIFERATIVE_S": "#38A6A5",
-    "PROLIFERATIVE_G2": "#73AF48",
-    "PROLIFERATIVE_M": "#CC503E",
-    "APOPTOTIC_EARLY": "#E17C05",
-    "APOPTOTIC_LATE": "#94346E",
-}
-
 
 @task
-def plot_phase_fractions(keys, data, phases):
+def plot_phase_fractions(keys, data, phases, phase_colors):
     fig, gridspec, indices = make_grid_figure(keys)
 
     for i, j, key in indices:
@@ -26,7 +17,7 @@ def plot_phase_fractions(keys, data, phases):
         total_count = key_data.groupby(["SEED", "time"]).size()
 
         for phase in phases:
-            color = PHASE_COLORS[phase]
+            color = phase_colors[phase]
             count = key_data[key_data["PHASE"] == phase].groupby(["SEED", "time"]).size()
             fraction = count / total_count
 
