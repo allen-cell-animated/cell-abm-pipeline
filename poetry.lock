@@ -491,7 +491,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7
 
 [[package]]
 name = "container-collection"
-version = "0.4.5"
+version = "0.4.6"
 description = "Collection of tasks for running containerized models."
 category = "main"
 optional = false
@@ -2823,7 +2823,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "ae4ed8930ea16b39dbcc8160ba8afe2af79f2794d95b8328b15815ae7eb91a95"
+content-hash = "8b7cb1a8a8e518b1ff2bc86d9b2b173de090d55f410872b9f43b4a87eb36cdaa"
 
 [metadata.files]
 abm-colony-collection = [
@@ -3275,8 +3275,8 @@ colorama = [
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
 container-collection = [
-    {file = "container_collection-0.4.5-py3-none-any.whl", hash = "sha256:68c4cf6adb0490d2ee8706839edb312fb55a462b5e27b0ed514815ffb570afda"},
-    {file = "container_collection-0.4.5.tar.gz", hash = "sha256:a8e89777ff66d8ac2eb9ad8bd4e99323b724e12eab1d815b574a120ea31c86e0"},
+    {file = "container_collection-0.4.6-py3-none-any.whl", hash = "sha256:4880d990f9b7d940c014cb5f0ec6be45ccf1324aae9d222bffc5e08eb176c202"},
+    {file = "container_collection-0.4.6.tar.gz", hash = "sha256:e1a092f026edc43356b58a70234a25b462362b500e542bb286374012695064e8"},
 ]
 contourpy = [
     {file = "contourpy-1.0.7-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:95c3acddf921944f241b6773b767f1cbce71d03307270e2d769fd584d5d1092d"},
