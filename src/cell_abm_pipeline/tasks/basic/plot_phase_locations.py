@@ -10,8 +10,8 @@ from cell_abm_pipeline.utilities.plot import make_grid_figure
 def plot_phase_locations(
     keys: list[tuple[str, int]],
     data: dict[tuple[str, int], pd.DataFrame],
+    tick: int,
     phase_colors: dict[str, str],
-    tick: int = 0,
 ) -> mpl.Figure:
     handles = [
         Line2D(

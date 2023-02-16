@@ -1,3 +1,7 @@
+import tarfile
+from typing import Optional
+
+import matplotlib.figure as mpl
 import numpy as np
 from arcade_collection.output import extract_tick_json, get_location_voxels
 from prefect import task
@@ -10,7 +14,17 @@ from cell_abm_pipeline.utilities.plot import (
 
 
 @task
-def make_projection_frame(keys, locations, name, tick, scale, ds, dt, box, region=None):
+def make_projection_frame(
+    keys: list[tuple[str, int]],
+    locations: dict[tuple[str, int], tarfile.TarFile],
+    name: str,
+    tick: int,
+    scale: int,
+    ds: float,
+    dt: float,
+    box: tuple[int, int, int],
+    region: Optional[str] = None,
+) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
     length, width, height = box
 
@@ -36,7 +50,9 @@ def make_projection_frame(keys, locations, name, tick, scale, ds, dt, box, regio
     return fig
 
 
-def create_projection_array(locations, length, width, height, region=None):
+def create_projection_array(
+    locations: list, length: int, width: int, height: int, region: Optional[str] = None
+) -> np.ndarray:
     array = np.zeros((length, width, height))
     borders = np.zeros((width, length))
 

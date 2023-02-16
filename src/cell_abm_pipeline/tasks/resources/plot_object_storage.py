@@ -1,10 +1,12 @@
+import matplotlib.figure as mpl
+import pandas as pd
 from prefect import task
 
 from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 
 @task
-def plot_object_storage(keys, storage, groups):
+def plot_object_storage(keys: list[str], storage: pd.DataFrame, groups: list[str]) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(groups)
 
     storage["STORAGE_MIB"] = storage["STORAGE"] / 1024**2

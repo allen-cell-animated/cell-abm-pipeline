@@ -31,7 +31,7 @@ class ParametersConfig:
 
     frame_spec: tuple[int, int, int] = (0, 1153, 48)
 
-    scale: float = 100
+    scale: int = 100
 
     phase_colors: Optional[dict] = field(default_factory=lambda: PHASE_COLORS)
 

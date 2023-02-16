@@ -1,10 +1,12 @@
+import matplotlib.figure as mpl
+import pandas as pd
 from prefect import task
 
 from cell_abm_pipeline.utilities.plot import make_single_figure
 
 
 @task
-def plot_wall_clock(keys, clock):
+def plot_wall_clock(keys: list[str], clock: pd.DataFrame) -> mpl.Figure:
     fig = make_single_figure()
 
     ax = fig.add_subplot()

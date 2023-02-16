@@ -1,3 +1,7 @@
+from typing import Optional
+
+import matplotlib.figure as mpl
+import pandas as pd
 from matplotlib.lines import Line2D
 from prefect import task
 
@@ -9,7 +13,16 @@ from cell_abm_pipeline.utilities.plot import (
 
 
 @task
-def make_graph_frame(keys, neighbors, tick, scale, ds, dt, box, phase_colors):
+def make_graph_frame(
+    keys: list[tuple[str, int]],
+    neighbors: dict[tuple[str, int], pd.DataFrame],
+    tick: int,
+    scale: int,
+    ds: float,
+    dt: float,
+    box: tuple[int, int, int],
+    phase_colors: Optional[dict[str, str]],
+) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
     length, width, _ = box
 
@@ -66,9 +79,9 @@ def make_graph_frame(keys, neighbors, tick, scale, ds, dt, box, phase_colors):
             colors = [phase_colors[phase] for phase in frame["PHASE"]]
             ax.legend(handles=handles, loc="upper right")
 
-        edges = ["#000" if depth == 1 else "#fff" for depth in frame["DEPTH"]]
+        ecolors = ["#000" if depth == 1 else "#fff" for depth in frame["DEPTH"]]
         widths = [1 if depth == 1 else 0.2 for depth in frame["DEPTH"]]
-        ax.scatter(frame["CX"], frame["CY"], c=colors, s=20, zorder=2, edgecolor=edges, lw=widths)
+        ax.scatter(frame["CX"], frame["CY"], c=colors, s=20, zorder=2, edgecolor=ecolors, lw=widths)
 
         add_frame_timestamp(ax, length, width, dt, tick, "#000000")
         add_frame_scalebar(ax, length, width, ds, scale, "#000000")

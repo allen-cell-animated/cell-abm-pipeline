@@ -124,10 +124,10 @@ def run_flow_plot_pca(
 
     if "transform_compare" in parameters.plots and ref_model is not None:
         for component in range(parameters.components):
-            pc = f"PC{component + 1}"
+            pci = f"PC{component + 1}"
             save_figure(
                 context.working_location,
-                make_key(plot_key, f"{series.name}_transform_compare_{pc}_{region_key}.PCA.png"),
+                make_key(plot_key, f"{series.name}_transform_compare_{pci}_{region_key}.PCA.png"),
                 plot_transform_compare(keys, component, ref_model, all_data, ref_data),
             )
 

@@ -2,7 +2,6 @@ from typing import Optional
 
 import matplotlib.figure as mpl
 import numpy as np
-import pandas as pd
 from prefect import task
 from sklearn.decomposition import PCA
 
