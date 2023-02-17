@@ -1,4 +1,5 @@
 import os
+import re
 from dataclasses import dataclass, field, make_dataclass
 from typing import Any
 
@@ -78,4 +79,30 @@ def generate_config(config_class, group, arguments):
 
 
 def display_config(config):
-    print(OmegaConf.to_yaml(config, resolve=True))
+    active = False
+    config_lines = []
+    list_entries = []
+
+    for line in OmegaConf.to_yaml(config, resolve=True).split("\n"):
+        match = re.findall(r"^[\s]{2,4}\- ([\d\.]+)", line)
+
+        if not match:
+            match = re.findall(r"^[\s]{4}\- ([a-z]+)", line)
+
+        if match and not active:
+            active = True
+            list_entries.append(match[0])
+        elif not match and active:
+            active = False
+            config_lines.append("[" + ", ".join(list_entries) + "]")
+            list_entries = []
+            config_lines.append(line)
+        elif match and active:
+            list_entries.append(match[0])
+        else:
+            config_lines.append(line)
+
+    config_display = "\n".join(config_lines)
+    config_display = config_display.replace(":\n[", ": [")
+
+    print(config_display)
