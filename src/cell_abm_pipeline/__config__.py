@@ -84,10 +84,7 @@ def display_config(config):
     list_entries = []
 
     for line in OmegaConf.to_yaml(config, resolve=True).split("\n"):
-        match = re.findall(r"^[\s]{2,4}\- ([\d\.]+)", line)
-
-        if not match:
-            match = re.findall(r"^[\s]{4}\- ([a-z]+)", line)
+        match = re.findall(r"^[\s]{2,4}\- ([\dA-z\.\*\']+)$", line)
 
         if match and not active:
             active = True
