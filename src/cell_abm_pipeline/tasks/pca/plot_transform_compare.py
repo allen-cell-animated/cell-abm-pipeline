@@ -16,14 +16,15 @@ def plot_transform_compare(
 ) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
 
-    ref_transform = model.transform(ref_data.filter(like="shcoeffs").values)
+    columns = ref_data.filter(like="shcoeffs").columns
+    ref_transform = model.transform(ref_data[columns].values)
 
     for i, j, key in indices:
         ax = fig.add_subplot(gridspec[i, j])
         ax.set_title(f"{key}")
         ax.set_xlabel(f"PC {component + 1}")
 
-        key_transform = model.transform(data[key].filter(like="shcoeffs").values)
+        key_transform = model.transform(data[key][columns].values)
 
         ax.hist(
             ref_transform[:, component],
