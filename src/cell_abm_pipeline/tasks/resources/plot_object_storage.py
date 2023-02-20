@@ -20,15 +20,16 @@ def plot_object_storage(keys: list[str], storage: pd.DataFrame, groups: list[str
 
         storage_group = storage[storage["GROUP"] == group]
 
-        values = [storage_group[storage_group["KEY"] == key]["STORAGE_MIB"].values for key in keys]
-        ax.boxplot(values, labels=keys, positions=range(0, len(keys)))
-        ax.scatter(
-            storage_group["KEY"],
-            storage_group["STORAGE_MIB"],
-            s=10,
-            alpha=0.3,
-            c="k",
-            edgecolors="none",
-        )
+        for i, key in enumerate(keys):
+            group = storage_group[storage_group["KEY"] == key]
+            ax.boxplot(group["STORAGE_MIB"].values, labels=[key], positions=[i], widths=0.6)
+            ax.scatter(
+                group["KEY"],
+                group["STORAGE_MIB"],
+                s=10,
+                alpha=0.3,
+                c="k",
+                edgecolors="none",
+            )
 
     return fig

@@ -13,8 +13,16 @@ def plot_wall_clock(keys: list[str], clock: pd.DataFrame) -> mpl.Figure:
     ax.set_ylabel("Wall clock time (minutes)")
     ax.set_xlim([-0.5, len(keys) - 0.5])
 
-    values = [clock[clock["KEY"] == key]["CLOCK"].values for key in keys]
-    ax.boxplot(values, labels=keys, positions=range(0, len(keys)))
-    ax.scatter(clock["KEY"], clock["CLOCK"], s=10, alpha=0.3, c="k", edgecolors="none")
+    for i, key in enumerate(keys):
+        group = clock[clock["KEY"] == key]
+        ax.boxplot(group["CLOCK"].values, labels=[key], positions=[i], widths=0.6)
+        ax.scatter(
+            group["KEY"],
+            group["CLOCK"],
+            s=10,
+            alpha=0.3,
+            c="k",
+            edgecolors="none",
+        )
 
     return fig
