@@ -19,7 +19,6 @@ def plot_transform_compare(
     thresholds: Optional[list[int]] = None,
 ) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
-    bins = np.arange(-60, 60, 2)
 
     columns = ref_data.filter(like="shcoeffs").columns
     ref_transform = model.transform(ref_data[columns].values)
@@ -29,6 +28,7 @@ def plot_transform_compare(
         ax.set_title(f"{key}")
         ax.set_xlabel(f"PC {component + 1}")
 
+        bins = np.linspace(ref_transform[:, component].min(), ref_transform[:, component].max(), 50)
         key_transform = model.transform(data[key][columns].values)
 
         ax.hist(
