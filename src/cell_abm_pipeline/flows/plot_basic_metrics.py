@@ -63,6 +63,15 @@ PHASE_COLORS: dict[str, str] = {
     "APOPTOTIC_LATE": "#94346E",
 }
 
+BOUNDS: dict[str, tuple[int, int]] = {
+    "volume": (0, 5500),
+    "height": (0, 23),
+    "volume.NUCLEUS": (0, 1600),
+    "height.NUCLEUS": (0, 18),
+}
+
+SUBSET_THRESHOLDS: list[int] = [24, 48, 72]
+
 
 @dataclass
 class ParametersConfig:
@@ -81,6 +90,10 @@ class ParametersConfig:
     phases: list[str] = field(default_factory=lambda: CELL_PHASES)
 
     phase_colors: dict[str, str] = field(default_factory=lambda: PHASE_COLORS)
+
+    bounds: dict = field(default_factory=lambda: BOUNDS)
+
+    thresholds: list[int] = field(default_factory=lambda: SUBSET_THRESHOLDS)
 
 
 @dataclass
@@ -160,7 +173,14 @@ def run_flow_plot_temporal(
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_height_distribution{region_key}.BASIC.png"),
-            plot_height_distribution(keys, all_results, reference_data, parameters.region),
+            plot_height_distribution(
+                keys,
+                all_results,
+                parameters.bounds,
+                reference_data,
+                parameters.region,
+                parameters.thresholds,
+            ),
         )
 
     if "phase_durations" in parameters.plots and parameters.region is None:
@@ -193,8 +213,15 @@ def run_flow_plot_temporal(
     if "volume_distribution" in parameters.plots:
         save_figure(
             context.working_location,
-            make_key(plot_key, f"v{series.name}_volume_distribution{region_key}.BASIC.png"),
-            plot_volume_distribution(keys, all_results, reference_data, parameters.region),
+            make_key(plot_key, f"{series.name}_volume_distribution{region_key}.BASIC.png"),
+            plot_volume_distribution(
+                keys,
+                all_results,
+                parameters.bounds,
+                reference_data,
+                parameters.region,
+                parameters.thresholds,
+            ),
         )
 
     if "volume_individual" in parameters.plots:
