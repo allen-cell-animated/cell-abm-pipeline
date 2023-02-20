@@ -81,6 +81,11 @@ def run_flow(module, config):
     parameters = OmegaConf.to_object(config.parameters)
 
     if config["deploy"]:
+        infra_overrides = {}
+
+        if hasattr(context, "region"):
+            infra_overrides = {"env": {"AWS_DEFAULT_REGION": context.region}}
+
         deployment = Deployment.build_from_flow(
             flow=module.run_flow,
             name=series.name,
@@ -89,6 +94,7 @@ def run_flow(module, config):
                 "series": series,
                 "parameters": parameters,
             },
+            infra_overrides=infra_overrides,
         )
         deployment.apply()
     else:
