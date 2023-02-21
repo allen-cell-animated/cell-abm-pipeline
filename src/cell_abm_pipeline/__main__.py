@@ -1,3 +1,4 @@
+import hashlib
 import importlib
 import os
 import sys
@@ -86,9 +87,11 @@ def run_flow(module, config):
         if hasattr(context, "region"):
             infra_overrides = {"env": {"AWS_DEFAULT_REGION": context.region}}
 
+        checksum = hashlib.md5(OmegaConf.to_yaml(config, resolve=True).encode("utf-8")).hexdigest()
+
         deployment = Deployment.build_from_flow(
             flow=module.run_flow,
-            name=series.name,
+            name=f"{series.name}:{checksum}",
             parameters={
                 "context": context,
                 "series": series,
