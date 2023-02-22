@@ -1,6 +1,6 @@
 [[package]]
 name = "abm-colony-collection"
-version = "0.2.1"
+version = "0.2.2"
 description = "Collection of tasks for analyzing colony dynamics."
 category = "main"
 optional = false
@@ -8,33 +8,33 @@ python-versions = ">=3.9,<4.0"
 
 [package.dependencies]
 networkx = ">=3.0,<4.0"
-numpy = ">=1.23.4,<2.0.0"
-pandas = ">=1.5.1,<2.0.0"
-prefect = ">=2.6.0,<3.0.0"
+numpy = ">=1.24.2,<2.0.0"
+pandas = ">=1.5.3,<2.0.0"
+prefect = ">=2.8.2,<3.0.0"
 scikit-image = ">=0.19.3,<0.20.0"
 scipy = ">=1.9.3,<2.0.0"
 
 [[package]]
 name = "abm-initialization-collection"
-version = "0.2.1"
+version = "0.2.2"
 description = "Collection of tasks for initializing abm simulations."
 category = "main"
 optional = false
 python-versions = ">=3.9,<4.0"
 
 [package.dependencies]
-aicsimageio = ">=4.9.2,<5.0.0"
+aicsimageio = ">=4.9.4,<5.0.0"
 hexalattice = ">=1.2.1,<2.0.0"
-matplotlib = ">=3.6.1,<4.0.0"
-numpy = ">=1.23.4,<2.0.0"
-pandas = ">=1.5.1,<2.0.0"
-prefect = ">=2.6.0,<3.0.0"
+matplotlib = ">=3.7.0,<4.0.0"
+numpy = ">=1.24.2,<2.0.0"
+pandas = ">=1.5.3,<2.0.0"
+prefect = ">=2.8.2,<3.0.0"
 scikit-image = ">=0.19.3,<0.20.0"
 scipy = ">=1.9.3,<2.0.0"
 
 [[package]]
 name = "abm-shape-collection"
-version = "0.2.2"
+version = "0.2.3"
 description = "Collection of tasks for analyzing cell shapes."
 category = "main"
 optional = false
@@ -42,9 +42,9 @@ python-versions = ">=3.9,<4.0"
 
 [package.dependencies]
 aicsshparam = ">=0.1.1,<0.2.0"
-numpy = ">=1.23.4,<2.0.0"
-pandas = ">=1.5.1,<2.0.0"
-prefect = ">=2.6.0,<3.0.0"
+numpy = ">=1.24.2,<2.0.0"
+pandas = ">=1.5.3,<2.0.0"
+prefect = ">=2.8.2,<3.0.0"
 trimesh = ">=3.18.3,<4.0.0"
 vtk = ">=9.2.5,<10.0.0"
 
@@ -181,7 +181,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "alembic"
-version = "1.9.3"
+version = "1.9.4"
 description = "A database migration tool for SQLAlchemy."
 category = "main"
 optional = false
@@ -245,16 +245,16 @@ requests-oauthlib = "*"
 
 [[package]]
 name = "arcade-collection"
-version = "0.6.0"
+version = "0.6.1"
 description = "Collection of tasks for working with ARCADE."
 category = "main"
 optional = false
 python-versions = ">=3.9,<4.0"
 
 [package.dependencies]
-numpy = ">=1.23.4,<2.0.0"
-pandas = ">=1.5.1,<2.0.0"
-prefect = ">=2.6.0,<3.0.0"
+numpy = ">=1.24.2,<2.0.0"
+pandas = ">=1.5.3,<2.0.0"
+prefect = ">=2.8.2,<3.0.0"
 scikit-image = ">=0.19.3,<0.20.0"
 simulariumio = ">=1.7.0,<2.0.0"
 
@@ -491,7 +491,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7
 
 [[package]]
 name = "container-collection"
-version = "0.4.6"
+version = "0.4.8"
 description = "Collection of tasks for running containerized models."
 category = "main"
 optional = false
@@ -500,10 +500,10 @@ python-versions = ">=3.9,<4.0"
 [package.dependencies]
 boto3 = ">=1.24.59,<2.0.0"
 deepdiff = ">=5.8.1,<6.0.0"
-docker = ">=6.0.0,<7.0.0"
-numpy = ">=1.23.4,<2.0.0"
-pandas = ">=1.5.1,<2.0.0"
-prefect = ">=2.6.0,<3.0.0"
+docker = ">=6.0.1,<7.0.0"
+numpy = ">=1.24.2,<2.0.0"
+pandas = ">=1.5.3,<2.0.0"
+prefect = ">=2.8.2,<3.0.0"
 tabulate = ">=0.9.0,<0.10.0"
 
 [[package]]
@@ -819,7 +819,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "fsspec"
-version = "2022.11.0"
+version = "2023.1.0"
 description = "File-system specification"
 category = "main"
 optional = false
@@ -850,7 +850,7 @@ tqdm = ["tqdm"]
 
 [[package]]
 name = "google-auth"
-version = "2.16.0"
+version = "2.16.1"
 description = "Google Authentication Library"
 category = "main"
 optional = false
@@ -883,7 +883,7 @@ test = ["objgraph", "psutil"]
 
 [[package]]
 name = "griffe"
-version = "0.25.4"
+version = "0.25.5"
 description = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
 category = "main"
 optional = false
@@ -1072,7 +1072,7 @@ testing = ["flake8 (<5)", "flufl.flake8", "importlib-resources (>=1.3)", "packag
 
 [[package]]
 name = "importlib-resources"
-version = "5.10.2"
+version = "5.12.0"
 description = "Read resources from Python packages"
 category = "main"
 optional = false
@@ -1095,21 +1095,21 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "io-collection"
-version = "0.6.1"
+version = "0.6.2"
 description = "Collection of tasks for I/O."
 category = "main"
 optional = false
 python-versions = ">=3.9,<4.0"
 
 [package.dependencies]
-aicsimageio = ">=4.9.2,<5.0.0"
+aicsimageio = ">=4.9.4,<5.0.0"
 boto3 = ">=1.24.59,<2.0.0"
-matplotlib = ">=3.6.1,<4.0.0"
-numpy = ">=1.23.4,<2.0.0"
-pandas = ">=1.5.1,<2.0.0"
-prefect = ">=2.6.0,<3.0.0"
+matplotlib = ">=3.7.0,<4.0.0"
+numpy = ">=1.24.2,<2.0.0"
+pandas = ">=1.5.3,<2.0.0"
+prefect = ">=2.8.2,<3.0.0"
 quilt3 = ">=5.0.0,<6.0.0"
-s3fs = ">=2022.10.0,<2023.0.0"
+s3fs = ">=2023.1.0,<2024.0.0"
 
 [[package]]
 name = "isort"
@@ -1211,7 +1211,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "kubernetes"
-version = "25.3.0"
+version = "26.1.0"
 description = "Kubernetes python client"
 category = "main"
 optional = false
@@ -1294,7 +1294,7 @@ testing = ["coverage", "pyyaml"]
 
 [[package]]
 name = "markdown-it-py"
-version = "2.1.0"
+version = "2.2.0"
 description = "Python port of markdown-it. Markdown parsing, done right!"
 category = "main"
 optional = false
@@ -1304,10 +1304,10 @@ python-versions = ">=3.7"
 mdurl = ">=0.1,<1.0"
 
 [package.extras]
-benchmarking = ["psutil", "pytest", "pytest-benchmark (>=3.2,<4.0)"]
-code_style = ["pre-commit (==2.6)"]
-compare = ["commonmark (>=0.9.1,<0.10.0)", "markdown (>=3.3.6,<3.4.0)", "mistletoe (>=0.8.1,<0.9.0)", "mistune (>=2.0.2,<2.1.0)", "panflute (>=2.1.3,<2.2.0)"]
-linkify = ["linkify-it-py (>=1.0,<2.0)"]
+benchmarking = ["psutil", "pytest", "pytest-benchmark"]
+code_style = ["pre-commit (>=3.0,<4.0)"]
+compare = ["commonmark (>=0.9,<1.0)", "markdown (>=3.4,<4.0)", "mistletoe (>=1.0,<2.0)", "mistune (>=2.0,<3.0)", "panflute (>=2.3,<3.0)"]
+linkify = ["linkify-it-py (>=1,<3)"]
 plugins = ["mdit-py-plugins"]
 profiling = ["gprof2dot"]
 rtd = ["attrs", "myst-parser", "pyyaml", "sphinx", "sphinx-copybutton", "sphinx-design", "sphinx_book_theme"]
@@ -2106,20 +2106,20 @@ pyasn1 = ">=0.1.3"
 
 [[package]]
 name = "s3fs"
-version = "2022.11.0"
+version = "2023.1.0"
 description = "Convenient Filesystem interface over S3"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-aiobotocore = ">=2.4.0,<2.5.0"
+aiobotocore = ">=2.4.2,<2.5.0"
 aiohttp = "<4.0.0a0 || >4.0.0a0,<4.0.0a1 || >4.0.0a1"
-fsspec = "2022.11.0"
+fsspec = "2023.1.0"
 
 [package.extras]
-awscli = ["aiobotocore[awscli] (>=2.4.0,<2.5.0)"]
-boto3 = ["aiobotocore[boto3] (>=2.4.0,<2.5.0)"]
+awscli = ["aiobotocore[awscli] (>=2.4.2,<2.5.0)"]
+boto3 = ["aiobotocore[boto3] (>=2.4.2,<2.5.0)"]
 
 [[package]]
 name = "s3transfer"
@@ -2197,7 +2197,7 @@ test = ["asv", "gmpy2", "mpmath", "pytest", "pytest-cov", "pytest-xdist", "sciki
 
 [[package]]
 name = "setuptools"
-version = "67.3.2"
+version = "67.4.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 category = "main"
 optional = false
@@ -2228,7 +2228,7 @@ toml = ["setuptools (>=42)"]
 
 [[package]]
 name = "simulariumio"
-version = "1.7.0"
+version = "1.7.1"
 description = "Python package that converts simulation outputs to the format consumed by the Simularium viewer website"
 category = "main"
 optional = false
@@ -2810,7 +2810,7 @@ jupyter = ["ipytree (>=0.2.2)", "ipywidgets (>=8.0.0)", "notebook"]
 
 [[package]]
 name = "zipp"
-version = "3.13.0"
+version = "3.14.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
 category = "main"
 optional = false
@@ -2823,20 +2823,20 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "557dff302c6bdc7498fc97702165a429b4893ced4d655ac3581f18b700eacb22"
+content-hash = "baa37e7b92991d17d402b998637af6b66ca0fd01f22699b4f4f8d1509e8bf48e"
 
 [metadata.files]
 abm-colony-collection = [
-    {file = "abm_colony_collection-0.2.1-py3-none-any.whl", hash = "sha256:877ea64cb7ce6ff8cd69499fca1e0600eaa1f010bd9f980d563863d1041a350f"},
-    {file = "abm_colony_collection-0.2.1.tar.gz", hash = "sha256:74de92bd8503b8703921cec7508307e5e9eb7eb6bbdd5c531774af72f15c4ad8"},
+    {file = "abm_colony_collection-0.2.2-py3-none-any.whl", hash = "sha256:4caee232c32592d934df973eb79f6defd8abf5cd8c95d47aa95f13edaa769643"},
+    {file = "abm_colony_collection-0.2.2.tar.gz", hash = "sha256:9976d8c19357b58a7fd7a1ce608c9fc62cf08ade56a5b541161070b214a404dc"},
 ]
 abm-initialization-collection = [
-    {file = "abm_initialization_collection-0.2.1-py3-none-any.whl", hash = "sha256:33e5527feb85509af2676713afcb417074d8d26ec2e4405c93026ac838e6d992"},
-    {file = "abm_initialization_collection-0.2.1.tar.gz", hash = "sha256:5c166d977ffd148f9858b6649365f12c7c6242f1af583df061fd6e8b41d74aa4"},
+    {file = "abm_initialization_collection-0.2.2-py3-none-any.whl", hash = "sha256:7b238418784a6ff1682caabba3742fe8615903ee3ce57dd4f42a1dc5e67608b5"},
+    {file = "abm_initialization_collection-0.2.2.tar.gz", hash = "sha256:bd7ec9b004f636e4fa67fb660fc95008bc2a4e3799885a64f0b2acd751a1b2a6"},
 ]
 abm-shape-collection = [
-    {file = "abm_shape_collection-0.2.2-py3-none-any.whl", hash = "sha256:0f9c5fbf66be7865f1444e20c6aae6b7b0a76ef8efd6c4bdaae98a49f974bf18"},
-    {file = "abm_shape_collection-0.2.2.tar.gz", hash = "sha256:7a6089b147d3ebecc83bae684db4aa6903906019a7ee6c38f2201868c41aa147"},
+    {file = "abm_shape_collection-0.2.3-py3-none-any.whl", hash = "sha256:eab77ed7e2e74b0db506b8809904ec3b29ada1622a82563726510a56581729c8"},
+    {file = "abm_shape_collection-0.2.3.tar.gz", hash = "sha256:d905307178b94c1f0ea3ade93c9faaeda4cb414cf8fa1461373f1745028c1930"},
 ]
 aicsimageio = [
     {file = "aicsimageio-4.9.4-py2.py3-none-any.whl", hash = "sha256:eb90db9886eda9ef04e98216fd0e05d8e553dff67868c771b9188004db95ce1d"},
@@ -2956,8 +2956,8 @@ alabaster = [
     {file = "alabaster-0.7.13.tar.gz", hash = "sha256:a27a4a084d5e690e16e01e03ad2b2e552c61a65469419b907243193de1a84ae2"},
 ]
 alembic = [
-    {file = "alembic-1.9.3-py3-none-any.whl", hash = "sha256:ed2f73ea9c986f43af8ad7502c5f60d6bb1400bcd6d29f230e760e08884cb476"},
-    {file = "alembic-1.9.3.tar.gz", hash = "sha256:8fd6aaea56f5a703a190d25a705dfa91d7c313bb71de2f9c68f5abdcaf5df164"},
+    {file = "alembic-1.9.4-py3-none-any.whl", hash = "sha256:6f1c2207369bf4f49f952057a33bb017fbe5c148c2a773b46906b806ea6e825f"},
+    {file = "alembic-1.9.4.tar.gz", hash = "sha256:4d3bd32ecdbb7bbfb48a9fe9e6d6fd6a831a1b59d03e26e292210237373e7db5"},
 ]
 antlr4-python3-runtime = [
     {file = "antlr4-python3-runtime-4.9.3.tar.gz", hash = "sha256:f224469b4168294902bb1efa80a8bf7855f24c99aef99cbefc1bcd3cce77881b"},
@@ -2975,8 +2975,8 @@ apprise = [
     {file = "apprise-1.2.1.tar.gz", hash = "sha256:67e0c227eecee260000980dbbf8ba1e5eebdbe494f4730808297c9e645c03579"},
 ]
 arcade-collection = [
-    {file = "arcade_collection-0.6.0-py3-none-any.whl", hash = "sha256:d7b367c94c477eb09404767fd224481454712d66d9e1ad005bf749f3e487f843"},
-    {file = "arcade_collection-0.6.0.tar.gz", hash = "sha256:3896cc78c607d47f56bb10423d3c00c129286751f4d12b13bdf340dd158161fa"},
+    {file = "arcade_collection-0.6.1-py3-none-any.whl", hash = "sha256:f36409bfaf96a2715758afa7b71f030080fd6d36e9b26903c4ebe220506da040"},
+    {file = "arcade_collection-0.6.1.tar.gz", hash = "sha256:4ec7d3edb110d65913ac7a19e8521b9d2595cbcbb377ad26a59e964643989644"},
 ]
 asciitree = [
     {file = "asciitree-0.3.3.tar.gz", hash = "sha256:4aa4b9b649f85e3fcb343363d97564aa1fb62e249677f2e18a96765145cc0f6e"},
@@ -3275,8 +3275,8 @@ colorama = [
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
 container-collection = [
-    {file = "container_collection-0.4.6-py3-none-any.whl", hash = "sha256:4880d990f9b7d940c014cb5f0ec6be45ccf1324aae9d222bffc5e08eb176c202"},
-    {file = "container_collection-0.4.6.tar.gz", hash = "sha256:e1a092f026edc43356b58a70234a25b462362b500e542bb286374012695064e8"},
+    {file = "container_collection-0.4.8-py3-none-any.whl", hash = "sha256:32be0e7ccd53852dc011fc4f978027a9ffef91e0d2dd3b4808752b6d471e5c5d"},
+    {file = "container_collection-0.4.8.tar.gz", hash = "sha256:32b05733a30d05b32dfe99c9d5f05b4a83335cb1f4657cb666a3ad139435a4c0"},
 ]
 contourpy = [
     {file = "contourpy-1.0.7-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:95c3acddf921944f241b6773b767f1cbce71d03307270e2d769fd584d5d1092d"},
@@ -3566,12 +3566,12 @@ frozenlist = [
     {file = "frozenlist-1.3.3.tar.gz", hash = "sha256:58bcc55721e8a90b88332d6cd441261ebb22342e238296bb330968952fbb3a6a"},
 ]
 fsspec = [
-    {file = "fsspec-2022.11.0-py3-none-any.whl", hash = "sha256:d6e462003e3dcdcb8c7aa84c73a228f8227e72453cd22570e2363e8844edfe7b"},
-    {file = "fsspec-2022.11.0.tar.gz", hash = "sha256:259d5fd5c8e756ff2ea72f42e7613c32667dc2049a4ac3d84364a7ca034acb8b"},
+    {file = "fsspec-2023.1.0-py3-none-any.whl", hash = "sha256:b833e2e541e9e8cde0ab549414187871243177feb3d344f9d27b25a93f5d8139"},
+    {file = "fsspec-2023.1.0.tar.gz", hash = "sha256:fbae7f20ff801eb5f7d0bedf81f25c787c0dfac5e982d98fa3884a9cde2b5411"},
 ]
 google-auth = [
-    {file = "google-auth-2.16.0.tar.gz", hash = "sha256:ed7057a101af1146f0554a769930ac9de506aeca4fd5af6543ebe791851a9fbd"},
-    {file = "google_auth-2.16.0-py2.py3-none-any.whl", hash = "sha256:5045648c821fb72384cdc0e82cc326df195f113a33049d9b62b74589243d2acc"},
+    {file = "google-auth-2.16.1.tar.gz", hash = "sha256:5fd170986bce6bfd7bb5c845c4b8362edb1e0cba901e062196e83f8bb5d5d32c"},
+    {file = "google_auth-2.16.1-py2.py3-none-any.whl", hash = "sha256:75d76ea857df65938e1f71dcbcd7d0cd48e3f80b34b8870ba229c9292081f7ef"},
 ]
 greenlet = [
     {file = "greenlet-2.0.2-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:bdfea8c661e80d3c1c99ad7c3ff74e6e87184895bbaca6ee8cc61209f8b9b85d"},
@@ -3636,8 +3636,8 @@ greenlet = [
     {file = "greenlet-2.0.2.tar.gz", hash = "sha256:e7c8dc13af7db097bed64a051d2dd49e9f0af495c26995c00a9ee842690d34c0"},
 ]
 griffe = [
-    {file = "griffe-0.25.4-py3-none-any.whl", hash = "sha256:919f935a358b31074d16e324e26b041883c60a8cf10504655e394afc3a7caad8"},
-    {file = "griffe-0.25.4.tar.gz", hash = "sha256:f190edf8ef58d43c856d2d6761ec324a043ff60deb8c14359263571e8b91fe68"},
+    {file = "griffe-0.25.5-py3-none-any.whl", hash = "sha256:1fb9edff48e66d4873014a2ebf21aca5f271d0006a4c937826e3cf592ffb3706"},
+    {file = "griffe-0.25.5.tar.gz", hash = "sha256:11ea3403ef0560a1cbcf7f302eb5d21cf4c1d8ed3f8a16a75aa9f6f458caf3f1"},
 ]
 h11 = [
     {file = "h11-0.14.0-py3-none-any.whl", hash = "sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761"},
@@ -3713,16 +3713,16 @@ importlib-metadata = [
     {file = "importlib_metadata-6.0.0.tar.gz", hash = "sha256:e354bedeb60efa6affdcc8ae121b73544a7aa74156d047311948f6d711cd378d"},
 ]
 importlib-resources = [
-    {file = "importlib_resources-5.10.2-py3-none-any.whl", hash = "sha256:7d543798b0beca10b6a01ac7cafda9f822c54db9e8376a6bf57e0cbd74d486b6"},
-    {file = "importlib_resources-5.10.2.tar.gz", hash = "sha256:e4a96c8cc0339647ff9a5e0550d9f276fc5a01ffa276012b58ec108cfd7b8484"},
+    {file = "importlib_resources-5.12.0-py3-none-any.whl", hash = "sha256:7b1deeebbf351c7578e09bf2f63fa2ce8b5ffec296e0d349139d43cca061a81a"},
+    {file = "importlib_resources-5.12.0.tar.gz", hash = "sha256:4be82589bf5c1d7999aedf2a45159d10cb3ca4f19b2271f8792bc8e6da7b22f6"},
 ]
 iniconfig = [
     {file = "iniconfig-2.0.0-py3-none-any.whl", hash = "sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"},
     {file = "iniconfig-2.0.0.tar.gz", hash = "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3"},
 ]
 io-collection = [
-    {file = "io_collection-0.6.1-py3-none-any.whl", hash = "sha256:cbe509ed128ed05ac67fd12709201e689ffb71c94e8db402339dad1f58639507"},
-    {file = "io_collection-0.6.1.tar.gz", hash = "sha256:5175eb85c976989e45edb4af6145ba54a9a505abbdf70dad6befda1439e95ebd"},
+    {file = "io_collection-0.6.2-py3-none-any.whl", hash = "sha256:16de302df114e78597d647397166a38122f651a2c3cac5ac978af5e423576003"},
+    {file = "io_collection-0.6.2.tar.gz", hash = "sha256:329af90766775d1e99551d1dfec9977a8f0a043e2bbf332c2ef01597989d2ff1"},
 ]
 isort = [
     {file = "isort-5.12.0-py3-none-any.whl", hash = "sha256:f84c2818376e66cf843d497486ea8fed8700b340f308f076c6fb1229dff318b6"},
@@ -3827,8 +3827,8 @@ kiwisolver = [
     {file = "kiwisolver-1.4.4.tar.gz", hash = "sha256:d41997519fcba4a1e46eb4a2fe31bc12f0ff957b2b81bac28db24744f333e955"},
 ]
 kubernetes = [
-    {file = "kubernetes-25.3.0-py2.py3-none-any.whl", hash = "sha256:eb42333dad0bb5caf4e66460c6a4a1a36f0f057a040f35018f6c05a699baed86"},
-    {file = "kubernetes-25.3.0.tar.gz", hash = "sha256:213befbb4e5aed95f94950c7eed0c2322fc5a2f8f40932e58d28fdd42d90836c"},
+    {file = "kubernetes-26.1.0-py2.py3-none-any.whl", hash = "sha256:e3db6800abf7e36c38d2629b5cb6b74d10988ee0cba6fba45595a7cbe60c0042"},
+    {file = "kubernetes-26.1.0.tar.gz", hash = "sha256:5854b0c508e8d217ca205591384ab58389abdae608576f9c9afc35a3c76a366c"},
 ]
 lazy-object-proxy = [
     {file = "lazy-object-proxy-1.9.0.tar.gz", hash = "sha256:659fb5809fa4629b8a1ac5106f669cfc7bef26fbb389dda53b3e010d1ac4ebae"},
@@ -3960,8 +3960,8 @@ Markdown = [
     {file = "Markdown-3.4.1.tar.gz", hash = "sha256:3b809086bb6efad416156e00a0da66fe47618a5d6918dd688f53f40c8e4cfeff"},
 ]
 markdown-it-py = [
-    {file = "markdown-it-py-2.1.0.tar.gz", hash = "sha256:cf7e59fed14b5ae17c0006eff14a2d9a00ed5f3a846148153899a0224e2c07da"},
-    {file = "markdown_it_py-2.1.0-py3-none-any.whl", hash = "sha256:93de681e5c021a432c63147656fe21790bc01231e0cd2da73626f1aa3ac0fe27"},
+    {file = "markdown-it-py-2.2.0.tar.gz", hash = "sha256:7c9a5e412688bc771c67432cbfebcdd686c93ce6484913dccf06cb5a0bea35a1"},
+    {file = "markdown_it_py-2.2.0-py3-none-any.whl", hash = "sha256:5a35f8d1870171d9acc47b99612dc146129b631baf04970128b568f190d0cc30"},
 ]
 MarkupSafe = [
     {file = "MarkupSafe-2.1.2-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:665a36ae6f8f20a4676b53224e33d456a6f5a72657d9c83c2aa00765072f31f7"},
@@ -4845,8 +4845,8 @@ rsa = [
     {file = "rsa-4.9.tar.gz", hash = "sha256:e38464a49c6c85d7f1351b0126661487a7e0a14a50f1675ec50eb34d4f20ef21"},
 ]
 s3fs = [
-    {file = "s3fs-2022.11.0-py3-none-any.whl", hash = "sha256:42d57a3ceedb478b18ee53e34bbe3305a3f07f6381ca1ab76135efe076c6a07d"},
-    {file = "s3fs-2022.11.0.tar.gz", hash = "sha256:10c5ac283a4f5b67ffad6d1f25ff7ee026142750c5c5dc868746cd904f617c33"},
+    {file = "s3fs-2023.1.0-py3-none-any.whl", hash = "sha256:a549ae518fff4388bd6fca5248575c29f521e7e39efcd2bfab476651701fd114"},
+    {file = "s3fs-2023.1.0.tar.gz", hash = "sha256:8b2e28372423e93f26312208a9272e22a962ddd0a79d63f9a68693b6af5ff187"},
 ]
 s3transfer = [
     {file = "s3transfer-0.6.0-py3-none-any.whl", hash = "sha256:06176b74f3a15f61f1b4f25a1fc29a4429040b7647133a463da8fa5bd28d5ecd"},
@@ -4927,16 +4927,16 @@ scipy = [
     {file = "scipy-1.9.3.tar.gz", hash = "sha256:fbc5c05c85c1a02be77b1ff591087c83bc44579c6d2bd9fb798bb64ea5e1a027"},
 ]
 setuptools = [
-    {file = "setuptools-67.3.2-py3-none-any.whl", hash = "sha256:bb6d8e508de562768f2027902929f8523932fcd1fb784e6d573d2cafac995a48"},
-    {file = "setuptools-67.3.2.tar.gz", hash = "sha256:95f00380ef2ffa41d9bba85d95b27689d923c93dfbafed4aecd7cf988a25e012"},
+    {file = "setuptools-67.4.0-py3-none-any.whl", hash = "sha256:f106dee1b506dee5102cc3f3e9e68137bbad6d47b616be7991714b0c62204251"},
+    {file = "setuptools-67.4.0.tar.gz", hash = "sha256:e5fd0a713141a4a105412233c63dc4e17ba0090c8e8334594ac790ec97792330"},
 ]
 setuptools-scm = [
     {file = "setuptools_scm-7.1.0-py3-none-any.whl", hash = "sha256:73988b6d848709e2af142aa48c986ea29592bbcfca5375678064708205253d8e"},
     {file = "setuptools_scm-7.1.0.tar.gz", hash = "sha256:6c508345a771aad7d56ebff0e70628bf2b0ec7573762be9960214730de278f27"},
 ]
 simulariumio = [
-    {file = "simulariumio-1.7.0-py3-none-any.whl", hash = "sha256:fda7df6fcf9368be4bbdf607fbecd73ee4d48eb8074784e3a7051bfaacacb965"},
-    {file = "simulariumio-1.7.0.tar.gz", hash = "sha256:2addf919174ba967479c4fd1f7d94290cd9a08905b0461ff8acfcc301d71fcf4"},
+    {file = "simulariumio-1.7.1-py3-none-any.whl", hash = "sha256:be156694194a9a287af08c11ebed80ccfb19d00f1e617f826c7a559ce90e6e64"},
+    {file = "simulariumio-1.7.1.tar.gz", hash = "sha256:273f906161614b68d7c98a15130522027b1d993cf5bebec94f190d3fef967c55"},
 ]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
@@ -5366,6 +5366,6 @@ zarr = [
     {file = "zarr-2.14.1.tar.gz", hash = "sha256:1d2b6cd4460f1741deca17df1e9f071b917380cb2a27b6e2e949f067a2054a64"},
 ]
 zipp = [
-    {file = "zipp-3.13.0-py3-none-any.whl", hash = "sha256:e8b2a36ea17df80ffe9e2c4fda3f693c3dad6df1697d3cd3af232db680950b0b"},
-    {file = "zipp-3.13.0.tar.gz", hash = "sha256:23f70e964bc11a34cef175bc90ba2914e1e4545ea1e3e2f67c079671883f9cb6"},
+    {file = "zipp-3.14.0-py3-none-any.whl", hash = "sha256:188834565033387710d046e3fe96acfc9b5e86cbca7f39ff69cf21a4128198b7"},
+    {file = "zipp-3.14.0.tar.gz", hash = "sha256:9e5421e176ef5ab4c0ad896624e87a7b2f07aca746c9b2aa305952800cb8eecb"},
 ]
