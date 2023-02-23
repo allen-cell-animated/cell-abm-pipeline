@@ -14,6 +14,7 @@ from cell_abm_pipeline.tasks.basic import (
     plot_height_distribution,
     plot_height_individual,
     plot_height_locations,
+    plot_height_merge,
     plot_phase_durations,
     plot_phase_fractions,
     plot_phase_locations,
@@ -22,6 +23,7 @@ from cell_abm_pipeline.tasks.basic import (
     plot_volume_distribution,
     plot_volume_individual,
     plot_volume_locations,
+    plot_volume_merge,
 )
 
 PLOTS_TEMPORAL = [
@@ -29,11 +31,13 @@ PLOTS_TEMPORAL = [
     "height_average",
     "height_distribution",
     "height_individual",
+    "height_merge",
     "phase_durations",
     "phase_fractions",
     "volume_average",
     "volume_distribution",
     "volume_individual",
+    "volume_merge",
 ]
 
 PLOTS_SPATIAL = [
@@ -162,13 +166,6 @@ def run_flow_plot_temporal(
             plot_height_average(keys, all_results, reference_data, parameters.region),
         )
 
-    if "height_individual" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_height_individual{region_key}.BASIC.png"),
-            plot_height_individual(keys, all_results, parameters.region),
-        )
-
     if "height_distribution" in parameters.plots:
         save_figure(
             context.working_location,
@@ -181,6 +178,20 @@ def run_flow_plot_temporal(
                 parameters.region,
                 parameters.thresholds,
             ),
+        )
+
+    if "height_individual" in parameters.plots:
+        save_figure(
+            context.working_location,
+            make_key(plot_key, f"{series.name}_height_individual{region_key}.BASIC.png"),
+            plot_height_individual(keys, all_results, parameters.region),
+        )
+
+    if "height_merge" in parameters.plots and reference_data is not None:
+        save_figure(
+            context.working_location,
+            make_key(plot_key, f"{series.name}_height_merge.BASIC.png"),
+            plot_height_merge(keys, all_results, reference_data, parameters.region),
         )
 
     if "phase_durations" in parameters.plots and parameters.region is None:
@@ -229,6 +240,13 @@ def run_flow_plot_temporal(
             context.working_location,
             make_key(plot_key, f"{series.name}_volume_individual{region_key}.BASIC.png"),
             plot_volume_individual(keys, all_results, parameters.region),
+        )
+
+    if "volume_merge" in parameters.plots and reference_data is not None:
+        save_figure(
+            context.working_location,
+            make_key(plot_key, f"{series.name}_volume_merge.BASIC.png"),
+            plot_volume_merge(keys, all_results, reference_data, parameters.region),
         )
 
 

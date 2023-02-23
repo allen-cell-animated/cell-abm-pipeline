@@ -3,6 +3,7 @@ from .plot_height_average import plot_height_average
 from .plot_height_distribution import plot_height_distribution
 from .plot_height_individual import plot_height_individual
 from .plot_height_locations import plot_height_locations
+from .plot_height_merge import plot_height_merge
 from .plot_phase_durations import plot_phase_durations
 from .plot_phase_fractions import plot_phase_fractions
 from .plot_phase_locations import plot_phase_locations
@@ -11,3 +12,4 @@ from .plot_volume_average import plot_volume_average
 from .plot_volume_distribution import plot_volume_distribution
 from .plot_volume_individual import plot_volume_individual
 from .plot_volume_locations import plot_volume_locations
+from .plot_volume_merge import plot_volume_merge
