@@ -10,11 +10,16 @@ from prefect import flow
 
 from cell_abm_pipeline.flows.calculate_coefficients import COEFFICIENT_ORDER
 from cell_abm_pipeline.flows.run_shape_analysis import PCA_COMPONENTS
-from cell_abm_pipeline.tasks.pca import plot_transform_compare, plot_variance_explained
+from cell_abm_pipeline.tasks.pca import (
+    plot_transform_compare,
+    plot_transform_merge,
+    plot_variance_explained,
+)
 from cell_abm_pipeline.tasks.stats import plot_ks_all_ticks, plot_ks_by_feature, plot_ks_by_key
 
 PLOTS_PCA = [
     "transform_compare",
+    "transform_merge",
     "variance_explained",
 ]
 
@@ -136,6 +141,13 @@ def run_flow_plot_pca(
                     keys, component, ref_model, all_data, ref_data, parameters.thresholds
                 ),
             )
+
+    if "transform_merge" in parameters.plots and ref_model is not None:
+        save_figure(
+            context.working_location,
+            make_key(plot_key, f"{series.name}_transform_merge_{region_key}.PCA.png"),
+            plot_transform_merge(keys, ref_model, all_data, ref_data),
+        )
 
 
 @flow(name="plot-shape-analysis_plot-stats")
