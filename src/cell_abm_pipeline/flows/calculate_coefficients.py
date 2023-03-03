@@ -27,6 +27,10 @@ class ParametersConfig:
     order: int = COEFFICIENT_ORDER
     """Order of the spherical harmonics coefficient parametrization."""
 
+    offset: int = 0
+
+    chunk: Optional[int] = None
+
 
 @dataclass
 class ContextConfig:
@@ -50,7 +54,16 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     all_coeffs = []
 
-    for location in locations_json:
+    count = 0
+
+    for i, location in enumerate(locations_json):
+        if i < parameters.offset:
+            continue
+
+        count = count + 1
+        if parameters.chunk is not None and count > parameters.chunk:
+            break
+
         voxels = get_location_voxels(location)
 
         if len(voxels) == 0:
@@ -77,11 +90,19 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         all_coeffs.append(coeffs)
 
     coeffs_dataframe = pd.DataFrame(all_coeffs)
+
+    chunk_key = ""
+    offset_key = f".{parameters.offset:04d}" if parameters.offset > 0 else ""
+
+    if parameters.chunk is not None:
+        chunk_key = f".{parameters.chunk:04d}"
+        offset_key = f".{parameters.offset:04d}"
+
     region_key = f"_{parameters.region}" if parameters.region is not None else ""
     coeffs_key = make_key(
         series.name,
         "analysis",
         "analysis.COEFFS",
-        f"{series_key}_{parameters.frame:06d}{region_key}.COEFFS.csv",
+        f"{series_key}_{parameters.frame:06d}{region_key}{offset_key}{chunk_key}.COEFFS.csv",
     )
     save_dataframe(context.working_location, coeffs_key, coeffs_dataframe, index=False)
