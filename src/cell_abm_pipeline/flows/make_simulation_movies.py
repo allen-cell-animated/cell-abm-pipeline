@@ -137,8 +137,8 @@ def run_flow_make_graph(
         frame_key = make_key(movie_key, f"{series.name}_{frame:06d}.GRAPH.png")
         frame_keys.append(frame_key)
 
-        # if check_key(context.working_location, frame_key):
-        #     continue
+        if check_key(context.working_location, frame_key):
+            continue
 
         save_figure(
             context.working_location,
