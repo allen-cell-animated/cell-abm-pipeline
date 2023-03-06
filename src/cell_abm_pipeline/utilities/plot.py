@@ -28,13 +28,13 @@ def make_grid_figure(keys: list[Any]) -> mpl.figure.Figure:
 
 def separate_rows_cols(keys: list[Any]) -> tuple[int, int, list[tuple[int, int, Any]]]:
     if isinstance(keys[0], tuple):
-        rows = list(dict.fromkeys([a for a, b in keys]))
-        cols = list(dict.fromkeys([b for a, b in keys]))
+        cols = list(dict.fromkeys([a for a, b in keys]))
+        rows = list(dict.fromkeys([b for a, b in keys]))
         n_cols = len(cols)
         n_rows = len(rows)
 
         all_tuple_indices = [
-            (i, j, (row, col)) for i, row in enumerate(rows) for j, col in enumerate(cols)
+            (i, j, (col, row)) for i, row in enumerate(rows) for j, col in enumerate(cols)
         ]
         indices = [(i, j, key) for i, j, key in all_tuple_indices if key in keys]
     else:
