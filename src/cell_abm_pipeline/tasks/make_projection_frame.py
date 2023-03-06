@@ -23,7 +23,7 @@ def make_projection_frame(
     ds: float,
     dt: float,
     box: tuple[int, int, int],
-    region: Optional[str] = None,
+    regions: list[str],
 ) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
     length, width, height = box
@@ -40,9 +40,25 @@ def make_projection_frame(
         tick_json = extract_tick_json.fn(
             locations[(key, seed)], f"{name}_{key}_{seed:04d}", tick, "LOCATIONS"
         )
-        array = create_projection_array(tick_json, length, width, height, region)
 
-        ax.imshow(array, cmap="bone", interpolation="none", vmin=0, vmax=1)
+        if len(regions) == 1:
+            region = None if regions[0] == "DEFAULT" else regions[0]
+            array = create_projection_array(tick_json, length, width, height, region)
+            ax.imshow(array, cmap="bone", interpolation="none", vmin=0, vmax=1)
+        elif len(regions) == 2:
+            array = np.zeros((width, length, 3))
+
+            region_a = None if regions[0] == "DEFAULT" else regions[0]
+            array_a = create_projection_array(tick_json, length, width, height, region_a)
+            array[:, :, 0] = array_a
+            array[:, :, 2] = array_a
+
+            region_b = None if regions[1] == "DEFAULT" else regions[1]
+            array_b = create_projection_array(tick_json, length, width, height, region_b)
+            array[:, :, 1] = array_b
+            array[:, :, 2] = np.maximum(array[:, :, 2], array_b)
+
+            ax.imshow(array, interpolation="none")
 
         add_frame_timestamp(ax, length, width, dt, tick, "#ffffff")
         add_frame_scalebar(ax, length, width, ds, scale, "#ffffff")

@@ -21,7 +21,7 @@ MOVIES = [
 class ParametersConfig:
     movies: list[str] = field(default_factory=lambda: MOVIES)
 
-    region: Optional[str] = None
+    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
 
     ds: float = 1.0
 
@@ -55,7 +55,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     if "projection" in parameters.movies:
         run_flow_make_projection(context, series, parameters)
 
-    if "graph" in parameters.movies and parameters.region is None:
+    if "graph" in parameters.movies and "DEFAULT" in parameters.regions:
         run_flow_make_graph(context, series, parameters)
 
 
@@ -65,7 +65,7 @@ def run_flow_make_projection(
 ) -> None:
     data_key = make_key(series.name, "data", "data.LOCATIONS")
     movie_key = make_key(series.name, "movies", "movies.PROJECTION")
-    region_key = f"_{parameters.region}" if parameters.region is not None else ""
+    region_key = ":".join(sorted(parameters.regions))
     keys = [(condition["key"], seed) for condition in series.conditions for seed in series.seeds]
 
     all_locations = {}
@@ -79,7 +79,7 @@ def run_flow_make_projection(
     frames = list(np.arange(*parameters.frame_spec))
 
     for frame in frames:
-        frame_key = make_key(movie_key, f"{series.name}{region_key}_{frame:06d}.PROJECTION.png")
+        frame_key = make_key(movie_key, f"{series.name}_{region_key}_{frame:06d}.PROJECTION.png")
         frame_keys.append(frame_key)
 
         if check_key(context.working_location, frame_key):
@@ -97,11 +97,11 @@ def run_flow_make_projection(
                 parameters.ds,
                 parameters.dt,
                 parameters.box,
-                parameters.region,
+                parameters.regions,
             ),
         )
 
-    movie_key = make_key(movie_key, f"{series.name}{region_key}.PROJECTION.gif")
+    movie_key = make_key(movie_key, f"{series.name}_{region_key}.PROJECTION.gif")
     save_gif(context.working_location, movie_key, frame_keys)
 
 
