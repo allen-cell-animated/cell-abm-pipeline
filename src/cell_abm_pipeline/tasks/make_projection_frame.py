@@ -98,6 +98,10 @@ def create_projection_array(
 
     for location in locations:
         voxels = get_location_voxels.fn(location, region)
+
+        if len(voxels) == 0:
+            continue
+
         array[tuple(np.transpose(voxels))] = location["id"]
 
     if rotate is not None:
