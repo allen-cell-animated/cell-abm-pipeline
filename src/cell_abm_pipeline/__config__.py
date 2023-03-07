@@ -37,10 +37,9 @@ def make_config_from_dotlist(module, args):
 
     config = OmegaConf.create(
         {
-            "series": series_config,
             "context": context_config,
+            "series": series_config,
             "parameters": parameters_config,
-            "deploy": bool("deploy=True" in args),
         }
     )
 
@@ -54,7 +53,6 @@ def make_config_from_yaml(module, args):
         "Config",
         [
             ("defaults", list[Any], field(default_factory=lambda: defaults)),
-            ("deploy", bool, field(default=False)),
             ("context", module.ContextConfig, MISSING),
             ("series", module.SeriesConfig, MISSING),
             ("parameters", module.ParametersConfig, MISSING),

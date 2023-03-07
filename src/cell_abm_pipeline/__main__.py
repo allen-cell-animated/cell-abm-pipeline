@@ -24,6 +24,12 @@ def main():
     else:
         dryrun = False
 
+    if "--deploy" in sys.argv:
+        sys.argv.remove("--deploy")
+        deploy = True
+    else:
+        deploy = False
+
     OmegaConf.register_new_resolver("secret", lambda secret: Secret.load(secret).get())
     OmegaConf.register_new_resolver("concat", lambda items: ":".join(sorted(items)))
     OmegaConf.register_new_resolver(
@@ -46,7 +52,7 @@ def main():
     if dryrun:
         return
 
-    run_flow(module, config)
+    run_flow(module, config, deploy)
 
 
 def get_module(module_name):
@@ -76,12 +82,12 @@ def create_flow_template(module_name):
         file.write(template)
 
 
-def run_flow(module, config):
+def run_flow(module, config, deploy):
     context = OmegaConf.to_object(config.context)
     series = OmegaConf.to_object(config.series)
     parameters = OmegaConf.to_object(config.parameters)
 
-    if config["deploy"]:
+    if deploy:
         infra_overrides = {}
 
         if hasattr(context, "region"):
