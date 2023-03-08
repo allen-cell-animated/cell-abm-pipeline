@@ -5,32 +5,32 @@ import os
 import argparse
 from typing import Dict, List
 import shutil
+from itertools import product
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import pandas as pd
 import numpy as np
-from itertools import product
 
 PARAMETER_DEFAULTS = {
     "output_name" : "default",
     "init_conditions_file_name" : "hex_id_data_3c5a0327_3500002920_100X_20190419_c-Scene-06-P18-F09_CellNucSegCombined.csv",
-    "subcell_radius" : 2.5,  # 20.58327
+    "subcell_radius" : 2.5,
     "dt" : 6,
-    "subcell_adhesion" : 0.4,
-    "subcell_repulsion" : 1.0,
+    "subcell_adhesion" : 0.01,
+    "subcell_repulsion" : 0.01,
     "subcell_adhesion_distance" : 4.0,
-    "substrate_adhesion" : 1.0,
-    "substrate_repulsion" : 1.0,
+    "substrate_adhesion" : 0.01,
+    "substrate_repulsion" : 0.01,
     "substrate_adhesion_distance" : 4.0,
     "relative_heterotypic_adhesion" : 0.2,
     "subcell_transition_multiplier" : 20.0,
-    "subcell_death_rate" : 0.0001,
-    "subcell_volume_growth_rate" : 0.02,
+    "subcell_death_rate" : 0.00001,
+    "subcell_volume_growth_rate" : 0.1,
     "owner_basal_apoptosis_rate" : 0.0001,
-    "owner_death_volume" : 1000000.0,
+    "owner_death_volume" : 300.0,
     "timesteps_per_owner_motility_switch" : 16.7,
     "owner_motility_bias" : 1.0,
-    "normalized_subcell_speed" : 0.02,
+    "normalized_subcell_speed" : 0.01,
 }
 
 
@@ -40,30 +40,30 @@ PARAMETER_SCANS = {
         "subcell_radius",  # to match csv
         "dt",
     ],
-    "Subcell_Adhesion" : [
-        "subcell_adhesion",
-        "subcell_repulsion",
-        "subcell_adhesion_distance",
-    ],
-    "Substrate_Adhesion" : [
-        "substrate_adhesion",
-        "substrate_repulsion",
-        "substrate_adhesion_distance",
-    ],
-    "Subcell_Dynamics" : [
-        "subcell_transition_multiplier",
-        "subcell_death_rate",
-        "subcell_volume_growth_rate",
-    ],
-    "Apoptosis" : [
-        "owner_basal_apoptosis_rate",
-        "owner_death_volume",
-    ],
-    "Motility" : [
-        "timesteps_per_owner_motility_switch",
-        "owner_motility_bias",
-        "normalized_subcell_speed",
-    ],
+    # "Subcell_Adhesion" : [
+    #     "subcell_adhesion",
+    #     "subcell_repulsion",
+    #     "subcell_adhesion_distance",
+    # ],
+    # "Substrate_Adhesion" : [
+    #     "substrate_adhesion",
+    #     "substrate_repulsion",
+    #     "substrate_adhesion_distance",
+    # ],
+    # "Subcell_Dynamics" : [
+    #     "subcell_transition_multiplier",
+    #     "subcell_death_rate",
+    #     "subcell_volume_growth_rate",
+    # ],
+    # "Apoptosis" : [
+    #     "owner_basal_apoptosis_rate",
+    #     "owner_death_volume",
+    # ],
+    # "Motility" : [
+    #     "timesteps_per_owner_motility_switch",
+    #     "owner_motility_bias",
+    #     "normalized_subcell_speed",
+    # ],
 }
 
 
@@ -100,9 +100,9 @@ class TemplateRenderer:
             )
         return self._jinja_environment
     
-    def _read_parameters_csv(self) -> List[Dict[str, str or float]]:
+    def _read_parameters_xlsx(self) -> List[Dict[str, str or float]]:
         """
-        Read values to use for parameters from CSV
+        Read values to use for parameters from XLSX file
         """
         START_COLUMN = 2
         N_PARAMS = 17
@@ -153,8 +153,8 @@ class TemplateRenderer:
         param_set["dt_diffusion"] = 0.01 * param_set["dt"]
         param_set["dt_mechanics"] = 0.1 * param_set["dt"]
         param_set["dt_phenotype"] = param_set["dt"]
+        param_set["subcell_volume"] = 4 / 3 * np.pi * param_set["subcell_radius"] ** 3
         param_set["subcell_volume_growth_rate_cytoplasmic"] = 0.1 * param_set["subcell_volume_growth_rate"]
-        param_set["subcell_volume_growth_rate_nuclear"] = 0.1 * param_set["subcell_volume_growth_rate"]
         param_set["owner_motility_switch_time"] = param_set["timesteps_per_owner_motility_switch"] * param_set["dt"]
         param_set["subcell_speed"] = param_set["normalized_subcell_speed"] * param_set["subcell_radius"]
         # remove extra parameters
@@ -180,9 +180,9 @@ class TemplateRenderer:
     def render(self):
         """
         Render XML configs for each combination 
-        of the parameter values from the CSV.
+        of the parameter values from the XLSX sheet.
         """
-        param_sets = self._read_parameters_csv()
+        param_sets = self._read_parameters_xlsx()
         param_set_names = []
         for param_set in param_sets:
             param_set_names.append(param_set["output_name"])
@@ -202,7 +202,7 @@ if __name__ == "__main__":
         "template_name", help="the name of the template file to use"
     )
     parser.add_argument(
-        "params_path", help="the file path to the CSV file containing parameter values to use"
+        "params_path", help="the file path to the XLSX file containing parameter values to use"
     )
     parser.add_argument(
         "init_cond_directory", help="the file path to the directory containing CSV files of initial conditions"
