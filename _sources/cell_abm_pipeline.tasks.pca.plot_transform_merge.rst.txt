@@ -1,0 +1,7 @@
+cell\_abm\_pipeline.tasks.pca.plot\_transform\_merge module
+===========================================================
+
+.. automodule:: cell_abm_pipeline.tasks.pca.plot_transform_merge
+   :members:
+   :undoc-members:
+   :show-inheritance:

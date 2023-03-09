@@ -13,6 +13,7 @@ Submodules
    :maxdepth: 4
 
    cell_abm_pipeline.flows.analyze_cell_shapes
+   cell_abm_pipeline.flows.analyze_cell_shapes_chunk
    cell_abm_pipeline.flows.analyze_colony_dynamics
    cell_abm_pipeline.flows.calculate_coefficients
    cell_abm_pipeline.flows.calculate_neighbors

@@ -1,0 +1,7 @@
+cell\_abm\_pipeline.tasks.basic.plot\_height\_merge module
+==========================================================
+
+.. automodule:: cell_abm_pipeline.tasks.basic.plot_height_merge
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -17,6 +17,7 @@ Submodules
    cell_abm_pipeline.tasks.basic.plot_height_distribution
    cell_abm_pipeline.tasks.basic.plot_height_individual
    cell_abm_pipeline.tasks.basic.plot_height_locations
+   cell_abm_pipeline.tasks.basic.plot_height_merge
    cell_abm_pipeline.tasks.basic.plot_phase_durations
    cell_abm_pipeline.tasks.basic.plot_phase_fractions
    cell_abm_pipeline.tasks.basic.plot_phase_locations
@@ -25,3 +26,4 @@ Submodules
    cell_abm_pipeline.tasks.basic.plot_volume_distribution
    cell_abm_pipeline.tasks.basic.plot_volume_individual
    cell_abm_pipeline.tasks.basic.plot_volume_locations
+   cell_abm_pipeline.tasks.basic.plot_volume_merge
