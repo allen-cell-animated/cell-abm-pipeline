@@ -92,7 +92,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     )
 
     for channel in parameters.channels:
-        channel_key = f"{series.name}_{parameters.key}_channel_{channel}"
+        channel_key = f"{series.name}_{parameters.key}_C{channel:02}"
         samples = get_image_samples(image, sample_indices, channel)
         samples = scale_sample_coordinates(
             samples,

@@ -80,7 +80,7 @@ class SeriesConfig:
 
 @flow(name="process-sample")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    channel_key = f"{series.name}_{parameters.key}_channel_{parameters.channel}"
+    channel_key = f"{series.name}_{parameters.key}_C{parameters.channel:02}"
     sample_key = make_key(series.name, "samples", "samples.RAW", f"{channel_key}.RAW.csv")
 
     raw_samples = load_dataframe(context.working_location, sample_key)
