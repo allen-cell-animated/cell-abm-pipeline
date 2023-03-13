@@ -144,8 +144,8 @@ def run_flow_sample_images(
     series_config = SampleImageSeriesConfig(name=series.name)
 
     for fov in series.conditions:
-        for _, config in parameters.sample_image.items():
-            parameters_config = copy.deepcopy(config)
+        for _, sample_image in parameters.sample_image.items():
+            parameters_config = copy.deepcopy(sample_image)
             parameters_config.key = parameters_config.key % fov["key"]
 
             config = {
@@ -178,8 +178,8 @@ def run_flow_process_samples(
     for fov in series.conditions:
         fov_key = fov["key"]
 
-        for region, config in parameters.process_sample.items():
-            parameters_config = copy.deepcopy(config)
+        for region, process_sample in parameters.process_sample.items():
+            parameters_config = copy.deepcopy(process_sample)
             parameters_config.key = parameters_config.key % fov_key
 
             if "include_ids" in fov:
