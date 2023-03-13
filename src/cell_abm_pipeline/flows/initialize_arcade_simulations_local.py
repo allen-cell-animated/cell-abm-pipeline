@@ -16,7 +16,7 @@ from io_collection.load import load_dataframe
 from io_collection.save import save_json, save_text
 from prefect import flow, get_run_logger
 
-from cell_abm_pipeline.flows.initialize_voronoi_simulations import (
+from cell_abm_pipeline.flows.initialize_segmentation_simulations import (
     CRITICAL_HEIGHTS,
     CRITICAL_VOLUMES,
     HEIGHTS,
