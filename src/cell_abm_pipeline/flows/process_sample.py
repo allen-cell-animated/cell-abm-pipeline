@@ -8,12 +8,12 @@ Working location structure:
     (name)
     ├── plots
     │    └── plots.SAMPLE
-    │        └── (name)_(key)_channel_(channel).SAMPLE.png
+    │        └── (name)_(key)_C(channel).SAMPLE.png
     └── samples
         ├── samples.PROCESSED
-        │    └── (name)_(key)_channel_(channel).PROCESSED.csv
+        │    └── (name)_(key)_C(channel).PROCESSED.csv
         └── samples.RAW
-            └── (name)_(key)_channel_(channel).RAW.csv
+            └── (name)_(key)_C(channel).RAW.csv
 
 Samples to be processed are loaded from the **samples/samples.RAW**
 directory.

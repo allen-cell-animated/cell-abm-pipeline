@@ -30,6 +30,26 @@ class ParametersConfig:
     name: str
 
 
+def make_dotlist_from_config(config):
+    container = OmegaConf.to_container(OmegaConf.structured(config))
+    queue = list(container.items())
+    dotlist = []
+
+    while queue:
+        key, value = queue.pop()
+
+        if isinstance(value, dict):
+            queue = queue + [(f"{key}.{subkey}", subvalue) for subkey, subvalue in value.items()]
+        elif isinstance(value, list):
+            dotlist.append(f"{key}=[{','.join([str(v) for v in value])}]")
+        elif value is None:
+            dotlist.append(f"{key}=null")
+        else:
+            dotlist.append(f"{key}={value}")
+
+    return dotlist
+
+
 def make_config_from_dotlist(module, args):
     context_config = generate_config(module.ContextConfig, "context", args)
     series_config = generate_config(module.SeriesConfig, "series", args)

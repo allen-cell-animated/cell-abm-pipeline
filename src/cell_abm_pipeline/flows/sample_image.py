@@ -10,10 +10,10 @@ Working location structure:
     │    └── (name)_(key).ome.tiff
     ├── plots
     │    └── plots.SAMPLE
-    │        └── (name)_(key)_channel_(channel).SAMPLE.png
+    │        └── (name)_(key)_C(channel).SAMPLE.png
     └── samples
         └── samples.RAW
-            └── (name)_(key)_channel_(channel).RAW.csv
+            └── (name)_(key)_C(channel).RAW.csv
 
 The **images** directory contains the input image to be sampled.
 Resulting sample(s) are placed into the **samples/samples.RAW** directory and
