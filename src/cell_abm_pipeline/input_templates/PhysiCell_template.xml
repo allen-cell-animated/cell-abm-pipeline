@@ -187,7 +187,7 @@
 					<relative_maximum_adhesion_distance units="dimensionless">{{subcell_adhesion_distance}}</relative_maximum_adhesion_distance>
 					
 					<options>
-						<set_relative_equilibrium_distance enabled="true" units="dimensionless">1.75</set_relative_equilibrium_distance>
+						<set_relative_equilibrium_distance enabled="true" units="dimensionless">2.</set_relative_equilibrium_distance>
 						<set_absolute_equilibrium_distance enabled="false" units="micron">10</set_absolute_equilibrium_distance>
 					</options>
 				</mechanics>
@@ -220,7 +220,7 @@
 				</cycle>
 
 				<volume>  
-					<total units="micron^3">700.0</total>
+					<total units="micron^3">3300.0</total>
 					<fluid_fraction units="dimensionless">0.</fluid_fraction>
 					<nuclear units="micron^3">0.</nuclear>
 					

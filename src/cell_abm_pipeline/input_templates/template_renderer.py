@@ -16,17 +16,17 @@ PARAMETER_DEFAULTS = {
     "init_conditions_file_name" : "hex_id_data_3c5a0327_3500002920_100X_20190419_c-Scene-06-P18-F09_CellNucSegCombined.csv",
     "subcell_radius" : 2.5,
     "dt" : 6,
-    "subcell_adhesion" : 0.01,
-    "subcell_repulsion" : 0.01,
+    "subcell_adhesion" : 0.05,
+    "subcell_repulsion" : 0.1,
     "subcell_adhesion_distance" : 4.0,
-    "substrate_adhesion" : 0.01,
-    "substrate_repulsion" : 0.01,
+    "substrate_adhesion" : 0.15,
+    "substrate_repulsion" : 0.1,
     "substrate_adhesion_distance" : 4.0,
-    "relative_heterotypic_adhesion" : 0.2,
-    "subcell_transition_multiplier" : 20.0,
+    "relative_heterotypic_adhesion" : 0.05,
+    "subcell_transition_multiplier" : 10.0,
     "subcell_death_rate" : 0.00001,
-    "subcell_volume_growth_rate" : 0.1,
-    "owner_basal_apoptosis_rate" : 0.0001,
+    "subcell_volume_growth_rate" : 0.015,
+    "owner_basal_apoptosis_rate" : 0.00001,
     "owner_death_volume" : 300.0,
     "timesteps_per_owner_motility_switch" : 16.7,
     "owner_motility_bias" : 1.0,
@@ -153,7 +153,7 @@ class TemplateRenderer:
         param_set["dt_diffusion"] = 0.01 * param_set["dt"]
         param_set["dt_mechanics"] = 0.1 * param_set["dt"]
         param_set["dt_phenotype"] = param_set["dt"]
-        param_set["subcell_volume"] = 4 / 3 * np.pi * param_set["subcell_radius"] ** 3
+        param_set["subcell_volume"] = 1.5 * 4 / 3 * np.pi * param_set["subcell_radius"] ** 3
         param_set["subcell_volume_growth_rate_cytoplasmic"] = 0.1 * param_set["subcell_volume_growth_rate"]
         param_set["owner_motility_switch_time"] = param_set["timesteps_per_owner_motility_switch"] * param_set["dt"]
         param_set["subcell_speed"] = param_set["normalized_subcell_speed"] * param_set["subcell_radius"]
