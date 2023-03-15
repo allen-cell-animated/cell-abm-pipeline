@@ -22,9 +22,7 @@ Submodules
    cell_abm_pipeline.flows.download_images
    cell_abm_pipeline.flows.generate_coordinates
    cell_abm_pipeline.flows.generate_voronoi_tessellation
-   cell_abm_pipeline.flows.initialize_arcade_simulations_aws
-   cell_abm_pipeline.flows.initialize_arcade_simulations_local
-   cell_abm_pipeline.flows.initialize_voronoi_simulations
+   cell_abm_pipeline.flows.initialize_arcade_simulations
    cell_abm_pipeline.flows.make_simulation_movies
    cell_abm_pipeline.flows.plot_basic_metrics
    cell_abm_pipeline.flows.plot_colony_analysis
