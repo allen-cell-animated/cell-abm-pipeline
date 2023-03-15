@@ -5,7 +5,7 @@ from io_collection.load import load_dataframe
 from io_collection.save import save_figure
 from prefect import flow
 
-from cell_abm_pipeline.flows.run_resource_analysis import STORAGE_GROUPS
+from cell_abm_pipeline.flows.analyze_resource_usage import STORAGE_GROUPS
 from cell_abm_pipeline.tasks.resources import plot_object_storage, plot_wall_clock
 
 PLOTS = [
@@ -33,7 +33,7 @@ class SeriesConfig:
     conditions: list[dict]
 
 
-@flow(name="plot-resource-analysis")
+@flow(name="plot-resource-usage")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     analysis_key = make_key(series.name, "analysis", "analysis.RESOURCES")
     plot_key = make_key(series.name, "plots", "plots.RESOURCES")

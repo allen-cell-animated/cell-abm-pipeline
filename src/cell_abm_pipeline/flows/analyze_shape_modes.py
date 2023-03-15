@@ -48,7 +48,7 @@ class SeriesConfig:
     conditions: list[dict]
 
 
-@flow(name="run-shape-analysis")
+@flow(name="analyze-shape-modes")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     # Process spherical harmonics coefficients and parsed simulation results and
     # compile into a single dataframe that can used for PCA. If the combined
@@ -64,7 +64,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     run_flow_analyze_stats(context, series, parameters)
 
 
-@flow(name="run-shape-analysis_load-data")
+@flow(name="analyze-shape-modes_load-data")
 def run_flow_process_data(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
@@ -128,7 +128,7 @@ def run_flow_process_data(
         save_dataframe(context.working_location, data_key, data, index=False)
 
 
-@flow(name="run-shape-analysis_fit-model")
+@flow(name="analyze-shape-modes_fit-model")
 def run_flow_fit_model(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
@@ -153,7 +153,7 @@ def run_flow_fit_model(
         save_pickle(context.working_location, model_key, model)
 
 
-@flow(name="run-shape-analysis_analyze-stats")
+@flow(name="analyze-shape-modes_analyze-stats")
 def run_flow_analyze_stats(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:

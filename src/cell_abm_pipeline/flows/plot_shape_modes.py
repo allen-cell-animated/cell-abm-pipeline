@@ -9,7 +9,7 @@ from io_collection.save import save_figure, save_text
 from prefect import flow
 
 from cell_abm_pipeline.flows.calculate_coefficients import COEFFICIENT_ORDER
-from cell_abm_pipeline.flows.run_shape_analysis import PCA_COMPONENTS
+from cell_abm_pipeline.flows.analyze_shape_modes import PCA_COMPONENTS
 from cell_abm_pipeline.tasks.pca import (
     plot_transform_compare,
     plot_transform_merge,
@@ -80,7 +80,7 @@ class SeriesConfig:
     conditions: list[dict]
 
 
-@flow(name="plot-shape-analysis")
+@flow(name="plot-shape-modes")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     # Make plots for PCA results including variance explained and comparisons of
     # distributions in PC space using the given reference model.
@@ -96,7 +96,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         run_flow_plot_shapes(context, series, parameters)
 
 
-@flow(name="plot-shape-analysis_plot-pca")
+@flow(name="plot-shape-modes_plot-pca")
 def run_flow_plot_pca(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
@@ -150,7 +150,7 @@ def run_flow_plot_pca(
         )
 
 
-@flow(name="plot-shape-analysis_plot-stats")
+@flow(name="plot-shape-modes_plot-stats")
 def run_flow_plot_stats(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
@@ -194,7 +194,7 @@ def run_flow_plot_stats(
         )
 
 
-@flow(name="plot-shape-analysis_plot-shapes")
+@flow(name="plot-shape-modes_plot-shapes")
 def run_flow_plot_shapes(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:

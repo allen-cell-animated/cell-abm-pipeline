@@ -57,7 +57,7 @@ class SeriesConfig:
     conditions: list[dict]
 
 
-@flow(name="plot-colony-analysis")
+@flow(name="plot-colony-dynamics")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     # Make plots for graph analysis on neighbor connections.
     if any(plot in parameters.plots for plot in PLOTS_MEASURES):
@@ -68,7 +68,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         run_flow_plot_clusters(context, series, parameters)
 
 
-@flow(name="plot-colony-analysis_plot-measures")
+@flow(name="plot-colony-dynamics_plot-measures")
 def run_flow_plot_measures(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
@@ -121,7 +121,7 @@ def run_flow_plot_measures(
         )
 
 
-@flow(name="plot-colony-analysis_plot-clusters")
+@flow(name="plot-colony-dynamics_plot-clusters")
 def run_flow_plot_clusters(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:

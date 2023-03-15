@@ -38,7 +38,7 @@ class SeriesConfig:
     conditions: list[dict]
 
 
-@flow(name="run-colony-analysis")
+@flow(name="analyze-colony-dynamics")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     # Process neighbor connections to generate graph objects where nodes
     # represent cells and edges represent cells that share borders. If the
@@ -55,7 +55,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     run_flow_analyze_clusters(context, series, parameters)
 
 
-@flow(name="run-colony-analysis_generate-networks")
+@flow(name="analyze-colony-dynamics_generate-networks")
 def run_flow_generate_networks(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
@@ -84,7 +84,7 @@ def run_flow_generate_networks(
         save_pickle(context.working_location, networks_key, all_networks)
 
 
-@flow(name="run-colony-analysis_analyze-measures")
+@flow(name="analyze-colony-dynamics_analyze-measures")
 def run_flow_analyze_measures(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
@@ -112,7 +112,7 @@ def run_flow_analyze_measures(
         save_dataframe(context.working_location, measures_key, measures, index=False)
 
 
-@flow(name="run-colony-analysis_analyze-clusters")
+@flow(name="analyze-colony-dynamics_analyze-clusters")
 def run_flow_analyze_clusters(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:

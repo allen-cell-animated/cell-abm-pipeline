@@ -37,7 +37,7 @@ class SeriesConfig:
     conditions: list[dict]
 
 
-@flow(name="run-resource-analysis")
+@flow(name="analyze-resource-usage")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     # Iterate through simulation data files to extract storage size.
     run_flow_analyze_storage(context, series, parameters)
@@ -46,7 +46,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     run_flow_analyze_clock(context, series, parameters)
 
 
-@flow(name="run-resource-analysis_analyze-storage")
+@flow(name="analyze-resource-usage_analyze-storage")
 def run_flow_analyze_storage(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
@@ -79,7 +79,7 @@ def run_flow_analyze_storage(
     save_dataframe(context.working_location, storage_key, storage_df, index=False)
 
 
-@flow(name="run-resource-analysis_analyze-clock")
+@flow(name="analyze-resource-usage_analyze-clock")
 def run_flow_analyze_clock(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
