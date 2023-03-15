@@ -30,11 +30,11 @@ class SeriesConfig:
 
 @flow(name="calculate-neighbors")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    data_key = make_key(series.name, "data", "data.LOCATIONS")
+    analysis_key = make_key(series.name, "analysis", "analysis.NEIGHBORS")
     series_key = f"{series.name}_{parameters.key}_{parameters.seed:04d}"
 
-    locations_key = make_key(
-        series.name, "data", "data.LOCATIONS", f"{series_key}.LOCATIONS.tar.xz"
-    )
+    locations_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
     locations_tar = load_tar(context.working_location, locations_key)
     locations_json = extract_tick_json(locations_tar, series_key, parameters.frame, "LOCATIONS")
 
@@ -61,10 +61,5 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         all_neighbors.append(voxel_neighbors)
 
     neighbors_dataframe = pd.DataFrame(all_neighbors)
-    neighbors_key = make_key(
-        series.name,
-        "analysis",
-        "analysis.NEIGHBORS",
-        f"{series_key}_{parameters.frame:06d}.NEIGHBORS.csv",
-    )
+    neighbors_key = make_key(analysis_key, f"{series_key}_{parameters.frame:06d}.NEIGHBORS.csv")
     save_dataframe(context.working_location, neighbors_key, neighbors_dataframe, index=False)

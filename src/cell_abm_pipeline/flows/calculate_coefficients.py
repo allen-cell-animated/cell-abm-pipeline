@@ -44,11 +44,11 @@ class SeriesConfig:
 
 @flow(name="calculate-coefficients")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    data_key = make_key(series.name, "data", "data.LOCATIONS")
+    analysis_key = make_key(series.name, "analysis", "analysis.NEIGHBORS")
     series_key = f"{series.name}_{parameters.key}_{parameters.seed:04d}"
 
-    locations_key = make_key(
-        series.name, "data", "data.LOCATIONS", f"{series_key}.LOCATIONS.tar.xz"
-    )
+    locations_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
     locations_tar = load_tar(context.working_location, locations_key)
     locations_json = extract_tick_json(locations_tar, series_key, parameters.frame, "LOCATIONS")
 
@@ -99,10 +99,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         offset_key = f".{parameters.offset:04d}"
 
     region_key = f"_{parameters.region}" if parameters.region is not None else ""
-    coeffs_key = make_key(
-        series.name,
-        "analysis",
-        "analysis.COEFFS",
-        f"{series_key}_{parameters.frame:06d}{region_key}{offset_key}{chunk_key}.COEFFS.csv",
-    )
+    suffix = f"{region_key}{offset_key}{chunk_key}"
+
+    coeffs_key = make_key(analysis_key, f"{series_key}_{parameters.frame:06d}{suffix}.COEFFS.csv")
     save_dataframe(context.working_location, coeffs_key, coeffs_dataframe, index=False)
