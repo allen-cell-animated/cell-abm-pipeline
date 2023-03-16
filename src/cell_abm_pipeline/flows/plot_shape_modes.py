@@ -8,8 +8,8 @@ from io_collection.load import load_dataframe, load_pickle
 from io_collection.save import save_figure, save_text
 from prefect import flow
 
-from cell_abm_pipeline.flows.calculate_coefficients import COEFFICIENT_ORDER
 from cell_abm_pipeline.flows.analyze_shape_modes import PCA_COMPONENTS
+from cell_abm_pipeline.flows.calculate_coefficients import COEFFICIENT_ORDER
 from cell_abm_pipeline.tasks.pca import (
     plot_transform_compare,
     plot_transform_merge,

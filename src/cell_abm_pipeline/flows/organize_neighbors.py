@@ -27,27 +27,27 @@ class SeriesConfig:
     conditions: list[dict]
 
 
-@flow(name="process-colony-dynamics")
+@flow(name="organize-neighbors")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     # Iterate through conditions and seeds to merge contents of individual
     # frames into a single csv. If merged csv exists and the specified frame
     # does not exist in the csv, the frame is appended. If the merged csv exists
     # and specified frame exists in the csv, the frame is skipped.
-    run_flow_merge_colonies(context, series, parameters)
+    run_flow_merge_neighbors(context, series, parameters)
 
     # Iterate through conditions and seeds to combine and compress individual
     # frames into a .tar.xz archive. If the archive exists and the specified
     # frame is not in the archive, the frame is appended. If the archive exists
     # and specified frame exists in the archive, the frame is skipped.
-    run_flow_compress_colonies(context, series, parameters)
+    run_flow_compress_neighbors(context, series, parameters)
 
     # Iterate through conditions and seeds to remove individual frames if the
     # frame exists in the corresponding .tar.xz archive.
-    run_flow_remove_colonies(context, series, parameters)
+    run_flow_remove_neighbors(context, series, parameters)
 
 
-@flow(name="process-colony-dynamics_merge-colonies")
-def run_flow_merge_colonies(
+@flow(name="organize-neighbors_merge-neighbors")
+def run_flow_merge_neighbors(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     analysis_key = make_key(series.name, "analysis", "analysis.NEIGHBORS")
@@ -85,8 +85,8 @@ def run_flow_merge_colonies(
             save_dataframe(context.working_location, neighbor_key, neighbor_dataframe, index=False)
 
 
-@flow(name="process-colony-dynamics_compress-colonies")
-def run_flow_compress_colonies(
+@flow(name="organize-neighbors_compress-neighbors")
+def run_flow_compress_neighbors(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     analysis_key = make_key(series.name, "analysis", "analysis.NEIGHBORS")
@@ -121,8 +121,8 @@ def run_flow_compress_colonies(
             save_tar(context.working_location, neighbor_key, contents)
 
 
-@flow(name="process-colony-dynamics_remove-colonies")
-def run_flow_remove_colonies(
+@flow(name="organize-neighbors_remove-neighbors")
+def run_flow_remove_neighbors(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     analysis_key = make_key(series.name, "analysis", "analysis.NEIGHBORS")

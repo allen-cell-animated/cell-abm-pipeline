@@ -30,27 +30,27 @@ class SeriesConfig:
     conditions: list[dict]
 
 
-@flow(name="process-cell-shapes")
+@flow(name="organize-coefficients")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     # Iterate through conditions and seeds to merge contents of individual
     # frames into a single csv. If merged csv exists and the specified frame
     # does not exist in the csv, the frame is appended. If the merged csv exists
     # and specified frame exists in the csv, the frame is skipped.
-    run_flow_merge_shapes(context, series, parameters)
+    run_flow_merge_coefficients(context, series, parameters)
 
     # Iterate through conditions and seeds to combine and compress individual
     # frames into a .tar.xz archive. If the archive exists and the specified
     # frame is not in the archive, the frame is appended. If the archive exists
     # and specified frame exists in the archive, the frame is skipped.
-    run_flow_compress_shapes(context, series, parameters)
+    run_flow_compress_coefficients(context, series, parameters)
 
     # Iterate through conditions and seeds to remove individual frames if the
     # frame exists in the corresponding .tar.xz archive.
-    run_flow_remove_shapes(context, series, parameters)
+    run_flow_remove_coefficients(context, series, parameters)
 
 
-@flow(name="process-cell-shapes_merge-shapes")
-def run_flow_merge_shapes(
+@flow(name="organize-coefficients_merge-coefficients")
+def run_flow_merge_coefficients(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     analysis_key = make_key(series.name, "analysis", "analysis.COEFFS")
@@ -89,8 +89,8 @@ def run_flow_merge_shapes(
             save_dataframe(context.working_location, coeff_key, coeff_dataframe, index=False)
 
 
-@flow(name="process-cell-shapes_compress-shapes")
-def run_flow_compress_shapes(
+@flow(name="organize-coefficients_compress-coefficients")
+def run_flow_compress_coefficients(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     analysis_key = make_key(series.name, "analysis", "analysis.COEFFS")
@@ -128,8 +128,8 @@ def run_flow_compress_shapes(
             save_tar(context.working_location, coeff_key, contents)
 
 
-@flow(name="process-cell-shapes_remove-shapes")
-def run_flow_remove_shapes(
+@flow(name="organize-coefficients_remove-coefficients")
+def run_flow_remove_coefficients(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     analysis_key = make_key(series.name, "analysis", "analysis.COEFFS")
