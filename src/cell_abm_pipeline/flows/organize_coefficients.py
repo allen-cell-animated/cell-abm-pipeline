@@ -54,12 +54,12 @@ def run_flow_merge_coefficients(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     analysis_key = make_key(series.name, "analysis", "analysis.COEFFS")
-    region_key = f"_{parameters.region}" if parameters.region is not None else ""
+    region = f"_{parameters.region}" if parameters.region is not None else ""
 
     for condition in series.conditions:
         for seed in series.seeds:
             series_key = f"{series.name}_{condition['key']}_{seed:04d}"
-            coeff_key = make_key(analysis_key, f"{series_key}{region_key}.COEFFS.csv")
+            coeff_key = make_key(analysis_key, f"{series_key}{region}.COEFFS.csv")
             coeff_key_exists = check_key(context.working_location, coeff_key)
 
             existing_frames = []
@@ -73,9 +73,8 @@ def run_flow_merge_coefficients(
                 if frame in existing_frames:
                     continue
 
-                frame_key = make_key(
-                    analysis_key, f"{series_key}_{frame:06d}{region_key}.COEFFS.csv"
-                )
+                frame_key = make_key(analysis_key, f"{series_key}_{frame:06d}{region}.COEFFS.csv")
+
                 frame_coeffs.append(load_dataframe(context.working_location, frame_key))
 
             if not frame_coeffs:
@@ -94,12 +93,12 @@ def run_flow_compress_coefficients(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     analysis_key = make_key(series.name, "analysis", "analysis.COEFFS")
-    region_key = f"_{parameters.region}" if parameters.region is not None else ""
+    region = f"_{parameters.region}" if parameters.region is not None else ""
 
     for condition in series.conditions:
         for seed in series.seeds:
             series_key = f"{series.name}_{condition['key']}_{seed:04d}"
-            coeff_key = make_key(analysis_key, f"{series_key}{region_key}.COEFFS.tar.xz")
+            coeff_key = make_key(analysis_key, f"{series_key}{region}.COEFFS.tar.xz")
             coeff_key_exists = check_key(context.working_location, coeff_key)
 
             existing_frames = []
@@ -116,9 +115,7 @@ def run_flow_compress_coefficients(
                 if frame in existing_frames:
                     continue
 
-                frame_key = make_key(
-                    analysis_key, f"{series_key}_{frame:06d}{region_key}.COEFFS.csv"
-                )
+                frame_key = make_key(analysis_key, f"{series_key}_{frame:06d}{region}.COEFFS.csv")
 
                 contents.append(frame_key)
 
@@ -133,12 +130,12 @@ def run_flow_remove_coefficients(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     analysis_key = make_key(series.name, "analysis", "analysis.COEFFS")
-    region_key = f"_{parameters.region}" if parameters.region is not None else ""
+    region = f"_{parameters.region}" if parameters.region is not None else ""
 
     for condition in series.conditions:
         for seed in series.seeds:
             series_key = f"{series.name}_{condition['key']}_{seed:04d}"
-            coeff_key = make_key(analysis_key, f"{series_key}{region_key}.COEFFS.tar.xz")
+            coeff_key = make_key(analysis_key, f"{series_key}{region}.COEFFS.tar.xz")
             coeff_key_exists = check_key(context.working_location, coeff_key)
 
             if not coeff_key_exists:

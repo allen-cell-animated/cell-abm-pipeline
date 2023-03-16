@@ -1,13 +1,15 @@
 import copy
 from dataclasses import dataclass
 
+import pandas as pd
 from container_collection.fargate import (
     make_fargate_task,
     register_fargate_task,
     submit_fargate_task,
 )
-from io_collection.keys import check_key, make_key
+from io_collection.keys import check_key, make_key, remove_key
 from io_collection.load import load_dataframe
+from io_collection.save import save_dataframe
 from prefect import flow
 
 from cell_abm_pipeline.__config__ import make_dotlist_from_config
@@ -88,7 +90,11 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     for condition in series.conditions:
         for seed in series.seeds:
             series_key = f"{series.name}_{condition['key']}_{seed:04d}"
-            coeff_key = make_key(analysis_key, f"{series_key}.COEFFS.csv")
+
+            results_key = make_key(series.name, "results", f"{series_key}.csv")
+            results = load_dataframe(context.working_location, results_key)
+
+            coeff_key = make_key(analysis_key, f"{series_key}{region}.COEFFS.csv")
             coeff_key_exists = check_key(context.working_location, coeff_key)
 
             existing_frames = []
@@ -108,27 +114,58 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
                 if frame_key_exists:
                     continue
 
-                parameters_config = copy.deepcopy(parameters.calculate_coefficients)
-                parameters_config.key = parameters_config.key % condition["key"]
-                parameters_config.seed = seed
-                parameters_config.frame = frame
+                total = results[results["TICK"] == frame].shape[0]
+                chunk = parameters.calculate_coefficients.chunk
+                offsets = list(range(0, total, chunk)) if chunk is not None else [0]
+                completed_keys = []
 
-                config = {
-                    "context": context_config,
-                    "series": series_config,
-                    "parameters": parameters_config,
-                }
+                for offset in offsets:
+                    if chunk is not None:
+                        offset_key = frame_key.replace(
+                            ".COEFFS.csv", f".{offset:04d}.{chunk:04d}.COEFFS.csv"
+                        )
+                        offset_key_exists = check_key(context.working_location, offset_key)
 
-                calculate_coefficients_command = (
-                    CALCULATE_COEFFICIENTS_COMMAND + make_dotlist_from_config(config)
-                )
+                        if offset_key_exists:
+                            completed_keys.append(offset_key)
+                            continue
 
-                submit_fargate_task(
-                    "calculate_coefficients",
-                    task_definition_arn,
-                    context.user,
-                    context.cluster,
-                    context.security_groups.split(":"),
-                    context.subnets.split(":"),
-                    calculate_coefficients_command,
-                )
+                    parameters_config = copy.deepcopy(parameters.calculate_coefficients)
+                    parameters_config.key = parameters_config.key % condition["key"]
+                    parameters_config.seed = seed
+                    parameters_config.frame = frame
+                    parameters_config.offset = offset
+
+                    config = {
+                        "context": context_config,
+                        "series": series_config,
+                        "parameters": parameters_config,
+                    }
+
+                    calculate_coefficients_command = (
+                        CALCULATE_COEFFICIENTS_COMMAND + make_dotlist_from_config(config)
+                    )
+
+                    submit_fargate_task(
+                        "calculate_coefficients",
+                        task_definition_arn,
+                        context.user,
+                        context.cluster,
+                        context.security_groups.split(":"),
+                        context.subnets.split(":"),
+                        calculate_coefficients_command,
+                    )
+
+                if len(completed_keys) == len(offsets) and chunk is not None:
+                    frame_coeffs = []
+
+                    for key in completed_keys:
+                        frame_coeffs.append(load_dataframe(context.working_location, key))
+
+                    coeff_dataframe = pd.concat(frame_coeffs, ignore_index=True)
+                    save_dataframe(
+                        context.working_location, frame_key, coeff_dataframe, index=False
+                    )
+
+                    for key in completed_keys:
+                        remove_key(context.working_location, key)
