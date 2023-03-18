@@ -1,6 +1,6 @@
 [[package]]
 name = "abm-colony-collection"
-version = "0.2.2"
+version = "0.3.0"
 description = "Collection of tasks for analyzing colony dynamics."
 category = "main"
 optional = false
@@ -16,7 +16,7 @@ scipy = ">=1.9.3,<2.0.0"
 
 [[package]]
 name = "abm-initialization-collection"
-version = "0.2.2"
+version = "0.3.0"
 description = "Collection of tasks for initializing abm simulations."
 category = "main"
 optional = false
@@ -34,7 +34,7 @@ scipy = ">=1.9.3,<2.0.0"
 
 [[package]]
 name = "abm-shape-collection"
-version = "0.2.3"
+version = "0.3.0"
 description = "Collection of tasks for analyzing cell shapes."
 category = "main"
 optional = false
@@ -245,7 +245,7 @@ requests-oauthlib = "*"
 
 [[package]]
 name = "arcade-collection"
-version = "0.6.2"
+version = "0.7.0"
 description = "Collection of tasks for working with ARCADE."
 category = "main"
 optional = false
@@ -491,7 +491,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7
 
 [[package]]
 name = "container-collection"
-version = "0.4.8"
+version = "0.5.0"
 description = "Collection of tasks for running containerized models."
 category = "main"
 optional = false
@@ -1095,7 +1095,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "io-collection"
-version = "0.6.2"
+version = "0.7.0"
 description = "Collection of tasks for I/O."
 category = "main"
 optional = false
@@ -2823,20 +2823,20 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "81aaacd9403d125803e760835db4af86de8803e4faee4f9d1358312ace973a78"
+content-hash = "af2a854c8c5cd4fe5220dbbd36e93e537e2bd2f9b18963e8fd0894fc283a7f69"
 
 [metadata.files]
 abm-colony-collection = [
-    {file = "abm_colony_collection-0.2.2-py3-none-any.whl", hash = "sha256:4caee232c32592d934df973eb79f6defd8abf5cd8c95d47aa95f13edaa769643"},
-    {file = "abm_colony_collection-0.2.2.tar.gz", hash = "sha256:9976d8c19357b58a7fd7a1ce608c9fc62cf08ade56a5b541161070b214a404dc"},
+    {file = "abm_colony_collection-0.3.0-py3-none-any.whl", hash = "sha256:cd84f2de80836c331a71c108d09330a0f9c273252b7a02ca183f0d48aeeeaa6f"},
+    {file = "abm_colony_collection-0.3.0.tar.gz", hash = "sha256:132e8b7df5556abd6a4ad4775c64256aadc48928f2ba17615b7f9c2024447f4f"},
 ]
 abm-initialization-collection = [
-    {file = "abm_initialization_collection-0.2.2-py3-none-any.whl", hash = "sha256:7b238418784a6ff1682caabba3742fe8615903ee3ce57dd4f42a1dc5e67608b5"},
-    {file = "abm_initialization_collection-0.2.2.tar.gz", hash = "sha256:bd7ec9b004f636e4fa67fb660fc95008bc2a4e3799885a64f0b2acd751a1b2a6"},
+    {file = "abm_initialization_collection-0.3.0-py3-none-any.whl", hash = "sha256:ee8696fe814aa54e783e20098d0a6d08e29d4225aeed44317d247e5396aa363b"},
+    {file = "abm_initialization_collection-0.3.0.tar.gz", hash = "sha256:805247bb937d13a28911051a139102a14d482de34b6849be4372d761992513b2"},
 ]
 abm-shape-collection = [
-    {file = "abm_shape_collection-0.2.3-py3-none-any.whl", hash = "sha256:eab77ed7e2e74b0db506b8809904ec3b29ada1622a82563726510a56581729c8"},
-    {file = "abm_shape_collection-0.2.3.tar.gz", hash = "sha256:d905307178b94c1f0ea3ade93c9faaeda4cb414cf8fa1461373f1745028c1930"},
+    {file = "abm_shape_collection-0.3.0-py3-none-any.whl", hash = "sha256:52f9fdb5ab08cc275edd0ac9c402adadaab0c992ea604f5ed9f3021de7b9bff1"},
+    {file = "abm_shape_collection-0.3.0.tar.gz", hash = "sha256:23cdc349c5aa4a1e7ba0079c893bbef27e83f53f3281a17358577a4f2c3ab4a3"},
 ]
 aicsimageio = [
     {file = "aicsimageio-4.9.4-py2.py3-none-any.whl", hash = "sha256:eb90db9886eda9ef04e98216fd0e05d8e553dff67868c771b9188004db95ce1d"},
@@ -2975,8 +2975,8 @@ apprise = [
     {file = "apprise-1.2.1.tar.gz", hash = "sha256:67e0c227eecee260000980dbbf8ba1e5eebdbe494f4730808297c9e645c03579"},
 ]
 arcade-collection = [
-    {file = "arcade_collection-0.6.2-py3-none-any.whl", hash = "sha256:cfda1341354da7ad86cdb3789286c4c4f7e643d1be6fb37f5776ed1359d39d37"},
-    {file = "arcade_collection-0.6.2.tar.gz", hash = "sha256:aae4f740facbcc46b82f41c3a758376bbbdeb5d48cbe8160a46a5e38f169eef3"},
+    {file = "arcade_collection-0.7.0-py3-none-any.whl", hash = "sha256:60e6d4e59a8a651e1fa6f49bee3fe94a9f7a5f244b334cbd21719e1fa8ac2bdf"},
+    {file = "arcade_collection-0.7.0.tar.gz", hash = "sha256:9ee5952cd23442a6c4b83cd8854ce62433d5979de1c82cb966ac7942c6adc2c0"},
 ]
 asciitree = [
     {file = "asciitree-0.3.3.tar.gz", hash = "sha256:4aa4b9b649f85e3fcb343363d97564aa1fb62e249677f2e18a96765145cc0f6e"},
@@ -3275,8 +3275,8 @@ colorama = [
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
 container-collection = [
-    {file = "container_collection-0.4.8-py3-none-any.whl", hash = "sha256:32be0e7ccd53852dc011fc4f978027a9ffef91e0d2dd3b4808752b6d471e5c5d"},
-    {file = "container_collection-0.4.8.tar.gz", hash = "sha256:32b05733a30d05b32dfe99c9d5f05b4a83335cb1f4657cb666a3ad139435a4c0"},
+    {file = "container_collection-0.5.0-py3-none-any.whl", hash = "sha256:63056b8d02fcef8aa8a7a7667c4e702c8ccc8c1e76308badf10ce78b061f5eb9"},
+    {file = "container_collection-0.5.0.tar.gz", hash = "sha256:7b46fecc459052b10d854c12945f06e3489d0dc3143a3b3b0d7d270145726c31"},
 ]
 contourpy = [
     {file = "contourpy-1.0.7-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:95c3acddf921944f241b6773b767f1cbce71d03307270e2d769fd584d5d1092d"},
@@ -3721,8 +3721,8 @@ iniconfig = [
     {file = "iniconfig-2.0.0.tar.gz", hash = "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3"},
 ]
 io-collection = [
-    {file = "io_collection-0.6.2-py3-none-any.whl", hash = "sha256:16de302df114e78597d647397166a38122f651a2c3cac5ac978af5e423576003"},
-    {file = "io_collection-0.6.2.tar.gz", hash = "sha256:329af90766775d1e99551d1dfec9977a8f0a043e2bbf332c2ef01597989d2ff1"},
+    {file = "io_collection-0.7.0-py3-none-any.whl", hash = "sha256:56e149f63d517f7154766fff149f6e06b59f1bceff0ecf0be9747630f927f353"},
+    {file = "io_collection-0.7.0.tar.gz", hash = "sha256:3029eec2e70949018437d691919a3bb2a475365bb2a086a87a2ba1429c12f7a0"},
 ]
 isort = [
     {file = "isort-5.12.0-py3-none-any.whl", hash = "sha256:f84c2818376e66cf843d497486ea8fed8700b340f308f076c6fb1229dff318b6"},
