@@ -16,8 +16,8 @@ io-collection = "^0.7.0"
 container-collection = "^0.5.0"
 arcade-collection = "^0.7.0"
 abm-initialization-collection = "^0.3.0"
-abm-shape-collection = "^0.3.0"
-abm-colony-collection = "^0.3.0"
+abm-shape-collection = "^0.3.1"
+abm-colony-collection = "^0.3.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.12.0"
