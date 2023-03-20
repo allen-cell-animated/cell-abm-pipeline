@@ -45,7 +45,7 @@ class SeriesConfig:
 @flow(name="calculate-coefficients")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     data_key = make_key(series.name, "data", "data.LOCATIONS")
-    analysis_key = make_key(series.name, "analysis", "analysis.NEIGHBORS")
+    analysis_key = make_key(series.name, "analysis", "analysis.COEFFS")
     series_key = f"{series.name}_{parameters.key}_{parameters.seed:04d}"
 
     locations_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
