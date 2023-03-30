@@ -33,6 +33,15 @@ class ParametersConfig:
 
     dt: float = 1.0
 
+    sample_ticks: list[int] = field(default_factory=lambda: [])
+    """List of ticks to sample for calculating stats with sampling."""
+
+    sample_reps: int = 100
+    """Number of replicates for calculating stats with sampling."""
+
+    sample_size: int = 100
+    """Sample size for each tick for calculating stats with sampling."""
+
 
 @dataclass
 class ContextConfig:
@@ -178,9 +187,38 @@ def run_flow_analyze_stats(
         data = load_dataframe(context.working_location, data_key)
         data = data[data["SEED"].isin(series.seeds)]
 
-        size_stats = calculate_size_stats(data, ref_data, parameters.regions)
-        shape_stats = calculate_shape_stats(ref_model, data, ref_data, parameters.components)
-        stats = pd.concat([size_stats, shape_stats])
+        size_stats = calculate_size_stats(data, ref_data, parameters.regions, include_ticks=True)
+        shape_stats = calculate_shape_stats(
+            ref_model, data, ref_data, parameters.components, include_ticks=True
+        )
+
+        if parameters.sample_ticks:
+            subset_data = data[data["TICK"].isin(parameters.sample_ticks)]
+            subset_size_stats = calculate_size_stats(
+                subset_data,
+                ref_data,
+                parameters.regions,
+                include_samples=True,
+                sample_reps=parameters.sample_reps,
+                sample_size=parameters.sample_size,
+            )
+            subset_shape_stats = calculate_shape_stats(
+                ref_model,
+                subset_data,
+                ref_data,
+                parameters.components,
+                include_samples=True,
+                sample_reps=parameters.sample_reps,
+                sample_size=parameters.sample_size,
+            )
+
+            subset_size_stats = subset_size_stats.dropna(subset=["SAMPLE"])
+            subset_shape_stats = subset_shape_stats.dropna(subset=["SAMPLE"])
+
+            stats = pd.concat([size_stats, shape_stats, subset_size_stats, subset_shape_stats])
+        else:
+            stats = pd.concat([size_stats, shape_stats])
+
         convert_model_units(stats, parameters.ds, parameters.dt)
 
         save_dataframe(context.working_location, stats_key, stats, index=False)
