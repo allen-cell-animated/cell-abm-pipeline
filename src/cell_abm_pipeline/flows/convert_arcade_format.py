@@ -29,6 +29,8 @@ class ParametersConfig:
 
     binary: bool = False
 
+    separate: bool = False
+
     ds: float = 1.0
 
     dt: float = 1.0
@@ -84,10 +86,17 @@ def run_flow_convert_to_images(
                 parameters.box,
                 parameters.chunk_size,
                 parameters.binary,
+                parameters.separate,
             )
 
-            for i, j, chunk in chunks:
-                image_key = make_key(converted_key, f"{series_key}_{i:02d}_{j:02d}.IMAGE.ome.tiff")
+            for i, j, chunk, frame in chunks:
+                chunk_key = f"{i:02d}_{j:02d}.IMAGE.ome.tiff"
+
+                if frame is None:
+                    image_key = make_key(converted_key, f"{series_key}_{chunk_key}")
+                else:
+                    image_key = make_key(converted_key, f"{series_key}_{frame:06d}_{chunk_key}")
+
                 save_image(context.working_location, image_key, chunk)
 
 

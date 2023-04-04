@@ -245,7 +245,7 @@ requests-oauthlib = "*"
 
 [[package]]
 name = "arcade-collection"
-version = "0.7.2"
+version = "0.8.0"
 description = "Collection of tasks for working with ARCADE."
 category = "main"
 optional = false
@@ -2824,7 +2824,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "f8c2e0574a4b7134a6ab41a9d44717b4b64c039ff8dae3e3c3579874387a2117"
+content-hash = "d4e3856308839f1db8cdeb2ae9e4071de6e02aedaf9fecfab740055efabd99ee"
 
 [metadata.files]
 abm-colony-collection = [
@@ -2976,8 +2976,8 @@ apprise = [
     {file = "apprise-1.2.1.tar.gz", hash = "sha256:67e0c227eecee260000980dbbf8ba1e5eebdbe494f4730808297c9e645c03579"},
 ]
 arcade-collection = [
-    {file = "arcade_collection-0.7.2-py3-none-any.whl", hash = "sha256:c501859fcc5a760acef7468a57be624c7dc19535932da8e91997e5d7a371270c"},
-    {file = "arcade_collection-0.7.2.tar.gz", hash = "sha256:e33d5312563fb1ce68b4f577bdf23325a254e6cf99372072fd4784c4d2a06248"},
+    {file = "arcade_collection-0.8.0-py3-none-any.whl", hash = "sha256:f24a35528e09ed8bc8d46211089f8a85520ced29e49f6aea8306e03e99940b8a"},
+    {file = "arcade_collection-0.8.0.tar.gz", hash = "sha256:0d515c7f3e357bb54863313d22f7616100abacb5db9fdc7cf7e4f049d14580a1"},
 ]
 asciitree = [
     {file = "asciitree-0.3.3.tar.gz", hash = "sha256:4aa4b9b649f85e3fcb343363d97564aa1fb62e249677f2e18a96765145cc0f6e"},
