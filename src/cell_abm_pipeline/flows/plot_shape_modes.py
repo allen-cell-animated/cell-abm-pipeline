@@ -15,7 +15,12 @@ from cell_abm_pipeline.tasks.pca import (
     plot_transform_merge,
     plot_variance_explained,
 )
-from cell_abm_pipeline.tasks.stats import plot_ks_all_ticks, plot_ks_by_feature, plot_ks_by_key
+from cell_abm_pipeline.tasks.stats import (
+    plot_ks_all_ticks,
+    plot_ks_by_feature,
+    plot_ks_by_key,
+    plot_ks_by_sample,
+)
 
 PLOTS_PCA = [
     "transform_compare",
@@ -191,6 +196,12 @@ def run_flow_plot_stats(
             context.working_location,
             make_key(plot_key, f"{series.name}_ks_stats_by_feature.STATS.png"),
             plot_ks_by_feature(keys, all_stats, ref_stats),
+        )
+
+        save_figure(
+            context.working_location,
+            make_key(plot_key, f"{series.name}_ks_stats_by_sample.STATS.png"),
+            plot_ks_by_sample(keys, all_stats),
         )
 
 

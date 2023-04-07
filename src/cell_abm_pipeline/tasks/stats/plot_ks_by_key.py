@@ -1,15 +1,15 @@
-import matplotlib.figure as mpl
+import matplotlib as mpl
 import pandas as pd
-from matplotlib import cm
+from matplotlib import colormaps
 from prefect import task
 
 from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 
 @task
-def plot_ks_by_key(keys: list[str], stats: pd.DataFrame) -> mpl.Figure:
+def plot_ks_by_key(keys: list[str], stats: pd.DataFrame) -> mpl.figure.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
-    cmap = cm.get_cmap("tab20")
+    cmap = colormaps["tab20"]
 
     stats_by_tick = stats[~stats["TICK"].isna()]
 
