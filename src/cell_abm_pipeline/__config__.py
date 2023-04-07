@@ -1,6 +1,6 @@
 import os
 import re
-from dataclasses import dataclass, field, make_dataclass
+from dataclasses import dataclass, field, fields, make_dataclass
 from typing import Any
 
 from hydra import compose, initialize_config_dir
@@ -87,6 +87,19 @@ def make_config_from_yaml(module, args):
     config = compose(config_name="config", overrides=args)
 
     return config
+
+
+def make_config_from_file(schema, file):
+    config = OmegaConf.load(file)
+
+    config_keys = list(config.keys())
+    schema_fields = [field.name for field in fields(schema)]
+
+    for key in config_keys:
+        if key not in schema_fields:
+            del config[key]
+
+    return OmegaConf.merge(schema, config)
 
 
 def generate_config(config_class, group, arguments):
