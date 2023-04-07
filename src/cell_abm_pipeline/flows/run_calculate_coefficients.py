@@ -146,7 +146,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
                         CALCULATE_COEFFICIENTS_COMMAND + make_dotlist_from_config(config)
                     )
 
-                    submit_fargate_task(
+                    submit_fargate_task.with_options(retries=2, retry_delay_seconds=1)(
                         "calculate_coefficients",
                         task_definition_arn,
                         context.user,
