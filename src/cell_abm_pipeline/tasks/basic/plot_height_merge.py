@@ -2,7 +2,7 @@ from typing import Optional
 
 import matplotlib.figure as mpl
 import pandas as pd
-from matplotlib import cm
+from matplotlib import colormaps
 from prefect import task
 
 from cell_abm_pipeline.utilities.plot import make_single_figure
@@ -16,7 +16,7 @@ def plot_height_merge(
     region: Optional[str] = None,
 ) -> mpl.Figure:
     fig = make_single_figure()
-    cmap = cm.get_cmap("tab10")
+    cmap = colormaps["tab10"]
 
     positions = [0] if region is None else [0, 1]
     labels = ["height"] if region is None else ["height", f"height ({region})"]
