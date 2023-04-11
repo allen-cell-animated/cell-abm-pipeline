@@ -72,6 +72,8 @@ class ParametersConfig:
 
     thresholds: list[int] = field(default_factory=lambda: SUBSET_THRESHOLDS)
 
+    ordered: bool = True
+
 
 @dataclass
 class ContextConfig:
@@ -151,7 +153,7 @@ def run_flow_plot_pca(
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_transform_merge_{region_key}.PCA.png"),
-            plot_transform_merge(keys, ref_model, all_data, ref_data),
+            plot_transform_merge(keys, ref_model, all_data, ref_data, parameters.ordered),
         )
 
 
@@ -195,7 +197,7 @@ def run_flow_plot_stats(
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_ks_stats_by_feature.STATS.png"),
-            plot_ks_by_feature(keys, all_stats, ref_stats),
+            plot_ks_by_feature(keys, all_stats, ref_stats, parameters.ordered),
         )
 
         save_figure(

@@ -17,7 +17,7 @@ def plot_ks_by_key(keys: list[str], stats: pd.DataFrame) -> mpl.figure.Figure:
         ax = fig.add_subplot(gridspec[i, j])
         ax.set_title(key)
         ax.set_xlabel("Time (days)")
-        ax.set_ylabel("Kolmogorov–Smirnov statistic")
+        ax.set_ylabel("Kolmogorov-Smirnov statistic")
 
         key_stats = stats_by_tick[stats_by_tick["KEY"] == key]
         for index, (feature, group) in enumerate(key_stats.groupby("FEATURE")):

@@ -14,7 +14,7 @@ def plot_ks_by_sample(keys: list[str], stats: pd.DataFrame) -> mpl.figure.Figure
 
     ax = fig.add_subplot()
     ax.set_xlabel("Key")
-    ax.set_ylabel("Kolmogorov–Smirnov statistic")
+    ax.set_ylabel("Kolmogorov-Smirnov statistic")
 
     stats_samples = stats[~stats["SAMPLE"].isna()]
 

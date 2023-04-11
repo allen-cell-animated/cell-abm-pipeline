@@ -10,10 +10,17 @@ from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 @task
 def plot_ks_by_feature(
-    keys: list[str], stats: pd.DataFrame, ref_stats: Optional[pd.DataFrame] = None
+    keys: list[str],
+    stats: pd.DataFrame,
+    ref_stats: Optional[pd.DataFrame] = None,
+    ordered: bool = True,
 ) -> mpl.figure.Figure:
     fig, gridspec, indices = make_grid_figure(stats["FEATURE"].unique())
-    cmap = colormaps["tab20"]
+
+    if ordered:
+        cmap = colormaps["coolwarm"].resampled(len(keys))
+    else:
+        cmap = colormaps["tab20"]
 
     stats_by_tick = stats[~stats["TICK"].isna()]
 
@@ -21,13 +28,12 @@ def plot_ks_by_feature(
         ax = fig.add_subplot(gridspec[i, j])
         ax.set_title(feature_key)
         ax.set_xlabel("Time (days)")
-        ax.set_ylabel("Kolmogorov–Smirnov statistic")
+        ax.set_ylabel("Kolmogorov-Smirnov statistic")
 
         feature_stats = stats_by_tick[stats_by_tick["FEATURE"] == feature_key]
 
-        for index, (key, group) in enumerate(feature_stats.groupby("KEY")):
-            if key not in keys:
-                continue
+        for index, key in enumerate(keys):
+            group = feature_stats[feature_stats["KEY"] == key]
 
             ax.plot(
                 group["time"] / 24,

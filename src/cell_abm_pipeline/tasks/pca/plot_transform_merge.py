@@ -1,6 +1,6 @@
 import matplotlib.figure as mpl
 import pandas as pd
-from matplotlib import cm
+from matplotlib import colormaps
 from prefect import task
 from sklearn.decomposition import PCA
 
@@ -13,9 +13,14 @@ def plot_transform_merge(
     model: PCA,
     data: dict[str, pd.DataFrame],
     ref_data: pd.DataFrame,
+    ordered: bool = True,
 ) -> mpl.Figure:
     fig = make_single_figure()
-    cmap = cm.get_cmap("tab10")
+
+    if ordered:
+        cmap = colormaps["coolwarm"].resampled(len(keys))
+    else:
+        cmap = colormaps["tab20"]
 
     columns = ref_data.filter(like="shcoeffs").columns
     ref_transform = model.transform(ref_data[columns].values)
@@ -33,7 +38,7 @@ def plot_transform_merge(
     ref_violins = ax.violinplot(ref_transform, positions=positions, showextrema=False, widths=0.8)
 
     for ref_violin in ref_violins["bodies"]:
-        ref_violin.set_facecolor("#ccc")
+        ref_violin.set_facecolor("#eee")
         ref_violin.set_edgecolor("none")
         ref_violin.set_alpha(1)
 

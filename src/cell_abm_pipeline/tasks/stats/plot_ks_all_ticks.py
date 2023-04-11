@@ -17,7 +17,7 @@ def plot_ks_all_ticks(
 
     ax = fig.add_subplot()
     ax.set_xlabel("Key")
-    ax.set_ylabel("Kolmogorov–Smirnov statistic")
+    ax.set_ylabel("Kolmogorov-Smirnov statistic")
 
     stats_all_ticks = stats[stats["TICK"].isna() & stats["SAMPLE"].isna()]
 
