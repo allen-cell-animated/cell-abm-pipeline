@@ -1641,7 +1641,7 @@ xxhash = ["xxhash (>=1.4.3)"]
 
 [[package]]
 name = "prefect"
-version = "2.10.2"
+version = "2.10.3"
 description = "Workflow orchestration and management."
 category = "main"
 optional = false
@@ -2824,7 +2824,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "231d4cbf21ab6ce63a981fae6b244167b6b913aec41ddc2ab4989e7b4562d4fc"
+content-hash = "f31c4729b7ba557bcb009e30da29758dc6d4dcb43c902851f1fd05312f162085"
 
 [metadata.files]
 abm-colony-collection = [
@@ -4454,8 +4454,8 @@ pooch = [
     {file = "pooch-1.6.0.tar.gz", hash = "sha256:57d20ec4b10dd694d2b05bb64bc6b109c6e85a6c1405794ce87ed8b341ab3f44"},
 ]
 prefect = [
-    {file = "prefect-2.10.2-py3-none-any.whl", hash = "sha256:e2adc07a74fb7beb0f2441045323f2c9e19caa836281e907846859c8a4952d34"},
-    {file = "prefect-2.10.2.tar.gz", hash = "sha256:fbe281174e236b2d5fdd6f4df75fb3a4629b7f9986d1c9823a104947a481ab74"},
+    {file = "prefect-2.10.3-py3-none-any.whl", hash = "sha256:1b40ad3e6e5da7cf0dc2df36f8af5e335ee0694e0a916943cc19b842ec636689"},
+    {file = "prefect-2.10.3.tar.gz", hash = "sha256:9a3e6f82244fdcbc7c0ba04c1af7610600a02ef4ee254d8bf1024efee9d7de04"},
 ]
 py = [
     {file = "py-1.11.0-py2.py3-none-any.whl", hash = "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378"},
