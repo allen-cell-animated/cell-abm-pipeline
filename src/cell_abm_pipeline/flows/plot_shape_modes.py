@@ -43,8 +43,6 @@ REGION_COLORS = {"DEFAULT": "#F200FF", "NUCLEUS": "#3AADA7"}
 
 MODE_VIEWS = ["top", "side_1", "side_2"]
 
-SUBSET_THRESHOLDS: list[int] = [24, 48, 72]
-
 
 @dataclass
 class ParametersConfig:
@@ -69,8 +67,6 @@ class ParametersConfig:
     colors: dict = field(default_factory=lambda: REGION_COLORS)
 
     views: list = field(default_factory=lambda: MODE_VIEWS)
-
-    thresholds: list[int] = field(default_factory=lambda: SUBSET_THRESHOLDS)
 
     ordered: bool = True
 
@@ -144,9 +140,7 @@ def run_flow_plot_pca(
             save_figure(
                 context.working_location,
                 make_key(plot_key, f"{series.name}_transform_compare_{pci}_{region_key}.PCA.png"),
-                plot_transform_compare(
-                    keys, component, ref_model, all_data, ref_data, parameters.thresholds
-                ),
+                plot_transform_compare(keys, component, ref_model, all_data, ref_data),
             )
 
     if "transform_merge" in parameters.plots and ref_model is not None:

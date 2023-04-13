@@ -1,5 +1,3 @@
-from typing import Optional
-
 import matplotlib.figure as mpl
 import numpy as np
 import pandas as pd
@@ -16,7 +14,6 @@ def plot_transform_compare(
     model: PCA,
     data: dict[str, pd.DataFrame],
     ref_data: pd.DataFrame,
-    thresholds: Optional[list[int]] = None,
 ) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
 
@@ -47,19 +44,6 @@ def plot_transform_compare(
             histtype="step",
             label=f"simulated (n = {key_transform.shape[0]})",
         )
-
-        if thresholds is not None:
-            for threshold in thresholds:
-                subset = data[key][data[key]["time"] >= threshold]
-                subset_transform = model.transform(subset[columns].values)
-                ax.hist(
-                    subset_transform[:, component],
-                    bins=bins,
-                    density=True,
-                    histtype="step",
-                    linewidth=0.5,
-                    label=f"simulated (n = {subset_transform.shape[0]} | t $\\geq$ {threshold} hrs)",
-                )
 
         ax.legend()
 
