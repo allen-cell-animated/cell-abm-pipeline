@@ -29,18 +29,21 @@ class ParametersConfig:
     valid_phases: list[str] = field(default_factory=lambda: VALID_PHASES)
     """Valid phases for calculating shape modes."""
 
+    valid_ticks: list[int] = field(default_factory=lambda: [0])
+    """Valid ticks for calculating shape modes."""
+
     ds: float = 1.0
 
     dt: float = 1.0
-
-    sample_ticks: list[int] = field(default_factory=lambda: [])
-    """List of ticks to sample for calculating stats with sampling."""
 
     sample_reps: int = 100
     """Number of replicates for calculating stats with sampling."""
 
     sample_size: int = 100
     """Sample size for each tick for calculating stats with sampling."""
+
+    outlier: Optional[float] = None
+    """Standard deviation threshold for outliers."""
 
 
 @dataclass
@@ -126,8 +129,21 @@ def run_flow_process_data(
         results_data = pd.concat(all_results)
         coeffs_data = pd.concat(all_coeffs)
 
+        # Filter coefficient outliers.
+        if parameters.outlier is not None:
+            outlier_filter = abs(
+                coeffs_data - coeffs_data.mean()
+            ) <= parameters.outlier * coeffs_data.std(ddof=1)
+            coeffs_data = coeffs_data[outlier_filter].dropna()
+
+        # Join results and coefficients data
         data = coeffs_data.join(results_data, on=INDEX_COLUMNS).reset_index()
+
+        # Filter for cell phase and selected ticks.
         data = data[data["PHASE"].isin(parameters.valid_phases)]
+        data = data[data["TICK"].isin(parameters.valid_ticks)]
+
+        # Convert units.
         convert_model_units(data, parameters.ds, parameters.dt, parameters.regions)
 
         # Remove nans
@@ -153,7 +169,6 @@ def run_flow_fit_model(
             continue
 
         data = load_dataframe(context.working_location, data_key)
-        data = data[data["SEED"].isin(series.seeds)]
 
         coeffs = data.filter(like="shcoeffs").values
         ordering = data["NUM_VOXELS"].values
@@ -188,36 +203,31 @@ def run_flow_analyze_stats(
         data = data[data["SEED"].isin(series.seeds)]
 
         size_stats = calculate_size_stats(data, ref_data, parameters.regions, include_ticks=True)
+        sample_size_stats = calculate_size_stats(
+            data,
+            ref_data,
+            parameters.regions,
+            include_samples=True,
+            sample_reps=parameters.sample_reps,
+            sample_size=parameters.sample_size,
+        )
         shape_stats = calculate_shape_stats(
             ref_model, data, ref_data, parameters.components, include_ticks=True
         )
+        sample_shape_stats = calculate_shape_stats(
+            ref_model,
+            data,
+            ref_data,
+            parameters.components,
+            include_samples=True,
+            sample_reps=parameters.sample_reps,
+            sample_size=parameters.sample_size,
+        )
 
-        if parameters.sample_ticks:
-            subset_data = data[data["TICK"].isin(parameters.sample_ticks)]
-            subset_size_stats = calculate_size_stats(
-                subset_data,
-                ref_data,
-                parameters.regions,
-                include_samples=True,
-                sample_reps=parameters.sample_reps,
-                sample_size=parameters.sample_size,
-            )
-            subset_shape_stats = calculate_shape_stats(
-                ref_model,
-                subset_data,
-                ref_data,
-                parameters.components,
-                include_samples=True,
-                sample_reps=parameters.sample_reps,
-                sample_size=parameters.sample_size,
-            )
+        sample_size_stats = sample_size_stats.dropna(subset=["SAMPLE"])
+        sample_shape_stats = sample_shape_stats.dropna(subset=["SAMPLE"])
 
-            subset_size_stats = subset_size_stats.dropna(subset=["SAMPLE"])
-            subset_shape_stats = subset_shape_stats.dropna(subset=["SAMPLE"])
-
-            stats = pd.concat([size_stats, shape_stats, subset_size_stats, subset_shape_stats])
-        else:
-            stats = pd.concat([size_stats, shape_stats])
+        stats = pd.concat([size_stats, shape_stats, sample_size_stats, sample_shape_stats])
 
         convert_model_units(stats, parameters.ds, parameters.dt)
 
