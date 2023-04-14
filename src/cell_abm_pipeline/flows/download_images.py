@@ -11,7 +11,9 @@ from prefect import flow
 class ParametersConfig:
     cells_per_fov: int
 
-    num_fovs: int
+    bins: list[int]
+
+    counts: list[int]
 
     quilt_package: str = "aics/hipsc_single_cell_image_dataset"
 
@@ -43,12 +45,14 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     metadata = load_dataframe(
         context.metadata_location,
         series.metadata_key,
-        usecols=["CellId", "cell_stage", "outlier", "fov_seg_path", "this_cell_index"],
+        usecols=["CellId", "cell_stage", "outlier", "fov_seg_path", "this_cell_index", "mem_shape_volume_lcc"],
     )
 
-    selected_fovs = select_fov_images(metadata, parameters.cells_per_fov, parameters.num_fovs)
+    selected_fovs = select_fov_images(metadata, parameters.cells_per_fov, parameters.bins, parameters.counts)
 
     for fov in selected_fovs:
+        print(f"key: {fov['key']}")
+        print(f"include_ids: {', '.join([str(cell_id) for cell_id in fov['cell_ids']])}")
         fov_key = make_key(series.name, "images", f"{series.name}_{fov['key']}.ome.tiff")
         key_exists = check_key(context.working_location, fov_key)
 
