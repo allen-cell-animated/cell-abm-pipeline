@@ -11,6 +11,7 @@ from prefect import flow
 from cell_abm_pipeline.flows.analyze_shape_modes import PCA_COMPONENTS
 from cell_abm_pipeline.flows.calculate_coefficients import COEFFICIENT_ORDER
 from cell_abm_pipeline.tasks.pca import (
+    plot_feature_compare,
     plot_transform_compare,
     plot_transform_merge,
     plot_variance_explained,
@@ -23,6 +24,7 @@ from cell_abm_pipeline.tasks.stats import (
 )
 
 PLOTS_PCA = [
+    "feature_compare",
     "transform_compare",
     "transform_merge",
     "variance_explained",
@@ -126,6 +128,16 @@ def run_flow_plot_pca(
     if parameters.reference is not None:
         ref_model = load_pickle(context.working_location, parameters.reference["model"])
         ref_data = load_dataframe(context.working_location, parameters.reference["data"])
+
+    if "feature_compare" in parameters.plots and ref_model is not None:
+        for region in parameters.regions:
+            for feature in ["volume", "height"]:
+                feature_name = f"{feature}.{region}" if region != "DEFAULT" else feature
+                save_figure(
+                    context.working_location,
+                    make_key(plot_key, f"{series.name}_feature_compare_{feature}_{region}.PCA.png"),
+                    plot_feature_compare(keys, feature_name, all_data, ref_data),
+                )
 
     if "variance_explained" in parameters.plots:
         save_figure(
