@@ -9,10 +9,7 @@ from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 @task
 def plot_feature_compare(
-    keys: list[str],
-    feature: str,
-    data: dict[str, pd.DataFrame],
-    ref_data: pd.DataFrame
+    keys: list[str], feature: str, data: dict[str, pd.DataFrame], ref_data: pd.DataFrame
 ) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
 
