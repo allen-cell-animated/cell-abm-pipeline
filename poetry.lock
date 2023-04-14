@@ -16,7 +16,7 @@ scipy = ">=1.9.3,<2.0.0"
 
 [[package]]
 name = "abm-initialization-collection"
-version = "0.3.1"
+version = "0.4.0"
 description = "Collection of tasks for initializing abm simulations."
 category = "main"
 optional = false
@@ -2824,7 +2824,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "f31c4729b7ba557bcb009e30da29758dc6d4dcb43c902851f1fd05312f162085"
+content-hash = "3abdf8df1c889047c2c6c59e7208508d652dc21e32c14945ab974f9c036586ae"
 
 [metadata.files]
 abm-colony-collection = [
@@ -2832,8 +2832,8 @@ abm-colony-collection = [
     {file = "abm_colony_collection-0.3.2.tar.gz", hash = "sha256:5092453b51291fcb6c30438103d70ce6cfff64f5fef63e3f887748a9816be6f6"},
 ]
 abm-initialization-collection = [
-    {file = "abm_initialization_collection-0.3.1-py3-none-any.whl", hash = "sha256:4ba14f8c80d2952d4b19421c0aa8f34c59dd16c68fcb0deeb55145f9e969ff48"},
-    {file = "abm_initialization_collection-0.3.1.tar.gz", hash = "sha256:949ad0d82e3a3ec326dc8e02d949e7ce2428cf8b4bc28603b33996d8740c7a2e"},
+    {file = "abm_initialization_collection-0.4.0-py3-none-any.whl", hash = "sha256:6dc0a1c6f48ecfca1a26c5174ed4d3112497311792851a238383f57fbe3fba0b"},
+    {file = "abm_initialization_collection-0.4.0.tar.gz", hash = "sha256:7e79e37140963404bb18d98d3147a2e69719104aa8980511dbeaf7e7c2cdb78b"},
 ]
 abm-shape-collection = [
     {file = "abm_shape_collection-0.4.0-py3-none-any.whl", hash = "sha256:793d8d6b8d40bd7457b5ce0fbacb95cc09796b523b3a7c9366b9bcc309d8078a"},
