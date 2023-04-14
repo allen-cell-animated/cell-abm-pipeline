@@ -1,5 +1,6 @@
 from .plot_feature_compare import plot_feature_compare
 from .plot_feature_merge import plot_feature_merge
+from .plot_pca_correlation import plot_pca_correlation
 from .plot_transform_compare import plot_transform_compare
 from .plot_transform_merge import plot_transform_merge
 from .plot_variance_explained import plot_variance_explained

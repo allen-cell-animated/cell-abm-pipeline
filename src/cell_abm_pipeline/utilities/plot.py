@@ -19,9 +19,9 @@ def make_single_figure() -> mpl.figure.Figure:
     return fig
 
 
-def make_grid_figure(keys: list[Any]) -> mpl.figure.Figure:
+def make_grid_figure(keys: list[Any], size: int = PLOT_SIZE) -> mpl.figure.Figure:
     n_rows, n_cols, indices = separate_rows_cols(keys)
-    fig = plt.figure(figsize=(n_cols * PLOT_SIZE, n_rows * PLOT_SIZE), constrained_layout=True)
+    fig = plt.figure(figsize=(n_cols * size, n_rows * size), constrained_layout=True)
     gridspec = fig.add_gridspec(n_rows, n_cols)
     return fig, gridspec, indices
 

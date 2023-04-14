@@ -13,6 +13,7 @@ from cell_abm_pipeline.flows.calculate_coefficients import COEFFICIENT_ORDER
 from cell_abm_pipeline.tasks.pca import (
     plot_feature_compare,
     plot_feature_merge,
+    plot_pca_correlation,
     plot_transform_compare,
     plot_transform_merge,
     plot_variance_explained,
@@ -27,6 +28,7 @@ from cell_abm_pipeline.tasks.stats import (
 PLOTS_PCA = [
     "feature_compare",
     "feature_merge",
+    "pca_correlation",
     "transform_compare",
     "transform_merge",
     "variance_explained",
@@ -151,12 +153,13 @@ def run_flow_plot_pca(
                 ),
             )
 
-    if "variance_explained" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_variance_explained_{region_key}.PCA.png"),
-            plot_variance_explained(keys, all_models, ref_model),
-        )
+    if "pca_correlation" in parameters.plots:
+        for key in keys:
+            save_figure(
+                context.working_location,
+                make_key(plot_key, f"{series.name}_pca_correlation_{key}_{region_key}.PCA.png"),
+                plot_pca_correlation(all_models[key], all_data[key], parameters.regions),
+            )
 
     if "transform_compare" in parameters.plots and ref_model is not None:
         for component in range(parameters.components):
@@ -172,6 +175,13 @@ def run_flow_plot_pca(
             context.working_location,
             make_key(plot_key, f"{series.name}_transform_merge_{region_key}.PCA.png"),
             plot_transform_merge(keys, ref_model, all_data, ref_data, parameters.ordered),
+        )
+
+    if "variance_explained" in parameters.plots:
+        save_figure(
+            context.working_location,
+            make_key(plot_key, f"{series.name}_variance_explained_{region_key}.PCA.png"),
+            plot_variance_explained(keys, all_models, ref_model),
         )
 
 
