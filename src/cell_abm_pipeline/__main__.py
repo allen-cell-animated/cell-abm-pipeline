@@ -2,6 +2,7 @@ import hashlib
 import importlib
 import os
 import sys
+from datetime import datetime
 
 from omegaconf import OmegaConf
 from prefect.blocks.system import Secret
@@ -52,7 +53,10 @@ def main():
     if dryrun:
         return
 
-    run_flow(module, config, deploy)
+    if deploy:
+        create_deployment(module, config)
+    else:
+        run_flow(module, config)
 
 
 def get_module(module_name):
@@ -82,32 +86,83 @@ def create_flow_template(module_name):
         file.write(template)
 
 
-def run_flow(module, config, deploy):
+def run_flow(module, config):
     context = OmegaConf.to_object(config.context)
     series = OmegaConf.to_object(config.series)
     parameters = OmegaConf.to_object(config.parameters)
 
-    if deploy:
-        infra_overrides = {}
+    module.run_flow(context, series, parameters)
 
-        if hasattr(context, "region"):
-            infra_overrides = {"env": {"AWS_DEFAULT_REGION": context.region}}
 
-        checksum = hashlib.md5(OmegaConf.to_yaml(config, resolve=True).encode("utf-8")).hexdigest()
+def create_deployment(module, config):
+    context = OmegaConf.to_object(config.context)
+    series = OmegaConf.to_object(config.series)
+    parameters = OmegaConf.to_object(config.parameters)
 
-        deployment = Deployment.build_from_flow(
-            flow=module.run_flow,
-            name=f"{series.name}:{checksum}",
+    flow_name = module.__name__.split(".")[-1]
+
+    name = input("Deployment name: ")
+    name = name.replace("{{timestamp}}", datetime.now().strftime("%Y-%m-%d"))
+    name = name.replace("{{name}}", series.name)
+
+    work_queue_name = input("Deployment queue (default if None): ")
+    work_queue_name = "default" if work_queue_name == "" else work_queue_name
+
+    infra_overrides = {}
+
+    if hasattr(context, "region"):
+        infra_overrides = {"env": {"AWS_DEFAULT_REGION": context.region}}
+
+    deployment = Deployment(name=name, flow_name=flow_name)
+    checksum = hashlib.md5(OmegaConf.to_yaml(config, resolve=True).encode("utf-8")).hexdigest()
+
+    full_name = f"\033[1m{flow_name}/{name}\033[0m"
+
+    if deployment.load() and deployment.version != checksum:
+        response = input(f"Deployment {full_name} already exists. Overwrite [y/n]? ")
+        if response[0] != "y":
+            return
+
+        deployment.update(
+            version=checksum,
             parameters={
                 "context": context,
                 "series": series,
                 "parameters": parameters,
             },
+            work_queue_name=work_queue_name,
             infra_overrides=infra_overrides,
         )
         deployment.apply()
+
+        print(f"Deployment [ {full_name} ] updated.")
+    elif deployment.version != checksum:
+        deployment = Deployment.build_from_flow(
+            flow=module.run_flow,
+            name=name,
+            version=checksum,
+            parameters={
+                "context": context,
+                "series": series,
+                "parameters": parameters,
+            },
+            work_queue_name=work_queue_name,
+            infra_overrides=infra_overrides,
+            apply=True,
+        )
+
+        print(f"Deployment {full_name} created.")
+    elif deployment.work_queue_name != work_queue_name:
+        response = input(f"Update {full_name} queue to \033[92m{ work_queue_name }\033[0m [y/n]? ")
+        if response[0] != "y":
+            return
+
+        deployment.update(work_queue_name=work_queue_name)
+        deployment.apply()
+
+        print(f"Deployment {full_name} queue updated.")
     else:
-        module.run_flow(context, series, parameters)
+        print(f"Deployment {full_name} with same configuration already exists.")
 
 
 if __name__ == "__main__":
