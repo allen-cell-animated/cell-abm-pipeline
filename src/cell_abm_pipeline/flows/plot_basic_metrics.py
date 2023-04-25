@@ -89,6 +89,8 @@ class ParametersConfig:
 
     tick: int = 0
 
+    chunk: int = 5
+
     plots: list[str] = field(default_factory=lambda: PLOTS)
 
     phases: list[str] = field(default_factory=lambda: CELL_PHASES)
@@ -98,6 +100,8 @@ class ParametersConfig:
     bounds: dict = field(default_factory=lambda: BOUNDS)
 
     thresholds: list[int] = field(default_factory=lambda: SUBSET_THRESHOLDS)
+
+    ids: Optional[list[int]] = field(default_factory=lambda: [1])
 
 
 @dataclass
@@ -184,7 +188,7 @@ def run_flow_plot_temporal(
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_height_individual{region_key}.BASIC.png"),
-            plot_height_individual(keys, all_results, parameters.region),
+            plot_height_individual(keys, all_results, parameters.region, parameters.ids),
         )
 
     if "height_merge" in parameters.plots and reference_data is not None:
@@ -239,7 +243,7 @@ def run_flow_plot_temporal(
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_volume_individual{region_key}.BASIC.png"),
-            plot_volume_individual(keys, all_results, parameters.region),
+            plot_volume_individual(keys, all_results, parameters.region, parameters.ids),
         )
 
     if "volume_merge" in parameters.plots and reference_data is not None:
@@ -256,50 +260,61 @@ def run_flow_plot_spatial(
 ) -> None:
     plot_key = make_key(series.name, "plots", "plots.BASIC")
     region_key = f"_{parameters.region}" if parameters.region is not None else ""
-    tick_key = f"T{parameters.tick:06d}"
-    keys = [(condition["key"], seed) for condition in series.conditions for seed in series.seeds]
 
-    all_results = {}
+    for index in range(0, len(series.seeds), parameters.chunk):
+        start = index
+        end = index + parameters.chunk
 
-    for key, seed in keys:
-        series_key = f"{series.name}_{key}_{seed:04d}"
-        results_key = make_key(series.name, "results", f"{series_key}.csv")
-        results = load_dataframe(context.working_location, results_key)
-        convert_model_units(results, parameters.ds, parameters.dt, parameters.region)
-        all_results[(key, seed)] = results
+        subset_key = f"T{parameters.tick:06d}_{series.seeds[start]:04d}_{series.seeds[end - 1]:04d}"
+        subset_region_key = f"{subset_key}{region_key}"
 
-    reference_data = None
-    if parameters.reference:
-        reference_data = load_dataframe(context.working_location, parameters.reference)
+        keys = [
+            (condition["key"], seed)
+            for condition in series.conditions
+            for seed in series.seeds[start:end]
+        ]
 
-    if "height_locations" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_height_locations_{tick_key}{region_key}.BASIC.png"),
-            plot_height_locations(
-                keys, all_results, parameters.tick, reference_data, parameters.region
-            ),
-        )
+        all_results = {}
 
-    if "phase_locations" in parameters.plots and parameters.region is None:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_phase_locations_{tick_key}.BASIC.png"),
-            plot_phase_locations(keys, all_results, parameters.tick, parameters.phase_colors),
-        )
+        for key, seed in keys:
+            series_key = f"{series.name}_{key}_{seed:04d}"
+            results_key = make_key(series.name, "results", f"{series_key}.csv")
+            results = load_dataframe(context.working_location, results_key)
+            convert_model_units(results, parameters.ds, parameters.dt, parameters.region)
+            all_results[(key, seed)] = results
 
-    if "population_locations" in parameters.plots and parameters.region is None:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_population_locations_{tick_key}.BASIC.png"),
-            plot_population_locations(keys, all_results, parameters.tick),
-        )
+        reference_data = None
+        if parameters.reference:
+            reference_data = load_dataframe(context.working_location, parameters.reference)
 
-    if "volume_locations" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_volume_locations_{tick_key}{region_key}.BASIC.png"),
-            plot_volume_locations(
-                keys, all_results, parameters.tick, reference_data, parameters.region
-            ),
-        )
+        if "height_locations" in parameters.plots:
+            save_figure(
+                context.working_location,
+                make_key(plot_key, f"{series.name}_height_locations_{subset_region_key}.BASIC.png"),
+                plot_height_locations(
+                    keys, all_results, parameters.tick, reference_data, parameters.region
+                ),
+            )
+
+        if "phase_locations" in parameters.plots and parameters.region is None:
+            save_figure(
+                context.working_location,
+                make_key(plot_key, f"{series.name}_phase_locations_{subset_key}.BASIC.png"),
+                plot_phase_locations(keys, all_results, parameters.tick, parameters.phase_colors),
+            )
+
+        if "population_locations" in parameters.plots and parameters.region is None:
+            save_figure(
+                context.working_location,
+                make_key(plot_key, f"{series.name}_population_locations_{subset_key}.BASIC.png"),
+                plot_population_locations(keys, all_results, parameters.tick),
+            )
+
+        if "volume_locations" in parameters.plots:
+            save_figure(
+                context.working_location,
+                make_key(plot_key, f"{series.name}_volume_locations_{subset_region_key}.BASIC.png"),
+                plot_volume_locations(
+                    keys, all_results, parameters.tick, reference_data, parameters.region
+                ),
+            )

@@ -9,7 +9,10 @@ from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 @task
 def plot_height_individual(
-    keys: list[str], data: dict[str, pd.DataFrame], region: Optional[str] = None
+    keys: list[str],
+    data: dict[str, pd.DataFrame],
+    region: Optional[str] = None,
+    ids: Optional[list[int]] = None,
 ) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
     value = f"height.{region}" if region else "height"
@@ -21,6 +24,9 @@ def plot_height_individual(
         ax.set_ylabel("Height ($\\mu m$)")
 
         key_data = data[key]
+
+        if ids is not None:
+            key_data = key_data[key_data["ID"].isin(ids)]
 
         for _, group in key_data.groupby(["SEED", "ID"]):
             group.sort_values("time", inplace=True)
