@@ -32,6 +32,8 @@ class ParametersConfig:
 
     calculate_neighbors: CalculateNeighborsParametersConfig
 
+    submit_tasks: bool = True
+
 
 @dataclass
 class ContextConfig:
@@ -119,12 +121,15 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
                     CALCULATE_NEIGHBORS_COMMAND + make_dotlist_from_config(config)
                 )
 
-                submit_fargate_task.with_options(retries=2, retry_delay_seconds=1)(
-                    "calculate_neighbors",
-                    task_definition_arn,
-                    context.user,
-                    context.cluster,
-                    context.security_groups.split(":"),
-                    context.subnets.split(":"),
-                    calculate_neighbors_command,
-                )
+                if parameters.submit_tasks:
+                    submit_fargate_task.with_options(retries=2, retry_delay_seconds=1)(
+                        "calculate_neighbors",
+                        task_definition_arn,
+                        context.user,
+                        context.cluster,
+                        context.security_groups.split(":"),
+                        context.subnets.split(":"),
+                        calculate_neighbors_command,
+                    )
+                else:
+                    print(" ".join(calculate_neighbors_command))
