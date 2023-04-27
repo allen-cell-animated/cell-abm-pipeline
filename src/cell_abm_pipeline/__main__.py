@@ -99,7 +99,7 @@ def create_deployment(module, config):
     series = OmegaConf.to_object(config.series)
     parameters = OmegaConf.to_object(config.parameters)
 
-    flow_name = module.__name__.split(".")[-1]
+    flow_name = module.__name__.split(".")[-1].replace("_", "-")
 
     name = input("Deployment name: ")
     name = name.replace("{{timestamp}}", datetime.now().strftime("%Y-%m-%d"))
@@ -135,7 +135,7 @@ def create_deployment(module, config):
         )
         deployment.apply()
 
-        print(f"Deployment [ {full_name} ] updated.")
+        print(f"Deployment {full_name} updated.")
     elif deployment.version != checksum:
         deployment = Deployment.build_from_flow(
             flow=module.run_flow,
