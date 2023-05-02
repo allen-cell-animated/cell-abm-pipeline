@@ -3,8 +3,9 @@ from typing import Optional
 
 import pandas as pd
 from abm_shape_collection import compile_shape_modes, extract_shape_modes, merge_shape_modes
+from arcade_collection.output import extract_tick_json
 from io_collection.keys import make_key
-from io_collection.load import load_dataframe, load_pickle
+from io_collection.load import load_dataframe, load_pickle, load_tar
 from io_collection.save import save_figure, save_text
 from prefect import flow
 
@@ -18,6 +19,7 @@ from cell_abm_pipeline.tasks.pca import (
     plot_transform_merge,
     plot_variance_explained,
 )
+from cell_abm_pipeline.tasks.shapes import plot_sample_shapes
 from cell_abm_pipeline.tasks.stats import (
     plot_ks_all_ticks,
     plot_ks_by_feature,
@@ -39,6 +41,7 @@ PLOTS_STATS = [
 ]
 
 PLOTS_SHAPES = [
+    "sample_shapes",
     "shape_modes_compile",
     "shape_modes_merge",
 ]
@@ -75,6 +78,16 @@ class ParametersConfig:
     views: list = field(default_factory=lambda: MODE_VIEWS)
 
     ordered: bool = True
+
+    sample_seed: int = 0
+
+    sample_tick: int = 0
+
+    sample_size: int = 100
+
+    sample_box: tuple[int, int, int] = (22, 60, 60)
+
+    random_seed: int = 0
 
 
 @dataclass
@@ -239,6 +252,7 @@ def run_flow_plot_stats(
 def run_flow_plot_shapes(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    data_key = make_key(series.name, "data", "data.LOCATIONS")
     analysis_key = make_key(series.name, "analysis", "analysis.PCA")
     plot_key = make_key(series.name, "plots", "plots.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
@@ -246,20 +260,21 @@ def run_flow_plot_shapes(
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
-        data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
-        data = load_dataframe(context.working_location, data_key)
+        if "shape_modes_compile" in parameters.plots or "shape_modes_merge" in parameters.plots:
+            data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
+            data = load_dataframe(context.working_location, data_key)
 
-        model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
-        model = load_pickle(context.working_location, model_key)
+            model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
+            model = load_pickle(context.working_location, model_key)
 
-        shape_modes = extract_shape_modes(
-            model,
-            data,
-            parameters.components,
-            parameters.regions,
-            parameters.order,
-            parameters.delta,
-        )
+            shape_modes = extract_shape_modes(
+                model,
+                data,
+                parameters.components,
+                parameters.regions,
+                parameters.order,
+                parameters.delta,
+            )
 
         if "shape_modes_compile" in parameters.plots:
             shape_modes_compile = compile_shape_modes(
@@ -292,3 +307,27 @@ def run_flow_plot_shapes(
                 f"{series.name}_{key}_shape_modes_merge_{region_key}_{views_key}.SHAPES.svg",
             )
             save_text(context.working_location, shape_modes_merge_key, shape_modes_merge)
+
+        if "sample_shapes" in parameters.plots:
+            tick_key = f"{series.name}_{key}_{parameters.sample_seed:04d}"
+            locations_key = make_key(data_key, f"{tick_key}.LOCATIONS.tar.xz")
+            locations_tar = load_tar(context.working_location, locations_key)
+            locations = extract_tick_json(
+                locations_tar, tick_key, parameters.sample_tick, "LOCATIONS"
+            )
+
+            for region in parameters.regions:
+                subset_key = f"T{parameters.sample_tick:06d}_{parameters.sample_seed:04d}_{region}"
+                save_figure(
+                    context.working_location,
+                    make_key(
+                        plot_key, f"{series.name}_{key}_sample_shapes_{subset_key}.SHAPES.png"
+                    ),
+                    plot_sample_shapes(
+                        locations,
+                        parameters.sample_box,
+                        region,
+                        parameters.sample_size,
+                        parameters.random_seed,
+                    ),
+                )
