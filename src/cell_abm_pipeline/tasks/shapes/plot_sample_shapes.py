@@ -5,7 +5,7 @@ import numpy as np
 from abm_shape_collection.make_voxels_array import make_voxels_array
 from arcade_collection.output.get_location_voxels import get_location_voxels
 from numpy.random import SeedSequence, default_rng
-from prefect import task
+from prefect import get_run_logger, task
 
 from cell_abm_pipeline.utilities.plot import make_grid_figure
 
@@ -18,16 +18,23 @@ def plot_sample_shapes(
     sample_size: int = 1,
     random_seed: int = 0,
 ) -> mpl.Figure:
+    logger = get_run_logger()
+
     region = None if region == "DEFAULT" else region
     rng = default_rng(SeedSequence(random_seed))
-    keys = list(rng.choice(len(locations), min(len(locations), sample_size), replace=False))
+
+    valid_locations = [loc for loc in locations if len(get_location_voxels(loc, region)) > 0]
+
+    keys = list(
+        rng.choice(len(valid_locations), min(len(valid_locations), sample_size), replace=False)
+    )
 
     fig, gridspec, indices = make_grid_figure(keys)
     height, width, length = box
 
     for i, j, index in indices:
         ax = fig.add_subplot(gridspec[i, j])
-        ax.set_title(f"{locations[index]['id']}")
+        ax.set_title(f"{valid_locations[index]['id']}")
         ax.invert_yaxis()
         ax.get_xaxis().set_ticks([])
         ax.get_yaxis().set_ticks([])
@@ -43,9 +50,13 @@ def plot_sample_shapes(
         ax_vert.set_xlim([0, height - 1])
         ax_vert.get_xaxis().set_ticks([])
 
-        array = make_voxels_array(get_location_voxels(locations[index], region))
+        array = make_voxels_array(get_location_voxels(valid_locations[index], region))
 
-        pad_z, pad_y, pad_x = np.array(box) - array.shape
+        for dim, shape, bound in zip(["z", "y", "x"], array.shape, box):
+            if shape > bound:
+                logger.warning("Insufficient %s padding for %d with box size %d", dim, shape, bound)
+
+        pad_z, pad_y, pad_x = (np.array(box) - array.shape).clip(0)
         padding = (
             (0, pad_z),
             (int(pad_y / 2), pad_y - int(pad_y / 2)),
