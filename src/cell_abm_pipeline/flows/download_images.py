@@ -45,10 +45,19 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     metadata = load_dataframe(
         context.metadata_location,
         series.metadata_key,
-        usecols=["CellId", "cell_stage", "outlier", "fov_seg_path", "this_cell_index", "mem_shape_volume_lcc"],
+        usecols=[
+            "CellId",
+            "cell_stage",
+            "outlier",
+            "fov_seg_path",
+            "this_cell_index",
+            "mem_shape_volume_lcc",
+        ],
     )
 
-    selected_fovs = select_fov_images(metadata, parameters.cells_per_fov, parameters.bins, parameters.counts)
+    selected_fovs = select_fov_images(
+        metadata, parameters.cells_per_fov, parameters.bins, parameters.counts
+    )
 
     for fov in selected_fovs:
         print(f"key: {fov['key']}")
