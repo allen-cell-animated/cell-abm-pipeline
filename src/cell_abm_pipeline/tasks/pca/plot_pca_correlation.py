@@ -15,19 +15,24 @@ def plot_pca_correlation(model: PCA, data: pd.DataFrame, regions: list[str]) -> 
     transform = model.transform(data[columns].values)
     components = transform.shape[1]
 
-    shape_features = list(range(components))
-    size_features = [
+    pca_features = list(range(components))
+    prop_features = [
         f"{feature}.{region}" if region != "DEFAULT" else feature
+        for feature in [
+            "volume",
+            "height",
+            "area",
+            "axis_major_length",
+            "axis_minor_length",
+            "eccentricity",
+            "orientation",
+            "perimeter",
+        ]
         for region in regions
-        for feature in ["volume", "height"]
     ]
-    features = sorted(size_features) + shape_features
 
     feature_combos = [
-        (feature_a, feature_b)
-        for index_a, feature_a in enumerate(features)
-        for index_b, feature_b in enumerate(features)
-        if index_a < index_b
+        (feature_a, feature_b) for feature_a in pca_features for feature_b in prop_features
     ]
 
     fig, gridspec, indices = make_grid_figure(feature_combos, size=2)
@@ -43,24 +48,24 @@ def plot_pca_correlation(model: PCA, data: pd.DataFrame, regions: list[str]) -> 
         elif j == 0:
             ax = fig.add_subplot(gridspec[i, j], sharex=col_ax[j])
             row_ax[i] = ax
-        elif i == j:
+        elif i == 0:
             ax = fig.add_subplot(gridspec[i, j], sharey=row_ax[i])
-            col_ax[i] = ax
+            col_ax[j] = ax
         else:
             ax = fig.add_subplot(gridspec[i, j], sharex=col_ax[j], sharey=row_ax[i])
 
         if j == 0:
-            ax.set_ylabel(f"PC {key_b + 1}" if isinstance(key_b, int) else key_b)
+            ax.set_ylabel(key_b)
         else:
             plt.setp(ax.get_yticklabels(), visible=False)
 
-        if i == len(features) - 2:
-            ax.set_xlabel(f"PC {key_a + 1}" if isinstance(key_a, int) else key_a)
+        if i == len(prop_features) - 1:
+            ax.set_xlabel(f"PC {key_a + 1}")
         else:
             plt.setp(ax.get_xticklabels(), visible=False)
 
-        data_a = data[key_a] if key_a in data.columns else transform[:, key_a]
-        data_b = data[key_b] if key_b in data.columns else transform[:, key_b]
+        data_a = transform[:, key_a]
+        data_b = data[key_b]
 
         slope, intercept = np.polyfit(data_a, data_b, 1)
         ax.plot(data_a, intercept + slope * data_a, linewidth=0.5, linestyle="dotted")
