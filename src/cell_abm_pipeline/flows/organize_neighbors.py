@@ -70,10 +70,11 @@ def run_flow_merge_neighbors(
                     continue
 
                 frame_key = make_key(analysis_key, f"{series_key}_{frame:06d}.NEIGHBORS.csv")
+
                 frame_neighbors.append(load_dataframe(context.working_location, frame_key))
 
             if not frame_neighbors:
-                return
+                continue
 
             neighbor_dataframe = pd.concat(frame_neighbors, ignore_index=True)
 
@@ -116,7 +117,7 @@ def run_flow_compress_neighbors(
                 contents.append(frame_key)
 
             if not contents:
-                return
+                continue
 
             save_tar(context.working_location, neighbor_key, contents)
 
@@ -134,7 +135,7 @@ def run_flow_remove_neighbors(
             neighbor_key_exists = check_key(context.working_location, neighbor_key)
 
             if not neighbor_key_exists:
-                return
+                continue
 
             existing_neighbors = load_tar(context.working_location, neighbor_key)
 

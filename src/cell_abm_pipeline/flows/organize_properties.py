@@ -59,12 +59,12 @@ def run_flow_merge_properties(
     for condition in series.conditions:
         for seed in series.seeds:
             series_key = f"{series.name}_{condition['key']}_{seed:04d}"
-            coeff_key = make_key(analysis_key, f"{series_key}{region}.PROPS.csv")
-            coeff_key_exists = check_key(context.working_location, coeff_key)
+            prop_key = make_key(analysis_key, f"{series_key}{region}.PROPS.csv")
+            prop_key_exists = check_key(context.working_location, prop_key)
 
             existing_frames = []
-            if coeff_key_exists:
-                existing_props = load_dataframe(context.working_location, coeff_key)
+            if prop_key_exists:
+                existing_props = load_dataframe(context.working_location, prop_key)
                 existing_frames = list(existing_props["TICK"].unique())
 
             frame_props = []
@@ -78,14 +78,14 @@ def run_flow_merge_properties(
                 frame_props.append(load_dataframe(context.working_location, frame_key))
 
             if not frame_props:
-                return
+                continue
 
-            coeff_dataframe = pd.concat(frame_props, ignore_index=True)
+            prop_dataframe = pd.concat(frame_props, ignore_index=True)
 
-            if coeff_key_exists:
-                coeff_dataframe = pd.concat([existing_props, coeff_dataframe], ignore_index=True)
+            if prop_key_exists:
+                prop_dataframe = pd.concat([existing_props, prop_dataframe], ignore_index=True)
 
-            save_dataframe(context.working_location, coeff_key, coeff_dataframe, index=False)
+            save_dataframe(context.working_location, prop_key, prop_dataframe, index=False)
 
 
 @flow(name="organize-properties_compress-properties")
@@ -98,12 +98,12 @@ def run_flow_compress_properties(
     for condition in series.conditions:
         for seed in series.seeds:
             series_key = f"{series.name}_{condition['key']}_{seed:04d}"
-            coeff_key = make_key(analysis_key, f"{series_key}{region}.PROPS.tar.xz")
-            coeff_key_exists = check_key(context.working_location, coeff_key)
+            prop_key = make_key(analysis_key, f"{series_key}{region}.PROPS.tar.xz")
+            prop_key_exists = check_key(context.working_location, prop_key)
 
             existing_frames = []
-            if coeff_key_exists:
-                existing_props = load_tar(context.working_location, coeff_key)
+            if prop_key_exists:
+                existing_props = load_tar(context.working_location, prop_key)
                 existing_frames = [
                     int(re.findall(r"[0-9]{6}", member.name)[0])
                     for member in existing_props.getmembers()
@@ -120,9 +120,9 @@ def run_flow_compress_properties(
                 contents.append(frame_key)
 
             if not contents:
-                return
+                continue
 
-            save_tar(context.working_location, coeff_key, contents)
+            save_tar(context.working_location, prop_key, contents)
 
 
 @flow(name="organize-properties_remove-properties")
@@ -135,13 +135,13 @@ def run_flow_remove_properties(
     for condition in series.conditions:
         for seed in series.seeds:
             series_key = f"{series.name}_{condition['key']}_{seed:04d}"
-            coeff_key = make_key(analysis_key, f"{series_key}{region}.PROPS.tar.xz")
-            coeff_key_exists = check_key(context.working_location, coeff_key)
+            prop_key = make_key(analysis_key, f"{series_key}{region}.PROPS.tar.xz")
+            prop_key_exists = check_key(context.working_location, prop_key)
 
-            if not coeff_key_exists:
-                return
+            if not prop_key_exists:
+                continue
 
-            existing_props = load_tar(context.working_location, coeff_key)
+            existing_props = load_tar(context.working_location, prop_key)
 
             for member in existing_props.getmembers():
                 frame_key = make_key(analysis_key, member.name)

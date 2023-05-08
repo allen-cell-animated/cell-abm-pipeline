@@ -78,7 +78,7 @@ def run_flow_merge_coefficients(
                 frame_coeffs.append(load_dataframe(context.working_location, frame_key))
 
             if not frame_coeffs:
-                return
+                continue
 
             coeff_dataframe = pd.concat(frame_coeffs, ignore_index=True)
 
@@ -120,7 +120,7 @@ def run_flow_compress_coefficients(
                 contents.append(frame_key)
 
             if not contents:
-                return
+                continue
 
             save_tar(context.working_location, coeff_key, contents)
 
@@ -139,7 +139,7 @@ def run_flow_remove_coefficients(
             coeff_key_exists = check_key(context.working_location, coeff_key)
 
             if not coeff_key_exists:
-                return
+                continue
 
             existing_coeffs = load_tar(context.working_location, coeff_key)
 
