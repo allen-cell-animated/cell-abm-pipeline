@@ -23,3 +23,9 @@ build: # run tox tests and lint
 docs: # generates documentation
 	sphinx-apidoc -o docs/ -f -M -e src/* **/tests/
 	make -C docs html
+
+check: # run linting checks only on specified file
+	black -l 100 $(file)
+	isort -l 100 $(file)
+	pylint $(file) --fail-under=0 --verbose
+	mypy --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs $(file)
