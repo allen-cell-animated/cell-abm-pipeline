@@ -82,6 +82,7 @@ def run_flow_process_data(
 ) -> None:
     results_path_key = make_key(series.name, "results")
     coeffs_path_key = make_key(series.name, "analysis", "analysis.COEFFS")
+    props_path_key = make_key(series.name, "analysis", "analysis.PROPS")
     pca_path_key = make_key(series.name, "analysis", "analysis.PCA")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
@@ -93,10 +94,12 @@ def run_flow_process_data(
             continue
 
         all_coeffs = []
+        all_props = []
         all_results = []
 
         for seed in series.seeds:
             coeffs = None
+            props = None
 
             # Load parsed results
             results_key = make_key(results_path_key, f"{series.name}_{key}_{seed:04d}.csv")
@@ -106,8 +109,8 @@ def run_flow_process_data(
             results.set_index(INDEX_COLUMNS, inplace=True)
             all_results.append(results)
 
-            # Load coefficients for each region
             for region in parameters.regions:
+                # Load coefficients for each region
                 coeffs_key = make_key(
                     coeffs_path_key, f"{series.name}_{key}_{seed:04d}_{region}.COEFFS.csv"
                 )
@@ -124,10 +127,29 @@ def run_flow_process_data(
                 else:
                     coeffs = coeffs.join(region_coeffs, on=INDEX_COLUMNS, rsuffix=f".{region}")
 
+                # Load properties for each region
+                props_key = make_key(
+                    props_path_key, f"{series.name}_{key}_{seed:04d}_{region}.PROPS.csv"
+                )
+                props_key = props_key.replace("_DEFAULT", "")
+                region_props = load_dataframe(
+                    context.working_location, props_key, converters={"KEY": str}
+                )
+                region_props.set_index(INDEX_COLUMNS, inplace=True)
+
+                if props is None:
+                    props = region_props
+                    if region != "DEFAULT":
+                        props = props.add_suffix(f".{region}")
+                else:
+                    props = props.join(region_props, on=INDEX_COLUMNS, rsuffix=f".{region}")
+
             all_coeffs.append(coeffs)
+            all_props.append(props)
 
         results_data = pd.concat(all_results)
         coeffs_data = pd.concat(all_coeffs)
+        props_data = pd.concat(all_props)
 
         # Filter coefficient outliers.
         if parameters.outlier is not None:
@@ -137,7 +159,8 @@ def run_flow_process_data(
             coeffs_data = coeffs_data[outlier_filter].dropna()
 
         # Join results and coefficients data
-        data = coeffs_data.join(results_data, on=INDEX_COLUMNS).reset_index()
+        data = coeffs_data.join(props_data, on=INDEX_COLUMNS)
+        data = data.join(results_data, on=INDEX_COLUMNS).reset_index()
 
         # Filter for cell phase and selected ticks.
         data = data[data["PHASE"].isin(parameters.valid_phases)]
