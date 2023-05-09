@@ -12,9 +12,11 @@ from prefect import flow
 from cell_abm_pipeline.flows.analyze_shape_modes import PCA_COMPONENTS
 from cell_abm_pipeline.flows.calculate_coefficients import COEFFICIENT_ORDER
 from cell_abm_pipeline.tasks.pca import (
+    plot_correlation_all_features,
+    plot_correlation_pca_features,
+    plot_correlation_region_features,
     plot_feature_compare,
     plot_feature_merge,
-    plot_pca_correlation,
     plot_transform_compare,
     plot_transform_merge,
     plot_variance_explained,
@@ -30,7 +32,7 @@ from cell_abm_pipeline.tasks.stats import (
 PLOTS_PCA = [
     "feature_compare",
     "feature_merge",
-    "pca_correlation",
+    "feature_correlation",
     "transform_compare",
     "transform_merge",
     "variance_explained",
@@ -156,6 +158,33 @@ def run_flow_plot_pca(
                     plot_feature_compare(keys, feature_name, all_data, ref_data),
                 )
 
+    if "feature_correlation" in parameters.plots:
+        for key in keys:
+            save_figure(
+                context.working_location,
+                make_key(
+                    plot_key, f"{series.name}_correlation_all_features_{key}_{region_key}.PCA.png"
+                ),
+                plot_correlation_all_features(all_models[key], all_data[key], parameters.regions),
+            )
+
+            save_figure(
+                context.working_location,
+                make_key(
+                    plot_key, f"{series.name}_correlation_pca_features_{key}_{region_key}.PCA.png"
+                ),
+                plot_correlation_pca_features(all_models[key], all_data[key]),
+            )
+
+            save_figure(
+                context.working_location,
+                make_key(
+                    plot_key,
+                    f"{series.name}_correlation_region_features_{key}_{region_key}.PCA.png",
+                ),
+                plot_correlation_region_features(all_data[key], parameters.regions),
+            )
+
     if "feature_merge" in parameters.plots:
         for feature in ["volume", "height"]:
             save_figure(
@@ -164,14 +193,6 @@ def run_flow_plot_pca(
                 plot_feature_merge(
                     keys, feature, all_data, ref_data, parameters.regions, parameters.ordered
                 ),
-            )
-
-    if "pca_correlation" in parameters.plots:
-        for key in keys:
-            save_figure(
-                context.working_location,
-                make_key(plot_key, f"{series.name}_pca_correlation_{key}_{region_key}.PCA.png"),
-                plot_pca_correlation(all_models[key], all_data[key], parameters.regions),
             )
 
     if "transform_compare" in parameters.plots and ref_model is not None:
