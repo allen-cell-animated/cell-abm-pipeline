@@ -9,15 +9,15 @@ from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 
 @task
-def plot_volume_locations(
+def plot_feature_locations(
     keys: list[tuple[str, int]],
+    feature: str,
     data: dict[tuple[str, int], pd.DataFrame],
     tick: int = 0,
     reference: Optional[pd.DataFrame] = None,
     region: Optional[str] = None,
 ) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
-    value = f"volume.{region}" if region else "volume"
 
     all_data = pd.concat(data.values())
     max_x = all_data["CENTER_X"].max()
@@ -27,9 +27,9 @@ def plot_volume_locations(
     padding = 0.5 * max((max_x - min_x), (max_y - min_y))
 
     if reference is not None:
-        reference_volume = reference[value].mean()
+        reference_value = reference[feature].mean()
     else:
-        reference_volume = all_data[all_data["TICK"] == tick][value].mean()
+        reference_feature = all_data[all_data["TICK"] == tick][feature].mean()
 
     for i, j, (key, seed) in indices:
         ax = fig.add_subplot(gridspec[i, j])
@@ -45,9 +45,9 @@ def plot_volume_locations(
 
         x = tick_data["CENTER_X"]
         y = tick_data["CENTER_Y"]
-        volumes = (tick_data[value] - reference_volume) / reference_volume
+        values = (tick_data[feature] - reference_value) / reference_value
 
-        sax = ax.scatter(x, y, c=volumes, s=20, cmap="coolwarm", vmin=-1, vmax=1)
+        sax = ax.scatter(x, y, c=values, s=20, cmap="coolwarm", vmin=-1, vmax=1)
         cbax = inset_axes(ax, width="3%", height="96%", loc="upper right")
         colorbar = fig.colorbar(sax, cax=cbax)
         colorbar.ax.yaxis.set_ticks_position("left")

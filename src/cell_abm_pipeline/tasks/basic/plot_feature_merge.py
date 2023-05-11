@@ -1,43 +1,59 @@
 from typing import Optional
 
-import matplotlib as mpl
+import matplotlib.figure as mpl
 import numpy as np
 import pandas as pd
 from matplotlib import colormaps
 from prefect import task
 
+from cell_abm_pipeline.tasks.basic.plot_feature_distribution import get_data_bins
 from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 
 @task
-def plot_volume_merge(
+def plot_feature_merge(
     keys: list[str],
+    feature: str,
     data: dict[str, pd.DataFrame],
-    bounds: dict[str, tuple[int, int]],
-    reference: pd.DataFrame,
+    bin_sizes: dict[str, float],
+    reference: Optional[pd.DataFrame] = None,
     region: Optional[str] = None,
-) -> mpl.figure.Figure:
+    ordered: bool = True,
+) -> mpl.Figure:
     region_keys: list[Optional[str]] = [None] if region is None else [None, region]
     fig, gridspec, indices = make_grid_figure(region_keys)
-    cmap = colormaps["tab10"]
+
+    if ordered:
+        cmap = colormaps["coolwarm"].resampled(len(keys))
+    else:
+        cmap = colormaps["tab10"]
+
+    if "height" in feature:
+        unit = "$\\mu m$"
+    elif "volume" in feature:
+        unit = "$\\mu m^3$"
+    else:
+        return fig
 
     for i, j, region_key in indices:
         ax = fig.add_subplot(gridspec[i, j])
         ax.set_title(region_key)
-        ax.set_xlabel("Volume ($\\mu m^3$)")
-        ax.set_ylabel("Frequency")
+        ax.set_xlabel(f"{feature.title()} ({unit})")
 
-        value = f"volume.{region}" if region_key else "volume"
-        bins = np.linspace(*bounds[value], 50)
+        feature_name = f"{feature}.{region}" if region_key else feature
+        bin_size = bin_sizes[feature_name]
+        bins = get_data_bins(keys, data, bin_size, feature_name, reference)
 
         if reference is not None:
-            ref_volumes = reference[value]
+            ref_values = reference[feature_name]
+
             ref_label = [
-                f"{ref_volumes.mean():.1f} $\\pm$ {ref_volumes.std():.1f} $\\mu m^3$",
-                f"n = {ref_volumes.count()}",
+                f"{ref_values.mean():.1f} $\\pm$ {ref_values.std():.1f} {unit}",
+                f"n = {ref_values.count()}",
             ]
+
             ax.hist(
-                reference[value],
+                ref_values,
                 bins=bins,
                 density=True,
                 color="#999999",
@@ -46,15 +62,15 @@ def plot_volume_merge(
             )
 
         for index, key in enumerate(keys):
-            volumes = data[key][value]
+            values = data[key][feature_name]
 
             label = [
-                f"{volumes.mean():.1f} $\\pm$ {volumes.std():.1f} $\\mu m^3$",
-                f"n = {volumes.count()}",
+                f"{values.mean():.1f} $\\pm$ {values.std():.1f} {unit}",
+                f"n = {values.count()}",
             ]
 
             ax.hist(
-                volumes,
+                values,
                 bins=bins,
                 density=True,
                 histtype="step",

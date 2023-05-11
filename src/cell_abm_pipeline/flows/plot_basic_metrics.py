@@ -10,20 +10,15 @@ from prefect import flow
 
 from cell_abm_pipeline.tasks.basic import (
     plot_counts_total,
-    plot_height_average,
-    plot_height_distribution,
-    plot_height_individual,
-    plot_height_locations,
-    plot_height_merge,
+    plot_feature_average,
+    plot_feature_distribution,
+    plot_feature_individual,
+    plot_feature_locations,
+    plot_feature_merge,
     plot_phase_durations,
     plot_phase_fractions,
     plot_phase_locations,
     plot_population_locations,
-    plot_volume_average,
-    plot_volume_distribution,
-    plot_volume_individual,
-    plot_volume_locations,
-    plot_volume_merge,
 )
 
 PLOTS_TEMPORAL = [
@@ -67,14 +62,12 @@ PHASE_COLORS: dict[str, str] = {
     "APOPTOTIC_LATE": "#94346E",
 }
 
-BOUNDS: dict[str, tuple[int, int]] = {
-    "volume": (0, 5500),
-    "height": (0, 23),
-    "volume.NUCLEUS": (0, 1600),
-    "height.NUCLEUS": (0, 18),
+BIN_SIZES: dict[str, float] = {
+    "volume": 100,
+    "height": 1,
+    "volume.NUCLEUS": 50,
+    "height.NUCLEUS": 1,
 }
-
-SUBSET_THRESHOLDS: list[int] = [24, 48, 72]
 
 
 @dataclass
@@ -97,9 +90,7 @@ class ParametersConfig:
 
     phase_colors: dict[str, str] = field(default_factory=lambda: PHASE_COLORS)
 
-    bounds: dict = field(default_factory=lambda: BOUNDS)
-
-    thresholds: list[int] = field(default_factory=lambda: SUBSET_THRESHOLDS)
+    bin_sizes: dict[str, float] = field(default_factory=lambda: BIN_SIZES)
 
     ids: Optional[list[int]] = field(default_factory=lambda: [1])
 
@@ -156,6 +147,9 @@ def run_flow_plot_temporal(
     if parameters.reference:
         reference_data = load_dataframe(context.working_location, parameters.reference)
 
+    height_feature = f"height.{parameters.region}" if parameters.region else "height"
+    volume_feature = f"volume.{parameters.region}" if parameters.region else "volume"
+
     if "counts_total" in parameters.plots and parameters.region is None:
         save_figure(
             context.working_location,
@@ -167,20 +161,15 @@ def run_flow_plot_temporal(
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_height_average{region_key}.BASIC.png"),
-            plot_height_average(keys, all_results, reference_data, parameters.region),
+            plot_feature_average(keys, height_feature, all_results, reference_data),
         )
 
     if "height_distribution" in parameters.plots:
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_height_distribution{region_key}.BASIC.png"),
-            plot_height_distribution(
-                keys,
-                all_results,
-                parameters.bounds,
-                reference_data,
-                parameters.region,
-                parameters.thresholds,
+            plot_feature_distribution(
+                keys, height_feature, all_results, parameters.bin_sizes[feature], reference_data
             ),
         )
 
@@ -188,14 +177,22 @@ def run_flow_plot_temporal(
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_height_individual{region_key}.BASIC.png"),
-            plot_height_individual(keys, all_results, parameters.region, parameters.ids),
+            plot_feature_individual(keys, height_feature, all_results, parameters.ids),
         )
 
     if "height_merge" in parameters.plots and reference_data is not None:
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_height_merge.BASIC.png"),
-            plot_height_merge(keys, all_results, reference_data, parameters.region),
+            plot_feature_merge(
+                keys,
+                "height",
+                all_results,
+                parameters.bin_sizes,
+                reference_data,
+                parameters.region,
+                parameters.ordered,
+            ),
         )
 
     if "phase_durations" in parameters.plots and parameters.region is None:
@@ -222,20 +219,15 @@ def run_flow_plot_temporal(
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_volume_average{region_key}.BASIC.png"),
-            plot_volume_average(keys, all_results, reference_data, parameters.region),
+            plot_volume_average(keys, volume_feature, all_results, reference_data),
         )
 
     if "volume_distribution" in parameters.plots:
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_volume_distribution{region_key}.BASIC.png"),
-            plot_volume_distribution(
-                keys,
-                all_results,
-                parameters.bounds,
-                reference_data,
-                parameters.region,
-                parameters.thresholds,
+            plot_feature_distribution(
+                keys, volume_feature, all_results, parameters.bin_sizes[feature], reference_data
             ),
         )
 
@@ -243,14 +235,22 @@ def run_flow_plot_temporal(
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_volume_individual{region_key}.BASIC.png"),
-            plot_volume_individual(keys, all_results, parameters.region, parameters.ids),
+            plot_feature_individual(keys, volume_feature, all_results, parameters.ids),
         )
 
     if "volume_merge" in parameters.plots and reference_data is not None:
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_volume_merge.BASIC.png"),
-            plot_volume_merge(keys, all_results, reference_data, parameters.region),
+            plot_feature_merge(
+                keys,
+                "volume",
+                all_results,
+                parameters.bin_sizes,
+                reference_data,
+                parameters.region,
+                parameters.ordered,
+            ),
         )
 
 
@@ -260,6 +260,9 @@ def run_flow_plot_spatial(
 ) -> None:
     plot_key = make_key(series.name, "plots", "plots.BASIC")
     region_key = f"_{parameters.region}" if parameters.region is not None else ""
+
+    height_feature = f"height.{parameters.region}" if parameters.region else "height"
+    volume_feature = f"volume.{parameters.region}" if parameters.region else "volume"
 
     for index in range(0, len(series.seeds), parameters.chunk):
         start = index
@@ -291,8 +294,8 @@ def run_flow_plot_spatial(
             save_figure(
                 context.working_location,
                 make_key(plot_key, f"{series.name}_height_locations_{subset_region_key}.BASIC.png"),
-                plot_height_locations(
-                    keys, all_results, parameters.tick, reference_data, parameters.region
+                plot_feature_locations(
+                    keys, height_feature, all_results, parameters.tick, reference_data
                 ),
             )
 
@@ -314,7 +317,7 @@ def run_flow_plot_spatial(
             save_figure(
                 context.working_location,
                 make_key(plot_key, f"{series.name}_volume_locations_{subset_region_key}.BASIC.png"),
-                plot_volume_locations(
-                    keys, all_results, parameters.tick, reference_data, parameters.region
+                plot_feature_locations(
+                    keys, volume_feature, all_results, parameters.tick, reference_data
                 ),
             )
