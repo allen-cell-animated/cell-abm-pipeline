@@ -1,79 +1,67 @@
 from typing import Optional
 
-import matplotlib.figure as mpl
+import matplotlib as mpl
+import numpy as np
 import pandas as pd
 from matplotlib import colormaps
 from prefect import task
 
-from cell_abm_pipeline.utilities.plot import make_single_figure
+from cell_abm_pipeline.utilities.plot import make_grid_figure
 
 
 @task
 def plot_height_merge(
     keys: list[str],
     data: dict[str, pd.DataFrame],
+    bounds: dict[str, tuple[int, int]],
     reference: pd.DataFrame,
     region: Optional[str] = None,
-) -> mpl.Figure:
-    fig = make_single_figure()
+) -> mpl.figure.Figure:
+    region_keys: list[Optional[str]] = [None] if region is None else [None, region]
+    fig, gridspec, indices = make_grid_figure(region_keys)
     cmap = colormaps["tab10"]
 
-    positions = [0] if region is None else [0, 1]
-    labels = ["height"] if region is None else ["height", f"height ({region})"]
+    for i, j, region_key in indices:
+        ax = fig.add_subplot(gridspec[i, j])
+        ax.set_title(region_key)
+        ax.set_xlabel("Height ($\\mu m$)")
+        ax.set_ylabel("Frequency")
 
-    ax = fig.add_subplot()
+        value = f"height.{region}" if region_key else "height"
+        bins = np.linspace(*bounds[value], 20)
 
-    ax.set_ylabel("Height ($\\mu m$)")
-    ax.set_xlim([-0.5, len(positions) - 0.5])
-    ax.set_xticks(positions)
-    ax.set_xticklabels(labels)
+        if reference is not None:
+            ref_heights = reference[value]
+            ref_label = [
+                f"{ref_heights.mean():.1f} $\\pm$ {ref_heights.std():.1f} $\\mu m$",
+                f"n = {ref_heights.count()}",
+            ]
+            ax.hist(
+                reference[value],
+                bins=bins,
+                density=True,
+                color="#999999",
+                alpha=0.7,
+                label=f"reference ({' | '.join(ref_label)})",
+            )
 
-    ref_data = reference["height"]
+        for index, key in enumerate(keys):
+            heights = data[key][value]
 
-    if region is not None:
-        ref_data = reference[["height", f"height.{region}"]]
+            label = [
+                f"{heights.mean():.1f} $\\pm$ {heights.std():.1f} $\\mu m$",
+                f"n = {heights.count()}",
+            ]
 
-    ref_violins = ax.violinplot(
-        ref_data, positions=positions, showextrema=False, widths=0.8, bw_method=0.25
-    )
+            ax.hist(
+                heights,
+                bins=bins,
+                density=True,
+                histtype="step",
+                color=cmap(index),
+                label=f"simulated {key} ({' | '.join(label)})",
+            )
 
-    for ref_violin in ref_violins["bodies"]:
-        ref_violin.set_facecolor("#ccc")
-        ref_violin.set_edgecolor("none")
-        ref_violin.set_alpha(1)
-
-    ref_means = ref_data.mean(axis=0)
-    ax.scatter(positions, ref_means, marker="o", color="#999", s=30, label="reference")
-
-    for index, key in enumerate(keys):
-        key_data = data[key]["height"]
-
-        if region is not None:
-            key_data = data[key][["height", f"height.{region}"]]
-
-        violins = ax.violinplot(
-            key_data, positions=positions, showextrema=False, widths=0.8, bw_method=0.25
-        )
-
-        for violin in violins["bodies"]:
-            violin.set_facecolor("none")
-            violin.set_edgecolor(cmap(index))
-            violin.set_linewidth(0.5)
-            violin.set_alpha(1)
-
-        means = key_data.mean(axis=0)
-        ax.scatter(
-            positions,
-            means,
-            marker="o",
-            color="none",
-            linewidth=0.5,
-            edgecolor=cmap(index),
-            s=30,
-            zorder=3,
-            label=key,
-        )
-
-    ax.legend()
+        ax.legend()
 
     return fig

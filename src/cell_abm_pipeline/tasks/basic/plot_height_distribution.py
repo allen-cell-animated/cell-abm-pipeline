@@ -19,7 +19,7 @@ def plot_height_distribution(
 ) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
     value = f"height.{region}" if region else "height"
-    bins = np.linspace(*bounds[value], 10)
+    bins = np.linspace(*bounds[value], 20)
 
     for i, j, key in indices:
         ax = fig.add_subplot(gridspec[i, j])
