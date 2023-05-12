@@ -13,7 +13,6 @@ def plot_feature_average(
     feature: str,
     data: dict[str, pd.DataFrame],
     reference: Optional[pd.DataFrame] = None,
-    region: Optional[str] = None,
 ) -> mpl.Figure:
     fig, gridspec, indices = make_grid_figure(keys)
 

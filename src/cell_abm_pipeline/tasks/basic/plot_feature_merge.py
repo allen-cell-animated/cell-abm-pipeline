@@ -1,7 +1,6 @@
 from typing import Optional
 
 import matplotlib.figure as mpl
-import numpy as np
 import pandas as pd
 from matplotlib import colormaps
 from prefect import task

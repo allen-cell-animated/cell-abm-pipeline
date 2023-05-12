@@ -94,6 +94,8 @@ class ParametersConfig:
 
     ids: Optional[list[int]] = field(default_factory=lambda: [1])
 
+    ordered: bool = True
+
 
 @dataclass
 class ContextConfig:
@@ -169,7 +171,11 @@ def run_flow_plot_temporal(
             context.working_location,
             make_key(plot_key, f"{series.name}_height_distribution{region_key}.BASIC.png"),
             plot_feature_distribution(
-                keys, height_feature, all_results, parameters.bin_sizes[feature], reference_data
+                keys,
+                height_feature,
+                all_results,
+                parameters.bin_sizes[height_feature],
+                reference_data,
             ),
         )
 
@@ -219,7 +225,7 @@ def run_flow_plot_temporal(
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_volume_average{region_key}.BASIC.png"),
-            plot_volume_average(keys, volume_feature, all_results, reference_data),
+            plot_feature_average(keys, volume_feature, all_results, reference_data),
         )
 
     if "volume_distribution" in parameters.plots:
@@ -227,7 +233,11 @@ def run_flow_plot_temporal(
             context.working_location,
             make_key(plot_key, f"{series.name}_volume_distribution{region_key}.BASIC.png"),
             plot_feature_distribution(
-                keys, volume_feature, all_results, parameters.bin_sizes[feature], reference_data
+                keys,
+                volume_feature,
+                all_results,
+                parameters.bin_sizes[volume_feature],
+                reference_data,
             ),
         )
 
