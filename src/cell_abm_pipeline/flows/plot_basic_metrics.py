@@ -151,6 +151,9 @@ def run_flow_plot_temporal(
 
     height_feature = f"height.{parameters.region}" if parameters.region else "height"
     volume_feature = f"volume.{parameters.region}" if parameters.region else "volume"
+    region_subsets: list[Optional[str]] = (
+        [None] if parameters.region is None else [None, f".{parameters.region}"]
+    )
 
     if "counts_total" in parameters.plots and parameters.region is None:
         save_figure(
@@ -195,8 +198,8 @@ def run_flow_plot_temporal(
                 "height",
                 all_results,
                 parameters.bin_sizes,
+                region_subsets,
                 reference_data,
-                parameters.region,
                 parameters.ordered,
             ),
         )
@@ -257,8 +260,8 @@ def run_flow_plot_temporal(
                 "volume",
                 all_results,
                 parameters.bin_sizes,
+                region_subsets,
                 reference_data,
-                parameters.region,
                 parameters.ordered,
             ),
         )

@@ -11,14 +11,12 @@ from prefect import flow
 
 from cell_abm_pipeline.flows.analyze_shape_modes import PCA_COMPONENTS
 from cell_abm_pipeline.flows.calculate_coefficients import COEFFICIENT_ORDER
+from cell_abm_pipeline.flows.plot_basic_metrics import BIN_SIZES
+from cell_abm_pipeline.tasks.basic import plot_feature_distribution, plot_feature_merge
 from cell_abm_pipeline.tasks.pca import (
     plot_correlation_all_features,
     plot_correlation_pca_features,
     plot_correlation_region_features,
-    plot_feature_compare,
-    plot_feature_merge,
-    plot_transform_compare,
-    plot_transform_merge,
     plot_variance_explained,
 )
 from cell_abm_pipeline.tasks.shapes import plot_sample_shapes
@@ -54,6 +52,21 @@ REGION_COLORS = {"DEFAULT": "#F200FF", "NUCLEUS": "#3AADA7"}
 
 MODE_VIEWS = ["top", "side_1", "side_2"]
 
+ALL_BIN_SIZES: dict[str, float] = {
+    "volume": BIN_SIZES["volume"],
+    "height": BIN_SIZES["height"],
+    "volume.NUCLEUS": BIN_SIZES["volume.NUCLEUS"],
+    "height.NUCLEUS": BIN_SIZES["height.NUCLEUS"],
+    "PC1": 1,
+    "PC2": 1,
+    "PC3": 1,
+    "PC4": 1,
+    "PC5": 1,
+    "PC6": 1,
+    "PC7": 1,
+    "PC8": 1,
+}
+
 
 @dataclass
 class ParametersConfig:
@@ -68,6 +81,8 @@ class ParametersConfig:
 
     order: int = COEFFICIENT_ORDER
     """Order of the spherical harmonics coefficient parametrization."""
+
+    bin_sizes: dict[str, float] = field(default_factory=lambda: ALL_BIN_SIZES)
 
     delta: float = 1.0
 
@@ -148,6 +163,18 @@ def run_flow_plot_pca(
         ref_model = load_pickle(context.working_location, parameters.reference["model"])
         ref_data = load_dataframe(context.working_location, parameters.reference["data"])
 
+        columns = ref_data.filter(like="shcoeffs").columns
+        ref_transform = ref_model.transform(ref_data[columns].values)
+
+        for component in range(parameters.components):
+            ref_data[f"PC{component + 1}"] = ref_transform[:, component]
+
+        for key in keys:
+            key_transform = ref_model.transform(all_data[key][columns].values)
+
+            for component in range(parameters.components):
+                all_data[key][f"PC{component + 1}"] = key_transform[:, component]
+
     if "feature_compare" in parameters.plots:
         for region in parameters.regions:
             for feature in ["volume", "height"]:
@@ -155,7 +182,9 @@ def run_flow_plot_pca(
                 save_figure(
                     context.working_location,
                     make_key(plot_key, f"{series.name}_feature_compare_{feature}_{region}.PCA.png"),
-                    plot_feature_compare(keys, feature_name, all_data, ref_data),
+                    plot_feature_distribution(
+                        keys, feature_name, all_data, parameters.bin_sizes[feature_name], ref_data
+                    ),
                 )
 
     if "feature_correlation" in parameters.plots:
@@ -191,7 +220,16 @@ def run_flow_plot_pca(
                 context.working_location,
                 make_key(plot_key, f"{series.name}_feature_merge_{feature}.PCA.png"),
                 plot_feature_merge(
-                    keys, feature, all_data, ref_data, parameters.regions, parameters.ordered
+                    keys,
+                    feature,
+                    all_data,
+                    parameters.bin_sizes,
+                    [
+                        None if region == "DEFAULT" else f".{region}"
+                        for region in parameters.regions
+                    ],
+                    ref_data,
+                    parameters.ordered,
                 ),
             )
 
@@ -201,14 +239,25 @@ def run_flow_plot_pca(
             save_figure(
                 context.working_location,
                 make_key(plot_key, f"{series.name}_transform_compare_{pci}_{region_key}.PCA.png"),
-                plot_transform_compare(keys, component, ref_model, all_data, ref_data),
+                plot_feature_distribution(
+                    keys, pci, all_data, parameters.bin_sizes[pci], ref_data, symmetric=True
+                ),
             )
 
     if "transform_merge" in parameters.plots and ref_model is not None:
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_transform_merge_{region_key}.PCA.png"),
-            plot_transform_merge(keys, ref_model, all_data, ref_data, parameters.ordered),
+            plot_feature_merge(
+                keys,
+                "",
+                all_data,
+                parameters.bin_sizes,
+                [f"PC{i + 1}" for i in range(8)],
+                ref_data,
+                parameters.ordered,
+                symmetric=True,
+            ),
         )
 
     if "variance_explained" in parameters.plots:

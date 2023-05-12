@@ -15,12 +15,12 @@ def plot_feature_merge(
     feature: str,
     data: dict[str, pd.DataFrame],
     bin_sizes: dict[str, float],
+    subsets: list[Optional[str]],
     reference: Optional[pd.DataFrame] = None,
-    region: Optional[str] = None,
     ordered: bool = True,
+    symmetric: bool = False,
 ) -> mpl.Figure:
-    region_keys: list[Optional[str]] = [None] if region is None else [None, region]
-    fig, gridspec, indices = make_grid_figure(region_keys)
+    fig, gridspec, indices = make_grid_figure(subsets)
 
     if ordered:
         cmap = colormaps["coolwarm"].resampled(len(keys))
@@ -32,22 +32,22 @@ def plot_feature_merge(
     elif "volume" in feature:
         unit = "$\\mu m^3$"
     else:
-        return fig
+        unit = None
 
-    for i, j, region_key in indices:
+    for i, j, subset in indices:
         ax = fig.add_subplot(gridspec[i, j])
-        ax.set_title(region_key)
-        ax.set_xlabel(f"{feature.title()} ({unit})")
+        ax.set_title(subset)
+        ax.set_xlabel(f"{feature.title()}{' (' + unit + ')' if unit else ''}")
 
-        feature_name = f"{feature}.{region}" if region_key else feature
+        feature_name = f"{feature}{subset}" if subset else feature
         bin_size = bin_sizes[feature_name]
-        bins = get_data_bins(keys, data, bin_size, feature_name, reference)
+        bins = get_data_bins(keys, data, bin_size, feature_name, reference, symmetric)
 
         if reference is not None:
             ref_values = reference[feature_name]
 
             ref_label = [
-                f"{ref_values.mean():.1f} $\\pm$ {ref_values.std():.1f} {unit}",
+                f"{ref_values.mean():.1f} $\\pm$ {ref_values.std():.1f} {unit if unit else ''}",
                 f"n = {ref_values.count()}",
             ]
 
@@ -64,7 +64,7 @@ def plot_feature_merge(
             values = data[key][feature_name]
 
             label = [
-                f"{values.mean():.1f} $\\pm$ {values.std():.1f} {unit}",
+                f"{values.mean():.1f} $\\pm$ {values.std():.1f} {unit if unit else ''}",
                 f"n = {values.count()}",
             ]
 
