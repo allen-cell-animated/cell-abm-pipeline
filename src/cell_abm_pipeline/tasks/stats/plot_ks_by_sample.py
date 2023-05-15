@@ -8,46 +8,32 @@ from cell_abm_pipeline.utilities.plot import make_single_figure
 
 
 @task
-def plot_ks_by_sample(keys: list[str], stats: pd.DataFrame) -> mpl.figure.Figure:
+def plot_ks_by_sample(
+    keys: list[str], stats: pd.DataFrame, ordered: bool = True
+) -> mpl.figure.Figure:
     fig = make_single_figure()
-    cmap = colormaps["tab20"]
+
+    if ordered:
+        cmap = colormaps["coolwarm"].resampled(len(keys))
+    else:
+        cmap = colormaps["tab10"]
 
     ax = fig.add_subplot()
-    ax.set_xlabel("Key")
     ax.set_ylabel("Kolmogorov-Smirnov statistic")
 
     stats_samples = stats[~stats["SAMPLE"].isna()]
+    features = stats_samples["FEATURE"].unique()
 
-    for index, (feature, group) in enumerate(stats_samples.groupby("FEATURE")):
-        summary = group.groupby("KEY")["KS_STATISTIC"]
-        means = summary.mean()
-        stds = summary.std()
+    bar_width = 1 / (len(keys) + 2)
 
-        min_deltas = [means[key] - summary.min()[key] for key in keys]
-        max_deltas = [summary.max()[key] - means[key] for key in keys]
+    for index, key in enumerate(keys):
+        key_stats = stats_samples[stats_samples["KEY"] == key].set_index("FEATURE")
+        bar_positions = np.arange(len(features)) + index * bar_width
+        bar_heights = key_stats.groupby("FEATURE")["KS_STATISTIC"].mean().loc[features]
+        std = key_stats.groupby("FEATURE")["KS_STATISTIC"].std(ddof=1).loc[features]
+        ax.bar(bar_positions, bar_heights, yerr=std, width=bar_width, label=key, color=cmap(index))
 
-        ax.errorbar(
-            keys,
-            [means[key] for key in keys],
-            yerr=np.vstack((min_deltas, max_deltas)),
-            marker="o",
-            markersize=4,
-            linestyle="dashed",
-            linewidth=0.5,
-            color=cmap(index),
-            label=feature,
-        )
-
-        ax.errorbar(
-            keys,
-            [means[key] for key in keys],
-            yerr=[stds[key] for key in keys],
-            marker="",
-            linestyle="",
-            linewidth=2,
-            color=cmap(index),
-        )
-
-    ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1))
+    ax.set_xticks(np.arange(len(features)) + bar_width * (len(keys) / 2 - 0.5), features)
+    ax.legend()
 
     return fig

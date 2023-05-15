@@ -296,7 +296,7 @@ def run_flow_plot_stats(
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_ks_stats_all_ticks.STATS.png"),
-            plot_ks_all_ticks(keys, all_stats, ref_stats),
+            plot_ks_all_ticks(keys, all_stats, parameters.ordered),
         )
 
         save_figure(
@@ -314,7 +314,7 @@ def run_flow_plot_stats(
         save_figure(
             context.working_location,
             make_key(plot_key, f"{series.name}_ks_stats_by_sample.STATS.png"),
-            plot_ks_by_sample(keys, all_stats),
+            plot_ks_by_sample(keys, all_stats, parameters.ordered),
         )
 
 
@@ -331,15 +331,15 @@ def run_flow_plot_shapes(
 
     for key in keys:
         if "shape_modes_compile" in parameters.plots or "shape_modes_merge" in parameters.plots:
-            data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
-            data = load_dataframe(context.working_location, data_key)
+            pca_data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
+            pca_data = load_dataframe(context.working_location, pca_data_key)
 
-            model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
-            model = load_pickle(context.working_location, model_key)
+            pca_model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
+            pca_model = load_pickle(context.working_location, pca_model_key)
 
             shape_modes = extract_shape_modes(
-                model,
-                data,
+                pca_model,
+                pca_data,
                 parameters.components,
                 parameters.regions,
                 parameters.order,
@@ -351,7 +351,7 @@ def run_flow_plot_shapes(
                 shape_modes,
                 parameters.views,
                 parameters.regions,
-                model.explained_variance_ratio_,
+                pca_model.explained_variance_ratio_,
                 parameters.colors,
                 parameters.box,
                 parameters.scale,
@@ -367,7 +367,7 @@ def run_flow_plot_shapes(
                 shape_modes,
                 parameters.views,
                 parameters.regions,
-                model.explained_variance_ratio_,
+                pca_model.explained_variance_ratio_,
                 parameters.colors,
                 parameters.box,
                 parameters.scale,

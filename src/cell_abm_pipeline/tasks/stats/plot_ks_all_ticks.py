@@ -1,45 +1,37 @@
-from typing import Optional
-
 import matplotlib as mpl
+import numpy as np
 import pandas as pd
 from matplotlib import colormaps
 from prefect import task
 
 from cell_abm_pipeline.utilities.plot import make_single_figure
 
-
 @task
 def plot_ks_all_ticks(
-    keys: list[str], stats: pd.DataFrame, ref_stats: Optional[pd.DataFrame] = None
+    keys: list[str], stats: pd.DataFrame, ordered: bool = True
 ) -> mpl.figure.Figure:
     fig = make_single_figure()
-    cmap = colormaps["tab20"]
+
+    if ordered:
+        cmap = colormaps["coolwarm"].resampled(len(keys))
+    else:
+        cmap = colormaps["tab10"]
 
     ax = fig.add_subplot()
-    ax.set_xlabel("Key")
     ax.set_ylabel("Kolmogorov-Smirnov statistic")
 
     stats_all_ticks = stats[stats["TICK"].isna() & stats["SAMPLE"].isna()]
+    features = stats_all_ticks["FEATURE"].unique()
 
-    for index, (feature, group) in enumerate(stats_all_ticks.groupby("FEATURE")):
-        ax.plot(
-            group["KEY"],
-            group["KS_STATISTIC"],
-            marker="o",
-            markersize=5,
-            linestyle="dashed",
-            linewidth=0.5,
-            color=cmap(index),
-            label=feature,
-        )
+    bar_width = 1 / (len(keys) + 2)
 
-    if ref_stats is not None:
-        ref_stats_all_ticks = ref_stats[ref_stats["TICK"].isna() & ref_stats["SAMPLE"].isna()]
-        for index, (feature, group) in enumerate(ref_stats_all_ticks.groupby("FEATURE")):
-            value = group["KS_STATISTIC"]
-            ax.plot([-0.2], [value], marker=">", color=cmap(index), markersize=5)
-            ax.plot([len(keys) - 0.8], [value], marker="<", color=cmap(index), markersize=5)
+    for index, key in enumerate(keys):
+        key_stats = stats_all_ticks[stats_all_ticks["KEY"] == key].set_index("FEATURE")
+        bar_positions = np.arange(len(features)) + index * bar_width
+        bar_heights = key_stats.loc[features]["KS_STATISTIC"]
+        ax.bar(bar_positions, bar_heights, width=bar_width, label=key, color=cmap(index))
 
-    ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1))
+    ax.set_xticks(np.arange(len(features)) + bar_width * (len(keys) / 2 - 0.5), features)
+    ax.legend()
 
     return fig
