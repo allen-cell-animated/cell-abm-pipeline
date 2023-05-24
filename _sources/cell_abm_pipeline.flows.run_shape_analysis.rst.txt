@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.flows.run\_shape\_analysis module
-=====================================================
-
-.. automodule:: cell_abm_pipeline.flows.run_shape_analysis
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.flows.analyze\_cell\_shapes\_chunk module
-=============================================================
-
-.. automodule:: cell_abm_pipeline.flows.analyze_cell_shapes_chunk
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.flows.process\_colony\_dynamics module
-==========================================================
-
-.. automodule:: cell_abm_pipeline.flows.process_colony_dynamics
-   :members:
-   :undoc-members:
-   :show-inheritance:

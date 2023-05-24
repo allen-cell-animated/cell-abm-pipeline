@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.utilities.prefect\_plugin module
-====================================================
-
-.. automodule:: cell_abm_pipeline.utilities.prefect_plugin
-   :members:
-   :undoc-members:
-   :show-inheritance:

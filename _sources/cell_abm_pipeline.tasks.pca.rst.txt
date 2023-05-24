@@ -12,6 +12,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   cell_abm_pipeline.tasks.pca.plot_transform_compare
-   cell_abm_pipeline.tasks.pca.plot_transform_merge
+   cell_abm_pipeline.tasks.pca.plot_correlation_all_features
+   cell_abm_pipeline.tasks.pca.plot_correlation_pca_features
+   cell_abm_pipeline.tasks.pca.plot_correlation_region_features
    cell_abm_pipeline.tasks.pca.plot_variance_explained

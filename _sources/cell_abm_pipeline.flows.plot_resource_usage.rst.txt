@@ -1,0 +1,7 @@
+cell\_abm\_pipeline.flows.plot\_resource\_usage module
+======================================================
+
+.. automodule:: cell_abm_pipeline.flows.plot_resource_usage
+   :members:
+   :undoc-members:
+   :show-inheritance:

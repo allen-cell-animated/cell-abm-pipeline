@@ -1,0 +1,7 @@
+cell\_abm\_pipeline.tasks.shapes.plot\_sample\_shapes module
+============================================================
+
+.. automodule:: cell_abm_pipeline.tasks.shapes.plot_sample_shapes
+   :members:
+   :undoc-members:
+   :show-inheritance:

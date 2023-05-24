@@ -1,0 +1,7 @@
+cell\_abm\_pipeline.flows.organize\_properties module
+=====================================================
+
+.. automodule:: cell_abm_pipeline.flows.organize_properties
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.tasks.basic.plot\_height\_locations module
-==============================================================
-
-.. automodule:: cell_abm_pipeline.tasks.basic.plot_height_locations
-   :members:
-   :undoc-members:
-   :show-inheritance:

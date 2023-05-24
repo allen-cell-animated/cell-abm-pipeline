@@ -1,0 +1,7 @@
+cell\_abm\_pipeline.flows.calculate\_properties module
+======================================================
+
+.. automodule:: cell_abm_pipeline.flows.calculate_properties
+   :members:
+   :undoc-members:
+   :show-inheritance:

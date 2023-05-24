@@ -1,0 +1,7 @@
+cell\_abm\_pipeline.flows.organize\_coefficients module
+=======================================================
+
+.. automodule:: cell_abm_pipeline.flows.organize_coefficients
+   :members:
+   :undoc-members:
+   :show-inheritance:

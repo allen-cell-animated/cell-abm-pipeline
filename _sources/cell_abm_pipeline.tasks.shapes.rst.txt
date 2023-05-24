@@ -1,0 +1,15 @@
+cell\_abm\_pipeline.tasks.shapes package
+========================================
+
+.. automodule:: cell_abm_pipeline.tasks.shapes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   cell_abm_pipeline.tasks.shapes.plot_sample_shapes

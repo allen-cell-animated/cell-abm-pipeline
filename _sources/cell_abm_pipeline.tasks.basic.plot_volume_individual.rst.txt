@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.tasks.basic.plot\_volume\_individual module
-===============================================================
-
-.. automodule:: cell_abm_pipeline.tasks.basic.plot_volume_individual
-   :members:
-   :undoc-members:
-   :show-inheritance:

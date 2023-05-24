@@ -17,6 +17,7 @@ Subpackages
    cell_abm_pipeline.tasks.measures
    cell_abm_pipeline.tasks.pca
    cell_abm_pipeline.tasks.resources
+   cell_abm_pipeline.tasks.shapes
    cell_abm_pipeline.tasks.stats
 
 Submodules

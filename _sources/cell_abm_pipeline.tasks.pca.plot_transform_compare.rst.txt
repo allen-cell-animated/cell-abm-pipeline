@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.tasks.pca.plot\_transform\_compare module
-=============================================================
-
-.. automodule:: cell_abm_pipeline.tasks.pca.plot_transform_compare
-   :members:
-   :undoc-members:
-   :show-inheritance:

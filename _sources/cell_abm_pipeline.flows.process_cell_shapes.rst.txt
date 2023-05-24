@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.flows.process\_cell\_shapes module
-======================================================
-
-.. automodule:: cell_abm_pipeline.flows.process_cell_shapes
-   :members:
-   :undoc-members:
-   :show-inheritance:

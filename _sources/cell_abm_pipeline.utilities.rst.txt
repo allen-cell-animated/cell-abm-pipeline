@@ -13,4 +13,3 @@ Submodules
    :maxdepth: 4
 
    cell_abm_pipeline.utilities.plot
-   cell_abm_pipeline.utilities.prefect_plugin

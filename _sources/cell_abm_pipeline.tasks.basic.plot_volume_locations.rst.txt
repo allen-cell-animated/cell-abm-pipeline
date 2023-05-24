@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.tasks.basic.plot\_volume\_locations module
-==============================================================
-
-.. automodule:: cell_abm_pipeline.tasks.basic.plot_volume_locations
-   :members:
-   :undoc-members:
-   :show-inheritance:
