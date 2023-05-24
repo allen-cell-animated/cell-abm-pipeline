@@ -10,7 +10,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-prefect = "^2.10.3"
+prefect = "^2.10.10"
 hydra-core = "^1.2.0"
 io-collection = "^0.7.2"
 container-collection = "^0.5.2"

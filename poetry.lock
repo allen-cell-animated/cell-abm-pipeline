@@ -3145,13 +3145,13 @@ xxhash = ["xxhash (>=1.4.3)"]
 
 [[package]]
 name = "prefect"
-version = "2.10.3"
+version = "2.10.10"
 description = "Workflow orchestration and management."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "prefect-2.10.3-py3-none-any.whl", hash = "sha256:1b40ad3e6e5da7cf0dc2df36f8af5e335ee0694e0a916943cc19b842ec636689"},
-    {file = "prefect-2.10.3.tar.gz", hash = "sha256:9a3e6f82244fdcbc7c0ba04c1af7610600a02ef4ee254d8bf1024efee9d7de04"},
+    {file = "prefect-2.10.10-py3-none-any.whl", hash = "sha256:95ac36ded34dfcd53ded5c42d76425a90ed403543319d47674d736cccb3021ff"},
+    {file = "prefect-2.10.10.tar.gz", hash = "sha256:45f51fb0e56a18c6b182d1b14877b11eb5ded73939f5ada4630afab8315eb394"},
 ]
 
 [package.dependencies]
@@ -3169,7 +3169,7 @@ cryptography = ">=36.0.1"
 dateparser = ">=1.1.1"
 docker = ">=4.0"
 fastapi = ">=0.93"
-fsspec = ">=2022.5.0,<2023.3.0 || >2023.3.0"
+fsspec = ">=2022.5.0"
 griffe = ">=0.20.0"
 httpx = {version = ">=0.23,<0.23.2 || >0.23.2", extras = ["http2"]}
 importlib-metadata = {version = ">=4.4", markers = "python_version < \"3.10\""}
@@ -3195,7 +3195,7 @@ uvicorn = ">=0.14.0"
 websockets = ">=10.4"
 
 [package.extras]
-dev = ["autoflake8", "cairosvg", "flake8", "flaky", "ipython", "jinja2", "mike", "mkdocs", "mkdocs-gen-files", "mkdocs-material", "mkdocstrings-python", "mock", "moto", "mypy", "numpy", "pillow", "pre-commit", "pytest (>7)", "pytest-asyncio (>=0.18.2)", "pytest-benchmark", "pytest-cov", "pytest-env", "pytest-flakefinder", "pytest-timeout", "pytest-xdist", "pytkdocs (>=0.14.2)", "pyyaml", "requests", "respx", "setuptools (!=60.9.0)", "virtualenv", "watchfiles"]
+dev = ["cairosvg", "flaky", "ipython", "ipython (==8.12.*)", "jinja2", "mike", "mkdocs", "mkdocs-gen-files", "mkdocs-material", "mkdocstrings-python", "mock", "moto", "mypy", "numpy", "pillow", "pre-commit", "pytest (>7)", "pytest-asyncio (>=0.18.2)", "pytest-benchmark", "pytest-cov", "pytest-env", "pytest-flakefinder", "pytest-timeout", "pytest-xdist", "pytkdocs (>=0.14.2)", "pyyaml", "requests", "respx", "ruff", "setuptools (!=60.9.0)", "virtualenv", "watchfiles"]
 
 [[package]]
 name = "py"
@@ -5132,4 +5132,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "684665b7dcb7546d62eeb382cbfdbdc56eb74c6f034edf8d960cc1a257364cff"
+content-hash = "568f63fca9edaafdcbce910bf64f646ae514321adc8b7ab07d3c13e8239a4cb2"
