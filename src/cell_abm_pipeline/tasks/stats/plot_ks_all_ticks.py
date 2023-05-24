@@ -6,6 +6,7 @@ from prefect import task
 
 from cell_abm_pipeline.utilities.plot import make_single_figure
 
+
 @task
 def plot_ks_all_ticks(
     keys: list[str], stats: pd.DataFrame, ordered: bool = True
