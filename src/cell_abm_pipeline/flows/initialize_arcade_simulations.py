@@ -211,7 +211,7 @@ def run_flow_convert_to_arcade(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     samples_key = make_key(series.name, "samples", "samples.PROCESSED")
-    converted_key = make_key(series.name, "converted", "converted.ARCADE")
+    inits_key = make_key(series.name, "inits", "inits.ARCADE")
 
     if check_key(context.reference_location, series.reference_key):
         reference = load_dataframe(context.reference_location, series.reference_key)
@@ -237,15 +237,15 @@ def run_flow_convert_to_arcade(
             parameters.critical_heights,
             parameters.state_thresholds,
         )
-        cells_key = make_key(converted_key, f"{series.name}_{fov['key']}.CELLS.json")
+        cells_key = make_key(inits_key, f"{series.name}_{fov['key']}.CELLS.json")
         save_json(context.working_location, cells_key, cells)
 
         locations = convert_to_locations_file(merged_samples)
-        locations_key = make_key(converted_key, f"{series.name}_{fov['key']}.LOCATIONS.json")
+        locations_key = make_key(inits_key, f"{series.name}_{fov['key']}.LOCATIONS.json")
         save_json(context.working_location, locations_key, locations)
 
         setup = generate_setup_file(merged_samples, margins, parameters.potts_terms)
-        setup_key = make_key(converted_key, f"{series.name}_{fov['key']}.xml")
+        setup_key = make_key(inits_key, f"{series.name}_{fov['key']}.xml")
         save_text(context.working_location, setup_key, setup)
 
 

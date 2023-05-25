@@ -24,6 +24,8 @@ from prefect import flow, get_run_logger
 
 @dataclass
 class ParametersConfig:
+    model: str
+
     seeds_per_job: int
 
     image: str
@@ -102,7 +104,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         ]
         group_inits = [init for init in series.inits if group is None or init["group"] == group]
 
-        # Find missing conditions and group into input file contents.
+        # Find missing conditions.
         missing_conditions = find_missing_conditions(
             manifest, series.name, group_conditions, series.seeds, series.extensions
         )
@@ -114,19 +116,19 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         input_contents = generate_input_contents(template, condition_sets)
 
         # Copy source init files to target init files.
-        valid_seeds = set([condition["seed"] for condition in missing_conditions])
+        valid_seeds = {condition["seed"] for condition in missing_conditions}
         for init in group_inits:
             if len(valid_seeds.intersection(init["seeds"])) == 0:
                 continue
 
-            source_key = make_key(init["name"], "converted", "converted.ARCADE")
+            source_key = make_key(init["name"], "inits", f"inits.{parameters.model.upper()}")
             source = make_key(source_key, f"{init['name']}_{init['key']}")
 
             target_key = make_key(series.name, "{{timestamp}}", "inits")
             targets = [make_key(target_key, f"{group_key}_{seed:04d}") for seed in init["seeds"]]
 
             for target in targets:
-                for ext in ["CELLS.json", "LOCATIONS.json"]:
+                for ext in init["extensions"]:
                     copy_key(context.working_location, f"{source}.{ext}", f"{target}.{ext}")
 
         # Create job definition.

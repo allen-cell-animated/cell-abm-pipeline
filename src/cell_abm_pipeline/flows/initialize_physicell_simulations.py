@@ -85,7 +85,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         # Save final list of coordinates.
         coordinates = pd.concat([substrate_coordinates, cell_coordinates])
         coordinates_key = make_key(
-            series.name, "inits", "inits.COORDINATES", f"{series.name}_{ds}.COORDINATES.csv"
+            series.name, "inits", "inits.PHYSICELL", f"{series.name}_{ds}.csv"
         )
         save_dataframe(
             context.working_location, coordinates_key, coordinates, index=False, header=False
