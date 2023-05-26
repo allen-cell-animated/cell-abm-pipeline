@@ -21,18 +21,20 @@ from io_collection.load import load_dataframe, load_text
 from io_collection.save import save_text
 from prefect import flow, get_run_logger
 
+from cell_abm_pipeline.tasks.physicell import render_physicell_template
+
 
 @dataclass
 class ParametersConfig:
     model: str
-
-    seeds_per_job: int
 
     image: str
 
     retries: int
 
     retry_delay: int
+
+    seeds_per_job: int = 1
 
     log_filter: str = ""
 
@@ -112,8 +114,17 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         if len(missing_conditions) == 0:
             continue
 
-        condition_sets = group_template_conditions(missing_conditions, parameters.seeds_per_job)
-        input_contents = generate_input_contents(template, condition_sets)
+        # Convert missing conditions into model input files.
+        input_contents: list[str] = []
+
+        if parameters.model.upper() == "ARCADE":
+            condition_sets = group_template_conditions(missing_conditions, parameters.seeds_per_job)
+            input_contents = generate_input_contents(template, condition_sets)
+        elif parameters.model.upper() == "PHYSICELL":
+            input_contents = render_physicell_template(template, missing_conditions)
+
+        if len(input_contents) == 0:
+            continue
 
         # Copy source init files to target init files.
         valid_seeds = {condition["seed"] for condition in missing_conditions}

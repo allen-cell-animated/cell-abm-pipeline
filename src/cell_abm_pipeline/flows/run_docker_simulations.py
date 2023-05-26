@@ -24,16 +24,20 @@ from io_collection.save import save_text
 from prefect import flow, get_run_logger
 from prefect.server.schemas.states import State
 
+from cell_abm_pipeline.tasks.physicell import render_physicell_template
+
 
 @dataclass
 class ParametersConfig:
-    seeds_per_job: int
+    model: str
 
     image: str
 
     retries: int
 
     retry_delay: int
+
+    seeds_per_job: int = 1
 
     log_filter: str = ""
 
@@ -96,7 +100,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         ]
         group_inits = [init for init in series.inits if group is None or init["group"] == group]
 
-        # Find missing conditions and group into input file contents.
+        # Find missing conditions.
         missing_conditions = find_missing_conditions(
             manifest, series.name, group_conditions, series.seeds, series.extensions
         )
@@ -104,23 +108,32 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         if len(missing_conditions) == 0:
             continue
 
-        condition_sets = group_template_conditions(missing_conditions, parameters.seeds_per_job)
-        input_contents = generate_input_contents(template, condition_sets)
+        # Convert missing conditions into model input files.
+        input_contents: list[str] = []
+
+        if parameters.model.upper() == "ARCADE":
+            condition_sets = group_template_conditions(missing_conditions, parameters.seeds_per_job)
+            input_contents = generate_input_contents(template, condition_sets)
+        elif parameters.model.upper() == "PHYSICELL":
+            input_contents = render_physicell_template(template, missing_conditions)
+
+        if len(input_contents) == 0:
+            continue
 
         # Copy source init files to target init files.
-        valid_seeds = set([condition["seed"] for condition in missing_conditions])
+        valid_seeds = {condition["seed"] for condition in missing_conditions}
         for init in group_inits:
             if len(valid_seeds.intersection(init["seeds"])) == 0:
                 continue
 
-            source_key = make_key(init["name"], "converted", "converted.ARCADE")
+            source_key = make_key(init["name"], "inits", f"inits.{parameters.model.upper()}")
             source = make_key(source_key, f"{init['name']}_{init['key']}")
 
             target_key = make_key(series.name, "{{timestamp}}", "inits")
             targets = [make_key(target_key, f"{group_key}_{seed:04d}") for seed in init["seeds"]]
 
             for target in targets:
-                for ext in ["CELLS.json", "LOCATIONS.json"]:
+                for ext in init["extensions"]:
                     copy_key(context.working_location, f"{source}.{ext}", f"{target}.{ext}")
 
         # Save input files and run jobs.
