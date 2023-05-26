@@ -20,6 +20,21 @@ $ poetry install
 $ poetry shell
 ```
 
+## Alternative installation using `pip`
+
+This project also includes a `requirements.txt` generated from the `poetry.lock` file.
+Install dependencies directly from this file using:
+
+```bash
+pip install -r requirements.txt
+```
+
+Install the package (note that you need pip ≥ 21.3):
+
+```bash
+pip install -e .
+```
+
 # Usage
 
 The pipeline uses [Prefect](https://docs.prefect.io/) for workflows and [Hydra](https://hydra.cc/docs/intro/) for composable configuration.
