@@ -47,53 +47,48 @@ class SeriesConfig:
 @flow(name="initialize-physicell-simulations")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     for ds in parameters.ds:
+        # Calculate cell radius and height.
         cell_radius = sqrt(parameters.cell_volume / parameters.cell_height / pi)
         cell_height = parameters.cell_height
 
-        # Set bounds for generating coordinates. If substrate is included, add
-        # an additional z layer to make sure the cell has enough layers.
+        # Adjust size of bounding box.
+        x_bound = ceil(parameters.bounding_box[0] / ds) * ds
+        y_bound = ceil(parameters.bounding_box[1] / ds) * ds
+        z_bound = ceil(cell_height)
+
+        # Generate full coordinates list.
+        grid_bounds = (ceil(x_bound + ds), ceil(y_bound + ds), ceil(z_bound + ds))
+        coords_list = make_grid_coordinates(parameters.grid, grid_bounds, ds, ds)
+
+        # Filter coordinates list for cell coordinates.
+        cell_coords_list = [
+            (x, y, z)
+            for x, y, z in coords_list
+            if x_bound / 2 - cell_radius <= x <= x_bound / 2 + cell_radius
+            and y_bound / 2 - cell_radius <= y <= y_bound / 2 + cell_radius
+            and z > 0
+        ]
+        cell_coords = filter_coordinate_bounds(cell_coords_list, cell_radius, center=False)
+        cell_coords["id"] = DEFAULT_CELL_ID
+
+        # If substrate is included, add the z = 0 coordinates. If not, adjust
+        # all the z positions of the cell coordinates.
         if parameters.substrate:
-            x_bound = ceil(parameters.bounding_box[0])
-            y_bound = ceil(parameters.bounding_box[1])
-            z_bound = ceil(cell_height + ds)
+            substrate_coords_list = [(x, y, z) for x, y, z in coords_list if z == 0]
+            substrate_coords = pd.DataFrame(substrate_coords_list, columns=["x", "y", "z"])
+            substrate_coords["id"] = SUBSTRATE_ID
         else:
-            x_bound = ceil(2 * cell_radius)
-            y_bound = ceil(2 * cell_radius)
-            z_bound = ceil(cell_height)
-
-        # Generate the coordinates.
-        coordinates_list = make_grid_coordinates(
-            parameters.grid, (x_bound, y_bound, z_bound), ds, ds
-        )
-
-        # Filter coordinates for the specified cell radius and set default id.
-        cell_coordinates = filter_coordinate_bounds(coordinates_list, cell_radius, center=False)
-        cell_coordinates["id"] = DEFAULT_CELL_ID
-
-        # If substrate is included, filter out the coordinates at z = 0 to use
-        # as substrate coordinates with substrate id.
-        if parameters.substrate:
-            substrate_coordinates_list = [(x, y, z) for x, y, z in coordinates_list if z == 0]
-            substrate_coordinates = pd.DataFrame(
-                substrate_coordinates_list, columns=["x", "y", "z"]
-            )
-            substrate_coordinates["id"] = SUBSTRATE_ID
-            cell_coordinates.drop(cell_coordinates[cell_coordinates["z"] == 0].index, inplace=True)
-        else:
-            substrate_coordinates = pd.DataFrame()
+            cell_coords["z"] = cell_coords["z"] - ds
+            substrate_coords = pd.DataFrame()
 
         # Save final list of coordinates.
-        coordinates = pd.concat([substrate_coordinates, cell_coordinates])
-        coordinates_key = make_key(
-            series.name, "inits", "inits.PHYSICELL", f"{series.name}_{ds}.csv"
-        )
-        save_dataframe(
-            context.working_location, coordinates_key, coordinates, index=False, header=False
-        )
+        coords = pd.concat([substrate_coords, cell_coords])
+        init_key = make_key(series.name, "inits", "inits.PHYSICELL", f"{series.name}_{ds}.csv")
+        save_dataframe(context.working_location, init_key, coords, index=False, header=False)
 
         # Plot contact sheet of coordinates.
         if parameters.contact_sheet:
-            contact_sheet = plot_contact_sheet(coordinates)
+            contact_sheet = plot_contact_sheet(coords)
             plot_key = make_key(
                 series.name, "plots", "plots.COORDINATES", f"{series.name}_{ds}.COORDINATES.png"
             )
