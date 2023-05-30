@@ -241,7 +241,7 @@
 	<initial_conditions>
 		<cell_positions type="csv" enabled="true">
 			<folder>./config</folder>
-			<filename>{{init_conditions_file_name}}</filename>
+			<filename>initial_conditions.csv</filename>
 			<owner_cell_definition_name>Cell</owner_cell_definition_name>
 			<member_cell_definition_name>subcell</member_cell_definition_name>
 			<subcell_radius_microns>{{subcell_radius}}</subcell_radius_microns>
