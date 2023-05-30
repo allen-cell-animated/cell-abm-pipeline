@@ -121,7 +121,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
             condition_sets = group_template_conditions(missing_conditions, parameters.seeds_per_job)
             input_contents = generate_input_contents(template, condition_sets)
         elif parameters.model.upper() == "PHYSICELL":
-            input_contents = render_physicell_template(template, missing_conditions)
+            input_contents = render_physicell_template(template, missing_conditions, group_key)
 
         if len(input_contents) == 0:
             continue
