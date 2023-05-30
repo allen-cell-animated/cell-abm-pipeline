@@ -1,8 +1,14 @@
 from dataclasses import dataclass, field
+import tempfile
+
+from io_collection.load import load_tar
+from io_collection.save import save_dataframe
 
 from container_collection.manifest import filter_manifest_files
 from io_collection.load import load_dataframe
 from prefect import flow
+
+from simulariumio.physicell.dep.pyMCDS import pyMCDS
 
 
 @dataclass
@@ -36,5 +42,18 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     )
 
     for key, files in filtered_files.items():
-        print(key, files)
-        # TODO: implement parse simulation results
+        # TODO verify this will load tar
+        tar_file = load_tar(context.working_location, key) 
+        working_dir = context.working_location
+        # read PhysiCell output files
+        output_files = working_dir.glob("*output*.xml")
+        file_mapping = {}
+        for output_file in output_files:
+            index = int(output_file.name[output_file.name.index("output") + 6 :].split(".")[0])
+            file_mapping[index] = output_file
+        data = []
+        for _, xml_file in sorted(file_mapping.items()):
+            data.append(pyMCDS(xml_file.name, False, working_dir))
+        # TODO shape data for analysis and save
+        print(data)
+        save_dataframe(context.working_location, key, data, index=False)
