@@ -1,5 +1,7 @@
 from prefect import task
 
 from .render_physicell_template import render_physicell_template
+from .visualize_physicell import convert_physicell_to_simularium
 
 render_physicell_template = task(render_physicell_template)
+convert_physicell_to_simularium = task(convert_physicell_to_simularium)
