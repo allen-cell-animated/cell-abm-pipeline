@@ -1,8 +1,12 @@
 from dataclasses import dataclass, field
 
 from container_collection.manifest import filter_manifest_files
-from io_collection.load import load_dataframe
+from io_collection.keys import make_key
+from io_collection.load import load_dataframe, load_tar
+from io_collection.save import save_dataframe
 from prefect import flow
+
+from cell_abm_pipeline.tasks.physicell import parse_mcds_file
 
 
 @dataclass
@@ -36,5 +40,8 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     )
 
     for key, files in filtered_files.items():
-        print(key, files)
-        # TODO: implement parse simulation results
+        tar_file = load_tar(**files["tar.xz"])
+        results = parse_mcds_file(tar_file)
+
+        results_key = make_key(series.name, "{{timestamp}}", "results", f"{key}.csv")
+        save_dataframe(context.working_location, results_key, results, index=False)

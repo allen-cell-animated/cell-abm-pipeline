@@ -66,6 +66,7 @@ module = [
     "matplotlib.*",
     "mpl_toolkits.*",
     "pandas.*",
+    "simulariumio.*",
     "sklearn.*",
     "scipy.*",
 ]
