@@ -31,12 +31,17 @@ sphinx = "^1.6.0"
 sphinx-rtd-theme = "^1.2.0"
 sphinx_mdinclude = "^0.5.3"
 tox = "^4.5.1"
+pre-commit = "^3.3.3"
 
 [tool.poetry.scripts]
 abmpipe = "cell_abm_pipeline.__main__:main"
 
+[tool.black]
+line-length = 100
+
 [tool.isort]
 profile = "black"
+line_length = 100
 
 [build-system]
 requires = ["poetry-core"]
