@@ -1,3 +1,7 @@
+"""
+Workflow for analyzing colony dynamics.
+"""
+
 import ast
 from dataclasses import dataclass
 

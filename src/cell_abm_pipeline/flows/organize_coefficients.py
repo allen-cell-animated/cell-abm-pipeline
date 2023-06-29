@@ -1,3 +1,7 @@
+"""
+Workflow for organizing spherical harmonics coefficients analysis files.
+"""
+
 import re
 from dataclasses import dataclass
 from typing import Optional

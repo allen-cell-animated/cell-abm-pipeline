@@ -1,3 +1,7 @@
+"""
+Workflow for summarizing simulation files.
+"""
+
 from dataclasses import dataclass, field
 
 from container_collection.manifest import summarize_manifest_files, update_manifest_contents

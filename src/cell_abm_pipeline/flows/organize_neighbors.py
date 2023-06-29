@@ -1,3 +1,7 @@
+"""
+Workflow for organizing neighbor connections analysis files.
+"""
+
 import re
 from dataclasses import dataclass
 

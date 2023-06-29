@@ -7,7 +7,7 @@ Working location structure:
 
     (name)
     ├── images
-    │    └── (name)_(key).ome.tiff
+    │    └── (name)_(key).(extension)
     ├── plots
     │    └── plots.SAMPLE
     │        └── (name)_(key)_C(channel).SAMPLE.png

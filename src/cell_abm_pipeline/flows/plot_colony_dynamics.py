@@ -1,3 +1,7 @@
+"""
+Workflow for plotting colony dynamics.
+"""
+
 import ast
 from dataclasses import dataclass, field
 

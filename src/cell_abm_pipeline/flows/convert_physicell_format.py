@@ -1,3 +1,7 @@
+"""
+Workflow for converting PhysiCell simulations to other formats.
+"""
+
 from dataclasses import dataclass, field
 
 from io_collection.keys import make_key

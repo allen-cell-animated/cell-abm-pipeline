@@ -1,3 +1,7 @@
+"""
+Workflow for downloading images from Quilt.
+"""
+
 from dataclasses import dataclass
 
 from abm_initialization_collection.image import select_fov_images

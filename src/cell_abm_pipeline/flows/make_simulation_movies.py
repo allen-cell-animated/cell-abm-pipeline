@@ -1,3 +1,7 @@
+"""
+Workflow for making simulation movies.
+"""
+
 import ast
 from dataclasses import dataclass, field
 from typing import Optional

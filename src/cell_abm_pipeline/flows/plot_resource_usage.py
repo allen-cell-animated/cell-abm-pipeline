@@ -1,3 +1,7 @@
+"""
+Workflow for plotting resource usage.
+"""
+
 from dataclasses import dataclass, field
 
 from io_collection.keys import make_key

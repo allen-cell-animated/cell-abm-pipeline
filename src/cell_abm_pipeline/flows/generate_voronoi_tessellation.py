@@ -1,3 +1,7 @@
+"""
+Workflow for generating Voronoi tessellation images.
+"""
+
 from dataclasses import dataclass
 
 from abm_initialization_collection.image import create_voronoi_image

@@ -1,3 +1,7 @@
+"""
+Demo workflow.
+"""
+
 from prefect import flow
 
 from cell_abm_pipeline.__config__ import ContextConfig, ParametersConfig, SeriesConfig

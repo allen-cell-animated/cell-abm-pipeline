@@ -1,3 +1,7 @@
+"""
+Workflow for initializing ARCADE simulations.
+"""
+
 import copy
 from dataclasses import dataclass, field
 from typing import Optional

@@ -1,3 +1,7 @@
+"""
+Workflow for initializing PhysiCell simulations.
+"""
+
 from dataclasses import dataclass, field
 from math import ceil, pi, sqrt
 

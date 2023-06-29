@@ -1,3 +1,7 @@
+"""
+Workflow for analyzing shape modes.
+"""
+
 from dataclasses import dataclass, field
 from typing import Optional
 

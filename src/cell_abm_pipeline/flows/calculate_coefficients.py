@@ -1,3 +1,7 @@
+"""
+Workflow for calculating spherical harmonic coefficients.
+"""
+
 from dataclasses import dataclass
 from typing import Optional
 

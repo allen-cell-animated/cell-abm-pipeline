@@ -1,3 +1,7 @@
+"""
+Workflow for analyzing resource usage.
+"""
+
 import os
 import re
 from dataclasses import dataclass, field

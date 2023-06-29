@@ -1,3 +1,7 @@
+"""
+Workflow for plotting basic metrics.
+"""
+
 from dataclasses import dataclass, field
 from typing import Optional
 

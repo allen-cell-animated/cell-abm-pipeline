@@ -1,3 +1,7 @@
+"""
+Workflow for running calculate neighbor connections flow across conditions and seeds.
+"""
+
 import copy
 from dataclasses import dataclass
 

@@ -1,3 +1,7 @@
+"""
+Workflow for parsing PhysiCell simulations into tidy data.
+"""
+
 from dataclasses import dataclass, field
 
 from container_collection.manifest import filter_manifest_files

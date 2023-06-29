@@ -1,3 +1,7 @@
+"""
+Workflow for parsing ARCADE simulations into tidy data.
+"""
+
 from dataclasses import dataclass, field
 
 from arcade_collection.output import merge_parsed_results, parse_cells_file, parse_locations_file

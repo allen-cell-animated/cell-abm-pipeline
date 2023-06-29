@@ -1,3 +1,7 @@
+"""
+Workflow for calculating neighbor connections.
+"""
+
 from dataclasses import dataclass
 
 import pandas as pd

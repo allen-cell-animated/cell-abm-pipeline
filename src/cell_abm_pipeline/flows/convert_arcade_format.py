@@ -1,3 +1,7 @@
+"""
+Workflow for converting ARCADE simulations to other formats.
+"""
+
 from dataclasses import dataclass, field
 
 from arcade_collection.output import convert_to_images, convert_to_meshes, convert_to_simularium
