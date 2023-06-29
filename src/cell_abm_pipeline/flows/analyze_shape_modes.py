@@ -127,11 +127,16 @@ def run_flow_process_data(
                 else:
                     coeffs = coeffs.join(region_coeffs, on=INDEX_COLUMNS, rsuffix=f".{region}")
 
-                # Load properties for each region
+                # Load properties for each region (if it exists)
                 props_key = make_key(
                     props_path_key, f"{series.name}_{key}_{seed:04d}_{region}.PROPS.csv"
                 )
                 props_key = props_key.replace("_DEFAULT", "")
+
+                if not check_key(context.working_location, props_key):
+                    props = None
+                    continue
+
                 region_props = load_dataframe(
                     context.working_location, props_key, converters={"KEY": str}
                 )
@@ -149,7 +154,7 @@ def run_flow_process_data(
 
         results_data = pd.concat(all_results)
         coeffs_data = pd.concat(all_coeffs)
-        props_data = pd.concat(all_props)
+        props_data = None if any(prop is None for prop in all_props) else pd.concat(all_props)
 
         # Filter coefficient outliers.
         if parameters.outlier is not None:
@@ -158,9 +163,12 @@ def run_flow_process_data(
             ) <= parameters.outlier * coeffs_data.std(ddof=1)
             coeffs_data = coeffs_data[outlier_filter].dropna()
 
-        # Join results and coefficients data
-        data = coeffs_data.join(props_data, on=INDEX_COLUMNS)
-        data = data.join(results_data, on=INDEX_COLUMNS).reset_index()
+        # Join results, coefficients, and properties data.
+        if props_data is None:
+            data = coeffs_data.join(results_data, on=INDEX_COLUMNS).reset_index()
+        else:
+            data = coeffs_data.join(props_data, on=INDEX_COLUMNS)
+            data = data.join(results_data, on=INDEX_COLUMNS).reset_index()
 
         # Filter for cell phase and selected ticks.
         data = data[data["PHASE"].isin(parameters.valid_phases)]
