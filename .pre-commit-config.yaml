@@ -23,6 +23,6 @@ repos:
   hooks:
   - id: poetry-check
   - id: poetry-lock
-    args: ["--no-update"]
+    args: ["--check"]
   - id: poetry-export
     args: ["--with", "dev", "-f", "requirements.txt", "-o", "requirements.txt"]
