@@ -143,16 +143,19 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
                     copy_key(context.working_location, f"{source}.{ext}", f"{target}.{ext}")
 
         # Create job definition.
+        registry = f"{context.account}.dkr.ecr.{context.region}.amazonaws.com"
         job_key = make_key(context.working_location, series.name, "{{timestamp}}/")
         job_definition = make_batch_job(
-            group_key,
-            parameters.image,
-            context.account,
-            context.region,
-            context.user,
+            f"{context.user}_{group_key}",
+            f"{registry}/{context.user}/{parameters.image}",
             context.vcpus,
             context.memory,
-            job_key,
+            [
+                {"name": "SIMULATION_TYPE", "value": "AWS"},
+                {"name": "BATCH_WORKING_URL", "value": job_key},
+                {"name": "FILE_SET_NAME", "value": group_key},
+            ],
+            f"arn:aws:iam::{context.account}:role/BatchJobRole",
         )
         job_definition_arn = register_batch_job(job_definition)
 
