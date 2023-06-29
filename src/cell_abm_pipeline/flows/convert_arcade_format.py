@@ -21,6 +21,8 @@ FORMATS: list[str] = [
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for convert arcade format flow."""
+
     box: tuple[int, int, int] = (1, 1, 1)
 
     frame_spec: tuple[int, int, int] = (0, 1153, 48)
@@ -44,11 +46,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for convert arcade format flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for convert arcade format flow."""
+
     name: str
 
     seeds: list[int]

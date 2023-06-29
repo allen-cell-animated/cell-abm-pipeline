@@ -13,6 +13,8 @@ from prefect import flow
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for download images flow."""
+
     cells_per_fov: int
 
     bins: list[int]
@@ -26,6 +28,8 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for download images flow."""
+
     working_location: str
 
     metadata_location: str
@@ -33,6 +37,8 @@ class ContextConfig:
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for download images flow."""
+
     name: str
 
     metadata_key: str

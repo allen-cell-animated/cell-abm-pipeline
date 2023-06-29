@@ -32,6 +32,8 @@ calculate_properties_COMMAND = ["abmpipe", "calculate-properties", "::"]
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for run calculate properties flow."""
+
     image: str
 
     frames: list[int]
@@ -43,6 +45,8 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for run calculate properties flow."""
+
     working_location: str
 
     account: str
@@ -64,6 +68,8 @@ class ContextConfig:
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for run calculate properties flow."""
+
     name: str
 
     seeds: list[int]

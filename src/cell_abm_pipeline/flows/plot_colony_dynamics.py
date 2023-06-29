@@ -46,16 +46,22 @@ PLOTS = PLOTS_MEASURES + PLOTS_CLUSTERS
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for plot colony dynamics flow."""
+
     plots: list[str] = field(default_factory=lambda: PLOTS)
 
 
 @dataclass
 class ContextConfig:
+    """Context configuration for plot colony dynamics flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for plot colony dynamics flow."""
+
     name: str
 
     conditions: list[dict]

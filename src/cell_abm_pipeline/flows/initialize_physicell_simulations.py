@@ -23,6 +23,8 @@ SUBSTRATE_ID = -1
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for initialize physicell simulations flow."""
+
     grid: str = "rect"
 
     ds: list[float] = field(default_factory=lambda: [1.0])  # um/voxel
@@ -40,11 +42,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for initialize physicell simulations flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for initialize physicell simulations flow."""
+
     name: str
 
 

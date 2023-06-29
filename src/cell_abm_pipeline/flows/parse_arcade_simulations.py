@@ -14,6 +14,8 @@ from prefect import flow
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for parse arcade simulations flow."""
+
     regions: list[str] = field(default_factory=lambda: [])
 
     include_filters: list[str] = field(default_factory=lambda: ["*"])
@@ -23,6 +25,8 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for parse arcade simulations flow."""
+
     working_location: str
 
     manifest_location: str
@@ -30,6 +34,8 @@ class ContextConfig:
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for parse arcade simulations flow."""
+
     name: str
 
     manifest_key: str

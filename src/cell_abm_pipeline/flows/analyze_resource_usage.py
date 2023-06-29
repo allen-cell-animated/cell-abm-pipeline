@@ -22,6 +22,8 @@ CLOCK_PATTERN = r"simulation \[ ([A-z0-9\s\_]+) \| ([0-9]{4}) \] finished in ([0
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for analyze resource usage flow."""
+
     groups: list[str] = field(default_factory=lambda: STORAGE_GROUPS)
 
     search_locations: list[str] = field(default_factory=lambda: [])
@@ -29,11 +31,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for analyze resource usage flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for analyze resource usage flow."""
+
     name: str
 
     seeds: list[int]

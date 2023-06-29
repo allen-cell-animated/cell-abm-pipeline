@@ -26,6 +26,8 @@ from cell_abm_pipeline.tasks.physicell import render_physicell_template
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for run batch simulations flow."""
+
     model: str
 
     image: str
@@ -47,6 +49,8 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for run batch simulations flow."""
+
     working_location: str
 
     manifest_location: str
@@ -68,6 +72,8 @@ class ContextConfig:
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for run batch simulations flow."""
+
     name: str
 
     manifest_key: str

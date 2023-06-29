@@ -42,6 +42,8 @@ SCALE_MICRONS_Z: float = 0.29
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for sample image flow."""
+
     key: str
 
     channels: list[int] = field(default_factory=lambda: [0])
@@ -63,11 +65,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for sample image flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for sample image flow."""
+
     name: str
 
 

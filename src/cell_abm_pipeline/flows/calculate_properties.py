@@ -25,6 +25,8 @@ SHAPE_PROPERTIES = [
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for calculate properties flow."""
+
     key: str
 
     seed: int
@@ -42,11 +44,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for calculate properties flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for calculate properties flow."""
+
     name: str
 
 

@@ -18,6 +18,8 @@ COEFFICIENT_ORDER = 16
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for calculate coefficients flow."""
+
     key: str
 
     seed: int
@@ -38,11 +40,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for calculate coefficients flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for calculate coefficients flow."""
+
     name: str
 
 

@@ -74,6 +74,8 @@ ALL_BIN_SIZES: dict[str, float] = {
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for plot shape modes flow."""
+
     reference: Optional[dict] = None
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
@@ -113,11 +115,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for plot shape modes flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for plot shape modes flow."""
+
     name: str
 
     conditions: list[dict]

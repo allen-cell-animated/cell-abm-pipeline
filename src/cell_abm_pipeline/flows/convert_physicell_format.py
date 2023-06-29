@@ -40,6 +40,8 @@ CELL_COLORS = [
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for convert physicell format flow."""
+
     box_size: tuple[float, float, float] = (1.0, 1.0, 1.0)
 
     timestep: float = 1.0
@@ -53,11 +55,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for convert physicell format flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for convert physicell format flow."""
+
     name: str
 
     seeds: list[int]

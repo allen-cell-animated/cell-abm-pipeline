@@ -13,6 +13,8 @@ from prefect import flow
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for generate voronoi tessellation flow."""
+
     channel: int
 
     iterations: int
@@ -22,11 +24,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for generate voronoi tessellation flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for generate voronoi tessellation flow."""
+
     name: str
 
     conditions: list[dict]

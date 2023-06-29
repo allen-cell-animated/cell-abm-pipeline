@@ -30,6 +30,8 @@ CALCULATE_NEIGHBORS_COMMAND = ["abmpipe", "calculate-neighbors", "::"]
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for run calculate neighbors flow."""
+
     image: str
 
     frames: list[int]
@@ -41,6 +43,8 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for run calculate neighbors flow."""
+
     working_location: str
 
     account: str
@@ -62,6 +66,8 @@ class ContextConfig:
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for run calculate neighbors flow."""
+
     name: str
 
     seeds: list[int]

@@ -23,6 +23,8 @@ from prefect import flow
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for analyze colony dynamics flow."""
+
     ds: float = 1.0
 
     dt: float = 1.0
@@ -30,11 +32,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for analyze colony dynamics flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for analyze colony dynamics flow."""
+
     name: str
 
     seeds: list[int]

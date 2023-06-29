@@ -15,6 +15,8 @@ from prefect import flow
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for calculate neighbors flow."""
+
     key: str
 
     seed: int
@@ -24,11 +26,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for calculate neighbors flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for calculate neighbors flow."""
+
     name: str
 
 

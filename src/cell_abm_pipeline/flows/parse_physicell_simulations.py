@@ -15,6 +15,8 @@ from cell_abm_pipeline.tasks.physicell import parse_mcds_file
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for parse physicell simulations flow."""
+
     include_filters: list[str] = field(default_factory=lambda: ["*"])
 
     exclude_filters: list[str] = field(default_factory=lambda: [])
@@ -22,6 +24,8 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for parse physicell simulations flow."""
+
     working_location: str
 
     manifest_location: str
@@ -29,6 +33,8 @@ class ContextConfig:
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for parse physicell simulations flow."""
+
     name: str
 
     manifest_key: str

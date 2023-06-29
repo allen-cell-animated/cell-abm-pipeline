@@ -23,6 +23,8 @@ MOVIES = [
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for make simulation movies flow."""
+
     movies: list[str] = field(default_factory=lambda: MOVIES)
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
@@ -42,11 +44,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for make simulation movies flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for make simulation movies flow."""
+
     name: str
 
     seeds: list[int]

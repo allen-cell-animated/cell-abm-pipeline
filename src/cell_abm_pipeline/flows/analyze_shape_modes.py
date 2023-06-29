@@ -23,6 +23,8 @@ VALID_PHASES = ["PROLIFERATIVE_G1", "PROLIFERATIVE_S", "PROLIFERATIVE_G2"]
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for analyze shape modes flow."""
+
     reference: Optional[dict] = None
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
@@ -52,11 +54,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for analyze shape modes flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for analyze shape modes flow."""
+
     name: str
 
     seeds: list[int]

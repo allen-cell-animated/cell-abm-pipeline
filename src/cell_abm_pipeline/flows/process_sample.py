@@ -44,6 +44,8 @@ UNCONNECTED_THRESHOLD: float = 2.0
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for process sample flow."""
+
     key: str
 
     channel: int
@@ -69,11 +71,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for process sample flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for process sample flow."""
+
     name: str
 
 

@@ -15,6 +15,8 @@ from prefect import flow
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for organize coefficients flow."""
+
     frames: list[int]
 
     region: Optional[str] = None
@@ -22,11 +24,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for organize coefficients flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for organize coefficients flow."""
+
     name: str
 
     seeds: list[int]

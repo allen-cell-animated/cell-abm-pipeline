@@ -76,6 +76,8 @@ BIN_SIZES: dict[str, float] = {
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for plot basic metrics flow."""
+
     reference: Optional[str] = None
 
     region: Optional[str] = None
@@ -103,11 +105,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for plot basic metrics flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for plot basic metrics flow."""
+
     name: str
 
     seeds: list[int]

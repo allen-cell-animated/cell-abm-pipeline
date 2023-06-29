@@ -20,6 +20,8 @@ PLOTS = [
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for plot resource usage flow."""
+
     groups: list[str] = field(default_factory=lambda: STORAGE_GROUPS)
 
     plots: list[str] = field(default_factory=lambda: PLOTS)
@@ -27,11 +29,15 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for plot resource usage flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for plot resource usage flow."""
+
     name: str
 
     conditions: list[dict]

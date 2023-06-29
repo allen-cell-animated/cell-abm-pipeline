@@ -76,6 +76,8 @@ POTTS_TERMS: list[str] = [
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for initialize arcade simulations flow."""
+
     image: str
 
     sample_image: dict[str, SampleImageParametersConfig]
@@ -99,6 +101,8 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for initialize arcade simulations flow."""
+
     working_location: str
 
     reference_location: str
@@ -110,6 +114,8 @@ class ContextConfig:
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for initialize arcade simulations flow."""
+
     name: str
 
     reference_key: str

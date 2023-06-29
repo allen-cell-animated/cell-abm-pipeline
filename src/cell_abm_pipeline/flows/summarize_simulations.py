@@ -13,6 +13,8 @@ from prefect import flow
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for summarize simulations flow."""
+
     update_manifest: bool = True
 
     search_locations: list[str] = field(default_factory=lambda: [])
@@ -20,6 +22,8 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
+    """Context configuration for summarize simulations flow."""
+
     working_location: str
 
     manifest_location: str
@@ -27,6 +31,8 @@ class ContextConfig:
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for summarize simulations flow."""
+
     name: str
 
     manifest_key: str

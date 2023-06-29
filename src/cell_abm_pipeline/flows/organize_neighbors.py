@@ -14,16 +14,22 @@ from prefect import flow
 
 @dataclass
 class ParametersConfig:
+    """Parameter configuration for organize neighbors flow."""
+
     frames: list[int]
 
 
 @dataclass
 class ContextConfig:
+    """Context configuration for organize neighbors flow."""
+
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
+    """Series configuration for organize neighbors flow."""
+
     name: str
 
     seeds: list[int]
