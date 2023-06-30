@@ -28,6 +28,8 @@ class ParametersConfig:
 
     search_locations: list[str] = field(default_factory=lambda: [])
 
+    exceptions: list[str] = field(default_factory=lambda: [])
+
 
 @dataclass
 class ContextConfig:
@@ -106,6 +108,10 @@ def run_flow_analyze_clock(
 
         for file_key in file_keys:
             contents = load_text(location, file_key)
+
+            if any(exception in contents for exception in parameters.exceptions):
+                continue
+
             matches = re.findall(CLOCK_PATTERN, contents)
 
             for key, seed, clock in matches:
