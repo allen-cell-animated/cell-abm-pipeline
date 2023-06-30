@@ -73,6 +73,8 @@ class SeriesConfig:
 
 @flow(name="convert-physicell-format")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main convert physicell format flow."""
+
     if "simularium" in parameters.formats:
         run_flow_convert_to_simularium(context, series, parameters)
 

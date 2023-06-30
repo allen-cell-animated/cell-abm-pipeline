@@ -50,10 +50,7 @@ class SeriesConfig:
 
 @flow(name="analyze-colony-dynamics")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    # Process neighbor connections to generate graph objects where nodes
-    # represent cells and edges represent cells that share borders. If the
-    # network already exists for a given key and seed, that key and seed are
-    # skipped.
+    """Main analyze colony dynamics flow."""
     run_flow_generate_networks(context, series, parameters)
 
     # Perform graph analysis on neighbor connections. If the analysis file

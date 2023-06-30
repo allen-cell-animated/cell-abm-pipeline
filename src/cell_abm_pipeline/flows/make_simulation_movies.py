@@ -62,6 +62,8 @@ class SeriesConfig:
 
 @flow(name="make-simulation-movies")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main make simulation movies flow."""
+
     if "projection" in parameters.movies:
         run_flow_make_projection(context, series, parameters)
 

@@ -45,6 +45,8 @@ class SeriesConfig:
 
 @flow(name="plot-resource-usage")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main plot resource usage flow."""
+
     analysis_key = make_key(series.name, "analysis", "analysis.RESOURCES")
     plot_key = make_key(series.name, "plots", "plots.RESOURCES")
     keys = [condition["key"] for condition in series.conditions]

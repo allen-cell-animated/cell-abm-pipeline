@@ -56,6 +56,8 @@ class SeriesConfig:
 
 @flow(name="initialize-physicell-simulations")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main initialize physicell simulations flow."""
+
     for ds in parameters.ds:
         # Calculate cell radius and height.
         cell_radius = sqrt(parameters.cell_volume / parameters.cell_height / pi)

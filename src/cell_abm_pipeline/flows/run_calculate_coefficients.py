@@ -79,6 +79,8 @@ class SeriesConfig:
 
 @flow(name="run-calculate-coefficients")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main run calculate coefficients flow."""
+
     analysis_key = make_key(series.name, "analysis", "analysis.COEFFS")
 
     region = ""

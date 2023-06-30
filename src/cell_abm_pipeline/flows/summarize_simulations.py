@@ -44,6 +44,8 @@ class SeriesConfig:
 
 @flow(name="summarize-simulations")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main summarize simulations flow."""
+
     if parameters.update_manifest:
         location_keys = {
             location: get_keys(location, series.name) for location in parameters.search_locations

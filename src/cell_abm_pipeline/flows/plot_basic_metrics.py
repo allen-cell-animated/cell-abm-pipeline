@@ -123,6 +123,8 @@ class SeriesConfig:
 
 @flow(name="plot-basic-metrics")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main plot basic metrics flow."""
+
     # Make plots for basic temporal metrics.
     if any(plot in parameters.plots for plot in PLOTS_TEMPORAL):
         run_flow_plot_temporal(context, series, parameters)

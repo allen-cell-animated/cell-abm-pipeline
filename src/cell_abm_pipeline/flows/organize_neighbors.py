@@ -39,6 +39,8 @@ class SeriesConfig:
 
 @flow(name="organize-neighbors")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main organize neighbors flow."""
+
     # Iterate through conditions and seeds to merge contents of individual
     # frames into a single csv. If merged csv exists and the specified frame
     # does not exist in the csv, the frame is appended. If the merged csv exists

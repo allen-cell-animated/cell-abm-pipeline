@@ -46,6 +46,8 @@ class SeriesConfig:
 
 @flow(name="download-images")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main download images flow."""
+
     package = load_quilt_package(parameters.quilt_package, parameters.quilt_registry)
     key_exists = check_key(context.metadata_location, series.metadata_key)
 

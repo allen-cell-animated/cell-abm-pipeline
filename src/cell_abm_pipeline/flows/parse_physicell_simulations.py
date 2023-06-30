@@ -44,6 +44,8 @@ class SeriesConfig:
 
 @flow(name="parse-physicell-simulations")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main parse physicell simulations flow."""
+
     manifest = load_dataframe(context.manifest_location, series.manifest_key)
     filtered_files = filter_manifest_files(
         manifest, series.extensions, parameters.include_filters, parameters.exclude_filters

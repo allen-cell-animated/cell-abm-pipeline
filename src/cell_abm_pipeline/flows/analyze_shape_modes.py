@@ -72,6 +72,8 @@ class SeriesConfig:
 
 @flow(name="analyze-shape-modes")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main analyze shape modes flow."""
+
     # Process spherical harmonics coefficients and parsed simulation results and
     # compile into a single dataframe that can used for PCA. If the combined
     # data already exists for a given key, that key is skipped.

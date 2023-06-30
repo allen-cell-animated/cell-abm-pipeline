@@ -51,6 +51,8 @@ class SeriesConfig:
 
 @flow(name="analyze-resource-usage")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main analyze resource usage flow."""
+
     # Iterate through simulation data files to extract storage size.
     run_flow_analyze_storage(context, series, parameters)
 

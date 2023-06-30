@@ -69,6 +69,8 @@ class SeriesConfig:
 
 @flow(name="plot-colony-dynamics")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main plot colony dynamics flow."""
+
     # Make plots for graph analysis on neighbor connections.
     if any(plot in parameters.plots for plot in PLOTS_MEASURES):
         run_flow_plot_measures(context, series, parameters)

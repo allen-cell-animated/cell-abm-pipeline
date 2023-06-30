@@ -125,6 +125,8 @@ class SeriesConfig:
 
 @flow(name="initialize-arcade-simulations")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main initialize arcade simulations flow."""
+
     # Iterate through conditions to sample images for each specified channel.
     # The subflow `sample_image` is run via Docker for each condition and
     # channel combination by passing in the subflow configuration as a dotlist.

@@ -64,6 +64,8 @@ class SeriesConfig:
 
 @flow(name="convert-arcade-format")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main convert arcade format flow."""
+
     if "image" in parameters.formats:
         run_flow_convert_to_images(context, series, parameters)
 

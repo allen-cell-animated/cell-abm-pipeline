@@ -77,6 +77,8 @@ class SeriesConfig:
 
 @flow(name="run-calculate-neighbors")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main run calculate neighbors flow."""
+
     analysis_key = make_key(series.name, "analysis", "analysis.NEIGHBORS")
 
     task_definition = make_fargate_task(

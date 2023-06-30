@@ -84,6 +84,8 @@ class SeriesConfig:
 
 @flow(name="run-docker-simulations")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main run docker simulations flow."""
+
     if context.working_location.startswith("s3://"):
         logger = get_run_logger()
         logger.error("Docker simulations can only be run with local working location.")

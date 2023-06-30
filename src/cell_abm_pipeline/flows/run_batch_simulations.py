@@ -93,6 +93,8 @@ class SeriesConfig:
 
 @flow(name="run-batch-simulations")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
+    """Main run batch simulations flow."""
+
     if not context.working_location.startswith("s3://"):
         logger = get_run_logger()
         logger.error("Batch simulations can only be run with S3 working location.")
