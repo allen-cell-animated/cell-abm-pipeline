@@ -3,19 +3,31 @@ Workflow for converting ARCADE simulations to other formats.
 """
 
 from dataclasses import dataclass, field
+from typing import Optional
 
-from arcade_collection.output import convert_to_images, convert_to_meshes, convert_to_simularium
+from arcade_collection.output import (
+    convert_to_colorizer,
+    convert_to_images,
+    convert_to_meshes,
+    convert_to_simularium,
+)
 from io_collection.keys import make_key
-from io_collection.load import load_tar
-from io_collection.save import save_image, save_text
+from io_collection.load import load_dataframe, load_tar
+from io_collection.save import save_image, save_json, save_text
 from prefect import flow
 
 from cell_abm_pipeline.flows.plot_basic_metrics import PHASE_COLORS
 
 FORMATS: list[str] = [
+    "colorizer",
     "image",
     "mesh",
     "simularium",
+]
+
+FEATURES: list[str] = [
+    "volume",
+    "height",
 ]
 
 
@@ -43,6 +55,10 @@ class ParametersConfig:
 
     phase_colors: dict = field(default_factory=lambda: PHASE_COLORS)
 
+    resolution: Optional[int] = None
+
+    features: list[str] = field(default_factory=lambda: FEATURES)
+
 
 @dataclass
 class ContextConfig:
@@ -66,6 +82,9 @@ class SeriesConfig:
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     """Main convert arcade format flow."""
 
+    if "colorizer" in parameters.formats:
+        run_flow_convert_to_colorizer(context, series, parameters)
+
     if "image" in parameters.formats:
         run_flow_convert_to_images(context, series, parameters)
 
@@ -74,6 +93,66 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     if "simularium" in parameters.formats:
         run_flow_convert_to_simularium(context, series, parameters)
+
+
+@flow(name="convert-arcade-format_convert-to-colorizer")
+def run_flow_convert_to_colorizer(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
+) -> None:
+    data_key = make_key(series.name, "data", "data.LOCATIONS")
+    converted_key = make_key(series.name, "converted", "converted.COLORIZER")
+    keys = [condition["key"] for condition in series.conditions]
+
+    for key in keys:
+        for seed in series.seeds:
+            series_key = f"{series.name}_{key}_{seed:04d}"
+
+            tar_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
+            tar = load_tar(context.working_location, tar_key)
+
+            chunks = convert_to_images(
+                series_key,
+                tar,
+                parameters.frame_spec,
+                parameters.regions,
+                parameters.box,
+                parameters.chunk_size,
+                binary=False,
+                separate=True,
+                flatten=True,
+            )
+
+            for frame_index, (_, _, chunk, _) in enumerate(chunks):
+                image_key = make_key(converted_key, series_key, f"frame_{frame_index}.png")
+                save_image(context.working_location, image_key, chunk)
+
+            results_key = make_key(series.name, "results", f"{series_key}.csv")
+            results = load_dataframe(context.working_location, results_key)
+
+            colorizer = convert_to_colorizer(
+                results,
+                parameters.features,
+                parameters.frame_spec,
+                parameters.ds,
+                parameters.dt,
+                parameters.regions,
+            )
+
+            manifest_key = make_key(converted_key, series_key, "manifest.json")
+            save_json(context.working_location, manifest_key, colorizer["manifest"])
+
+            outliers_key = make_key(converted_key, series_key, "outliers.json")
+            save_json(context.working_location, outliers_key, colorizer["outliers"])
+
+            tracks_key = make_key(converted_key, series_key, "tracks.json")
+            save_json(context.working_location, tracks_key, colorizer["tracks"])
+
+            times_key = make_key(converted_key, series_key, "times.json")
+            save_json(context.working_location, times_key, colorizer["times"])
+
+            for feature_index, feature in enumerate(parameters.features):
+                feature_key = make_key(converted_key, series_key, f"feature_{feature_index}.json")
+                save_json(context.working_location, feature_key, colorizer[feature])
 
 
 @flow(name="convert-arcade-format_convert-to-images")
@@ -97,8 +176,9 @@ def run_flow_convert_to_images(
                 parameters.regions,
                 parameters.box,
                 parameters.chunk_size,
-                parameters.binary,
-                parameters.separate,
+                binary=parameters.binary,
+                separate=parameters.separate,
+                flatten=False,
             )
 
             for i, j, chunk, frame in chunks:
@@ -162,6 +242,7 @@ def run_flow_convert_to_simularium(
                 parameters.ds,
                 parameters.dt,
                 parameters.phase_colors,
+                parameters.resolution,
             )
             simularium_key = make_key(converted_key, f"{series_key}.simularium")
             save_text(context.working_location, simularium_key, simularium)
