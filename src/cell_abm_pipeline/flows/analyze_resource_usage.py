@@ -25,10 +25,13 @@ class ParametersConfig:
     """Parameter configuration for analyze resource usage flow."""
 
     groups: list[str] = field(default_factory=lambda: STORAGE_GROUPS)
+    """Names of data storage groups."""
 
     search_locations: list[str] = field(default_factory=lambda: [])
+    """List of locations (local paths or S3 buckets) to search for files."""
 
     exceptions: list[str] = field(default_factory=lambda: [])
+    """List of exception strings used to filter log files."""
 
 
 @dataclass
@@ -36,6 +39,7 @@ class ContextConfig:
     """Context configuration for analyze resource usage flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
 
 @dataclass
@@ -43,20 +47,33 @@ class SeriesConfig:
     """Series configuration for analyze resource usage flow."""
 
     name: str
+    """Name of the simulation series."""
 
     seeds: list[int]
+    """List of series random seeds."""
 
     conditions: list[dict]
+    """List of series condition dictionaries (must include unique condition "key")."""
 
 
 @flow(name="analyze-resource-usage")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    """Main analyze resource usage flow."""
+    """
+    Main analyze resource usage flow.
 
-    # Iterate through simulation data files to extract storage size.
+    Calls the following subflows:
+
+    - :py:func:`run_flow_analyze_storage`
+
+    Iterate through simulation data files to extract storage size.
+
+    - :py:func:`run_flow_analyze_clock`
+
+    Iterate through simulation logs to extract wall clock time.
+    """
+
     run_flow_analyze_storage(context, series, parameters)
 
-    # Iterate through simulation logs to extract wall clock time.
     run_flow_analyze_clock(context, series, parameters)
 
 
@@ -64,6 +81,8 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 def run_flow_analyze_storage(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    """Analyze resource usage subflow for analyzing storage size."""
+
     resources_key = make_key(series.name, "analysis", "analysis.RESOURCES")
     storage_key = make_key(resources_key, f"{series.name}_object_storage.RESOURCES.csv")
 
@@ -97,6 +116,8 @@ def run_flow_analyze_storage(
 def run_flow_analyze_clock(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    """Analyze resource usage subflow for analyzing wall clock time."""
+
     resources_key = make_key(series.name, "analysis", "analysis.RESOURCES")
     clock_key = make_key(resources_key, f"{series.name}_wall_clock.RESOURCES.csv")
 

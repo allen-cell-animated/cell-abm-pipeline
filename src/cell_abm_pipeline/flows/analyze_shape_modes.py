@@ -26,8 +26,10 @@ class ParametersConfig:
     """Parameter configuration for analyze shape modes flow."""
 
     reference: Optional[dict] = None
+    """Dictionary of keys for reference data and model for statistics."""
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
 
     components: int = PCA_COMPONENTS
     """Number of principal components (i.e. shape modes)."""
@@ -39,8 +41,10 @@ class ParametersConfig:
     """Valid ticks for calculating shape modes."""
 
     ds: float = 1.0
+    """Spatial scaling in units/um."""
 
     dt: float = 1.0
+    """Temporal scaling in hours/tick."""
 
     sample_reps: int = 100
     """Number of replicates for calculating stats with sampling."""
@@ -57,6 +61,7 @@ class ContextConfig:
     """Context configuration for analyze shape modes flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
 
 @dataclass
@@ -64,27 +69,43 @@ class SeriesConfig:
     """Series configuration for analyze shape modes flow."""
 
     name: str
+    """Name of the simulation series."""
 
     seeds: list[int]
+    """List of series random seeds."""
 
     conditions: list[dict]
+    """List of series condition dictionaries (must include unique condition "key")."""
 
 
 @flow(name="analyze-shape-modes")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    """Main analyze shape modes flow."""
+    """
+    Main analyze shape modes flow.
 
-    # Process spherical harmonics coefficients and parsed simulation results and
-    # compile into a single dataframe that can used for PCA. If the combined
-    # data already exists for a given key, that key is skipped.
+    Calls the following subflows:
+
+    - :py:func:`run_flow_process_data`
+
+    Process spherical harmonics coefficients and parsed simulation results and
+    compile into a single dataframe that can used for PCA. If the combined data
+    already exists for a given key, that key is skipped.
+
+    - :py:func:`run_flow_fit_model`
+
+    Fit PCA for each key and save the resulting PCA object as a pickle. If the
+    model already exits for a given key, that key is skipped.
+
+    - :py:func:`run_flow_analyze_stats`
+
+    Perform statistical analysis of shape distributions. If the analysis file
+    already exists for a given key, that key is skipped.
+    """
+
     run_flow_process_data(context, series, parameters)
 
-    # Fit PCA for each key and save the resulting PCA object as a pickle. If the
-    # model already exits for a given key, that key is skipped.
     run_flow_fit_model(context, series, parameters)
 
-    # Perform statistical analysis of shape distributions. If the analysis file
-    # already exists for a given key, that key is skipped.
     run_flow_analyze_stats(context, series, parameters)
 
 
@@ -92,6 +113,8 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 def run_flow_process_data(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    """Analyze shape modes subflow for loading data."""
+
     results_path_key = make_key(series.name, "results")
     coeffs_path_key = make_key(series.name, "analysis", "analysis.COEFFS")
     props_path_key = make_key(series.name, "analysis", "analysis.PROPS")
@@ -200,6 +223,8 @@ def run_flow_process_data(
 def run_flow_fit_model(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    """Analyze shape modes subflow for fitting PCA model."""
+
     pca_path_key = make_key(series.name, "analysis", "analysis.PCA")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
@@ -224,6 +249,8 @@ def run_flow_fit_model(
 def run_flow_analyze_stats(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    """Analyze shape modes subflow for analyzing shape distribution statistics."""
+
     pca_path_key = make_key(series.name, "analysis", "analysis.PCA")
     stats_path_key = make_key(series.name, "analysis", "analysis.STATS")
     region_key = ":".join(sorted(parameters.regions))

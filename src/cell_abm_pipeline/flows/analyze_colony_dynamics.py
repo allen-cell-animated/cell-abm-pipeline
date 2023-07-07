@@ -26,8 +26,10 @@ class ParametersConfig:
     """Parameter configuration for analyze colony dynamics flow."""
 
     ds: float = 1.0
+    """Spatial scaling in units/um."""
 
     dt: float = 1.0
+    """Temporal scaling in hours/tick."""
 
 
 @dataclass
@@ -35,6 +37,7 @@ class ContextConfig:
     """Context configuration for analyze colony dynamics flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
 
 @dataclass
@@ -42,23 +45,43 @@ class SeriesConfig:
     """Series configuration for analyze colony dynamics flow."""
 
     name: str
+    """Name of the simulation series."""
 
     seeds: list[int]
+    """List of series random seeds."""
 
     conditions: list[dict]
+    """List of series condition dictionaries (must include unique condition "key")."""
 
 
 @flow(name="analyze-colony-dynamics")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    """Main analyze colony dynamics flow."""
+    """
+    Main analyze colony dynamics flow.
+
+    Calls the following subflows:
+
+    - :py:func:`run_flow_generate_networks`
+
+    Process neighbor connections to generate graph objects where nodes represent
+    cells and edges represent cells that share borders. If the network already
+    exists for a given key and seed, that key and seed are skipped.
+
+    - :py:func:`run_flow_analyze_measures`
+
+    Perform graph analysis on neighbor connections. If the analysis file already
+    exists for a given key, that key is skipped.
+
+    - :py:func:`run_flow_analyze_clusters`
+
+    Perform cluster analysis on neighbor connections. If the analysis file
+    already exists for a given key, that key is skipped.
+    """
+
     run_flow_generate_networks(context, series, parameters)
 
-    # Perform graph analysis on neighbor connections. If the analysis file
-    # already exists for a given key, that key is skipped.
     run_flow_analyze_measures(context, series, parameters)
 
-    # Perform cluster analysis on neighbor connections. If the analysis file
-    # already exists for a given key, that key is skipped.
     run_flow_analyze_clusters(context, series, parameters)
 
 
@@ -66,6 +89,8 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 def run_flow_generate_networks(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    """Analyze colony dynamics subflow for generating network object."""
+
     neighbors_path_key = make_key(series.name, "analysis", "analysis.NEIGHBORS")
     networks_path_key = make_key(series.name, "analysis", "analysis.NETWORKS")
     keys = [condition["key"] for condition in series.conditions]
@@ -95,6 +120,8 @@ def run_flow_generate_networks(
 def run_flow_analyze_measures(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    """Analyze colony dynamics subflow for analyzing graph measures."""
+
     networks_path_key = make_key(series.name, "analysis", "analysis.NETWORKS")
     measures_path_key = make_key(series.name, "analysis", "analysis.MEASURES")
     keys = [condition["key"] for condition in series.conditions]
@@ -123,6 +150,8 @@ def run_flow_analyze_measures(
 def run_flow_analyze_clusters(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    """Analyze colony dynamics subflow for analyzing clusters."""
+
     neighbors_path_key = make_key(series.name, "analysis", "analysis.NEIGHBORS")
     clusters_path_key = make_key(series.name, "analysis", "analysis.CLUSTERS")
     keys = [condition["key"] for condition in series.conditions]
