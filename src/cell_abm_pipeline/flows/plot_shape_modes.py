@@ -6,11 +6,10 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 import pandas as pd
-from abm_shape_collection import compile_shape_modes, extract_shape_modes, merge_shape_modes
 from arcade_collection.output import extract_tick_json
 from io_collection.keys import make_key
 from io_collection.load import load_dataframe, load_pickle, load_tar
-from io_collection.save import save_figure, save_text
+from io_collection.save import save_figure
 from prefect import flow
 
 from cell_abm_pipeline.flows.analyze_shape_modes import PCA_COMPONENTS
@@ -46,8 +45,6 @@ PLOTS_STATS = [
 
 PLOTS_SHAPES = [
     "sample_shapes",
-    "shape_modes_compile",
-    "shape_modes_merge",
 ]
 
 PLOTS = PLOTS_PCA + PLOTS_STATS + PLOTS_SHAPES
@@ -335,61 +332,10 @@ def run_flow_plot_shapes(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     data_key = make_key(series.name, "data", "data.LOCATIONS")
-    analysis_key = make_key(series.name, "analysis", "analysis.PCA")
     plot_key = make_key(series.name, "plots", "plots.SHAPES")
-    region_key = ":".join(sorted(parameters.regions))
-    views_key = ":".join(sorted(parameters.views))
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
-        if "shape_modes_compile" in parameters.plots or "shape_modes_merge" in parameters.plots:
-            pca_data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
-            pca_data = load_dataframe(context.working_location, pca_data_key)
-
-            pca_model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
-            pca_model = load_pickle(context.working_location, pca_model_key)
-
-            shape_modes = extract_shape_modes(
-                pca_model,
-                pca_data,
-                parameters.components,
-                parameters.regions,
-                parameters.order,
-                parameters.delta,
-            )
-
-        if "shape_modes_compile" in parameters.plots:
-            shape_modes_compile = compile_shape_modes(
-                shape_modes,
-                parameters.views,
-                parameters.regions,
-                pca_model.explained_variance_ratio_,
-                parameters.colors,
-                parameters.box,
-                parameters.scale,
-            )
-            shape_modes_compile_key = make_key(
-                plot_key,
-                f"{series.name}_{key}_shape_modes_compile_{region_key}_{views_key}.SHAPES.svg",
-            )
-            save_text(context.working_location, shape_modes_compile_key, shape_modes_compile)
-
-        if "shape_modes_merge" in parameters.plots:
-            shape_modes_merge = merge_shape_modes(
-                shape_modes,
-                parameters.views,
-                parameters.regions,
-                pca_model.explained_variance_ratio_,
-                parameters.colors,
-                parameters.box,
-                parameters.scale,
-            )
-            shape_modes_merge_key = make_key(
-                plot_key,
-                f"{series.name}_{key}_shape_modes_merge_{region_key}_{views_key}.SHAPES.svg",
-            )
-            save_text(context.working_location, shape_modes_merge_key, shape_modes_merge)
-
         if "sample_shapes" in parameters.plots:
             tick_key = f"{series.name}_{key}_{parameters.sample_seed:04d}"
             locations_key = make_key(data_key, f"{tick_key}.LOCATIONS.tar.xz")
