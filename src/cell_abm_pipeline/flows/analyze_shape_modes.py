@@ -215,6 +215,8 @@ def run_flow_process_data(
         # Remove nans
         nan_indices = np.isnan(data.filter(like="shcoeffs")).any(axis=1)
         data = data[~nan_indices]
+        nan_indices = np.isnan(data.filter(like="CENTER")).any(axis=1)
+        data = data[~nan_indices]
 
         save_dataframe(context.working_location, data_key, data, index=False)
 
