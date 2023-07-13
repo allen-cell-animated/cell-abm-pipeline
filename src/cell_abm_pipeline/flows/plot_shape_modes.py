@@ -13,7 +13,6 @@ from io_collection.save import save_figure
 from prefect import flow
 
 from cell_abm_pipeline.flows.analyze_shape_modes import PCA_COMPONENTS
-from cell_abm_pipeline.flows.calculate_coefficients import COEFFICIENT_ORDER
 from cell_abm_pipeline.flows.plot_basic_metrics import BIN_SIZES
 from cell_abm_pipeline.tasks.basic import plot_feature_distribution, plot_feature_merge
 from cell_abm_pipeline.tasks.pca import (
@@ -49,10 +48,6 @@ PLOTS_SHAPES = [
 
 PLOTS = PLOTS_PCA + PLOTS_STATS + PLOTS_SHAPES
 
-REGION_COLORS = {"DEFAULT": "#F200FF", "NUCLEUS": "#3AADA7"}
-
-MODE_VIEWS = ["top", "side_1", "side_2"]
-
 ALL_BIN_SIZES: dict[str, float] = {
     "volume": BIN_SIZES["volume"],
     "height": BIN_SIZES["height"],
@@ -82,20 +77,7 @@ class ParametersConfig:
     components: int = PCA_COMPONENTS
     """Number of principal components (i.e. shape modes)."""
 
-    order: int = COEFFICIENT_ORDER
-    """Order of the spherical harmonics coefficient parametrization."""
-
     bin_sizes: dict[str, float] = field(default_factory=lambda: ALL_BIN_SIZES)
-
-    delta: float = 1.0
-
-    box: tuple[int, int] = (150, 100)
-
-    scale: float = 0.5
-
-    colors: dict = field(default_factory=lambda: REGION_COLORS)
-
-    views: list = field(default_factory=lambda: MODE_VIEWS)
 
     ordered: bool = True
 
