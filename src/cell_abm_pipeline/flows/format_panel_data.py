@@ -7,15 +7,18 @@ Working location structure:
 
     (name)
     ├── analysis
-    │   └── analysis.PCA
-    │       ├── (name)_(key)_(regions).PCA.csv
-    │       ├── (name)_(key)_(regions).PCA.pkl
-    │       ├── (name)_(key)_(regions).PCA.csv
-    │       ├── (name)_(key)_(regions).PCA.pkl
-    │       ├── ...
-    │       ├── ...
-    │       ├── (name)_(key)_(regions).PCA.csv
-    │       └── (name)_(key)_(regions).PCA.pkl
+    │   ├── analysis.PCA
+    │   │   ├── (name)_(key)_(regions).PCA.csv
+    │   │   ├── (name)_(key)_(regions).PCA.pkl
+    │   │   ├── (name)_(key)_(regions).PCA.csv
+    │   │   ├── (name)_(key)_(regions).PCA.pkl
+    │   │   ├── ...
+    │   │   ├── ...
+    │   │   ├── (name)_(key)_(regions).PCA.csv
+    │   │   └── (name)_(key)_(regions).PCA.pkl
+    │   └── analysis.STATS
+    │       ├── HAMILTONIAN_TERMS_FOV_VSAxxxx_DEFAULT:NUCLEUS.STATS (copy).csv
+    │       └── HAMILTONIAN_TERMS_FOV_VSAxxxx_DEFAULT:NUCLEUS.STATS.csv
     ├── data
     │   └── data.LOCATIONS
     │       ├── (name)_(key)_(seed).LOCATIONS.tar.xz
@@ -28,17 +31,20 @@ Working location structure:
     │   ├── (name).feature_distributions.csv
     │   ├── (name).mode_correlations.csv
     │   ├── (name).population_counts.csv
+    │   ├── (name).population_stats.csv
     │   ├── (name).shape_average.json
+    │   ├── (name).shape_errors.csv
     │   ├── (name).shape_modes.json
     │   └── (name).shape_samples.json
+    │   └── (name).variance_explained.csv
     └── results
         ├── (name)_(key)_(seed).csv
         ├── (name)_(key)_(seed).csv
         ├── ...
         └── (name)_(key)_(seed).csv
 
-Different panels use inputs from the **analysis/analysis.PCA**, **results**, and
-**data/data.LOCATION** directories.
+Different panels use inputs from the **results**, **data/data.LOCATION**,
+**analysis/analysis.PCA**, and **analysis/analysis.STATS** directories.
 Formatted panel data is saved to the **panels** directory.
 """
 
@@ -72,9 +78,12 @@ PANELS: list[str] = [
     "feature_distributions",
     "mode_correlations",
     "population_counts",
+    "population_stats",
     "shape_average",
+    "shape_errors",
     "shape_modes",
     "shape_samples",
+    "variance_explained",
 ]
 
 FEATURES: list[str] = [
@@ -168,6 +177,12 @@ class ParametersConfigPopulationCounts:
 
 
 @dataclass
+class ParametersConfigPopulationStats:
+    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
+
+
+@dataclass
 class ParametersConfigShapeAverage:
     """Parameter configuration for format panel data shape average subflow."""
 
@@ -182,6 +197,14 @@ class ParametersConfigShapeAverage:
 
     scale: float = 1
     """Scaling for spherical harmonics reconstruction mesh."""
+
+
+@dataclass
+class ParametersConfigShapeErrors:
+    """Parameter configuration for format panel data shape errors subflow."""
+
+    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
 
 
 @dataclass
@@ -219,6 +242,15 @@ class ParametersConfigShapeSamples:
 
 
 @dataclass
+class ParametersConfigVarianceExplained:
+    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
+
+    components: int = PCA_COMPONENTS
+    """Number of principal components (i.e. shape modes)."""
+
+
+@dataclass
 class ParametersConfig:
     """Parameter configuration for format panel data flow."""
 
@@ -244,14 +276,23 @@ class ParametersConfig:
     population_counts: ParametersConfigPopulationCounts = ParametersConfigPopulationCounts()
     """Parameters for format population counts subflow."""
 
+    population_stats: ParametersConfigPopulationStats = ParametersConfigPopulationStats()
+    """Parameters for format population stats subflow."""
+
     shape_average: ParametersConfigShapeAverage = ParametersConfigShapeAverage()
     """Parameters for format shape average subflow."""
+
+    shape_errors: ParametersConfigShapeErrors = ParametersConfigShapeErrors()
+    """Parameters for format shape errors subflow."""
 
     shape_modes: ParametersConfigShapeModes = ParametersConfigShapeModes()
     """Parameters for format shape modes subflow."""
 
     shape_samples: ParametersConfigShapeSamples = ParametersConfigShapeSamples()
     """Parameters for format shape samples subflow."""
+
+    variance_explained: ParametersConfigVarianceExplained = ParametersConfigVarianceExplained()
+    """Parameters for format variance explained subflow."""
 
 
 @dataclass
@@ -285,9 +326,12 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     - :py:func:`run_flow_format_feature_distributions`
     - :py:func:`run_flow_format_mode_correlations`
     - :py:func:`run_flow_format_population_counts`
+    - :py:func:`run_flow_format_population_stats`
     - :py:func:`run_flow_format_shape_average`
+    - :py:func:`run_flow_format_shape_errors`
     - :py:func:`run_flow_format_shape_modes`
     - :py:func:`run_flow_format_shape_samples`
+    - :py:func:`run_flow_format_variance_explained`
     """
 
     if "feature_bins" in parameters.panels:
@@ -305,14 +349,23 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     if "population_counts" in parameters.panels:
         run_flow_format_population_counts(context, series, parameters.population_counts)
 
+    if "population_stats" in parameters.panels:
+        run_flow_format_population_stats(context, series, parameters.population_stats)
+
     if "shape_average" in parameters.panels:
         run_flow_format_shape_average(context, series, parameters.shape_average)
+
+    if "shape_errors" in parameters.panels:
+        run_flow_format_shape_errors(context, series, parameters.shape_errors)
 
     if "shape_modes" in parameters.panels:
         run_flow_format_shape_modes(context, series, parameters.shape_modes)
 
     if "shape_samples" in parameters.panels:
         run_flow_format_shape_samples(context, series, parameters.shape_samples)
+
+    if "variance_explained" in parameters.panels:
+        run_flow_format_variance_explained(context, series, parameters.variance_explained)
 
 
 @flow(name="format-panel-data_format-feature-bins")
@@ -578,6 +631,36 @@ def run_flow_format_population_counts(
     )
 
 
+@flow(name="format-panel-data_format-population-stats")
+def run_flow_format_population_stats(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigPopulationStats
+) -> None:
+    """Format panel data subflow for population stats."""
+
+    analysis_key = make_key(series.name, "analysis", "analysis.STATS")
+    panel_key = make_key(series.name, "panels")
+    region_key = ":".join(sorted(parameters.regions))
+    keys = [condition["key"] for condition in series.conditions]
+
+    stats: list[pd.DataFrame] = []
+
+    for key in keys:
+        data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.STATS.csv")
+        data = load_dataframe(context.working_location, data_key)
+
+        sample_data = data[~data["SAMPLE"].isna()].drop(columns=["TICK", "time"])
+        sample_data["key"] = key
+
+        stats.append(sample_data)
+
+    save_dataframe(
+        context.working_location,
+        make_key(panel_key, f"{series.name}.population_stats.csv"),
+        pd.concat(stats),
+        index=False,
+    )
+
+
 @flow(name="format-panel-data_format-shape-average")
 def run_flow_format_shape_average(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigShapeAverage
@@ -653,6 +736,36 @@ def run_flow_format_shape_average(
         context.working_location,
         make_key(panel_key, f"{series.name}.shape_average.json"),
         shape_average,
+    )
+
+
+@flow(name="format-panel-data_format-shape-errors")
+def run_flow_format_shape_errors(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigShapeErrors
+) -> None:
+    """Format panel data subflow for shape errors."""
+
+    analysis_key = make_key(series.name, "analysis", "analysis.PCA")
+    panel_key = make_key(series.name, "panels")
+    region_key = ":".join(sorted(parameters.regions))
+    keys = [condition["key"] for condition in series.conditions]
+
+    columns = ["KEY", "ID", "SEED", "TICK"] + [
+        f"mse.{region}" if region != "DEFAULT" else "mse" for region in parameters.regions
+    ]
+
+    errors: list[pd.DataFrame] = []
+
+    for key in keys:
+        data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
+        data = load_dataframe(context.working_location, data_key)
+        errors.append(data[columns])
+
+    save_dataframe(
+        context.working_location,
+        make_key(panel_key, f"{series.name}.shape_errors.csv"),
+        pd.concat(errors),
+        index=False,
     )
 
 
@@ -748,4 +861,39 @@ def run_flow_format_shape_samples(
         context.working_location,
         make_key(panel_key, f"{series.name}.shape_samples.json"),
         shape_samples,
+    )
+
+
+@flow(name="format-panel-data_format-variance-explained")
+def run_flow_format_variance_explained(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigVarianceExplained
+) -> None:
+    """Format panel data subflow for variance explained."""
+
+    analysis_key = make_key(series.name, "analysis", "analysis.PCA")
+    panel_key = make_key(series.name, "panels")
+    region_key = ":".join(sorted(parameters.regions))
+    keys = [condition["key"] for condition in series.conditions]
+
+    variance = []
+
+    for key in keys:
+        model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
+        model = load_pickle(context.working_location, model_key)
+
+        variance.append(
+            pd.DataFrame(
+                {
+                    "key": [key] * parameters.components,
+                    "mode": range(1, parameters.components + 1),
+                    "variance": model.explained_variance_ratio_,
+                }
+            )
+        )
+
+    save_dataframe(
+        context.working_location,
+        make_key(panel_key, f"{series.name}.variance_explained.csv"),
+        pd.concat(variance),
+        index=False,
     )
