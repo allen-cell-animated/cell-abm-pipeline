@@ -42,17 +42,17 @@ scipy = ">=1.9.3,<2.0.0"
 
 [[package]]
 name = "abm-shape-collection"
-version = "0.6.0"
+version = "0.7.0"
 description = "Collection of tasks for analyzing cell shapes."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "abm_shape_collection-0.6.0-py3-none-any.whl", hash = "sha256:4883b2d5587442c1a0683de0d2c162f850d522fa1f2d2ef53a9264987d0f6b2f"},
-    {file = "abm_shape_collection-0.6.0.tar.gz", hash = "sha256:baa6aeaf01508df68c9ec900baa7bfb8913540c7ceebd493ca72fb5a426cbf38"},
+    {file = "abm_shape_collection-0.7.0-py3-none-any.whl", hash = "sha256:bb185ac4d07cdffeaeb8c58ecaf979ca567048a6f45dbbec8d096ac68ef0d126"},
+    {file = "abm_shape_collection-0.7.0.tar.gz", hash = "sha256:427e0e464b84cb3d9b1c5ea642b52f677aa5389f405dde426bd670dc508dcb7d"},
 ]
 
 [package.dependencies]
-aicsshparam = ">=0.1.1,<0.2.0"
+aicsshparam = ">=0.1.6,<0.2.0"
 numpy = ">=1.24.2,<2.0.0"
 pandas = ">=1.5.3,<2.0.0"
 prefect = ">=2.8.2,<3.0.0"
@@ -97,28 +97,28 @@ test = ["codecov (>=2.1.4)", "dask[array,distributed] (>=2021.4.1,!=2022.5.1)", 
 
 [[package]]
 name = "aicsshparam"
-version = "0.1.1"
+version = "0.1.6"
 description = "Spherical harmonics parametrization for 3D starlike shapes"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "aicsshparam-0.1.1-py2.py3-none-any.whl", hash = "sha256:701b726000766b27bd63178dec1018e23cb7e6c061a63472fbf0c3d73508187a"},
-    {file = "aicsshparam-0.1.1.tar.gz", hash = "sha256:344c398f1febf7c458862ee89d3b41e4dfc2ef3e20ee1e1d7e9a1f67125479be"},
+    {file = "aicsshparam-0.1.6-py2.py3-none-any.whl", hash = "sha256:666875eab9f5464aca74db3d9710486f115e555960e28fb6ce9013035debf188"},
+    {file = "aicsshparam-0.1.6.tar.gz", hash = "sha256:036edf663ec1032d08204c8f09d85b32108f83307b7d6e7f514cfc1051bddd11"},
 ]
 
 [package.dependencies]
 numpy = ">=1.18.1"
-pyshtools = ">=4.5"
+pyshtools = "4.9.1"
 scikit-image = ">=0.16.2"
 scikit-learn = ">=0.22.1"
 scipy = ">=1.4.1"
 vtk = ">=9.0.1"
 
 [package.extras]
-all = ["Sphinx (>=3.4.3)", "black (>=19.10b0)", "bump2version (>=1.0.1)", "codecov (>=2.1.4)", "coverage (>=5.1)", "flake8 (>=3.8.3)", "flake8-debugger (>=3.2.1)", "ipython (>=7.15.0)", "m2r2 (>=0.2.7)", "numpy (>=1.18.1)", "pyshtools (>=4.5)", "pytest (>=5.4.3)", "pytest-cov (>=2.9.0)", "pytest-raises (>=0.11)", "pytest-runner (>=5.2)", "scikit-image (>=0.16.2)", "scikit-learn (>=0.22.1)", "scipy (>=1.4.1)", "sphinx-rtd-theme (>=0.5.1)", "tox (>=3.15.2)", "twine (>=3.1.1)", "vtk (>=9.0.1)", "wheel (>=0.34.2)"]
-dev = ["Sphinx (>=3.4.3)", "black (>=19.10b0)", "bump2version (>=1.0.1)", "codecov (>=2.1.4)", "coverage (>=5.1)", "flake8 (>=3.8.3)", "flake8-debugger (>=3.2.1)", "ipython (>=7.15.0)", "m2r2 (>=0.2.7)", "pytest (>=5.4.3)", "pytest-cov (>=2.9.0)", "pytest-raises (>=0.11)", "pytest-runner (>=5.2)", "sphinx-rtd-theme (>=0.5.1)", "tox (>=3.15.2)", "twine (>=3.1.1)", "wheel (>=0.34.2)"]
+all = ["Sphinx (>=3.4.3)", "black (>=22.10.0)", "bump2version (>=1.0.1)", "coverage (>=5.1)", "flake8 (>=3.8.3)", "flake8-debugger (>=3.2.1)", "ipython (>=7.15.0)", "m2r2 (>=0.2.7)", "numpy (>=1.18.1)", "pyshtools (==4.9.1)", "pytest (>=5.4.3)", "pytest-cov (>=2.9.0)", "pytest-raises (>=0.11)", "pytest-runner (>=5.2)", "scikit-image (>=0.16.2)", "scikit-learn (>=0.22.1)", "scipy (>=1.4.1)", "sphinx-rtd-theme (>=0.5.1)", "tox (>=3.15.2)", "twine (>=3.1.1)", "vtk (>=9.0.1)", "wheel (>=0.34.2)"]
+dev = ["Sphinx (>=3.4.3)", "black (>=22.10.0)", "bump2version (>=1.0.1)", "coverage (>=5.1)", "flake8 (>=3.8.3)", "flake8-debugger (>=3.2.1)", "ipython (>=7.15.0)", "m2r2 (>=0.2.7)", "pytest (>=5.4.3)", "pytest-cov (>=2.9.0)", "pytest-raises (>=0.11)", "pytest-runner (>=5.2)", "sphinx-rtd-theme (>=0.5.1)", "tox (>=3.15.2)", "twine (>=3.1.1)", "wheel (>=0.34.2)"]
 setup = ["pytest-runner (>=5.2)"]
-test = ["black (>=19.10b0)", "codecov (>=2.1.4)", "flake8 (>=3.8.3)", "flake8-debugger (>=3.2.1)", "pytest (>=5.4.3)", "pytest-cov (>=2.9.0)", "pytest-raises (>=0.11)"]
+test = ["black (>=22.10.0)", "flake8 (>=3.8.3)", "flake8-debugger (>=3.2.1)", "pytest (>=5.4.3)", "pytest-cov (>=2.9.0)", "pytest-raises (>=0.11)"]
 
 [[package]]
 name = "aiobotocore"
@@ -379,13 +379,13 @@ requests-oauthlib = "*"
 
 [[package]]
 name = "arcade-collection"
-version = "0.8.1"
+version = "0.9.0"
 description = "Collection of tasks for working with ARCADE."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "arcade_collection-0.8.1-py3-none-any.whl", hash = "sha256:faf7a59b1e2bb340fd95cc72aef49e8e9006f0a1557d0b1c9a6d3163ec6001de"},
-    {file = "arcade_collection-0.8.1.tar.gz", hash = "sha256:691fb4d060cd0c7e878a59846fd7375fc57458430223dc8a1210b8b6fe9ba808"},
+    {file = "arcade_collection-0.9.0-py3-none-any.whl", hash = "sha256:b8e338a034e76a834b639834594129b1d85650a8ec775c86d7f74b811617dcae"},
+    {file = "arcade_collection-0.9.0.tar.gz", hash = "sha256:78d2bd7292b8e1e8cef6f960d8edab5f0e45418eb968e7e6f2b1fd6148492a10"},
 ]
 
 [package.dependencies]
@@ -1982,13 +1982,13 @@ files = [
 
 [[package]]
 name = "io-collection"
-version = "0.7.3"
+version = "0.8.0"
 description = "Collection of tasks for I/O."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "io_collection-0.7.3-py3-none-any.whl", hash = "sha256:352f299e96f43a5ade36f9efd4a8b0072658f943c2ea6bec5d1fc044211b5db8"},
-    {file = "io_collection-0.7.3.tar.gz", hash = "sha256:9412f3f769e0cac1cd1458c987f017e8669f752fe8f16dcb7dde92d6742bdbb6"},
+    {file = "io_collection-0.8.0-py3-none-any.whl", hash = "sha256:278cbfeacb93786dbebffed3a5a7651853bfe580291dacf4da5a5382a185688f"},
+    {file = "io_collection-0.8.0.tar.gz", hash = "sha256:27b5f2d79ddffe266666eb9dc3461a14afc32b01f2b3922d7e0d443324d62e0a"},
 ]
 
 [package.dependencies]
@@ -3578,26 +3578,28 @@ files = [
 
 [[package]]
 name = "pyshtools"
-version = "4.10.1"
+version = "4.9.1"
 description = "SHTOOLS - Spherical Harmonic Tools"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "pyshtools-4.10.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:11f461a430ca400c86baf7bb29f649efea4681aa99facbd25c111c900e818d2b"},
-    {file = "pyshtools-4.10.1-cp310-cp310-win_amd64.whl", hash = "sha256:bb760a5bfd2e3b047fbe25a90cdc6b55a470a0b6e51cbf10da99b396e305726d"},
-    {file = "pyshtools-4.10.1-cp311-cp311-win_amd64.whl", hash = "sha256:f27b2db0c56072e46ace9d5bf12597f5f29698d5a90297e98ba1bd89b702b7e6"},
-    {file = "pyshtools-4.10.1-cp37-cp37m-win_amd64.whl", hash = "sha256:fc51a59b602cd6e68854e57b73400fb75119434faa154807e6bbc2da21076b17"},
-    {file = "pyshtools-4.10.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c655b51c801e4f5b4a03fefde4263fe5000393952167ef494492575badbc6549"},
-    {file = "pyshtools-4.10.1-cp38-cp38-win_amd64.whl", hash = "sha256:65dbb2229857f7ff6c3e1e8996fb4214c3892166be8a7fe7c600ed259a1fac41"},
-    {file = "pyshtools-4.10.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:aa9975ef38238e8c4cbc24e68139e160ed266b9ced95ea38d2d5fb60b191b3cc"},
-    {file = "pyshtools-4.10.1-cp39-cp39-win_amd64.whl", hash = "sha256:fef71fbc2412a474aa7a33add65a0456469ece69239fefe95e241c9c442e76b9"},
-    {file = "pyshtools-4.10.1.tar.gz", hash = "sha256:59a5403c901dd6cbe431f6a5e8213f435fcee3f1ed3020077f0f1608ff9d4f2a"},
+    {file = "pyshtools-4.9.1-cp36-cp36m-win_amd64.whl", hash = "sha256:78ceaae499bcf150c153c19dc4cbd0e0e0e4a796bd4ab99c753bb8841566a253"},
+    {file = "pyshtools-4.9.1-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:c6a3c411b8e9237cc37f64e6554fa099c7afea9c4598341ef34ea09c7fc14f59"},
+    {file = "pyshtools-4.9.1-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8e75a73836f7013b789193908d5e23a62744471c00b7b7105b1e8269ba674bf5"},
+    {file = "pyshtools-4.9.1-cp37-cp37m-win_amd64.whl", hash = "sha256:3ae9833fb77d274d5ff1e8b4611c56cd334cee30d167050bdff4c54e5fb082e0"},
+    {file = "pyshtools-4.9.1-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:9b168c2b12ea041bf10f55e3a623e6dc32a367a9abf7df474f92578de72ae4cd"},
+    {file = "pyshtools-4.9.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:aa4375b8b561882f24eb522a9b1060834066f53530fb9a2a9522aea7fd038314"},
+    {file = "pyshtools-4.9.1-cp38-cp38-win_amd64.whl", hash = "sha256:e457ef53fbb9f44b20e800e44d6716e6bab339004795649f16ed6f3923861377"},
+    {file = "pyshtools-4.9.1-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:37a2ece9d5f2a54be31704db772efb62e3f7a0df76a29b2cdd2fd457ec10070a"},
+    {file = "pyshtools-4.9.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9375e01160d08c11a844fa2090264002b4a14013c8e15e849de63f2c61c48bb6"},
+    {file = "pyshtools-4.9.1-cp39-cp39-win_amd64.whl", hash = "sha256:5c1680cb62124b48d0786bf0e679089207bcab3c31e2ce48b57c803c28d25989"},
+    {file = "pyshtools-4.9.1.tar.gz", hash = "sha256:43aa80e954e1a222436c8643d342541880f6402b23cdde9d2cd9fdd1097d4e6f"},
 ]
 
 [package.dependencies]
 astropy = ">=4.0"
 matplotlib = ">=3.3"
-numpy = ">=1.23.2"
+numpy = ">=1.19.5"
 pooch = ">=1.1"
 requests = "*"
 scipy = ">=0.14.0"
@@ -5272,4 +5274,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "843a138bb7e0f86167616d13a7be87b34ff88217c5665259a3dab5a7e4420a82"
+content-hash = "18c844f675931e86b937c7a3187d958b063b941c84390e7b8bea992117cdca8e"
