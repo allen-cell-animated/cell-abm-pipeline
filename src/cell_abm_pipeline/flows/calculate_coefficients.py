@@ -81,7 +81,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         if len(voxels) == 0:
             continue
 
-        array = make_voxels_array(voxels, parameters.scale)
+        array = make_voxels_array(voxels, None, parameters.scale)
 
         if parameters.region is not None:
             region_voxels = get_location_voxels(location, parameters.region)
@@ -89,7 +89,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
             if len(region_voxels) == 0:
                 continue
 
-            region_array = make_voxels_array(region_voxels, parameters.scale)
+            region_array = make_voxels_array(region_voxels, None, parameters.scale)
             coeffs = get_shape_coefficients(region_array, array, parameters.order)
         else:
             coeffs = get_shape_coefficients(array, array, parameters.order)
