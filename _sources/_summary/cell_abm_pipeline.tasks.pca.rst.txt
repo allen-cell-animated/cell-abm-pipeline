@@ -1,0 +1,38 @@
+﻿tasks.pca
+=========
+
+.. automodule:: cell_abm_pipeline.tasks.pca
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+
+.. currentmodule:: cell_abm_pipeline.tasks
+
+.. autosummary::
+   :toctree:
+   :template: custom_task_module.rst
+   :recursive:
+
+   pca.plot_correlation_all_features
+   pca.plot_correlation_pca_features
+   pca.plot_correlation_region_features
+   pca.plot_variance_explained
+

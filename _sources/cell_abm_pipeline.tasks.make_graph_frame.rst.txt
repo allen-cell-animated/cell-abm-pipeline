@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.tasks.make\_graph\_frame module
-===================================================
-
-.. automodule:: cell_abm_pipeline.tasks.make_graph_frame
-   :members:
-   :undoc-members:
-   :show-inheritance:

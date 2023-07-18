@@ -1,0 +1,22 @@
+plot\_object\_storage
+=====================
+
+.. automodule:: cell_abm_pipeline.tasks.resources.plot_object_storage
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

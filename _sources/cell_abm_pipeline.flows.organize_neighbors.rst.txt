@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.flows.organize\_neighbors module
-====================================================
-
-.. automodule:: cell_abm_pipeline.flows.organize_neighbors
-   :members:
-   :undoc-members:
-   :show-inheritance:

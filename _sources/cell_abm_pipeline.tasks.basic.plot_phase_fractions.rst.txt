@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.tasks.basic.plot\_phase\_fractions module
-=============================================================
-
-.. automodule:: cell_abm_pipeline.tasks.basic.plot_phase_fractions
-   :members:
-   :undoc-members:
-   :show-inheritance:

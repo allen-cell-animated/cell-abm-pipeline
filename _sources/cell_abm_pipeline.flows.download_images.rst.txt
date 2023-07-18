@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.flows.download\_images module
-=================================================
-
-.. automodule:: cell_abm_pipeline.flows.download_images
-   :members:
-   :undoc-members:
-   :show-inheritance:

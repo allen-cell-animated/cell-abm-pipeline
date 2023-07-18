@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.tasks.pca.plot\_variance\_explained module
-==============================================================
-
-.. automodule:: cell_abm_pipeline.tasks.pca.plot_variance_explained
-   :members:
-   :undoc-members:
-   :show-inheritance:

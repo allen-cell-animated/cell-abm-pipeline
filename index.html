@@ -1,104 +1,339 @@
-<!DOCTYPE html>
-<html class="writer-html5" lang="en" >
-<head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="flows" href="_summary/cell_abm_pipeline.flows.html" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; Cell agent-based model pipeline VERSION NUMBER X.X.X documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+    <!-- Generated with Sphinx 7.0.1 and Furo 2023.05.20 -->
+        <title>Cell ABM Pipeline 0.0.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-    <script src="_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cell_abm_pipeline" href="modules.html" /> 
-</head>
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
 
-          
-          
-          <a href="#" class="icon icon-home">
-            Cell agent-based model pipeline
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Package modules</a></li>
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="#"><div class="brand"><strong>Cell ABM Pipeline</strong> <br />0.0.0</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
+  
+  
+  <span class="sidebar-brand-text"><strong>Cell ABM Pipeline</strong> <br />0.0.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Flow reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.html">flows</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of flows</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.analyze_colony_dynamics.html">analyze_colony_dynamics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.analyze_resource_usage.html">analyze_resource_usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.analyze_shape_modes.html">analyze_shape_modes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.calculate_coefficients.html">calculate_coefficients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.calculate_neighbors.html">calculate_neighbors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.calculate_properties.html">calculate_properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html">convert_arcade_format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.convert_physicell_format.html">convert_physicell_format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.demo.html">demo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.download_images.html">download_images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.format_panel_data.html">format_panel_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.generate_voronoi_tessellation.html">generate_voronoi_tessellation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html">initialize_arcade_simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html">initialize_physicell_simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html">make_simulation_movies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.organize_coefficients.html">organize_coefficients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.organize_neighbors.html">organize_neighbors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.organize_properties.html">organize_properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html">parse_arcade_simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.parse_physicell_simulations.html">parse_physicell_simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.plot_basic_metrics.html">plot_basic_metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.plot_colony_dynamics.html">plot_colony_dynamics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.plot_resource_usage.html">plot_resource_usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.plot_shape_modes.html">plot_shape_modes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.process_sample.html">process_sample</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.run_batch_simulations.html">run_batch_simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.run_calculate_coefficients.html">run_calculate_coefficients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.run_calculate_neighbors.html">run_calculate_neighbors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.run_calculate_properties.html">run_calculate_properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.run_docker_simulations.html">run_docker_simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.sample_image.html">sample_image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.summarize_simulations.html">summarize_simulations</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Task reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.basic.html">tasks.basic</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of tasks.basic</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.basic.plot_counts_total.html">plot_counts_total</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.basic.plot_feature_average.html">plot_feature_average</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.basic.plot_feature_distribution.html">plot_feature_distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.basic.plot_feature_individual.html">plot_feature_individual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.basic.plot_feature_locations.html">plot_feature_locations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.basic.plot_feature_merge.html">plot_feature_merge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.basic.plot_phase_durations.html">plot_phase_durations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.basic.plot_phase_fractions.html">plot_phase_fractions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.basic.plot_phase_locations.html">plot_phase_locations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.basic.plot_population_locations.html">plot_population_locations</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.clusters.html">tasks.clusters</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of tasks.clusters</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.clusters.plot_cluster_counts.html">plot_cluster_counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.clusters.plot_cluster_fractions.html">plot_cluster_fractions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.clusters.plot_cluster_trajectory.html">plot_cluster_trajectory</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.measures.html">tasks.measures</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of tasks.measures</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.measures.plot_degree_distribution.html">plot_degree_distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.measures.plot_degree_trajectory.html">plot_degree_trajectory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.measures.plot_graph_centralities.html">plot_graph_centralities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.measures.plot_graph_distances.html">plot_graph_distances</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.pca.html">tasks.pca</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of tasks.pca</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.pca.plot_correlation_all_features.html">plot_correlation_all_features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.pca.plot_correlation_pca_features.html">plot_correlation_pca_features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.pca.plot_correlation_region_features.html">plot_correlation_region_features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.pca.plot_variance_explained.html">plot_variance_explained</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.physicell.html">tasks.physicell</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of tasks.physicell</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.physicell.convert_physicell_to_simularium.html">convert_physicell_to_simularium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.physicell.parse_mcds_file.html">parse_mcds_file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.physicell.render_physicell_template.html">render_physicell_template</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.resources.html">tasks.resources</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of tasks.resources</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.resources.plot_object_storage.html">plot_object_storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.resources.plot_wall_clock.html">plot_wall_clock</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.shapes.html">tasks.shapes</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle navigation of tasks.shapes</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.shapes.plot_sample_shapes.html">plot_sample_shapes</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.stats.html">tasks.stats</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle navigation of tasks.stats</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.stats.plot_ks_all_ticks.html">plot_ks_all_ticks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.stats.plot_ks_by_feature.html">plot_ks_by_feature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.stats.plot_ks_by_key.html">plot_ks_by_key</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.stats.plot_ks_by_sample.html">plot_ks_by_sample</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/allen-cell-animated/cell-abm-pipeline">GitHub</a></li>
 </ul>
 
-        </div>
+</div>
+</div>
+
       </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">Cell agent-based model pipeline</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Installation</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <div class="line-block">
+<div class="line"><br /></div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
-  <div class="toctree-wrapper compound">
-</div>
-<a class="reference external image-reference" href="https://github.com/allen-cell-animated/cell-abm-pipeline/actions?query=workflow%3Abuild"><img alt="Build Status" src="https://github.com/allen-cell-animated/cell-abm-pipeline/workflows/build/badge.svg" /></a>
-<a class="reference external image-reference" href="https://codecov.io/gh/allen-cell-animated/cell-abm-pipeline"><img alt="Codecov" src="https://img.shields.io/codecov/c/gh/allen-cell-animated/cell-abm-pipeline?token=1S5ZKVET7T" /></a>
-<a class="reference external image-reference" href="https://github.com/allen-cell-animated/cell-abm-pipeline/actions?query=workflow%3Alint"><img alt="Lint Status" src="https://github.com/allen-cell-animated/cell-abm-pipeline/workflows/lint/badge.svg" /></a>
-<a class="reference external image-reference" href="https://allen-cell-animated.github.io/cell-abm-pipeline/"><img alt="Documentation" src="https://github.com/allen-cell-animated/cell-abm-pipeline/workflows/documentation/badge.svg" /></a>
-<a class="reference external image-reference" href="https://github.com/psf/black"><img alt="Code style" src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a>
+<section id="cell-abm-pipeline">
+<h1>Cell ABM Pipeline<a class="headerlink" href="#cell-abm-pipeline" title="Permalink to this heading">#</a></h1>
+<p><a class="reference external" href="https://github.com/allen-cell-animated/cell-abm-pipeline/actions?query=workflow%3Abuild"><img alt="Build Status" src="https://github.com/allen-cell-animated/cell-abm-pipeline/workflows/build/badge.svg" /></a>
+<a class="reference external" href="https://codecov.io/gh/allen-cell-animated/cell-abm-pipeline"><img alt="Codecov" src="https://img.shields.io/codecov/c/gh/allen-cell-animated/cell-abm-pipeline?token=1S5ZKVET7T" /></a>
+<a class="reference external" href="https://github.com/allen-cell-animated/cell-abm-pipeline/actions?query=workflow%3Alint"><img alt="Lint Status" src="https://github.com/allen-cell-animated/cell-abm-pipeline/workflows/lint/badge.svg" /></a>
+<a class="reference external" href="https://allen-cell-animated.github.io/cell-abm-pipeline/"><img alt="Documentation" src="https://github.com/allen-cell-animated/cell-abm-pipeline/workflows/documentation/badge.svg" /></a>
+<a class="reference external" href="https://github.com/psf/black"><img alt="Code style" src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a></p>
 <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">#</a></h2>
+<section id="installation-using-poetry">
+<h3>Installation using Poetry<a class="headerlink" href="#installation-using-poetry" title="Permalink to this heading">#</a></h3>
 <p>This project uses <a class="reference external" href="https://python-poetry.org/">Poetry</a> to manage dependencies and virtual environments.</p>
 <ol class="arabic simple">
 <li><p>Create the virtual environment:</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>poetry<span class="w"> </span>install
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>install
 </pre></div>
 </div>
-<ol class="arabic simple">
+<ol class="arabic simple" start="2">
 <li><p>Activate the environment:</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>poetry<span class="w"> </span>shell
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>shell
 </pre></div>
 </div>
 </section>
+<section id="alternative-installation-using-pip">
+<h3>Alternative installation using <code class="docutils literal notranslate"><span class="pre">pip</span></code><a class="headerlink" href="#alternative-installation-using-pip" title="Permalink to this heading">#</a></h3>
+<p>This project also includes a <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> generated from the <code class="docutils literal notranslate"><span class="pre">poetry.lock</span></code> file.
+Install dependencies directly from this file using:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</pre></div>
+</div>
+<p>Install the package (note that you need pip ≥ 21.3):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+</section>
 <section id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h1>
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">#</a></h2>
 <p>The pipeline uses <a class="reference external" href="https://docs.prefect.io/">Prefect</a> for workflows and <a class="reference external" href="https://hydra.cc/docs/intro/">Hydra</a> for composable configuration.</p>
 <p>Run the demo workflow using:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>abmpipe<span class="w"> </span>demo<span class="w"> </span>::<span class="w"> </span>parameters.name<span class="o">=</span>demo<span class="w"> </span>context.name<span class="o">=</span>demo<span class="w"> </span>series.name<span class="o">=</span>demo
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>abmpipe<span class="w"> </span>demo<span class="w"> </span>::<span class="w"> </span>parameters.name<span class="o">=</span>demo_parameters<span class="w"> </span>context.name<span class="o">=</span>demo_context<span class="w"> </span>series.name<span class="o">=</span>demo_series
 </pre></div>
 </div>
 <p>To use config files, create a <code class="docutils literal notranslate"><span class="pre">configs</span></code> directory with the following structure:</p>
@@ -113,12 +348,13 @@
 </div>
 <p>Each <code class="docutils literal notranslate"><span class="pre">demo.yaml</span></code> should contain the field <code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">&lt;name&gt;</span></code>.
 Then use:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>abmpipe<span class="w"> </span>demo<span class="w"> </span><span class="nv">parameters</span><span class="o">=</span>demo<span class="w"> </span><span class="nv">context</span><span class="o">=</span>demo<span class="w"> </span><span class="nv">series</span><span class="o">=</span>demo
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>abmpipe<span class="w"> </span>demo<span class="w"> </span><span class="nv">parameters</span><span class="o">=</span>demo<span class="w"> </span><span class="nv">context</span><span class="o">=</span>demo<span class="w"> </span><span class="nv">series</span><span class="o">=</span>demo
 </pre></div>
 </div>
 <p>Use the flag <code class="docutils literal notranslate"><span class="pre">--dryrun</span></code> to display the composed configuration without running the workflow.</p>
+<p>Use the flag <code class="docutils literal notranslate"><span class="pre">--deploy</span></code> to create a Prefect deployment.</p>
 <section id="adding-secrets">
-<h2>Adding secrets<a class="headerlink" href="#adding-secrets" title="Permalink to this heading"></a></h2>
+<h3>Adding secrets<a class="headerlink" href="#adding-secrets" title="Permalink to this heading">#</a></h3>
 <p>Configs can use <a class="reference external" href="https://docs.prefect.io/concepts/blocks/?h=secret#secret-fields">Secret</a> fields.
 In configs, any field in the form <code class="docutils literal notranslate"><span class="pre">${secret:name-of-secret}</span></code> will be resolved using the Prefect Secret loader.
 These values must be configured as a Secret Block in Prefect via a script:</p>
@@ -130,43 +366,238 @@ These values must be configured as a Secret Block in Prefect via a script:</p>
 <p>or in the Prefect UI under Blocks.</p>
 </section>
 </section>
-<section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
+<section id="development">
+<h2>Development<a class="headerlink" href="#development" title="Permalink to this heading">#</a></h2>
+<p>New flows can be added to the <code class="docutils literal notranslate"><span class="pre">flows</span></code> module with following structure:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ParametersConfig</span><span class="p">:</span>
+    <span class="c1"># TODO: add parameter config</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ContextConfig</span><span class="p">:</span>
+    <span class="c1"># TODO: add context config</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SeriesConfig</span><span class="p">:</span>
+    <span class="c1"># TODO: add series config</span>
+
+
+<span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;name-of-flow&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">run_flow</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">ContextConfig</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="n">SeriesConfig</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># TODO: add flow</span>
+</pre></div>
+</div>
+<p>The command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>abmpipe<span class="w"> </span>name-of-flow
+</pre></div>
+</div>
+<p>will create a new flow template under the <code class="docutils literal notranslate"><span class="pre">flows</span></code> module with the name <code class="docutils literal notranslate"><span class="pre">name_of_flow</span></code>.</p>
+<section id="using-notebooks">
+<h3>Using notebooks<a class="headerlink" href="#using-notebooks" title="Permalink to this heading">#</a></h3>
+<p>Notebooks can be helpful for prototyping flows.</p>
+<section id="use-dataclasses-to-specify-configuration">
+<h4>Use dataclasses to specify configuration<a class="headerlink" href="#use-dataclasses-to-specify-configuration" title="Permalink to this heading">#</a></h4>
+<p>Create dataclasses for all relevant configuration for the flow.
+Specify types and default values, if relevant.
+For flows in this repo, three types of configs are used:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ParametersConfig</span></code> specifies all parameters for the flow</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ContextConfig</span></code> specifies the infrastructure context (e.g. local working path or S3 bucket names)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SeriesConfig</span></code> specifies the simulation series the flow is applied to (e.g. simulation name, conditions, seeds)</p></li>
 </ul>
 </section>
+<section id="load-configuration-into-dataclasses">
+<h4>Load configuration into dataclasses<a class="headerlink" href="#load-configuration-into-dataclasses" title="Permalink to this heading">#</a></h4>
+<p>Configurations can be loaded in multiple ways.</p>
+<ol class="arabic simple">
+<li><p>Load entire configuration directly from an existing configuration file using the <code class="docutils literal notranslate"><span class="pre">make_config_from_file</span></code> function.
+<em>Works best for simple configurations without interpolation</em>.</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="n">make_config_from_file</span><span class="p">(</span><span class="n">ConfigDataclass</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/path/to/config.yaml&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Load partial configuration directly from an existing configuration file using the <code class="docutils literal notranslate"><span class="pre">make_config_from_file</span></code> function.
+Missing fields in the config can be loaded from other configuration files using <code class="docutils literal notranslate"><span class="pre">OmegaConf.load</span></code> or set directly.
+<em>Works best for configurations that use interpolation</em>.</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="n">make_config_from_file</span><span class="p">(</span><span class="n">ConfigDataclass</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/path/to/config.yaml&quot;</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/path/to/another/config.yaml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">field</span>
+<span class="n">config</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="s2">&quot;value&quot;</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Directly instantiate the config object.
+Fields in object initialization can also be loaded using <code class="docutils literal notranslate"><span class="pre">OmegaConf.load</span></code>.
+<em>Works best for custom configurations or testing configurations</em>.</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="n">ConfigDataclass</span><span class="p">(</span>
+    <span class="n">field</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">,</span>
+    <span class="n">field</span><span class="o">=</span><span class="n">OmegaConf</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/path/to/config.yaml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">field</span><span class="p">,</span>
+    <span class="o">...</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="call-tasks-from-collections">
+<h4>Call tasks from collections<a class="headerlink" href="#call-tasks-from-collections" title="Permalink to this heading">#</a></h4>
+<p>Import tasks from collections in the undecorated form:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collection.module.task</span> <span class="kn">import</span> <span class="n">task</span>
+</pre></div>
+</div>
+<p>Tasks can also be imported in decorated form:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collection.module</span> <span class="kn">import</span> <span class="n">task</span>
+</pre></div>
+</div>
+<p>but will need to called using <code class="docutils literal notranslate"><span class="pre">task.fn()</span></code> because we are not in a Prefect flow environment.</p>
+</section>
+<section id="converting-notebooks-to-flows">
+<h4>Converting notebooks to flows<a class="headerlink" href="#converting-notebooks-to-flows" title="Permalink to this heading">#</a></h4>
+<p>Make sure the main flow method has the <code class="docutils literal notranslate"><span class="pre">&#64;flow</span></code> decorator and imports should be switched to their <code class="docutils literal notranslate"><span class="pre">&#64;task</span></code> decorated form to take advantage of Prefect task and flow monitoring.</p>
+</section>
+</section>
+</section>
+</section>
+<section id="flow-reference">
+<h1>Flow reference<a class="headerlink" href="#flow-reference" title="Permalink to this heading">#</a></h1>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_summary/cell_abm_pipeline.flows.html#module-cell_abm_pipeline.flows" title="cell_abm_pipeline.flows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cell_abm_pipeline.flows</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="task-reference">
+<h1>Task reference<a class="headerlink" href="#task-reference" title="Permalink to this heading">#</a></h1>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.basic.html#module-cell_abm_pipeline.tasks.basic" title="cell_abm_pipeline.tasks.basic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cell_abm_pipeline.tasks.basic</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.clusters.html#module-cell_abm_pipeline.tasks.clusters" title="cell_abm_pipeline.tasks.clusters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cell_abm_pipeline.tasks.clusters</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.measures.html#module-cell_abm_pipeline.tasks.measures" title="cell_abm_pipeline.tasks.measures"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cell_abm_pipeline.tasks.measures</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.pca.html#module-cell_abm_pipeline.tasks.pca" title="cell_abm_pipeline.tasks.pca"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cell_abm_pipeline.tasks.pca</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.physicell.html#module-cell_abm_pipeline.tasks.physicell" title="cell_abm_pipeline.tasks.physicell"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cell_abm_pipeline.tasks.physicell</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.resources.html#module-cell_abm_pipeline.tasks.resources" title="cell_abm_pipeline.tasks.resources"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cell_abm_pipeline.tasks.resources</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.shapes.html#module-cell_abm_pipeline.tasks.shapes" title="cell_abm_pipeline.tasks.shapes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cell_abm_pipeline.tasks.shapes</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.stats.html#module-cell_abm_pipeline.tasks.stats" title="cell_abm_pipeline.tasks.stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cell_abm_pipeline.tasks.stats</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="toctree-wrapper compound">
+</div>
+</section>
 
-
-           </div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="_summary/cell_abm_pipeline.flows.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">flows</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Allen Institute for Cell Science
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="modules.html" class="btn btn-neutral float-right" title="cell_abm_pipeline" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
     </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Cell ABM Pipeline</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#installation-using-poetry">Installation using Poetry</a></li>
+<li><a class="reference internal" href="#alternative-installation-using-pip">Alternative installation using <code class="docutils literal notranslate"><span class="pre">pip</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#adding-secrets">Adding secrets</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#development">Development</a><ul>
+<li><a class="reference internal" href="#using-notebooks">Using notebooks</a><ul>
+<li><a class="reference internal" href="#use-dataclasses-to-specify-configuration">Use dataclasses to specify configuration</a></li>
+<li><a class="reference internal" href="#load-configuration-into-dataclasses">Load configuration into dataclasses</a></li>
+<li><a class="reference internal" href="#call-tasks-from-collections">Call tasks from collections</a></li>
+<li><a class="reference internal" href="#converting-notebooks-to-flows">Converting notebooks to flows</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#flow-reference">Flow reference</a></li>
+<li><a class="reference internal" href="#task-reference">Task reference</a><ul>
+</ul>
+</li>
+</ul>
 
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright YYYY, AUTHOR_NAME.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
+          </div>
         </div>
       </div>
-    </section>
+      
+      
+    </aside>
   </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    </body>
 </html>

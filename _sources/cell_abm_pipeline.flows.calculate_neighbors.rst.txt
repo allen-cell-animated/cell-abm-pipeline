@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.flows.calculate\_neighbors module
-=====================================================
-
-.. automodule:: cell_abm_pipeline.flows.calculate_neighbors
-   :members:
-   :undoc-members:
-   :show-inheritance:

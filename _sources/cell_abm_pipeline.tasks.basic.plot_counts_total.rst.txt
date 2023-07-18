@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.tasks.basic.plot\_counts\_total module
-==========================================================
-
-.. automodule:: cell_abm_pipeline.tasks.basic.plot_counts_total
-   :members:
-   :undoc-members:
-   :show-inheritance:

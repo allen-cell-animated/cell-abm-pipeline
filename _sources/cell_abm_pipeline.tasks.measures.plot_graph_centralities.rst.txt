@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.tasks.measures.plot\_graph\_centralities module
-===================================================================
-
-.. automodule:: cell_abm_pipeline.tasks.measures.plot_graph_centralities
-   :members:
-   :undoc-members:
-   :show-inheritance:

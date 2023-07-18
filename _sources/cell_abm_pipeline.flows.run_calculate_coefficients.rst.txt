@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.flows.run\_calculate\_coefficients module
-=============================================================
-
-.. automodule:: cell_abm_pipeline.flows.run_calculate_coefficients
-   :members:
-   :undoc-members:
-   :show-inheritance:

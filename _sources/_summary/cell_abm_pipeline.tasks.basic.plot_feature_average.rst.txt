@@ -1,0 +1,22 @@
+plot\_feature\_average
+======================
+
+.. automodule:: cell_abm_pipeline.tasks.basic.plot_feature_average
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

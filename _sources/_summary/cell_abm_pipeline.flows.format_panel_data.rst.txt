@@ -1,0 +1,113 @@
+format\_panel\_data
+===================
+
+.. automodule:: cell_abm_pipeline.flows.format_panel_data
+   
+   
+   
+
+   
+   
+   .. rubric:: Flows
+
+   .. autosummary::
+      :nosignatures:
+   
+      run_flow
+      run_flow_format_feature_bins
+      run_flow_format_feature_correlations
+      run_flow_format_feature_distributions
+      run_flow_format_mode_correlations
+      run_flow_format_population_counts
+      run_flow_format_population_stats
+      run_flow_format_shape_average
+      run_flow_format_shape_errors
+      run_flow_format_shape_modes
+      run_flow_format_shape_samples
+      run_flow_format_variance_explained
+   
+   .. autofunction:: cell_abm_pipeline.flows.format_panel_data.run_flow
+   .. autofunction:: cell_abm_pipeline.flows.format_panel_data.run_flow_format_feature_bins
+   .. autofunction:: cell_abm_pipeline.flows.format_panel_data.run_flow_format_feature_correlations
+   .. autofunction:: cell_abm_pipeline.flows.format_panel_data.run_flow_format_feature_distributions
+   .. autofunction:: cell_abm_pipeline.flows.format_panel_data.run_flow_format_mode_correlations
+   .. autofunction:: cell_abm_pipeline.flows.format_panel_data.run_flow_format_population_counts
+   .. autofunction:: cell_abm_pipeline.flows.format_panel_data.run_flow_format_population_stats
+   .. autofunction:: cell_abm_pipeline.flows.format_panel_data.run_flow_format_shape_average
+   .. autofunction:: cell_abm_pipeline.flows.format_panel_data.run_flow_format_shape_errors
+   .. autofunction:: cell_abm_pipeline.flows.format_panel_data.run_flow_format_shape_modes
+   .. autofunction:: cell_abm_pipeline.flows.format_panel_data.run_flow_format_shape_samples
+   .. autofunction:: cell_abm_pipeline.flows.format_panel_data.run_flow_format_variance_explained
+   
+   
+
+   
+   
+   .. rubric:: Configs
+
+   .. autosummary::
+      :nosignatures:
+   
+      ContextConfig
+      ParametersConfig
+      ParametersConfigFeatureBins
+      ParametersConfigFeatureCorrelations
+      ParametersConfigFeatureDistributions
+      ParametersConfigModeCorrelations
+      ParametersConfigPopulationCounts
+      ParametersConfigPopulationStats
+      ParametersConfigShapeAverage
+      ParametersConfigShapeErrors
+      ParametersConfigShapeModes
+      ParametersConfigShapeSamples
+      ParametersConfigVarianceExplained
+      SeriesConfig
+   
+   .. autoclass:: cell_abm_pipeline.flows.format_panel_data.ContextConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.format_panel_data.ParametersConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.format_panel_data.ParametersConfigFeatureBins
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.format_panel_data.ParametersConfigFeatureCorrelations
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.format_panel_data.ParametersConfigFeatureDistributions
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.format_panel_data.ParametersConfigModeCorrelations
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.format_panel_data.ParametersConfigPopulationCounts
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.format_panel_data.ParametersConfigPopulationStats
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.format_panel_data.ParametersConfigShapeAverage
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.format_panel_data.ParametersConfigShapeErrors
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.format_panel_data.ParametersConfigShapeModes
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.format_panel_data.ParametersConfigShapeSamples
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.format_panel_data.ParametersConfigVarianceExplained
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.format_panel_data.SeriesConfig
+      :members:
+      :exclude-members: __init__
+   
+   
+
+   
+   
+   

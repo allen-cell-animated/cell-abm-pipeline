@@ -1,0 +1,35 @@
+﻿tasks.shapes
+============
+
+.. automodule:: cell_abm_pipeline.tasks.shapes
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+
+.. currentmodule:: cell_abm_pipeline.tasks
+
+.. autosummary::
+   :toctree:
+   :template: custom_task_module.rst
+   :recursive:
+
+   shapes.plot_sample_shapes
+

@@ -1,7 +1,0 @@
-cell\_abm\_pipeline.tasks.resources.plot\_object\_storage module
-================================================================
-
-.. automodule:: cell_abm_pipeline.tasks.resources.plot_object_storage
-   :members:
-   :undoc-members:
-   :show-inheritance:

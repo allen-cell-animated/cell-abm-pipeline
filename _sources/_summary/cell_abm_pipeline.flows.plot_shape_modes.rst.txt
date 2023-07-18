@@ -1,0 +1,53 @@
+plot\_shape\_modes
+==================
+
+.. automodule:: cell_abm_pipeline.flows.plot_shape_modes
+   
+   
+   
+
+   
+   
+   .. rubric:: Flows
+
+   .. autosummary::
+      :nosignatures:
+   
+      run_flow
+      run_flow_plot_pca
+      run_flow_plot_shapes
+      run_flow_plot_stats
+   
+   .. autofunction:: cell_abm_pipeline.flows.plot_shape_modes.run_flow
+   .. autofunction:: cell_abm_pipeline.flows.plot_shape_modes.run_flow_plot_pca
+   .. autofunction:: cell_abm_pipeline.flows.plot_shape_modes.run_flow_plot_shapes
+   .. autofunction:: cell_abm_pipeline.flows.plot_shape_modes.run_flow_plot_stats
+   
+   
+
+   
+   
+   .. rubric:: Configs
+
+   .. autosummary::
+      :nosignatures:
+   
+      ContextConfig
+      ParametersConfig
+      SeriesConfig
+   
+   .. autoclass:: cell_abm_pipeline.flows.plot_shape_modes.ContextConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.plot_shape_modes.ParametersConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.plot_shape_modes.SeriesConfig
+      :members:
+      :exclude-members: __init__
+   
+   
+
+   
+   
+   

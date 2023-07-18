@@ -1,0 +1,47 @@
+calculate\_coefficients
+=======================
+
+.. automodule:: cell_abm_pipeline.flows.calculate_coefficients
+   
+   
+   
+
+   
+   
+   .. rubric:: Flows
+
+   .. autosummary::
+      :nosignatures:
+   
+      run_flow
+   
+   .. autofunction:: cell_abm_pipeline.flows.calculate_coefficients.run_flow
+   
+   
+
+   
+   
+   .. rubric:: Configs
+
+   .. autosummary::
+      :nosignatures:
+   
+      ContextConfig
+      ParametersConfig
+      SeriesConfig
+   
+   .. autoclass:: cell_abm_pipeline.flows.calculate_coefficients.ContextConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.calculate_coefficients.ParametersConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.calculate_coefficients.SeriesConfig
+      :members:
+      :exclude-members: __init__
+   
+   
+
+   
+   
+   

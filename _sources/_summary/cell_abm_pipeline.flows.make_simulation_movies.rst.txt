@@ -1,0 +1,51 @@
+make\_simulation\_movies
+========================
+
+.. automodule:: cell_abm_pipeline.flows.make_simulation_movies
+   
+   
+   
+
+   
+   
+   .. rubric:: Flows
+
+   .. autosummary::
+      :nosignatures:
+   
+      run_flow
+      run_flow_make_graph
+      run_flow_make_projection
+   
+   .. autofunction:: cell_abm_pipeline.flows.make_simulation_movies.run_flow
+   .. autofunction:: cell_abm_pipeline.flows.make_simulation_movies.run_flow_make_graph
+   .. autofunction:: cell_abm_pipeline.flows.make_simulation_movies.run_flow_make_projection
+   
+   
+
+   
+   
+   .. rubric:: Configs
+
+   .. autosummary::
+      :nosignatures:
+   
+      ContextConfig
+      ParametersConfig
+      SeriesConfig
+   
+   .. autoclass:: cell_abm_pipeline.flows.make_simulation_movies.ContextConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.make_simulation_movies.ParametersConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.make_simulation_movies.SeriesConfig
+      :members:
+      :exclude-members: __init__
+   
+   
+
+   
+   
+   

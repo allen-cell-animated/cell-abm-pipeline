@@ -1,0 +1,37 @@
+﻿tasks.clusters
+==============
+
+.. automodule:: cell_abm_pipeline.tasks.clusters
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+
+.. currentmodule:: cell_abm_pipeline.tasks
+
+.. autosummary::
+   :toctree:
+   :template: custom_task_module.rst
+   :recursive:
+
+   clusters.plot_cluster_counts
+   clusters.plot_cluster_fractions
+   clusters.plot_cluster_trajectory
+
