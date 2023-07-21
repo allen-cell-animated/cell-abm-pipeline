@@ -27,8 +27,8 @@ Working location structure:
     │       └── (name)_(key)_(seed).LOCATIONS.tar.xz
     ├── panels
     │   ├── (name).feature_bins.csv
-    │   ├── (name).feature_correlations.csv
-    │   ├── (name).feature_distributions.csv
+    │   ├── (name).feature_correlations.(key).csv
+    │   ├── (name).feature_distributions.(feature).csv
     │   ├── (name).mode_correlations.csv
     │   ├── (name).population_counts.csv
     │   ├── (name).population_stats.csv
@@ -86,7 +86,7 @@ PANELS: list[str] = [
     "variance_explained",
 ]
 
-FEATURES: list[str] = [
+PROPERTIES: list[str] = [
     "volume",
     "height",
     "area",
@@ -95,6 +95,37 @@ FEATURES: list[str] = [
     "eccentricity",
     "perimeter",
 ]
+
+
+BOUNDS = {
+    "volume.DEFAULT": (0, 5000),
+    "volume.NUCLEUS": (0, 1500),
+    "height.DEFAULT": (0, 20),
+    "height.NUCLEUS": (0, 20),
+    "PC1": (-50, 50),
+    "PC2": (-50, 50),
+    "PC3": (-50, 50),
+    "PC4": (-50, 50),
+    "PC5": (-50, 50),
+    "PC6": (-50, 50),
+    "PC7": (-50, 50),
+    "PC8": (-50, 50),
+}
+
+BANDWIDTH = {
+    "volume.DEFAULT": 100,
+    "volume.NUCLEUS": 50,
+    "height.DEFAULT": 1,
+    "height.NUCLEUS": 1,
+    "PC1": 5,
+    "PC2": 5,
+    "PC3": 5,
+    "PC4": 5,
+    "PC5": 5,
+    "PC6": 5,
+    "PC7": 5,
+    "PC8": 5,
+}
 
 
 @dataclass
@@ -118,8 +149,8 @@ class ParametersConfigFeatureCorrelations:
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
 
-    features: list[str] = field(default_factory=lambda: FEATURES)
-    """List of shape features."""
+    properties: list[str] = field(default_factory=lambda: PROPERTIES)
+    """List of shape properties."""
 
     components: int = PCA_COMPONENTS
     """Number of principal components (i.e. shape modes)."""
@@ -135,8 +166,8 @@ class ParametersConfigFeatureDistributions:
     reference_data: Optional[str] = None
     """Full key for reference coefficients data."""
 
-    features: list[str] = field(default_factory=lambda: FEATURES)
-    """List of shape features."""
+    properties: list[str] = field(default_factory=lambda: PROPERTIES)
+    """List of shape properties."""
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
@@ -412,15 +443,9 @@ def run_flow_format_feature_correlations(
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
-    features = [
-        f"{feature}.{region}" if region != "DEFAULT" else feature
-        for feature in parameters.features
-        for region in parameters.regions
-    ]
-
-    correlations: list[dict[str, Union[str, int, float]]] = []
-
     for key in keys:
+        correlations: list[dict[str, Union[str, int, float]]] = []
+
         # Load model.
         model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
         model = load_pickle(context.working_location, model_key)
@@ -433,30 +458,31 @@ def run_flow_format_feature_correlations(
         columns = data.filter(like="shcoeffs").columns
         transform = model.transform(data[columns].values)
 
-        for feature in features:
-            feature_data = data[feature]
+        for prop in parameters.properties:
+            for region in parameters.regions:
+                prop_data = data[f"{prop}.{region}".replace(".DEFAULT", "")]
 
-            for component in range(parameters.components):
-                component_data = transform[:, component]
+                for component in range(parameters.components):
+                    component_data = transform[:, component]
 
-                correlations.append(
-                    {
-                        "key": key,
-                        "feature": feature,
-                        "mode": component + 1,
-                        "correlation": pearsonr(feature_data, component_data).statistic,
-                        "correlation_symmetric": pearsonr(
-                            feature_data, abs(component_data)
-                        ).statistic,
-                    }
-                )
+                    correlations.append(
+                        {
+                            "property": prop.upper(),
+                            "mode": f"PC{component + 1}",
+                            "region": region,
+                            "correlation": pearsonr(prop_data, component_data).statistic,
+                            "correlation_symmetric": pearsonr(
+                                prop_data, abs(component_data)
+                            ).statistic,
+                        }
+                    )
 
-    save_dataframe(
-        context.working_location,
-        make_key(panel_key, f"{series.name}.feature_correlations.csv"),
-        pd.DataFrame(correlations),
-        index=False,
-    )
+        save_dataframe(
+            context.working_location,
+            make_key(panel_key, f"{series.name}.feature_correlations.{key}.csv"),
+            pd.DataFrame(correlations),
+            index=False,
+        )
 
 
 @flow(name="format-panel-data_format-feature-distributions")
@@ -470,18 +496,18 @@ def run_flow_format_feature_distributions(
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
-    columns = ["KEY", "ID", "SEED", "TICK"] + [
-        f"{feature}.{region}" if region != "DEFAULT" else feature
-        for feature in parameters.features
-        for region in parameters.regions
+    features = [
+        f"{prop}.{region}" for prop in parameters.properties for region in parameters.regions
     ]
-
-    distributions: list[pd.DataFrame] = []
 
     if parameters.reference_model is not None and parameters.reference_data is not None:
         ref_data = load_dataframe(context.working_location, parameters.reference_data, nrows=1)
         ref_model = load_pickle(context.working_location, parameters.reference_model)
-        columns = columns + [f"PC{component + 1}" for component in range(parameters.components)]
+        features = features + [f"PC{component + 1}" for component in range(parameters.components)]
+
+    distributions: dict[str, dict] = {feature: {} for feature in features}
+    distribution_means: dict[str, dict] = {feature: {} for feature in features}
+    distribution_stdevs: dict[str, dict] = {feature: {} for feature in features}
 
     for key in keys:
         # Load dataframe.
@@ -494,15 +520,39 @@ def run_flow_format_feature_distributions(
             for component in range(parameters.components):
                 data[f"PC{component + 1}"] = transform[:, component]
 
-        data.drop(columns=[col for col in data if col not in columns], inplace=True)
-        distributions.append(data)
+        for feature in features:
+            feature_data = data[feature.replace(".DEFAULT", "")].values
 
-    save_dataframe(
-        context.working_location,
-        make_key(panel_key, f"{series.name}.feature_distributions.csv"),
-        pd.concat(distributions),
-        index=False,
-    )
+            bandwidth = BANDWIDTH[feature]
+            bounds = BOUNDS[feature]
+
+            total = len(feature_data) * bandwidth
+            num_bins = int((bounds[1] - bounds[0]) / bandwidth)
+            lower = bounds[0] - 3 * bandwidth / 2
+            upper = bounds[1] + 3 * bandwidth / 2
+
+            bins = np.linspace(lower, upper, num_bins + 4).tolist()
+            counts, _ = np.histogram(feature_data, bins)
+
+            distribution_means[feature][key] = np.mean(feature_data)
+            distribution_stdevs[feature][key] = np.std(feature_data, ddof=1)
+            distributions[feature][key] = [
+                {"n": count, "x": x0, "y": count / total, "m": (x0 + x1) / 2}
+                for count, x0, x1 in zip(counts.tolist(), bins[:-1], bins[1:])
+            ]
+
+    for feature, distribution in distributions.items():
+        distribution["*"] = {
+            "bandwidth": BANDWIDTH[feature],
+            "means": distribution_means[feature],
+            "stdevs": distribution_stdevs[feature],
+        }
+
+        save_json(
+            context.working_location,
+            make_key(panel_key, f"{series.name}.feature_distributions.{feature.upper()}.json"),
+            distribution,
+        )
 
 
 @flow(name="format-panel-data_format-mode-correlations")
@@ -573,8 +623,8 @@ def run_flow_format_mode_correlations(
                 {
                     "source_key": source_key,
                     "target_key": target_key,
-                    "source_mode": si + 1,
-                    "target_mode": ti + 1,
+                    "source_mode": f"PC{si + 1}",
+                    "target_mode": f"PC{ti + 1}",
                     "correlation": pearsonr(
                         transform_source[:, si], transform_target[:, ti]
                     ).statistic,
@@ -885,7 +935,7 @@ def run_flow_format_variance_explained(
             pd.DataFrame(
                 {
                     "key": [key] * parameters.components,
-                    "mode": range(1, parameters.components + 1),
+                    "mode": [f"PC{i}" for i in range(1, parameters.components + 1)],
                     "variance": model.explained_variance_ratio_,
                 }
             )
