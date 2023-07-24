@@ -96,6 +96,11 @@ PROPERTIES: list[str] = [
     "perimeter",
 ]
 
+PROJECTIONS: list[str] = [
+    "top",
+    "side1",
+    "side2",
+]
 
 BOUNDS = {
     "volume.DEFAULT": (0, 5000),
@@ -229,6 +234,9 @@ class ParametersConfigShapeAverage:
     scale: float = 1
     """Scaling for spherical harmonics reconstruction mesh."""
 
+    projections: list[str] = field(default_factory=lambda: PROJECTIONS)
+    """List of shape projections."""
+
 
 @dataclass
 class ParametersConfigShapeErrors:
@@ -253,6 +261,9 @@ class ParametersConfigShapeModes:
 
     delta: float = 0.5
     """Increment for shape mode map points."""
+
+    projections: list[str] = field(default_factory=lambda: PROJECTIONS)
+    """List of shape projections."""
 
 
 @dataclass
@@ -692,22 +703,26 @@ def run_flow_format_population_stats(
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
-    stats: list[pd.DataFrame] = []
+    stats: dict[str, dict] = {key: {} for key in keys}
 
     for key in keys:
         data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.STATS.csv")
         data = load_dataframe(context.working_location, data_key)
 
-        sample_data = data[~data["SAMPLE"].isna()].drop(columns=["TICK", "time"])
-        sample_data["key"] = key
+        for feature, group in data[~data["SAMPLE"].isna()].groupby("FEATURE"):
+            feature_name = feature.replace("_", "")
+            feature_name = "volume.DEFAULT" if feature == "volume" else feature_name
+            feature_name = "height.DEFAULT" if feature == "height" else feature_name
 
-        stats.append(sample_data)
+            stats[key][feature_name.upper()] = {
+                "mean": group["KS_STATISTIC"].mean(),
+                "std": group["KS_STATISTIC"].std(ddof=1),
+            }
 
-    save_dataframe(
+    save_json(
         context.working_location,
-        make_key(panel_key, f"{series.name}.population_stats.csv"),
-        pd.concat(stats),
-        index=False,
+        make_key(panel_key, f"{series.name}.population_stats.json"),
+        stats,
     )
 
 
@@ -730,11 +745,6 @@ def run_flow_format_shape_average(
     panel_key = make_key(series.name, "panels")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
-
-    shape_average: dict[str, dict] = {
-        "original": {},
-        "reconstructed": {},
-    }
 
     for key in keys:
         # Load model.
@@ -774,19 +784,27 @@ def run_flow_format_shape_average(
 
         # Create original mesh and get projections.
         original_mesh = construct_mesh_from_array(array, array)
-        shape_average["original"][key] = extract_mesh_projections(original_mesh)
+        original_mesh_projections = extract_mesh_projections(original_mesh)
 
         # Create reconstructed mesh and get projections.
         reconstructed_mesh = construct_mesh_from_coeffs(
             selected, parameters.order, scale=parameters.scale
         )
-        shape_average["reconstructed"][key] = extract_mesh_projections(reconstructed_mesh)
+        reconstructed_mesh_projections = extract_mesh_projections(reconstructed_mesh)
 
-    save_json(
-        context.working_location,
-        make_key(panel_key, f"{series.name}.shape_average.json"),
-        shape_average,
-    )
+        # Save json for each projection.
+        for projection in parameters.projections:
+            shape_average: dict[str, dict] = {
+                "original_slice": original_mesh_projections[f"{projection}_slice"],
+                "original_extent": original_mesh_projections[f"{projection}_extent"],
+                "reconstructed_slice": reconstructed_mesh_projections[f"{projection}_slice"],
+            }
+
+            save_json(
+                context.working_location,
+                make_key(panel_key, f"{series.name}.shape_average.{key}.{projection.upper()}.json"),
+                shape_average,
+            )
 
 
 @flow(name="format-panel-data_format-shape-errors")
@@ -800,22 +818,22 @@ def run_flow_format_shape_errors(
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
-    columns = ["KEY", "ID", "SEED", "TICK"] + [
-        f"mse.{region}" if region != "DEFAULT" else "mse" for region in parameters.regions
-    ]
-
-    errors: list[pd.DataFrame] = []
+    errors: dict[str, dict] = {key: {} for key in keys}
 
     for key in keys:
         data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
         data = load_dataframe(context.working_location, data_key)
-        errors.append(data[columns])
 
-    save_dataframe(
+        for region in parameters.regions:
+            errors[key][region] = {
+                "mean": data[f"mse.{region}".replace(".DEFAULT", "")].mean(),
+                "std": data[f"mse.{region}".replace(".DEFAULT", "")].std(ddof=1),
+            }
+
+    save_json(
         context.working_location,
-        make_key(panel_key, f"{series.name}.shape_errors.csv"),
-        pd.concat(errors),
-        index=False,
+        make_key(panel_key, f"{series.name}.shape_errors.json"),
+        errors,
     )
 
 
@@ -835,11 +853,9 @@ def run_flow_format_shape_modes(
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
-    shape_modes: dict[str, dict] = {}
+    projections = ["top", "side1", "side2"]
 
     for key in keys:
-        shape_modes[key] = {region: [] for region in parameters.regions}
-
         # Load model.
         model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
         model = load_pickle(context.working_location, model_key)
@@ -849,7 +865,7 @@ def run_flow_format_shape_modes(
         data = load_dataframe(context.working_location, dataframe_key)
 
         # Extract shape modes.
-        shape_modes[key] = extract_shape_modes(
+        shape_modes = extract_shape_modes(
             model,
             data,
             parameters.components,
@@ -858,11 +874,31 @@ def run_flow_format_shape_modes(
             parameters.delta,
         )
 
-    save_json(
-        context.working_location,
-        make_key(panel_key, f"{series.name}.shape_modes.json"),
-        shape_modes,
-    )
+        for region in parameters.regions:
+            shape_mode_projections: dict[str, list] = {
+                f"PC{component + 1}.{projection}": []
+                for component in range(parameters.components)
+                for projection in parameters.projections
+            }
+
+            for shape_mode in shape_modes[region]:
+                for projection in parameters.projections:
+                    shape_mode_projections[f"PC{shape_mode['mode']}.{projection}"].append(
+                        {
+                            "point": shape_mode["point"],
+                            "projection": shape_mode["projections"][f"{projection}_slice"],
+                        }
+                    )
+
+            for projection_key, projections in shape_mode_projections.items():
+                save_json(
+                    context.working_location,
+                    make_key(
+                        panel_key,
+                        f"{series.name}.shape_modes.{key}.{region}.{projection_key.upper()}.json",
+                    ).replace("..", "."),
+                    projections,
+                )
 
 
 @flow(name="format-panel-data_format-shape-samples")
