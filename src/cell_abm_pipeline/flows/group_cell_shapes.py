@@ -1,5 +1,5 @@
 """
-Workflow for formatting figure panel data.
+Workflow for grouping cell shapes.
 
 Working location structure:
 
@@ -17,35 +17,47 @@ Working location structure:
     │   │   ├── (name)_(key)_(regions).PCA.csv
     │   │   └── (name)_(key)_(regions).PCA.pkl
     │   └── analysis.STATS
-    │       ├── HAMILTONIAN_TERMS_FOV_VSAxxxx_DEFAULT:NUCLEUS.STATS (copy).csv
-    │       └── HAMILTONIAN_TERMS_FOV_VSAxxxx_DEFAULT:NUCLEUS.STATS.csv
+    │       ├── (name)_(key)_(regions).STATS.csv
+    │       ├── (name)_(key)_(regions).STATS.csv
+    │       ├── ...
+    │       └── (name)_(key)_(regions).STATS.csv
     ├── data
     │   └── data.LOCATIONS
     │       ├── (name)_(key)_(seed).LOCATIONS.tar.xz
     │       ├── (name)_(key)_(seed).LOCATIONS.tar.xz
     │       ├── ...
     │       └── (name)_(key)_(seed).LOCATIONS.tar.xz
-    ├── panels
-    │   ├── (name).feature_bins.csv
-    │   ├── (name).feature_correlations.(key).csv
-    │   ├── (name).feature_distributions.(feature).csv
-    │   ├── (name).mode_correlations.csv
-    │   ├── (name).population_counts.csv
-    │   ├── (name).population_stats.csv
-    │   ├── (name).shape_average.json
-    │   ├── (name).shape_errors.csv
-    │   ├── (name).shape_modes.json
-    │   └── (name).shape_samples.json
-    │   └── (name).variance_explained.csv
-    └── results
-        ├── (name)_(key)_(seed).csv
-        ├── (name)_(key)_(seed).csv
-        ├── ...
-        └── (name)_(key)_(seed).csv
+    └── groups
+        └── groups.SHAPES
+            ├── (name).feature_correlations.(key).csv
+            ├── (name).feature_correlations.(key).csv
+            ├── ...
+            ├── (name).feature_correlations.(key).csv
+            ├── (name).feature_distributions.(feature).json
+            ├── (name).feature_distributions.(feature).json
+            ├── ...
+            ├── (name).feature_distributions.(feature).json
+            ├── (name).mode_correlations.csv
+            ├── (name).population_counts.csv
+            ├── (name).population_stats.json
+            ├── (name).shape_average.(key).(projection).json
+            ├── (name).shape_average.(key).(projection).json
+            ├── ...
+            ├── (name).shape_average.(key).(projection).json
+            ├── (name).shape_errors.json
+            ├── (name).shape_modes.(key).(region).(mode).(projection).json
+            ├── (name).shape_modes.(key).(region).(mode).(projection).json
+            ├── ...
+            ├── (name).shape_modes.(key).(region).(mode).(projection).json
+            ├── (name).shape_samples.json
+            └── (name).variance_explained.csv
 
-Different panels use inputs from the **results**, **data/data.LOCATION**,
+Different groups use inputs from the **data/data.LOCATIONS**,
 **analysis/analysis.PCA**, and **analysis/analysis.STATS** directories.
-Formatted panel data is saved to the **panels** directory.
+Grouped data is saved to the **groups/groups.SHAPES** directory.
+
+Different groups can be visualized using the corresponding plotting workflow or
+loaded into alternative tools.
 """
 
 from dataclasses import dataclass, field
@@ -61,7 +73,7 @@ from abm_shape_collection import (
     extract_shape_modes,
     make_voxels_array,
 )
-from arcade_collection.output import extract_feature_bins, extract_tick_json, get_location_voxels
+from arcade_collection.output import extract_tick_json, get_location_voxels
 from io_collection.keys import make_key
 from io_collection.load import load_dataframe, load_pickle, load_tar
 from io_collection.save import save_dataframe, save_json
@@ -69,11 +81,10 @@ from prefect import flow, get_run_logger
 from scipy.spatial import KDTree
 from scipy.stats import pearsonr
 
-from cell_abm_pipeline.flows.analyze_shape_modes import PCA_COMPONENTS
+from cell_abm_pipeline.flows.analyze_cell_shapes import PCA_COMPONENTS
 from cell_abm_pipeline.flows.calculate_coefficients import COEFFICIENT_ORDER
 
-PANELS: list[str] = [
-    "feature_bins",
+GROUPS: list[str] = [
     "feature_correlations",
     "feature_distributions",
     "mode_correlations",
@@ -134,22 +145,8 @@ BANDWIDTH = {
 
 
 @dataclass
-class ParametersConfigFeatureBins:
-    """Parameter configuration for format panel data feature bins subflow."""
-
-    seeds: list[int] = field(default_factory=lambda: [0])
-    """Simulation seeds to use for formatting feature bins."""
-
-    tick: int = 0
-    """Simulation tick to use for formatting feature bins."""
-
-    scale: float = 1
-    """Feature bin scaling."""
-
-
-@dataclass
 class ParametersConfigFeatureCorrelations:
-    """Parameter configuration for format panel data feature correlations subflow."""
+    """Parameter configuration for group cell shapes subflow - feature correlations."""
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
@@ -163,7 +160,7 @@ class ParametersConfigFeatureCorrelations:
 
 @dataclass
 class ParametersConfigFeatureDistributions:
-    """Parameter configuration for format panel data feature distributions subflow."""
+    """Parameter configuration for group cell shapes subflow - feature distributions."""
 
     reference_model: Optional[str] = None
     """Full key for reference PCA model."""
@@ -183,7 +180,7 @@ class ParametersConfigFeatureDistributions:
 
 @dataclass
 class ParametersConfigModeCorrelations:
-    """Parameter configuration for format panel data mode correlations subflow."""
+    """Parameter configuration for group cell shapes subflow - mode correlations."""
 
     reference_model: Optional[str] = None
     """Full key for reference PCA model."""
@@ -200,27 +197,29 @@ class ParametersConfigModeCorrelations:
 
 @dataclass
 class ParametersConfigPopulationCounts:
-    """Parameter configuration for format panel data population counts subflow."""
+    """Parameter configuration for group cell shapes subflow - population counts."""
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
 
     tick: int = 0
-    """Simulation tick to use for formatting population counts."""
+    """Simulation tick to use for grouping population counts."""
 
     seeds: list[int] = field(default_factory=lambda: [0])
-    """Simulation seeds to use for formatting population counts."""
+    """Simulation seeds to use for grouping population counts."""
 
 
 @dataclass
 class ParametersConfigPopulationStats:
+    """Parameter configuration for group cell shapes subflow - population stats."""
+
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
 
 
 @dataclass
 class ParametersConfigShapeAverage:
-    """Parameter configuration for format panel data shape average subflow."""
+    """Parameter configuration for group cell shapes subflow - shape average."""
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
@@ -240,7 +239,7 @@ class ParametersConfigShapeAverage:
 
 @dataclass
 class ParametersConfigShapeErrors:
-    """Parameter configuration for format panel data shape errors subflow."""
+    """Parameter configuration for group cell shapes subflow - shape errors."""
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
@@ -248,7 +247,7 @@ class ParametersConfigShapeErrors:
 
 @dataclass
 class ParametersConfigShapeModes:
-    """Parameter configuration for format panel data shape modes subflow."""
+    """Parameter configuration for group cell shapes subflow - shape modes."""
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
@@ -268,23 +267,25 @@ class ParametersConfigShapeModes:
 
 @dataclass
 class ParametersConfigShapeSamples:
-    """Parameter configuration for format panel data shape samples subflow."""
+    """Parameter configuration for group cell shapes subflow - shape samples."""
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
 
     seed: int = 0
-    """Simulation random seed to use for formatting shape samples."""
+    """Simulation random seed to use for grouping shape samples."""
 
     tick: int = 0
-    """Simulation tick to use for formatting shape samples."""
+    """Simulation tick to use for grouping shape samples."""
 
     indices: list[int] = field(default_factory=lambda: [0])
-    """Cell indicies for shape samples."""
+    """Cell indices for shape samples."""
 
 
 @dataclass
 class ParametersConfigVarianceExplained:
+    """Parameter configuration for group cell shapes subflow - variance explained."""
+
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
 
@@ -294,52 +295,49 @@ class ParametersConfigVarianceExplained:
 
 @dataclass
 class ParametersConfig:
-    """Parameter configuration for format panel data flow."""
+    """Parameter configuration for group cell shapes flow."""
 
-    panels: list[str] = field(default_factory=lambda: PANELS)
-    """List of panel types to format."""
-
-    feature_bins: ParametersConfigFeatureBins = ParametersConfigFeatureBins()
-    """Parameters for format feature bins subflow."""
+    groups: list[str] = field(default_factory=lambda: GROUPS)
+    """List of cell shape groups."""
 
     feature_correlations: ParametersConfigFeatureCorrelations = (
         ParametersConfigFeatureCorrelations()
     )
-    """Parameters for format feature correlations subflow."""
+    """Parameters for group feature correlations subflow."""
 
     feature_distributions: ParametersConfigFeatureDistributions = (
         ParametersConfigFeatureDistributions()
     )
-    """Parameters for format feature distributions subflow."""
+    """Parameters for group feature distributions subflow."""
 
     mode_correlations: ParametersConfigModeCorrelations = ParametersConfigModeCorrelations()
-    """Parameters for format mode correlations subflow."""
+    """Parameters for group mode correlations subflow."""
 
     population_counts: ParametersConfigPopulationCounts = ParametersConfigPopulationCounts()
-    """Parameters for format population counts subflow."""
+    """Parameters for group population counts subflow."""
 
     population_stats: ParametersConfigPopulationStats = ParametersConfigPopulationStats()
-    """Parameters for format population stats subflow."""
+    """Parameters for group population stats subflow."""
 
     shape_average: ParametersConfigShapeAverage = ParametersConfigShapeAverage()
-    """Parameters for format shape average subflow."""
+    """Parameters for group shape average subflow."""
 
     shape_errors: ParametersConfigShapeErrors = ParametersConfigShapeErrors()
-    """Parameters for format shape errors subflow."""
+    """Parameters for group shape errors subflow."""
 
     shape_modes: ParametersConfigShapeModes = ParametersConfigShapeModes()
-    """Parameters for format shape modes subflow."""
+    """Parameters for group shape modes subflow."""
 
     shape_samples: ParametersConfigShapeSamples = ParametersConfigShapeSamples()
-    """Parameters for format shape samples subflow."""
+    """Parameters for group shape samples subflow."""
 
     variance_explained: ParametersConfigVarianceExplained = ParametersConfigVarianceExplained()
-    """Parameters for format variance explained subflow."""
+    """Parameters for group variance explained subflow."""
 
 
 @dataclass
 class ContextConfig:
-    """Context configuration for format panel data flow."""
+    """Context configuration for group cell shapes flow."""
 
     working_location: str
     """Location for input and output files (local path or S3 bucket)."""
@@ -347,7 +345,7 @@ class ContextConfig:
 
 @dataclass
 class SeriesConfig:
-    """Series configuration for format panel data flow."""
+    """Series configuration for group cell shapes flow."""
 
     name: str
     """Name of the simulation series."""
@@ -356,101 +354,64 @@ class SeriesConfig:
     """List of series condition dictionaries (must include unique condition "key")."""
 
 
-@flow(name="format-panel-data")
+@flow(name="group-cell-shapes")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     """
-    Main format panel data flow.
+    Main group cell shapes flow.
 
-    Calls the following subflows, if the panel is specified:
+    Calls the following subflows, if the group is specified:
 
-    - :py:func:`run_flow_format_feature_bins`
-    - :py:func:`run_flow_format_feature_correlations`
-    - :py:func:`run_flow_format_feature_distributions`
-    - :py:func:`run_flow_format_mode_correlations`
-    - :py:func:`run_flow_format_population_counts`
-    - :py:func:`run_flow_format_population_stats`
-    - :py:func:`run_flow_format_shape_average`
-    - :py:func:`run_flow_format_shape_errors`
-    - :py:func:`run_flow_format_shape_modes`
-    - :py:func:`run_flow_format_shape_samples`
-    - :py:func:`run_flow_format_variance_explained`
+    - :py:func:`run_flow_group_feature_correlations`
+    - :py:func:`run_flow_group_feature_distributions`
+    - :py:func:`run_flow_group_mode_correlations`
+    - :py:func:`run_flow_group_population_counts`
+    - :py:func:`run_flow_group_population_stats`
+    - :py:func:`run_flow_group_shape_average`
+    - :py:func:`run_flow_group_shape_errors`
+    - :py:func:`run_flow_group_shape_modes`
+    - :py:func:`run_flow_group_shape_samples`
+    - :py:func:`run_flow_group_variance_explained`
     """
 
-    if "feature_bins" in parameters.panels:
-        run_flow_format_feature_bins(context, series, parameters.feature_bins)
+    if "feature_correlations" in parameters.groups:
+        run_flow_group_feature_correlations(context, series, parameters.feature_correlations)
 
-    if "feature_correlations" in parameters.panels:
-        run_flow_format_feature_correlations(context, series, parameters.feature_correlations)
+    if "feature_distributions" in parameters.groups:
+        run_flow_group_feature_distributions(context, series, parameters.feature_distributions)
 
-    if "feature_distributions" in parameters.panels:
-        run_flow_format_feature_distributions(context, series, parameters.feature_distributions)
+    if "mode_correlations" in parameters.groups:
+        run_flow_group_mode_correlations(context, series, parameters.mode_correlations)
 
-    if "mode_correlations" in parameters.panels:
-        run_flow_format_mode_correlations(context, series, parameters.mode_correlations)
+    if "population_counts" in parameters.groups:
+        run_flow_group_population_counts(context, series, parameters.population_counts)
 
-    if "population_counts" in parameters.panels:
-        run_flow_format_population_counts(context, series, parameters.population_counts)
+    if "population_stats" in parameters.groups:
+        run_flow_group_population_stats(context, series, parameters.population_stats)
 
-    if "population_stats" in parameters.panels:
-        run_flow_format_population_stats(context, series, parameters.population_stats)
+    if "shape_average" in parameters.groups:
+        run_flow_group_shape_average(context, series, parameters.shape_average)
 
-    if "shape_average" in parameters.panels:
-        run_flow_format_shape_average(context, series, parameters.shape_average)
+    if "shape_errors" in parameters.groups:
+        run_flow_group_shape_errors(context, series, parameters.shape_errors)
 
-    if "shape_errors" in parameters.panels:
-        run_flow_format_shape_errors(context, series, parameters.shape_errors)
+    if "shape_modes" in parameters.groups:
+        run_flow_group_shape_modes(context, series, parameters.shape_modes)
 
-    if "shape_modes" in parameters.panels:
-        run_flow_format_shape_modes(context, series, parameters.shape_modes)
+    if "shape_samples" in parameters.groups:
+        run_flow_group_shape_samples(context, series, parameters.shape_samples)
 
-    if "shape_samples" in parameters.panels:
-        run_flow_format_shape_samples(context, series, parameters.shape_samples)
-
-    if "variance_explained" in parameters.panels:
-        run_flow_format_variance_explained(context, series, parameters.variance_explained)
+    if "variance_explained" in parameters.groups:
+        run_flow_group_variance_explained(context, series, parameters.variance_explained)
 
 
-@flow(name="format-panel-data_format-feature-bins")
-def run_flow_format_feature_bins(
-    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigFeatureBins
-) -> None:
-    """Format panel data subflow for feature bins."""
-
-    data_key = make_key(series.name, "data", "data.LOCATIONS")
-    panel_key = make_key(series.name, "panels")
-    keys = [condition["key"] for condition in series.conditions]
-
-    all_feature_bins = []
-
-    for key in keys:
-        tars = {}
-
-        for seed in parameters.seeds:
-            series_key = f"{series.name}_{key}_{seed:04d}"
-            tar_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
-            tar = load_tar(context.working_location, tar_key)
-            tars[series_key] = tar
-
-        feature_bins = extract_feature_bins(tars, parameters.tick, parameters.scale)
-        feature_bins["key"] = key
-        all_feature_bins.append(feature_bins)
-
-    save_dataframe(
-        context.working_location,
-        make_key(panel_key, f"{series.name}.feature_bins.csv"),
-        pd.concat(all_feature_bins),
-        index=False,
-    )
-
-
-@flow(name="format-panel-data_format-feature-correlations")
-def run_flow_format_feature_correlations(
+@flow(name="group-cell-shapes_group-feature-correlations")
+def run_flow_group_feature_correlations(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigFeatureCorrelations
 ) -> None:
-    """Format panel data subflow for feature correlations."""
+    """Group cell shapes subflow for feature correlations."""
 
     analysis_key = make_key(series.name, "analysis", "analysis.PCA")
-    panel_key = make_key(series.name, "panels")
+    group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
@@ -490,20 +451,20 @@ def run_flow_format_feature_correlations(
 
         save_dataframe(
             context.working_location,
-            make_key(panel_key, f"{series.name}.feature_correlations.{key}.csv"),
+            make_key(group_key, f"{series.name}.feature_correlations.{key}.csv"),
             pd.DataFrame(correlations),
             index=False,
         )
 
 
-@flow(name="format-panel-data_format-feature-distributions")
-def run_flow_format_feature_distributions(
+@flow(name="group-cell-shapes_group-feature-distributions")
+def run_flow_group_feature_distributions(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigFeatureDistributions
 ) -> None:
-    """Format panel data subflow for feature distributions."""
+    """Group cell shapes subflow for feature distributions."""
 
     analysis_key = make_key(series.name, "analysis", "analysis.PCA")
-    panel_key = make_key(series.name, "panels")
+    group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
@@ -561,19 +522,19 @@ def run_flow_format_feature_distributions(
 
         save_json(
             context.working_location,
-            make_key(panel_key, f"{series.name}.feature_distributions.{feature.upper()}.json"),
+            make_key(group_key, f"{series.name}.feature_distributions.{feature.upper()}.json"),
             distribution,
         )
 
 
-@flow(name="format-panel-data_format-mode-correlations")
-def run_flow_format_mode_correlations(
+@flow(name="group-cell-shapes_group-mode-correlations")
+def run_flow_group_mode_correlations(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigModeCorrelations
 ) -> None:
-    """Format panel data subflow for mode correlations."""
+    """Group cell shapes subflow for mode correlations."""
 
     analysis_key = make_key(series.name, "analysis", "analysis.PCA")
-    panel_key = make_key(series.name, "panels")
+    group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
@@ -646,21 +607,20 @@ def run_flow_format_mode_correlations(
 
     save_dataframe(
         context.working_location,
-        make_key(panel_key, f"{series.name}.mode_correlations.csv"),
+        make_key(group_key, f"{series.name}.mode_correlations.csv"),
         pd.DataFrame(correlations),
         index=False,
     )
 
 
-@flow(name="format-panel-data_format-population-counts")
-def run_flow_format_population_counts(
+@flow(name="group-cell-shapes_group-population-counts")
+def run_flow_group_population_counts(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigPopulationCounts
 ) -> None:
-    """Format panel data subflow for population counts."""
+    """Group cell shapes subflow for population counts."""
 
-    results_key = make_key(series.name, "results")
     analysis_key = make_key(series.name, "analysis", "analysis.PCA")
-    panel_key = make_key(series.name, "panels")
+    group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
@@ -672,34 +632,30 @@ def run_flow_format_population_counts(
         groups = data[data["TICK"] == parameters.tick].groupby("SEED")
 
         for seed in parameters.seeds:
-            data_key = make_key(results_key, f"{series.name}_{key}_{seed:04d}.csv")
-            results = load_dataframe(context.working_location, data_key, usecols=["TICK"])
-
             counts.append(
                 {
                     "key": key,
                     "seed": seed,
-                    "total_count": len(results[results["TICK"] == parameters.tick]),
-                    "filter_count": len(groups.get_group(seed)),
+                    "count": len(groups.get_group(seed)),
                 }
             )
 
     save_dataframe(
         context.working_location,
-        make_key(panel_key, f"{series.name}.population_counts.csv"),
+        make_key(group_key, f"{series.name}.population_counts.csv"),
         pd.DataFrame(counts),
         index=False,
     )
 
 
-@flow(name="format-panel-data_format-population-stats")
-def run_flow_format_population_stats(
+@flow(name="group-cell-shapes_group-population-stats")
+def run_flow_group_population_stats(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigPopulationStats
 ) -> None:
-    """Format panel data subflow for population stats."""
+    """Group cell shapes subflow for population stats."""
 
     analysis_key = make_key(series.name, "analysis", "analysis.STATS")
-    panel_key = make_key(series.name, "panels")
+    group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
@@ -721,17 +677,17 @@ def run_flow_format_population_stats(
 
     save_json(
         context.working_location,
-        make_key(panel_key, f"{series.name}.population_stats.json"),
+        make_key(group_key, f"{series.name}.population_stats.json"),
         stats,
     )
 
 
-@flow(name="format-panel-data_format-shape-average")
-def run_flow_format_shape_average(
+@flow(name="group-cell-shapes_group-shape-average")
+def run_flow_group_shape_average(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigShapeAverage
 ) -> None:
     """
-    Format panel data subflow for shape average.
+    Group cell shapes subflow for shape average.
 
     Find the cell closest to the average shape. Extract original mesh slice and
     extent projections. Created reconstructed mesh and extract mesh slice and
@@ -742,7 +698,7 @@ def run_flow_format_shape_average(
 
     analysis_key = make_key(series.name, "analysis", "analysis.PCA")
     data_key = make_key(series.name, "data", "data.LOCATIONS")
-    panel_key = make_key(series.name, "panels")
+    group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
@@ -802,19 +758,19 @@ def run_flow_format_shape_average(
 
             save_json(
                 context.working_location,
-                make_key(panel_key, f"{series.name}.shape_average.{key}.{projection.upper()}.json"),
+                make_key(group_key, f"{series.name}.shape_average.{key}.{projection.upper()}.json"),
                 shape_average,
             )
 
 
-@flow(name="format-panel-data_format-shape-errors")
-def run_flow_format_shape_errors(
+@flow(name="group-cell-shapes_group-shape-errors")
+def run_flow_group_shape_errors(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigShapeErrors
 ) -> None:
-    """Format panel data subflow for shape errors."""
+    """Group cell shapes subflow for shape errors."""
 
     analysis_key = make_key(series.name, "analysis", "analysis.PCA")
-    panel_key = make_key(series.name, "panels")
+    group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
@@ -832,24 +788,24 @@ def run_flow_format_shape_errors(
 
     save_json(
         context.working_location,
-        make_key(panel_key, f"{series.name}.shape_errors.json"),
+        make_key(group_key, f"{series.name}.shape_errors.json"),
         errors,
     )
 
 
-@flow(name="format-panel-data_format-shape-modes")
-def run_flow_format_shape_modes(
+@flow(name="group-cell-shapes_group-shape-modes")
+def run_flow_group_shape_modes(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigShapeModes
 ) -> None:
     """
-    Format panel data subflow for shape modes.
+    Group cell shapes subflow for shape modes.
 
     Extract shape modes from PCAs as dictionaries of svg paths for each map
     point and projection. Consolidate shape modes from keys into single json.
     """
 
     analysis_key = make_key(series.name, "analysis", "analysis.PCA")
-    panel_key = make_key(series.name, "panels")
+    group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
@@ -894,26 +850,26 @@ def run_flow_format_shape_modes(
                 save_json(
                     context.working_location,
                     make_key(
-                        panel_key,
+                        group_key,
                         f"{series.name}.shape_modes.{key}.{region}.{projection_key.upper()}.json",
                     ).replace("..", "."),
                     projections,
                 )
 
 
-@flow(name="format-panel-data_format-shape-samples")
-def run_flow_format_shape_samples(
+@flow(name="group-cell-shapes_group-shape-samples")
+def run_flow_group_shape_samples(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigShapeSamples
 ) -> None:
     """
-    Format panel data subflow for shape samples.
+    Group cell shapes subflow for shape samples.
 
     Extract sample cell shapes from specified simulations. Construct wireframes
     from the cell shape mesh.
     """
 
     data_key = make_key(series.name, "data", "data.LOCATIONS")
-    panel_key = make_key(series.name, "panels")
+    group_key = make_key(series.name, "groups", "groups.SHAPES")
     keys = [condition["key"] for condition in series.conditions]
 
     shape_samples: dict[str, dict] = {}
@@ -945,19 +901,19 @@ def run_flow_format_shape_samples(
 
     save_json(
         context.working_location,
-        make_key(panel_key, f"{series.name}.shape_samples.json"),
+        make_key(group_key, f"{series.name}.shape_samples.json"),
         shape_samples,
     )
 
 
-@flow(name="format-panel-data_format-variance-explained")
-def run_flow_format_variance_explained(
+@flow(name="group-cell-shapes_group-variance-explained")
+def run_flow_group_variance_explained(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigVarianceExplained
 ) -> None:
-    """Format panel data subflow for variance explained."""
+    """Group cell shapes subflow for variance explained."""
 
     analysis_key = make_key(series.name, "analysis", "analysis.PCA")
-    panel_key = make_key(series.name, "panels")
+    group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
@@ -979,7 +935,7 @@ def run_flow_format_variance_explained(
 
     save_dataframe(
         context.working_location,
-        make_key(panel_key, f"{series.name}.variance_explained.csv"),
+        make_key(group_key, f"{series.name}.variance_explained.csv"),
         pd.concat(variance),
         index=False,
     )
