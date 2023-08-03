@@ -1,5 +1,5 @@
 """
-Workflow for analyzing shape modes.
+Workflow for analyzing cell shapes.
 """
 
 from dataclasses import dataclass, field
@@ -23,7 +23,7 @@ VALID_PHASES = ["PROLIFERATIVE_G1", "PROLIFERATIVE_S", "PROLIFERATIVE_G2"]
 
 @dataclass
 class ParametersConfig:
-    """Parameter configuration for analyze shape modes flow."""
+    """Parameter configuration for analyze cell shapes flow."""
 
     reference: Optional[dict] = None
     """Dictionary of keys for reference data and model for statistics."""
@@ -58,7 +58,7 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
-    """Context configuration for analyze shape modes flow."""
+    """Context configuration for analyze cell shapes flow."""
 
     working_location: str
     """Location for input and output files (local path or S3 bucket)."""
@@ -66,7 +66,7 @@ class ContextConfig:
 
 @dataclass
 class SeriesConfig:
-    """Series configuration for analyze shape modes flow."""
+    """Series configuration for analyze cell shapes flow."""
 
     name: str
     """Name of the simulation series."""
@@ -78,10 +78,10 @@ class SeriesConfig:
     """List of series condition dictionaries (must include unique condition "key")."""
 
 
-@flow(name="analyze-shape-modes")
+@flow(name="analyze-cell-shapes")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     """
-    Main analyze shape modes flow.
+    Main analyze cell shapes flow.
 
     Calls the following subflows:
 
@@ -109,11 +109,11 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     run_flow_analyze_stats(context, series, parameters)
 
 
-@flow(name="analyze-shape-modes_load-data")
+@flow(name="analyze-cell-shapes_load-data")
 def run_flow_process_data(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
-    """Analyze shape modes subflow for loading data."""
+    """Analyze cell shapes subflow for loading data."""
 
     results_path_key = make_key(series.name, "results")
     coeffs_path_key = make_key(series.name, "analysis", "analysis.COEFFS")
@@ -221,11 +221,11 @@ def run_flow_process_data(
         save_dataframe(context.working_location, data_key, data, index=False)
 
 
-@flow(name="analyze-shape-modes_fit-model")
+@flow(name="analyze-cell-shapes_fit-model")
 def run_flow_fit_model(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
-    """Analyze shape modes subflow for fitting PCA model."""
+    """Analyze cell shapes subflow for fitting PCA model."""
 
     pca_path_key = make_key(series.name, "analysis", "analysis.PCA")
     region_key = ":".join(sorted(parameters.regions))
@@ -247,11 +247,11 @@ def run_flow_fit_model(
         save_pickle(context.working_location, model_key, model)
 
 
-@flow(name="analyze-shape-modes_analyze-stats")
+@flow(name="analyze-cell-shapes_analyze-stats")
 def run_flow_analyze_stats(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
-    """Analyze shape modes subflow for analyzing shape distribution statistics."""
+    """Analyze cell shapes subflow for analyzing shape distribution statistics."""
 
     pca_path_key = make_key(series.name, "analysis", "analysis.PCA")
     stats_path_key = make_key(series.name, "analysis", "analysis.STATS")
