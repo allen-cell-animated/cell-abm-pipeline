@@ -431,7 +431,7 @@ def run_flow_group_feature_correlations(
 
     for key in keys:
         feature_key = f"{series.name}.feature_correlations.{key}"
-        correlations: dict[str, dict[str, dict[str, float]]] = {}
+        correlations: list[dict[str, Union[str, float]]] = []
 
         # Load model.
         model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
@@ -446,10 +446,8 @@ def run_flow_group_feature_correlations(
         transform = model.transform(data[columns].values)
 
         for component in range(parameters.components):
-            component_key = f"PC{component + 1}"
+            mode_key = f"PC{component + 1}"
             component_data = transform[:, component]
-
-            correlations[component_key] = {}
 
             for prop in parameters.properties:
                 for region in parameters.regions:
@@ -458,32 +456,42 @@ def run_flow_group_feature_correlations(
 
                     slope, intercept = np.polyfit(component_data, prop_data, 1)
 
-                    correlations[component_key][prop_key] = {
-                        "correlation": pearsonr(prop_data, component_data).statistic,
-                        "correlation_symmetric": pearsonr(prop_data, abs(component_data)).statistic,
-                        "slope": slope,
-                        "intercept": intercept,
-                    }
+                    correlations.append(
+                        {
+                            "mode": mode_key,
+                            "property": prop.upper(),
+                            "region": region,
+                            "correlation": pearsonr(prop_data, component_data).statistic,
+                            "correlation_symmetric": pearsonr(
+                                prop_data, abs(component_data)
+                            ).statistic,
+                            "slope": slope,
+                            "intercept": intercept,
+                        }
+                    )
 
                     if not parameters.include_bins:
                         continue
 
-                    bins = bin_to_hex(component_data, prop_data, [0] * len(prop_data), scale=0.05)
+                    bins = bin_to_hex(
+                        component_data, prop_data, [0] * len(prop_data), scale=0.05, rescale=True
+                    )
                     bins_df = pd.DataFrame(
                         [[x, y, np.sum(v)] for (x, y), v in bins.items()], columns=["x", "y", "v"]
                     )
 
                     save_dataframe(
                         context.working_location,
-                        make_key(group_key, f"{feature_key}.{component_key}.{prop_key}.csv"),
+                        make_key(group_key, f"{feature_key}.{mode_key}.{prop_key}.csv"),
                         bins_df,
                         index=False,
                     )
 
-        save_json(
+        save_dataframe(
             context.working_location,
-            make_key(group_key, f"{series.name}.feature_correlations.{key}.json"),
-            correlations,
+            make_key(group_key, f"{series.name}.feature_correlations.{key}.csv"),
+            pd.DataFrame(correlations),
+            index=False,
         )
 
 

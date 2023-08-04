@@ -2,7 +2,6 @@
 Workflow for analyzing basic metrics.
 """
 
-
 from dataclasses import dataclass
 
 import numpy as np
