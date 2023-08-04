@@ -83,6 +83,7 @@ from scipy.stats import pearsonr
 
 from cell_abm_pipeline.flows.analyze_cell_shapes import PCA_COMPONENTS
 from cell_abm_pipeline.flows.calculate_coefficients import COEFFICIENT_ORDER
+from cell_abm_pipeline.tasks import calculate_data_bins
 
 GROUPS: list[str] = [
     "feature_correlations",
@@ -113,22 +114,22 @@ PROJECTIONS: list[str] = [
     "side2",
 ]
 
-BOUNDS = {
-    "volume.DEFAULT": (0, 5000),
-    "volume.NUCLEUS": (0, 1500),
-    "height.DEFAULT": (0, 20),
-    "height.NUCLEUS": (0, 20),
-    "PC1": (-50, 50),
-    "PC2": (-50, 50),
-    "PC3": (-50, 50),
-    "PC4": (-50, 50),
-    "PC5": (-50, 50),
-    "PC6": (-50, 50),
-    "PC7": (-50, 50),
-    "PC8": (-50, 50),
+BOUNDS: dict[str, list] = {
+    "volume.DEFAULT": [0, 5000],
+    "volume.NUCLEUS": [0, 1500],
+    "height.DEFAULT": [0, 20],
+    "height.NUCLEUS": [0, 20],
+    "PC1": [-50, 50],
+    "PC2": [-50, 50],
+    "PC3": [-50, 50],
+    "PC4": [-50, 50],
+    "PC5": [-50, 50],
+    "PC6": [-50, 50],
+    "PC7": [-50, 50],
+    "PC8": [-50, 50],
 }
 
-BANDWIDTH = {
+BANDWIDTH: dict[str, float] = {
     "volume.DEFAULT": 100,
     "volume.NUCLEUS": 50,
     "height.DEFAULT": 1,
@@ -176,6 +177,12 @@ class ParametersConfigFeatureDistributions:
 
     components: int = PCA_COMPONENTS
     """Number of principal components (i.e. shape modes)."""
+
+    bounds: dict[str, list] = field(default_factory=lambda: BOUNDS)
+    """Bounds for metric distributions."""
+
+    bandwidth: dict[str, float] = field(default_factory=lambda: BANDWIDTH)
+    """Bandwidths for metric distributions."""
 
 
 @dataclass
@@ -477,7 +484,7 @@ def run_flow_group_feature_distributions(
         ref_model = load_pickle(context.working_location, parameters.reference_model)
         features = features + [f"PC{component + 1}" for component in range(parameters.components)]
 
-    distributions: dict[str, dict] = {feature: {} for feature in features}
+    distribution_bins: dict[str, dict] = {feature: {} for feature in features}
     distribution_means: dict[str, dict] = {feature: {} for feature in features}
     distribution_stdevs: dict[str, dict] = {feature: {} for feature in features}
 
@@ -495,27 +502,16 @@ def run_flow_group_feature_distributions(
         for feature in features:
             feature_data = data[feature.replace(".DEFAULT", "")].values
 
-            bandwidth = BANDWIDTH[feature]
-            bounds = BOUNDS[feature]
-
-            total = len(feature_data) * bandwidth
-            num_bins = int((bounds[1] - bounds[0]) / bandwidth)
-            lower = bounds[0] - 3 * bandwidth / 2
-            upper = bounds[1] + 3 * bandwidth / 2
-
-            bins = np.linspace(lower, upper, num_bins + 4).tolist()
-            counts, _ = np.histogram(feature_data, bins)
+            bounds = (parameters.bounds[feature][0], parameters.bounds[feature][1])
+            bandwidth = parameters.bandwidth[feature]
 
             distribution_means[feature][key] = np.mean(feature_data)
             distribution_stdevs[feature][key] = np.std(feature_data, ddof=1)
-            distributions[feature][key] = [
-                {"n": count, "x": x0, "y": count / total, "m": (x0 + x1) / 2}
-                for count, x0, x1 in zip(counts.tolist(), bins[:-1], bins[1:])
-            ]
+            distribution_bins[feature][key] = calculate_data_bins(feature_data, bounds, bandwidth)
 
-    for feature, distribution in distributions.items():
+    for feature, distribution in distribution_bins.items():
         distribution["*"] = {
-            "bandwidth": BANDWIDTH[feature],
+            "bandwidth": parameters.bandwidth[feature],
             "means": distribution_means[feature],
             "stdevs": distribution_stdevs[feature],
         }
