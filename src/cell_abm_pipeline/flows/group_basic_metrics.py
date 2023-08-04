@@ -8,10 +8,14 @@ Working location structure:
     (name)
     ├── groups
     │   └── groups.BASIC
-    │       ├── (name).feature_distributions.(metric).json
-    │       ├── (name).feature_distributions.(metric).json
+    │       ├── (name).metric_bins.(key).(seed).(tick).csv
+    │       ├── (name).metric_bins.(key).(seed).(tick).csv
     │       ├── ...
-    │       ├── (name).feature_distributions.(metric).json
+    │       ├── (name).metric_bins.(key).(seed).(tick).csv
+    │       ├── (name).metric_distributions.(metric).json
+    │       ├── (name).metric_distributions.(metric).json
+    │       ├── ...
+    │       ├── (name).metric_distributions.(metric).json
     │       ├── (name).metrics_individuals.(key).(seed).(metric).json
     │       ├── (name).metrics_individuals.(key).(seed).(metric).json
     │       ├── ...
@@ -38,6 +42,7 @@ Different groups can be visualized using the corresponding plotting workflow or
 loaded into alternative tools.
 """
 
+import ast
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -48,7 +53,7 @@ from io_collection.load import load_dataframe
 from io_collection.save import save_dataframe, save_json
 from prefect import flow
 
-from cell_abm_pipeline.tasks import calculate_category_durations, calculate_data_bins
+from cell_abm_pipeline.tasks import bin_to_hex, calculate_category_durations, calculate_data_bins
 
 GROUPS: list[str] = [
     "metrics_distributions",
@@ -93,6 +98,12 @@ BANDWIDTH: dict[str, float] = {
     "phase.APOPTOTIC_LATE": 1,
 }
 
+BIN_METRICS: list[str] = [
+    "count",
+    "volume",
+    "height",
+]
+
 DISTRIBUTION_METRICS: list[str] = [
     "phase",
     "volume",
@@ -122,11 +133,31 @@ TEMPORAL_METRICS: list[str] = [
 
 
 @dataclass
+class ParametersConfigMetricsBins:
+    """Parameter configuration for group basic metrics subflow - metrics bins."""
+
+    metrics: list[str] = field(default_factory=lambda: BIN_METRICS)
+    """List of bin metrics."""
+
+    ticks: list[int] = field(default_factory=lambda: [0])
+    """Simulation ticks to use for grouping spatial metrics."""
+
+    scale: float = 1
+    """Metric bin scaling."""
+
+    ds: float = 1.0
+    """Spatial scaling in units/um."""
+
+    dt: float = 1.0
+    """Temporal scaling in hours/tick."""
+
+
+@dataclass
 class ParametersConfigMetricsDistributions:
     """Parameter configuration for group basic metrics subflow - metrics distributions."""
 
     metrics: list[str] = field(default_factory=lambda: DISTRIBUTION_METRICS)
-    """List of spatial metrics."""
+    """List of distribution metrics."""
 
     phases: list[str] = field(default_factory=lambda: CELL_PHASES)
     """List of cell cycle phases."""
@@ -152,7 +183,7 @@ class ParametersConfigMetricsIndividuals:
     """Parameter configuration for group basic metrics subflow - metrics individuals."""
 
     metrics: list[str] = field(default_factory=lambda: INDIVIDUAL_METRICS)
-    """List of spatial metrics."""
+    """List of individual metrics."""
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
@@ -222,6 +253,9 @@ class ParametersConfig:
     groups: list[str] = field(default_factory=lambda: GROUPS)
     """List of basic metric groups."""
 
+    metrics_bins: ParametersConfigMetricsBins = ParametersConfigMetricsBins()
+    """Parameters for group metrics bins subflow."""
+
     metrics_distributions: ParametersConfigMetricsDistributions = (
         ParametersConfigMetricsDistributions()
     )
@@ -269,12 +303,16 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     Calls the following subflows, if the group is specified:
 
+    - :py:func:`run_flow_group_metrics_bins`
     - :py:func:`run_flow_group_metrics_distributions`
     - :py:func:`run_flow_group_metrics_individuals`
     - :py:func:`run_flow_group_metrics_spatial`
     - :py:func:`run_flow_group_metrics_temporal`
     - :py:func:`run_flow_group_population_stats`
     """
+
+    if "metrics_bins" in parameters.groups:
+        run_flow_group_metrics_bins(context, series, parameters.metrics_bins)
 
     if "metrics_distributions" in parameters.groups:
         run_flow_group_metrics_distributions(context, series, parameters.metrics_distributions)
@@ -290,6 +328,71 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     if "population_counts" in parameters.groups:
         run_flow_group_population_counts(context, series, parameters.population_counts)
+
+
+def run_flow_group_metrics_bins(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigMetricsBins
+) -> None:
+    """Group basic metrics subflow for distributions metrics."""
+
+    analysis_key = make_key(series.name, "analysis", "analysis.POSITIONS")
+    group_key = make_key(series.name, "groups", "groups.BASIC")
+    keys = [condition["key"] for condition in series.conditions]
+
+    index_columns = ["x", "y"]
+
+    for key in keys:
+        for seed in series.seeds:
+            series_key = f"{series.name}_{key}_{seed:04d}"
+
+            results_key = make_key(series.name, "results", f"{series_key}.csv")
+            results = load_dataframe(context.working_location, results_key)
+            convert_model_units(results, parameters.ds, parameters.dt)
+
+            positions_key = make_key(analysis_key, f"{series_key}.POSITIONS.csv")
+            positions = load_dataframe(
+                context.working_location, positions_key, converters={"id": ast.literal_eval}
+            )
+
+            for tick in parameters.ticks:
+                tick_positions = positions[positions["TICK"] == tick]
+                x = tick_positions["x"]
+                y = tick_positions["y"]
+
+                bins_df = pd.DataFrame()
+
+                for metric in parameters.metrics:
+                    if metric == "count":
+                        v = tick_positions["id"].map(len)
+                    else:
+                        tick_results = results[results["TICK"] == tick].set_index("ID")
+                        v = [
+                            np.mean([tick_results.loc[i][metric] for i in ids])
+                            for ids in tick_positions["id"]
+                        ]
+
+                    bins = bin_to_hex(x, y, v, parameters.scale)
+                    bins_df_metric = pd.DataFrame(
+                        [[x, y, np.mean(v)] for (x, y), v in bins.items()],
+                        columns=index_columns + [metric.upper()],
+                    )
+
+                    if bins_df.empty:
+                        bins_df = bins_df_metric
+                    else:
+                        bins_df.set_index(index_columns, inplace=True)
+                        bins_df_metric.set_index(index_columns, inplace=True)
+                        bins_df = bins_df.join(bins_df_metric, on=index_columns)
+                        bins_df = bins_df.reset_index()
+
+                save_dataframe(
+                    context.working_location,
+                    make_key(
+                        group_key, f"{series.name}.metrics_bins.{key}.{seed:04d}.{tick:06d}.csv"
+                    ),
+                    bins_df,
+                    index=False,
+                )
 
 
 @flow(name="group-basic-metrics_group-metrics-distributions")
@@ -351,7 +454,7 @@ def run_flow_group_metrics_distributions(
 
         save_json(
             context.working_location,
-            make_key(group_key, f"{series.name}.feature_distributions.{metric.upper()}.json"),
+            make_key(group_key, f"{series.name}.metric_distributions.{metric.upper()}.json"),
             distribution,
         )
 
@@ -522,7 +625,7 @@ def run_flow_group_population_counts(
                 {
                     "key": key,
                     "seed": seed,
-                    "total_count": len(results[results["TICK"] == parameters.tick]),
+                    "count": len(results[results["TICK"] == parameters.tick]),
                 }
             )
 

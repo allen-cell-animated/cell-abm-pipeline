@@ -10,12 +10,17 @@ def bin_to_hex(
     x: list[Union[int, float]],
     y: list[Union[int, float]],
     v: list[Union[int, float]],
-    scale: float = 0.1,
+    scale: float = 1,
+    rescale: bool = False,
 ) -> dict[tuple[float, float], list[Union[int, float]]]:
     bins: dict[tuple[float, float], list[Union[int, float]]] = {}
 
-    x_scale = np.max(np.abs(x))
-    y_scale = np.max(np.abs(y))
+    if rescale:
+        x_scale = np.max(np.abs(x))
+        y_scale = np.max(np.abs(y))
+    else:
+        x_scale = 1
+        y_scale = 1
 
     for xi, yi, vi in zip(x / x_scale, y / y_scale, v):
         sx = xi / scale
