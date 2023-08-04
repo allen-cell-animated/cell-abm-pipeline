@@ -23,7 +23,8 @@ Working location structure:
     │       ├── (name).metrics_temporal.(key).(metric).json
     │       ├── (name).metrics_temporal.(key).(metric).json
     │       ├── ...
-    │       └── (name).metrics_temporal.(key).(metric).json
+    │       ├── (name).metrics_temporal.(key).(metric).json
+    │       └── (name).population_counts.csv
     └── results
         ├── (name)_(key)_(seed).csv
         ├── (name)_(key)_(seed).csv
@@ -54,6 +55,7 @@ GROUPS: list[str] = [
     "metrics_individuals",
     "metrics_spatial",
     "metrics_temporal",
+    "population_counts",
 ]
 
 CELL_PHASES: list[str] = [
@@ -206,6 +208,14 @@ class ParametersConfigMetricsTemporal:
 
 
 @dataclass
+class ParametersConfigPopulationCounts:
+    """Parameter configuration for group basic metrics subflow - population counts."""
+
+    tick: int = 0
+    """Simulation tick to use for grouping population counts."""
+
+
+@dataclass
 class ParametersConfig:
     """Parameter configuration for group basic metrics flow."""
 
@@ -225,6 +235,9 @@ class ParametersConfig:
 
     metrics_temporal: ParametersConfigMetricsTemporal = ParametersConfigMetricsTemporal()
     """Parameters for group metrics temporal subflow."""
+
+    population_counts: ParametersConfigPopulationCounts = ParametersConfigPopulationCounts()
+    """Parameters for group population counts subflow."""
 
 
 @dataclass
@@ -260,6 +273,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     - :py:func:`run_flow_group_metrics_individuals`
     - :py:func:`run_flow_group_metrics_spatial`
     - :py:func:`run_flow_group_metrics_temporal`
+    - :py:func:`run_flow_group_population_stats`
     """
 
     if "metrics_distributions" in parameters.groups:
@@ -273,6 +287,9 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     if "metrics_temporal" in parameters.groups:
         run_flow_group_metrics_temporal(context, series, parameters.metrics_temporal)
+
+    if "population_counts" in parameters.groups:
+        run_flow_group_population_counts(context, series, parameters.population_counts)
 
 
 @flow(name="group-basic-metrics_group-metrics-distributions")
@@ -483,3 +500,35 @@ def run_flow_group_metrics_temporal(
                 make_key(group_key, f"{series.name}.metrics_temporal.{key}.{metric.upper()}.json"),
                 temporal,
             )
+
+
+@flow(name="group-basic-metrics_group-population-counts")
+def run_flow_group_population_counts(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigPopulationCounts
+) -> None:
+    """Group cell shapes subflow for population counts."""
+
+    group_key = make_key(series.name, "groups", "groups.BASIC")
+    keys = [condition["key"] for condition in series.conditions]
+
+    counts: list[dict] = []
+
+    for key in keys:
+        for seed in series.seeds:
+            series_key = f"{series.name}_{key}_{seed:04d}"
+            results_key = make_key(series.name, "results", f"{series_key}.csv")
+            results = load_dataframe(context.working_location, results_key, usecols=["TICK"])
+            counts.append(
+                {
+                    "key": key,
+                    "seed": seed,
+                    "total_count": len(results[results["TICK"] == parameters.tick]),
+                }
+            )
+
+    save_dataframe(
+        context.working_location,
+        make_key(group_key, f"{series.name}.population_counts.csv"),
+        pd.DataFrame(counts),
+        index=False,
+    )
