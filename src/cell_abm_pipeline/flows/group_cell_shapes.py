@@ -29,10 +29,14 @@ Working location structure:
     │       └── (name)_(key)_(seed).LOCATIONS.tar.xz
     └── groups
         └── groups.SHAPES
-            ├── (name).feature_correlations.(key).csv
-            ├── (name).feature_correlations.(key).csv
+            ├── (name).feature_correlations.(key).json
+            ├── (name).feature_correlations.(key).json
             ├── ...
-            ├── (name).feature_correlations.(key).csv
+            ├── (name).feature_correlations.(key).json
+            ├── (name).feature_correlations.(key).(mode).(property).csv
+            ├── (name).feature_correlations.(key).(mode).(property).csv
+            ├── ...
+            ├── (name).feature_correlations.(key).(mode).(property).csv
             ├── (name).feature_distributions.(feature).json
             ├── (name).feature_distributions.(feature).json
             ├── ...
@@ -83,7 +87,7 @@ from scipy.stats import pearsonr
 
 from cell_abm_pipeline.flows.analyze_cell_shapes import PCA_COMPONENTS
 from cell_abm_pipeline.flows.calculate_coefficients import COEFFICIENT_ORDER
-from cell_abm_pipeline.tasks import calculate_data_bins
+from cell_abm_pipeline.tasks import bin_to_hex, calculate_data_bins
 
 GROUPS: list[str] = [
     "feature_correlations",
@@ -157,6 +161,9 @@ class ParametersConfigFeatureCorrelations:
 
     components: int = PCA_COMPONENTS
     """Number of principal components (i.e. shape modes)."""
+
+    include_bins: bool = False
+    """True if correlations are binned, False otherwise"""
 
 
 @dataclass
@@ -423,7 +430,8 @@ def run_flow_group_feature_correlations(
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
-        correlations: list[dict[str, Union[str, int, float]]] = []
+        feature_key = f"{series.name}.feature_correlations.{key}"
+        correlations: dict[str, dict[str, dict[str, float]]] = {}
 
         # Load model.
         model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
@@ -437,30 +445,45 @@ def run_flow_group_feature_correlations(
         columns = data.filter(like="shcoeffs").columns
         transform = model.transform(data[columns].values)
 
-        for prop in parameters.properties:
-            for region in parameters.regions:
-                prop_data = data[f"{prop}.{region}".replace(".DEFAULT", "")]
+        for component in range(parameters.components):
+            component_key = f"PC{component + 1}"
+            component_data = transform[:, component]
 
-                for component in range(parameters.components):
-                    component_data = transform[:, component]
+            correlations[component_key] = {}
 
-                    correlations.append(
-                        {
-                            "property": prop.upper(),
-                            "mode": f"PC{component + 1}",
-                            "region": region,
-                            "correlation": pearsonr(prop_data, component_data).statistic,
-                            "correlation_symmetric": pearsonr(
-                                prop_data, abs(component_data)
-                            ).statistic,
-                        }
+            for prop in parameters.properties:
+                for region in parameters.regions:
+                    prop_key = f"{prop.upper()}.{region}"
+                    prop_data = data[f"{prop}.{region}".replace(".DEFAULT", "")]
+
+                    slope, intercept = np.polyfit(component_data, prop_data, 1)
+
+                    correlations[component_key][prop_key] = {
+                        "correlation": pearsonr(prop_data, component_data).statistic,
+                        "correlation_symmetric": pearsonr(prop_data, abs(component_data)).statistic,
+                        "slope": slope,
+                        "intercept": intercept,
+                    }
+
+                    if not parameters.include_bins:
+                        continue
+
+                    bins = bin_to_hex(component_data, prop_data, [0] * len(prop_data), scale=0.05)
+                    bins_df = pd.DataFrame(
+                        [[x, y, np.sum(v)] for (x, y), v in bins.items()], columns=["x", "y", "v"]
                     )
 
-        save_dataframe(
+                    save_dataframe(
+                        context.working_location,
+                        make_key(group_key, f"{feature_key}.{component_key}.{prop_key}.csv"),
+                        bins_df,
+                        index=False,
+                    )
+
+        save_json(
             context.working_location,
-            make_key(group_key, f"{series.name}.feature_correlations.{key}.csv"),
-            pd.DataFrame(correlations),
-            index=False,
+            make_key(group_key, f"{series.name}.feature_correlations.{key}.json"),
+            correlations,
         )
 
 
