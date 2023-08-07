@@ -8,14 +8,14 @@ Working location structure:
     (name)
     ├── groups
     │   └── groups.BASIC
-    │       ├── (name).metric_bins.(key).(seed).(tick).csv
-    │       ├── (name).metric_bins.(key).(seed).(tick).csv
+    │       ├── (name).metrics_bins.(key).(seed).(tick).csv
+    │       ├── (name).metrics_bins.(key).(seed).(tick).csv
     │       ├── ...
-    │       ├── (name).metric_bins.(key).(seed).(tick).csv
-    │       ├── (name).metric_distributions.(metric).json
-    │       ├── (name).metric_distributions.(metric).json
+    │       ├── (name).metrics_bins.(key).(seed).(tick).csv
+    │       ├── (name).metrics_distributions.(metric).json
+    │       ├── (name).metrics_distributions.(metric).json
     │       ├── ...
-    │       ├── (name).metric_distributions.(metric).json
+    │       ├── (name).metrics_distributions.(metric).json
     │       ├── (name).metrics_individuals.(key).(seed).(metric).json
     │       ├── (name).metrics_individuals.(key).(seed).(metric).json
     │       ├── ...
@@ -56,6 +56,7 @@ from prefect import flow
 from cell_abm_pipeline.tasks import bin_to_hex, calculate_category_durations, calculate_data_bins
 
 GROUPS: list[str] = [
+    "metrics_bins",
     "metrics_distributions",
     "metrics_individuals",
     "metrics_spatial",
@@ -454,7 +455,7 @@ def run_flow_group_metrics_distributions(
 
         save_json(
             context.working_location,
-            make_key(group_key, f"{series.name}.metric_distributions.{metric.upper()}.json"),
+            make_key(group_key, f"{series.name}.metrics_distributions.{metric.upper()}.json"),
             distribution,
         )
 
