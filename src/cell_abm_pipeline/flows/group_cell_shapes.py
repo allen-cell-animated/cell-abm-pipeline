@@ -118,6 +118,31 @@ PROJECTIONS: list[str] = [
     "side2",
 ]
 
+LIMITS: dict[str, list] = {
+    "volume.DEFAULT": [500, 4000],
+    "volume.NUCLEUS": [0, 1500],
+    "height.DEFAULT": [0, 20],
+    "height.NUCLEUS": [0, 20],
+    "area.DEFAULT": [0, 1000],
+    "area.NUCLEUS": [0, 250],
+    "axis_major_length.DEFAULT": [0, 100],
+    "axis_major_length.NUCLEUS": [0, 50],
+    "axis_minor_length.DEFAULT": [0, 50],
+    "axis_minor_length.NUCLEUS": [0, 20],
+    "eccentricity.DEFAULT": [0, 1],
+    "eccentricity.NUCLEUS": [0, 1],
+    "perimeter.DEFAULT": [0, 250],
+    "perimeter.NUCLEUS": [0, 100],
+    "PC1": [-60, 60],
+    "PC2": [-50, 50],
+    "PC3": [-50, 50],
+    "PC4": [-50, 50],
+    "PC5": [-40, 40],
+    "PC6": [-40, 40],
+    "PC7": [-50, 50],
+    "PC8": [-50, 50],
+}
+
 BOUNDS: dict[str, list] = {
     "volume.DEFAULT": [0, 5000],
     "volume.NUCLEUS": [0, 1500],
@@ -165,6 +190,9 @@ class ParametersConfigFeatureCorrelations:
     include_bins: bool = False
     """True if correlations are binned, False otherwise"""
 
+    limits: dict[str, list] = field(default_factory=lambda: LIMITS)
+    """Limits for scaling feature correlations bins."""
+
 
 @dataclass
 class ParametersConfigFeatureDistributions:
@@ -186,10 +214,10 @@ class ParametersConfigFeatureDistributions:
     """Number of principal components (i.e. shape modes)."""
 
     bounds: dict[str, list] = field(default_factory=lambda: BOUNDS)
-    """Bounds for metric distributions."""
+    """Bounds for feature distributions."""
 
     bandwidth: dict[str, float] = field(default_factory=lambda: BANDWIDTH)
-    """Bandwidths for metric distributions."""
+    """Bandwidths for feature distributions."""
 
 
 @dataclass
@@ -473,8 +501,15 @@ def run_flow_group_feature_correlations(
                     if not parameters.include_bins:
                         continue
 
+                    prop_limits = parameters.limits[f"{prop}.{region}"]
+                    mode_limits = parameters.limits[mode_key]
+
                     bins = bin_to_hex(
-                        component_data, prop_data, [0] * len(prop_data), scale=0.05, rescale=True
+                        component_data,
+                        prop_data,
+                        np.ones(len(prop_data)),
+                        scale=0.025,
+                        limits=(mode_limits[0], mode_limits[1], prop_limits[0], prop_limits[1]),
                     )
                     bins_df = pd.DataFrame(
                         [[x, y, np.sum(v)] for (x, y), v in bins.items()], columns=["x", "y", "v"]
