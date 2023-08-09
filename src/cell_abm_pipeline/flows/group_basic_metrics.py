@@ -49,10 +49,10 @@ from itertools import groupby
 import numpy as np
 import pandas as pd
 from arcade_collection.output import convert_model_units
-from io_collection.keys import make_key
+from io_collection.keys import check_key, make_key
 from io_collection.load import load_dataframe
 from io_collection.save import save_dataframe, save_json
-from prefect import flow
+from prefect import flow, get_run_logger
 
 from cell_abm_pipeline.tasks import bin_to_hex, calculate_category_durations, calculate_data_bins
 
@@ -140,8 +140,11 @@ class ParametersConfigMetricsBins:
     metrics: list[str] = field(default_factory=lambda: BIN_METRICS)
     """List of bin metrics."""
 
+    seed: int = 0
+    """Simulation seed to use for grouping bin metrics."""
+
     ticks: list[int] = field(default_factory=lambda: [0])
-    """Simulation ticks to use for grouping spatial metrics."""
+    """Simulation ticks to use for grouping bin metrics."""
 
     scale: float = 1
     """Metric bin scaling."""
@@ -159,6 +162,9 @@ class ParametersConfigMetricsDistributions:
 
     metrics: list[str] = field(default_factory=lambda: DISTRIBUTION_METRICS)
     """List of distribution metrics."""
+
+    seeds: list[int] = field(default_factory=lambda: [0])
+    """Simulation seeds to use for grouping metric distributions."""
 
     phases: list[str] = field(default_factory=lambda: CELL_PHASES)
     """List of cell cycle phases."""
@@ -186,6 +192,9 @@ class ParametersConfigMetricsIndividuals:
     metrics: list[str] = field(default_factory=lambda: INDIVIDUAL_METRICS)
     """List of individual metrics."""
 
+    seed: int = 0
+    """Simulation seed to use for grouping individual metrics."""
+
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
 
@@ -202,6 +211,9 @@ class ParametersConfigMetricsSpatial:
 
     metrics: list[str] = field(default_factory=lambda: SPATIAL_METRICS)
     """List of spatial metrics."""
+
+    seeds: list[int] = field(default_factory=lambda: [0])
+    """Simulation seeds to use for grouping spatial metrics."""
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
@@ -222,6 +234,9 @@ class ParametersConfigMetricsTemporal:
 
     metrics: list[str] = field(default_factory=lambda: TEMPORAL_METRICS)
     """List of temporal metrics."""
+
+    seeds: list[int] = field(default_factory=lambda: [0])
+    """Simulation seeds to use for grouping temporal metrics."""
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
@@ -245,6 +260,9 @@ class ParametersConfigPopulationCounts:
 
     tick: int = 0
     """Simulation tick to use for grouping population counts."""
+
+    seeds: list[int] = field(default_factory=lambda: [0])
+    """Simulation seeds to use for grouping population counts."""
 
 
 @dataclass
@@ -290,9 +308,6 @@ class SeriesConfig:
     name: str
     """Name of the simulation series."""
 
-    seeds: list[int]
-    """List of series random seeds."""
-
     conditions: list[dict]
     """List of series condition dictionaries (must include unique condition "key")."""
 
@@ -334,7 +349,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 def run_flow_group_metrics_bins(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigMetricsBins
 ) -> None:
-    """Group basic metrics subflow for distributions metrics."""
+    """Group basic metrics subflow for binned metrics."""
 
     analysis_key = make_key(series.name, "analysis", "analysis.POSITIONS")
     group_key = make_key(series.name, "groups", "groups.BASIC")
@@ -343,57 +358,55 @@ def run_flow_group_metrics_bins(
     index_columns = ["x", "y"]
 
     for key in keys:
-        for seed in series.seeds:
-            series_key = f"{series.name}_{key}_{seed:04d}"
+        series_key = f"{series.name}_{key}_{parameters.seed:04d}"
 
-            results_key = make_key(series.name, "results", f"{series_key}.csv")
-            results = load_dataframe(context.working_location, results_key)
-            convert_model_units(results, parameters.ds, parameters.dt)
+        results_key = make_key(series.name, "results", f"{series_key}.csv")
+        results = load_dataframe(context.working_location, results_key)
+        convert_model_units(results, parameters.ds, parameters.dt)
 
-            positions_key = make_key(analysis_key, f"{series_key}.POSITIONS.csv")
-            positions = load_dataframe(
-                context.working_location, positions_key, converters={"id": ast.literal_eval}
-            )
+        positions_key = make_key(analysis_key, f"{series_key}.POSITIONS.csv")
+        positions = load_dataframe(
+            context.working_location, positions_key, converters={"id": ast.literal_eval}
+        )
 
-            for tick in parameters.ticks:
-                tick_positions = positions[positions["TICK"] == tick]
-                x = tick_positions["x"]
-                y = tick_positions["y"]
+        for tick in parameters.ticks:
+            tick_positions = positions[positions["TICK"] == tick]
+            x = tick_positions["x"]
+            y = tick_positions["y"]
 
-                bins_df = pd.DataFrame()
+            bins_df = pd.DataFrame()
 
-                for metric in parameters.metrics:
-                    if metric == "count":
-                        v = tick_positions["id"].map(len)
-                    else:
-                        tick_results = results[results["TICK"] == tick].set_index("ID")
-                        v = [
-                            np.mean([tick_results.loc[i][metric] for i in ids])
-                            for ids in tick_positions["id"]
-                        ]
+            for metric in parameters.metrics:
+                if metric == "count":
+                    v = tick_positions["id"].map(len)
+                else:
+                    tick_results = results[results["TICK"] == tick].set_index("ID")
+                    v = [
+                        np.mean([tick_results.loc[i][metric] for i in ids])
+                        for ids in tick_positions["id"]
+                    ]
 
-                    bins = bin_to_hex(x, y, v, parameters.scale)
-                    bins_df_metric = pd.DataFrame(
-                        [[x, y, np.mean(v)] for (x, y), v in bins.items()],
-                        columns=index_columns + [metric.upper()],
-                    )
-
-                    if bins_df.empty:
-                        bins_df = bins_df_metric
-                    else:
-                        bins_df.set_index(index_columns, inplace=True)
-                        bins_df_metric.set_index(index_columns, inplace=True)
-                        bins_df = bins_df.join(bins_df_metric, on=index_columns)
-                        bins_df = bins_df.reset_index()
-
-                save_dataframe(
-                    context.working_location,
-                    make_key(
-                        group_key, f"{series.name}.metrics_bins.{key}.{seed:04d}.{tick:06d}.csv"
-                    ),
-                    bins_df,
-                    index=False,
+                bins = bin_to_hex(x, y, v, parameters.scale)
+                bins_df_metric = pd.DataFrame(
+                    [[x, y, np.mean(v)] for (x, y), v in bins.items()],
+                    columns=index_columns + [metric.upper()],
                 )
+
+                if bins_df.empty:
+                    bins_df = bins_df_metric
+                else:
+                    bins_df.set_index(index_columns, inplace=True)
+                    bins_df_metric.set_index(index_columns, inplace=True)
+                    bins_df = bins_df.join(bins_df_metric, on=index_columns)
+                    bins_df = bins_df.reset_index()
+
+            metric_key = f"{key}.{parameters.seed:04d}.{tick:06d}"
+            save_dataframe(
+                context.working_location,
+                make_key(group_key, f"{series.name}.metrics_bins.{metric_key}.csv"),
+                bins_df,
+                index=False,
+            )
 
 
 @flow(name="group-basic-metrics_group-metrics-distributions")
@@ -402,6 +415,7 @@ def run_flow_group_metrics_distributions(
 ) -> None:
     """Group basic metrics subflow for distributions metrics."""
 
+    logger = get_run_logger()
     group_key = make_key(series.name, "groups", "groups.BASIC")
     keys = [condition["key"] for condition in series.conditions]
 
@@ -421,9 +435,14 @@ def run_flow_group_metrics_distributions(
     for key in keys:
         all_results = []
 
-        for seed in series.seeds:
+        for seed in parameters.seeds:
             series_key = f"{series.name}_{key}_{seed:04d}"
             results_key = make_key(series.name, "results", f"{series_key}.csv")
+
+            if not check_key(context.working_location, results_key):
+                logger.warning("[ %s ] seed [ %d ] not found", key, seed)
+                continue
+
             results = load_dataframe(context.working_location, results_key)
             results["SEED"] = seed
             all_results.append(results)
@@ -474,44 +493,43 @@ def run_flow_group_metrics_individuals(
     ]
 
     for key in keys:
-        for seed in series.seeds:
-            series_key = f"{series.name}_{key}_{seed:04d}"
-            results_key = make_key(series.name, "results", f"{series_key}.csv")
-            results = load_dataframe(context.working_location, results_key)
-            results.sort_values("TICK", inplace=True)
-            convert_model_units(results, parameters.ds, parameters.dt, parameters.regions)
+        series_key = f"{series.name}_{key}_{parameters.seed:04d}"
+        results_key = make_key(series.name, "results", f"{series_key}.csv")
+        results = load_dataframe(context.working_location, results_key)
+        results.sort_values("TICK", inplace=True)
+        convert_model_units(results, parameters.ds, parameters.dt, parameters.regions)
 
-            for metric in metrics:
-                times = results.groupby("ID")["time"].apply(np.hstack)
-                values = results.groupby("ID")[metric.replace(".DEFAULT", "")].apply(np.hstack)
-                phases = results.groupby("ID")["PHASE"].apply(np.hstack)
+        for metric in metrics:
+            times = results.groupby("ID")["time"].apply(np.hstack)
+            values = results.groupby("ID")[metric.replace(".DEFAULT", "")].apply(np.hstack)
+            phases = results.groupby("ID")["PHASE"].apply(np.hstack)
 
-                entries = [
-                    [
-                        {"time_and_value": np.array([x[:2] for x in group]), "phase": phase}
-                        for phase, group in groupby(zip(time, value, phase), key=lambda x: x[2])
-                    ]
-                    for time, value, phase in zip(times, values, phases)
+            entries = [
+                [
+                    {"time_and_value": np.array([x[:2] for x in group]), "phase": phase}
+                    for phase, group in groupby(zip(time, value, phase), key=lambda x: x[2])
                 ]
+                for time, value, phase in zip(times, values, phases)
+            ]
 
-                individuals = [
-                    [
-                        {
-                            "time": item["time_and_value"][:, 0].tolist(),
-                            "value": item["time_and_value"][:, 1].tolist(),
-                            "phase": item["phase"],
-                        }
-                        for item in entry
-                    ]
-                    for entry in entries
+            individuals = [
+                [
+                    {
+                        "time": item["time_and_value"][:, 0].tolist(),
+                        "value": item["time_and_value"][:, 1].tolist(),
+                        "phase": item["phase"],
+                    }
+                    for item in entry
                 ]
+                for entry in entries
+            ]
 
-                metric_key = f"{key}.{seed:04d}.{metric.upper()}"
-                save_json(
-                    context.working_location,
-                    make_key(group_key, f"{series.name}.metrics_individuals.{metric_key}.json"),
-                    individuals,
-                )
+            metric_key = f"{key}.{parameters.seed:04d}.{metric.upper()}"
+            save_json(
+                context.working_location,
+                make_key(group_key, f"{series.name}.metrics_individuals.{metric_key}.json"),
+                individuals,
+            )
 
 
 @flow(name="group-basic-metrics_group-metrics-spatial")
@@ -520,6 +538,7 @@ def run_flow_group_metrics_spatial(
 ) -> None:
     """Group basic metrics subflow for spatial metrics."""
 
+    logger = get_run_logger()
     group_key = make_key(series.name, "groups", "groups.BASIC")
     keys = [condition["key"] for condition in series.conditions]
 
@@ -531,9 +550,14 @@ def run_flow_group_metrics_spatial(
             metrics.append(metric)
 
     for key in keys:
-        for seed in series.seeds:
+        for seed in parameters.seeds:
             series_key = f"{series.name}_{key}_{seed:04d}"
             results_key = make_key(series.name, "results", f"{series_key}.csv")
+
+            if not check_key(context.working_location, results_key):
+                logger.warning("[ %s ] seed [ %d ] not found", key, seed)
+                continue
+
             results = load_dataframe(context.working_location, results_key)
             convert_model_units(results, parameters.ds, parameters.dt, parameters.regions)
 
@@ -561,6 +585,7 @@ def run_flow_group_metrics_temporal(
 ) -> None:
     """Group basic metrics subflow for temporal metrics."""
 
+    logger = get_run_logger()
     group_key = make_key(series.name, "groups", "groups.BASIC")
     keys = [condition["key"] for condition in series.conditions]
 
@@ -578,9 +603,14 @@ def run_flow_group_metrics_temporal(
     for key in keys:
         all_results = []
 
-        for seed in series.seeds:
+        for seed in parameters.seeds:
             series_key = f"{series.name}_{key}_{seed:04d}"
             results_key = make_key(series.name, "results", f"{series_key}.csv")
+
+            if not check_key(context.working_location, results_key):
+                logger.warning("[ %s ] seed [ %d ] not found", key, seed)
+                continue
+
             results = load_dataframe(context.working_location, results_key)
             results["SEED"] = seed
             all_results.append(results)
@@ -626,17 +656,23 @@ def run_flow_group_metrics_temporal(
 def run_flow_group_population_counts(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigPopulationCounts
 ) -> None:
-    """Group cell shapes subflow for population counts."""
+    """Group basic metrics subflow for population counts."""
 
+    logger = get_run_logger()
     group_key = make_key(series.name, "groups", "groups.BASIC")
     keys = [condition["key"] for condition in series.conditions]
 
     counts: list[dict] = []
 
     for key in keys:
-        for seed in series.seeds:
+        for seed in parameters.seeds:
             series_key = f"{series.name}_{key}_{seed:04d}"
             results_key = make_key(series.name, "results", f"{series_key}.csv")
+
+            if not check_key(context.working_location, results_key):
+                logger.warning("[ %s ] seed [ %d ] not found", key, seed)
+                continue
+
             results = load_dataframe(context.working_location, results_key, usecols=["TICK"])
             counts.append(
                 {
