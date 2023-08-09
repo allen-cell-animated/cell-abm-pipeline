@@ -416,37 +416,53 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     """
 
     if "feature_correlations" in parameters.groups:
-        run_flow_group_feature_correlations(context, series, parameters.feature_correlations)
+        run_flow_group_feature_correlations(
+            context, series, parameters.feature_correlations, return_state=True
+        )
 
     if "feature_distributions" in parameters.groups:
-        run_flow_group_feature_distributions(context, series, parameters.feature_distributions)
+        run_flow_group_feature_distributions(
+            context, series, parameters.feature_distributions, return_state=True
+        )
 
     if "mode_correlations" in parameters.groups:
-        run_flow_group_mode_correlations(context, series, parameters.mode_correlations)
+        run_flow_group_mode_correlations(
+            context, series, parameters.mode_correlations, return_state=True
+        )
 
     if "population_counts" in parameters.groups:
-        run_flow_group_population_counts(context, series, parameters.population_counts)
+        run_flow_group_population_counts(
+            context, series, parameters.population_counts, return_state=True
+        )
 
     if "population_stats" in parameters.groups:
-        run_flow_group_population_stats(context, series, parameters.population_stats)
+        run_flow_group_population_stats(
+            context, series, parameters.population_stats, return_state=True
+        )
 
     if "shape_average" in parameters.groups:
-        run_flow_group_shape_average(context, series, parameters.shape_average)
+        run_flow_group_shape_average(context, series, parameters.shape_average, return_state=True)
 
     if "shape_errors" in parameters.groups:
-        run_flow_group_shape_errors(context, series, parameters.shape_errors)
+        run_flow_group_shape_errors(context, series, parameters.shape_errors, return_state=True)
 
     if "shape_modes" in parameters.groups:
-        run_flow_group_shape_modes(context, series, parameters.shape_modes)
+        run_flow_group_shape_modes(context, series, parameters.shape_modes, return_state=True)
 
     if "shape_samples" in parameters.groups:
-        run_flow_group_shape_samples(context, series, parameters.shape_samples)
+        run_flow_group_shape_samples(context, series, parameters.shape_samples, return_state=True)
 
     if "variance_explained" in parameters.groups:
-        run_flow_group_variance_explained(context, series, parameters.variance_explained)
+        run_flow_group_variance_explained(
+            context, series, parameters.variance_explained, return_state=True
+        )
 
 
-@flow(name="group-cell-shapes_group-feature-correlations")
+@flow(
+    name="group-cell-shapes_group-feature-correlations",
+    persist_result=False,
+    cache_result_in_memory=False,
+)
 def run_flow_group_feature_correlations(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigFeatureCorrelations
 ) -> None:
@@ -530,7 +546,11 @@ def run_flow_group_feature_correlations(
         )
 
 
-@flow(name="group-cell-shapes_group-feature-distributions")
+@flow(
+    name="group-cell-shapes_group-feature-distributions",
+    persist_result=False,
+    cache_result_in_memory=False,
+)
 def run_flow_group_feature_distributions(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigFeatureDistributions
 ) -> None:
@@ -589,7 +609,11 @@ def run_flow_group_feature_distributions(
         )
 
 
-@flow(name="group-cell-shapes_group-mode-correlations")
+@flow(
+    name="group-cell-shapes_group-mode-correlations",
+    persist_result=False,
+    cache_result_in_memory=False,
+)
 def run_flow_group_mode_correlations(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigModeCorrelations
 ) -> None:
@@ -675,7 +699,11 @@ def run_flow_group_mode_correlations(
     )
 
 
-@flow(name="group-cell-shapes_group-population-counts")
+@flow(
+    name="group-cell-shapes_group-population-counts",
+    persist_result=False,
+    cache_result_in_memory=False,
+)
 def run_flow_group_population_counts(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigPopulationCounts
 ) -> None:
@@ -710,7 +738,11 @@ def run_flow_group_population_counts(
     )
 
 
-@flow(name="group-cell-shapes_group-population-stats")
+@flow(
+    name="group-cell-shapes_group-population-stats",
+    persist_result=False,
+    cache_result_in_memory=False,
+)
 def run_flow_group_population_stats(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigPopulationStats
 ) -> None:
@@ -744,7 +776,11 @@ def run_flow_group_population_stats(
     )
 
 
-@flow(name="group-cell-shapes_group-shape-average")
+@flow(
+    name="group-cell-shapes_group-shape-average",
+    persist_result=False,
+    cache_result_in_memory=False,
+)
 def run_flow_group_shape_average(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigShapeAverage
 ) -> None:
@@ -825,7 +861,11 @@ def run_flow_group_shape_average(
             )
 
 
-@flow(name="group-cell-shapes_group-shape-errors")
+@flow(
+    name="group-cell-shapes_group-shape-errors",
+    persist_result=False,
+    cache_result_in_memory=False,
+)
 def run_flow_group_shape_errors(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigShapeErrors
 ) -> None:
@@ -855,7 +895,11 @@ def run_flow_group_shape_errors(
     )
 
 
-@flow(name="group-cell-shapes_group-shape-modes")
+@flow(
+    name="group-cell-shapes_group-shape-modes",
+    persist_result=False,
+    cache_result_in_memory=False,
+)
 def run_flow_group_shape_modes(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigShapeModes
 ) -> None:
@@ -919,7 +963,11 @@ def run_flow_group_shape_modes(
                 )
 
 
-@flow(name="group-cell-shapes_group-shape-samples")
+@flow(
+    name="group-cell-shapes_group-shape-samples",
+    persist_result=False,
+    cache_result_in_memory=False,
+)
 def run_flow_group_shape_samples(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigShapeSamples
 ) -> None:
@@ -968,7 +1016,11 @@ def run_flow_group_shape_samples(
     )
 
 
-@flow(name="group-cell-shapes_group-variance-explained")
+@flow(
+    name="group-cell-shapes_group-variance-explained",
+    persist_result=False,
+    cache_result_in_memory=False,
+)
 def run_flow_group_variance_explained(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigVarianceExplained
 ) -> None:
