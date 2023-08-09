@@ -44,6 +44,7 @@ loaded into alternative tools.
 
 import ast
 from dataclasses import dataclass, field
+from itertools import groupby
 
 import numpy as np
 import pandas as pd
@@ -78,12 +79,12 @@ BOUNDS: dict[str, list] = {
     "volume.NUCLEUS": [0, 1500],
     "height.DEFAULT": [0, 20],
     "height.NUCLEUS": [0, 20],
-    "phase.PROLIFERATIVE_G1": [0, 7],
-    "phase.PROLIFERATIVE_S": [0, 21],
-    "phase.PROLIFERATIVE_G2": [0, 20],
-    "phase.PROLIFERATIVE_M": [0, 20],
-    "phase.APOPTOTIC_EARLY": [0, 10],
-    "phase.APOPTOTIC_LATE": [0, 10],
+    "phase.PROLIFERATIVE_G1": [0, 5],
+    "phase.PROLIFERATIVE_S": [0, 20],
+    "phase.PROLIFERATIVE_G2": [0, 18],
+    "phase.PROLIFERATIVE_M": [0, 2],
+    "phase.APOPTOTIC_EARLY": [0, 6],
+    "phase.APOPTOTIC_LATE": [0, 12],
 }
 
 BANDWIDTH: dict[str, float] = {
@@ -91,12 +92,12 @@ BANDWIDTH: dict[str, float] = {
     "volume.NUCLEUS": 50,
     "height.DEFAULT": 1,
     "height.NUCLEUS": 1,
-    "phase.PROLIFERATIVE_G1": 1,
-    "phase.PROLIFERATIVE_S": 1,
-    "phase.PROLIFERATIVE_G2": 1,
-    "phase.PROLIFERATIVE_M": 1,
-    "phase.APOPTOTIC_EARLY": 1,
-    "phase.APOPTOTIC_LATE": 1,
+    "phase.PROLIFERATIVE_G1": 0.5,
+    "phase.PROLIFERATIVE_S": 0.5,
+    "phase.PROLIFERATIVE_G2": 0.5,
+    "phase.PROLIFERATIVE_M": 0.25,
+    "phase.APOPTOTIC_EARLY": 0.25,
+    "phase.APOPTOTIC_LATE": 0.5,
 }
 
 BIN_METRICS: list[str] = [
@@ -112,7 +113,6 @@ DISTRIBUTION_METRICS: list[str] = [
 ]
 
 INDIVIDUAL_METRICS: list[str] = [
-    "phase",
     "volume",
     "height",
 ]
@@ -469,27 +469,41 @@ def run_flow_group_metrics_individuals(
     group_key = make_key(series.name, "groups", "groups.BASIC")
     keys = [condition["key"] for condition in series.conditions]
 
-    metrics: list[str] = []
-    for metric in parameters.metrics:
-        if metric in ["volume", "height"]:
-            metrics = metrics + [f"{metric}.{region}" for region in parameters.regions]
-        else:
-            metrics.append(metric)
+    metrics: list[str] = [
+        f"{metric}.{region}" for metric in parameters.metrics for region in parameters.regions
+    ]
 
     for key in keys:
         for seed in series.seeds:
             series_key = f"{series.name}_{key}_{seed:04d}"
             results_key = make_key(series.name, "results", f"{series_key}.csv")
             results = load_dataframe(context.working_location, results_key)
+            results.sort_values("TICK", inplace=True)
             convert_model_units(results, parameters.ds, parameters.dt, parameters.regions)
 
             for metric in metrics:
-                column = metric.replace(".DEFAULT", "") if "." in metric else metric.upper()
                 times = results.groupby("ID")["time"].apply(np.hstack)
-                values = results.groupby("ID")[column].apply(np.hstack)
+                values = results.groupby("ID")[metric.replace(".DEFAULT", "")].apply(np.hstack)
+                phases = results.groupby("ID")["PHASE"].apply(np.hstack)
+
+                entries = [
+                    [
+                        {"time_and_value": np.array([x[:2] for x in group]), "phase": phase}
+                        for phase, group in groupby(zip(time, value, phase), key=lambda x: x[2])
+                    ]
+                    for time, value, phase in zip(times, values, phases)
+                ]
+
                 individuals = [
-                    {"time": time.tolist(), "value": value.tolist()}
-                    for time, value in zip(times, values)
+                    [
+                        {
+                            "time": item["time_and_value"][:, 0].tolist(),
+                            "value": item["time_and_value"][:, 1].tolist(),
+                            "phase": item["phase"],
+                        }
+                        for item in entry
+                    ]
+                    for entry in entries
                 ]
 
                 metric_key = f"{key}.{seed:04d}.{metric.upper()}"
@@ -528,7 +542,9 @@ def run_flow_group_metrics_spatial(
 
                 for metric in metrics:
                     column = metric.replace(".DEFAULT", "") if "." in metric else metric.upper()
-                    spatial = tick_results[["CENTER_X", "CENTER_Y", "CENTER_Z", column]]
+                    spatial = tick_results[["CENTER_X", "CENTER_Y", "CENTER_Z", column]].rename(
+                        columns={"CENTER_X": "x", "CENTER_Y": "y", "CENTER_Z": "z", column: "v"}
+                    )
 
                     metric_key = f"{key}.{seed:04d}.{tick:06d}.{metric.upper()}"
                     save_dataframe(
@@ -593,10 +609,10 @@ def run_flow_group_metrics_temporal(
 
             temporal = {
                 "time": list(values.groups.keys()),
-                "mean": values.mean().values.tolist(),
-                "std": values.std(ddof=1).values.tolist(),
-                "min": values.min().values.tolist(),
-                "max": values.max().values.tolist(),
+                "mean": [v if not np.isnan(v) else "nan" for v in values.mean()],
+                "std": [v if not np.isnan(v) else "nan" for v in values.std(ddof=1)],
+                "min": [v if not np.isnan(v) else "nan" for v in values.min()],
+                "max": [v if not np.isnan(v) else "nan" for v in values.max()],
             }
 
             save_json(
