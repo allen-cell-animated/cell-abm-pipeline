@@ -6,6 +6,9 @@ from prefect import task
 def calculate_data_bins(
     data: np.ndarray, bounds: tuple[float, float], bandwidth: float
 ) -> list[dict]:
+    if len(data) == 0:
+        return []
+
     total = len(data) * bandwidth
     num_bins = int((bounds[1] - bounds[0]) / bandwidth)
     lower = bounds[0] - 3 * bandwidth / 2

@@ -722,6 +722,9 @@ def run_flow_group_population_counts(
         groups = data[data["TICK"] == parameters.tick].groupby("SEED")
 
         for seed in parameters.seeds:
+            if seed not in groups.groups:
+                continue
+
             counts.append(
                 {
                     "key": key,
