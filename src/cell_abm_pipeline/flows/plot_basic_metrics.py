@@ -1,348 +1,452 @@
 """
 Workflow for plotting basic metrics.
+
+Working location structure:
+
+.. code-block:: bash
+
+    (name)
+    ├── groups
+    │   └── groups.BASIC
+    │       ├── (name).metrics_bins.(key).(seed).(tick).(metric).csv
+    │       ├── (name).metrics_distributions.(metric).json
+    │       ├── (name).metrics_individuals.(key).(seed).(metric).json
+    │       ├── (name).metrics_spatial.(key).(seed).(tick).(metric).csv
+    │       ├── (name).metrics_temporal.(key).(metric).json
+    │       └── (name).population_counts.(tick).csv
+    └── plots
+        └── plots.BASIC
+            ├── (name).metrics_bins.(key).(seed).(tick).(metric).png
+            ├── (name).metrics_distributions.(metric).png
+            ├── (name).metrics_individuals.(key).(seed).(metric).png
+            ├── (name).metrics_spatial.(key).(seed).(tick).(metric).png
+            ├── (name).metrics_temporal.(key).(metric).png
+            └── (name).population_counts.(tick).png
+
+Plots use grouped data from the **groups/groups.BASIC** directory.
+Plots are saved to the **plots/plots.BASIC** directory.
 """
 
 from dataclasses import dataclass, field
 from typing import Optional
 
-import pandas as pd
-from arcade_collection.output import convert_model_units
 from io_collection.keys import make_key
-from io_collection.load import load_dataframe
+from io_collection.load import load_dataframe, load_json
 from io_collection.save import save_figure
 from prefect import flow
 
-from cell_abm_pipeline.tasks.basic import (
-    plot_counts_total,
-    plot_feature_average,
-    plot_feature_distribution,
-    plot_feature_individual,
-    plot_feature_locations,
-    plot_feature_merge,
-    plot_phase_durations,
-    plot_phase_fractions,
-    plot_phase_locations,
-    plot_population_locations,
+from cell_abm_pipeline.flows.group_basic_metrics import (
+    BIN_METRICS,
+    CELL_PHASES,
+    DISTRIBUTION_METRICS,
+    INDIVIDUAL_METRICS,
+    SPATIAL_METRICS,
+    TEMPORAL_METRICS,
+)
+from cell_abm_pipeline.tasks import (
+    make_bar_figure,
+    make_density_figure,
+    make_histogram_figure,
+    make_line_figure,
+    make_range_figure,
+    make_scatter_figure,
 )
 
-PLOTS_TEMPORAL = [
-    "counts_total",
-    "height_average",
-    "height_distribution",
-    "height_individual",
-    "height_merge",
-    "phase_durations",
-    "phase_fractions",
-    "volume_average",
-    "volume_distribution",
-    "volume_individual",
-    "volume_merge",
-]
-
-PLOTS_SPATIAL = [
-    "height_locations",
-    "phase_locations",
-    "population_locations",
-    "volume_locations",
-]
-
-PLOTS = PLOTS_TEMPORAL + PLOTS_SPATIAL
-
-CELL_PHASES = [
-    "PROLIFERATIVE_G1",
-    "PROLIFERATIVE_S",
-    "PROLIFERATIVE_G2",
-    "PROLIFERATIVE_M",
-    "APOPTOTIC_EARLY",
-    "APOPTOTIC_LATE",
+PLOTS: list[str] = [
+    "metrics_bins",
+    "metrics_distributions",
+    "metrics_individuals",
+    "metrics_spatial",
+    "metrics_temporal",
+    "population_counts",
 ]
 
 PHASE_COLORS: dict[str, str] = {
-    "PROLIFERATIVE_G1": "#5F4690",
-    "PROLIFERATIVE_S": "#38A6A5",
-    "PROLIFERATIVE_G2": "#73AF48",
-    "PROLIFERATIVE_M": "#CC503E",
-    "APOPTOTIC_EARLY": "#E17C05",
-    "APOPTOTIC_LATE": "#94346E",
+    "PROLIFERATIVE_G1": "#7F3C8D",
+    "PROLIFERATIVE_S": "#11A579",
+    "PROLIFERATIVE_G2": "#3969AC",
+    "PROLIFERATIVE_M": "#F2B701",
+    "APOPTOTIC_EARLY": "#E73F74",
+    "APOPTOTIC_LATE": "#80BA5A",
 }
 
-BIN_SIZES: dict[str, float] = {
-    "volume": 100,
-    "height": 1,
-    "volume.NUCLEUS": 50,
-    "height.NUCLEUS": 1,
+POPULATION_COLORS: dict[int, str] = {
+    1: "#7F3C8D",
 }
+
+
+@dataclass
+class ParametersConfigMetricsBins:
+    """Parameter configuration for plot basic metrics subflow - metrics bins."""
+
+    metrics: list[str] = field(default_factory=lambda: BIN_METRICS)
+    """List of bin metrics."""
+
+    seed: int = 0
+    """Simulation seed to use for plotting bin metrics."""
+
+    ticks: list[int] = field(default_factory=lambda: [0])
+    """Simulation ticks to use for plotting bin metrics."""
+
+    scale: float = 1
+    """Metric bin scaling."""
+
+
+@dataclass
+class ParametersConfigMetricsDistributions:
+    """Parameter configuration for plot basic metrics subflow - metrics distributions."""
+
+    metrics: list[str] = field(default_factory=lambda: DISTRIBUTION_METRICS)
+    """List of distribution metrics."""
+
+    phases: list[str] = field(default_factory=lambda: CELL_PHASES)
+    """List of cell cycle phases."""
+
+    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
+
+
+@dataclass
+class ParametersConfigMetricsIndividuals:
+    """Parameter configuration for plot basic metrics subflow - metrics individuals."""
+
+    metrics: list[str] = field(default_factory=lambda: INDIVIDUAL_METRICS)
+    """List of individual metrics."""
+
+    seed: int = 0
+    """Simulation seed to use for plotting individual metrics."""
+
+    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
+
+    phase_colors: dict[str, str] = field(default_factory=lambda: PHASE_COLORS)
+    """Colors for each cell cycle phase."""
+
+
+@dataclass
+class ParametersConfigMetricsSpatial:
+    """Parameter configuration for plot basic metrics subflow - metrics spatial."""
+
+    metrics: list[str] = field(default_factory=lambda: SPATIAL_METRICS)
+    """List of spatial metrics."""
+
+    seeds: list[int] = field(default_factory=lambda: [0])
+    """Simulation seeds to use for plotting spatial metrics."""
+
+    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
+
+    ticks: list[int] = field(default_factory=lambda: [0])
+    """Simulation ticks to use for plotting spatial metrics."""
+
+    phase_colors: dict[str, str] = field(default_factory=lambda: PHASE_COLORS)
+    """Colors for each cell cycle phase."""
+
+    population_colors: dict[int, str] = field(default_factory=lambda: POPULATION_COLORS)
+    """Colors for each cell population."""
+
+
+@dataclass
+class ParametersConfigMetricsTemporal:
+    """Parameter configuration for plot basic metrics subflow - metrics temporal."""
+
+    metrics: list[str] = field(default_factory=lambda: TEMPORAL_METRICS)
+    """List of temporal metrics."""
+
+    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
+
+    populations: list[int] = field(default_factory=lambda: [1])
+    """List of cell populations."""
+
+    phases: list[str] = field(default_factory=lambda: CELL_PHASES)
+    """List of cell cycle phases."""
+
+
+@dataclass
+class ParametersConfigPopulationCounts:
+    """Parameter configuration for plot basic metrics subflow - population counts."""
+
+    tick: int = 0
+    """Simulation tick to use for plotting population counts."""
 
 
 @dataclass
 class ParametersConfig:
     """Parameter configuration for plot basic metrics flow."""
 
-    reference: Optional[str] = None
-
-    region: Optional[str] = None
-
-    ds: float = 1.0
-
-    dt: float = 1.0
-
-    tick: int = 0
-
-    chunk: int = 5
-
     plots: list[str] = field(default_factory=lambda: PLOTS)
+    """List of basic metric plots."""
 
-    phases: list[str] = field(default_factory=lambda: CELL_PHASES)
+    metrics_bins: ParametersConfigMetricsBins = ParametersConfigMetricsBins()
+    """Parameters for plot metrics bins subflow."""
 
-    phase_colors: dict[str, str] = field(default_factory=lambda: PHASE_COLORS)
+    metrics_distributions: ParametersConfigMetricsDistributions = (
+        ParametersConfigMetricsDistributions()
+    )
+    """Parameters for plot metrics distributions subflow."""
 
-    bin_sizes: dict[str, float] = field(default_factory=lambda: BIN_SIZES)
+    metrics_individuals: ParametersConfigMetricsIndividuals = ParametersConfigMetricsIndividuals()
+    """Parameters for plot metrics individuals subflow."""
 
-    ids: Optional[list[int]] = field(default_factory=lambda: [1])
+    metrics_spatial: ParametersConfigMetricsSpatial = ParametersConfigMetricsSpatial()
+    """Parameters for plot metrics spatial subflow."""
 
-    ordered: bool = True
+    metrics_temporal: ParametersConfigMetricsTemporal = ParametersConfigMetricsTemporal()
+    """Parameters for plot metrics temporal subflow."""
+
+    population_counts: ParametersConfigPopulationCounts = ParametersConfigPopulationCounts()
+    """Parameters for plot population counts subflow."""
 
 
 @dataclass
 class ContextConfig:
-    """Context configuration for plot basic metrics flow."""
+    """Context configuration for group basic metrics flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
 
 @dataclass
 class SeriesConfig:
-    """Series configuration for plot basic metrics flow."""
+    """Series configuration for group basic metrics flow."""
 
     name: str
-
-    seeds: list[int]
+    """Name of the simulation series."""
 
     conditions: list[dict]
+    """List of series condition dictionaries (must include unique condition "key")."""
 
 
 @flow(name="plot-basic-metrics")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    """Main plot basic metrics flow."""
+    """
+    Main plot basic metrics flow.
 
-    # Make plots for basic temporal metrics.
-    if any(plot in parameters.plots for plot in PLOTS_TEMPORAL):
-        run_flow_plot_temporal(context, series, parameters)
+    Calls the following subflows, if the plot is specified:
 
-    # Make plots for basic spatial metrics.
-    if any(plot in parameters.plots for plot in PLOTS_SPATIAL):
-        run_flow_plot_spatial(context, series, parameters)
+    - :py:func:`run_flow_plot_metrics_bins`
+    - :py:func:`run_flow_plot_metrics_distributions`
+    - :py:func:`run_flow_plot_metrics_individuals`
+    - :py:func:`run_flow_plot_metrics_spatial`
+    - :py:func:`run_flow_plot_metrics_temporal`
+    - :py:func:`run_flow_plot_population_stats`
+    """
+
+    if "metrics_bins" in parameters.plots:
+        run_flow_plot_metrics_bins(context, series, parameters.metrics_bins)
+
+    if "metrics_distributions" in parameters.plots:
+        run_flow_plot_metrics_distributions(context, series, parameters.metrics_distributions)
+
+    if "metrics_individuals" in parameters.plots:
+        run_flow_plot_metrics_individuals(context, series, parameters.metrics_individuals)
+
+    if "metrics_spatial" in parameters.plots:
+        run_flow_plot_metrics_spatial(context, series, parameters.metrics_spatial)
+
+    if "metrics_temporal" in parameters.plots:
+        run_flow_plot_metrics_temporal(context, series, parameters.metrics_temporal)
+
+    if "population_counts" in parameters.plots:
+        run_flow_plot_population_counts(context, series, parameters.population_counts)
 
 
-@flow(name="plot-basic-metrics_plot-temporal")
-def run_flow_plot_temporal(
-    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
+@flow(name="plot-basic-metrics_plot-metrics-bins")
+def run_flow_plot_metrics_bins(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigMetricsBins
 ) -> None:
+    """Plot basic metrics subflow for binned metrics."""
+
+    group_key = make_key(series.name, "groups", "groups.BASIC")
     plot_key = make_key(series.name, "plots", "plots.BASIC")
-    region_key = f"_{parameters.region}" if parameters.region is not None else ""
     keys = [condition["key"] for condition in series.conditions]
 
-    all_results = {}
+    for key in keys:
+        for tick in parameters.ticks:
+            for metric in parameters.metrics:
+                metric_key = f"{key}.{parameters.seed:04d}.{tick:06d}.{metric.upper()}"
+
+                group = load_dataframe(
+                    context.working_location,
+                    make_key(group_key, f"{series.name}.metrics_bins.{metric_key}.csv"),
+                )
+
+                save_figure(
+                    context.working_location,
+                    make_key(plot_key, f"{series.name}.metrics_bins.{metric_key}.png"),
+                    make_density_figure(group, parameters.scale),
+                )
+
+
+@flow(name="plot-basic-metrics_plot-metrics-distributions")
+def run_flow_plot_metrics_distributions(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigMetricsDistributions
+) -> None:
+    """Plot basic metrics subflow for metrics distributions."""
+
+    group_key = make_key(series.name, "groups", "groups.BASIC")
+    plot_key = make_key(series.name, "plots", "plots.BASIC")
+    keys = [condition["key"] for condition in series.conditions]
+
+    metrics: list[str] = []
+    for metric in parameters.metrics:
+        if metric in ["volume", "height"]:
+            metrics = metrics + [f"{metric}.{region}" for region in parameters.regions]
+        elif metric == "phase":
+            metrics = metrics + [f"{metric}.{phase}" for phase in parameters.phases]
+        else:
+            continue
+
+    for metric in metrics:
+        metric_key = metric.upper()
+
+        group = load_json(
+            context.working_location,
+            make_key(group_key, f"{series.name}.metrics_distributions.{metric_key}.json"),
+        )
+
+        assert isinstance(group, dict)
+
+        save_figure(
+            context.working_location,
+            make_key(plot_key, f"{series.name}.metrics_distributions.{metric_key}.png"),
+            make_histogram_figure(keys, group),
+        )
+
+
+@flow(name="plot-basic-metrics_plot-metrics-individuals")
+def run_flow_plot_metrics_individuals(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigMetricsIndividuals
+) -> None:
+    """Plot basic metrics subflow for individual metrics."""
+
+    group_key = make_key(series.name, "groups", "groups.BASIC")
+    plot_key = make_key(series.name, "plots", "plots.BASIC")
+    keys = [condition["key"] for condition in series.conditions]
+
+    metrics: list[str] = [
+        f"{metric}.{region}" for metric in parameters.metrics for region in parameters.regions
+    ]
 
     for key in keys:
-        key_results = []
+        for metric in metrics:
+            metric_key = f"{key}.{parameters.seed:04d}.{metric.upper()}"
 
-        for seed in series.seeds:
-            series_key = f"{series.name}_{key}_{seed:04d}"
-            results_key = make_key(series.name, "results", f"{series_key}.csv")
-            results = load_dataframe(context.working_location, results_key)
-            results["SEED"] = seed
-            convert_model_units(results, parameters.ds, parameters.dt, parameters.region)
-            key_results.append(results)
+            group = load_json(
+                context.working_location,
+                make_key(group_key, f"{series.name}.metrics_individuals.{metric_key}.json"),
+            )
 
-        all_results[key] = pd.concat(key_results)
+            group_flat = [line for item in group for line in item]
 
-    reference_data = None
-    if parameters.reference:
-        reference_data = load_dataframe(context.working_location, parameters.reference)
+            save_figure(
+                context.working_location,
+                make_key(plot_key, f"{series.name}.metrics_individuals.{metric_key}.png"),
+                make_line_figure(group_flat, parameters.phase_colors, "phase"),
+            )
 
-    height_feature = f"height.{parameters.region}" if parameters.region else "height"
-    volume_feature = f"volume.{parameters.region}" if parameters.region else "volume"
-    region_subsets: list[Optional[str]] = (
-        [None] if parameters.region is None else [None, f".{parameters.region}"]
+
+@flow(name="plot-basic-metrics_plot-metrics-spatial")
+def run_flow_plot_metrics_spatial(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigMetricsSpatial
+) -> None:
+    """Plot basic metrics subflow for spatial metrics."""
+
+    group_key = make_key(series.name, "groups", "groups.BASIC")
+    plot_key = make_key(series.name, "plots", "plots.BASIC")
+    keys = [condition["key"] for condition in series.conditions]
+
+    metrics: list[str] = []
+    for metric in parameters.metrics:
+        if metric in ["volume", "height"]:
+            metrics = metrics + [f"{metric}.{region}" for region in parameters.regions]
+        else:
+            metrics.append(metric)
+
+    for key in keys:
+        for seed in parameters.seeds:
+            for tick in parameters.ticks:
+                for metric in metrics:
+                    metric_key = f"{key}.{seed:04d}.{tick:06d}.{metric.upper()}"
+
+                    colormap: Optional[dict] = None
+
+                    if metric == "phase":
+                        colormap = parameters.phase_colors
+                    elif metric == "population":
+                        colormap = parameters.population_colors
+
+                    group = load_dataframe(
+                        context.working_location,
+                        make_key(group_key, f"{series.name}.metrics_spatial.{metric_key}.csv"),
+                    )
+
+                    save_figure(
+                        context.working_location,
+                        make_key(plot_key, f"{series.name}.metrics_spatial.{metric_key}.png"),
+                        make_scatter_figure(group, colormap),
+                    )
+
+
+@flow(name="plot-basic-metrics_plot-metrics-temporal")
+def run_flow_plot_metrics_temporal(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigMetricsTemporal
+) -> None:
+    """Plot basic metrics subflow for temporal metrics."""
+
+    group_key = make_key(series.name, "groups", "groups.BASIC")
+    plot_key = make_key(series.name, "plots", "plots.BASIC")
+    keys = [condition["key"] for condition in series.conditions]
+
+    metrics: list[str] = []
+    for metric in parameters.metrics:
+        if metric in ["volume", "height"]:
+            metrics = metrics + [f"{metric}.{region}" for region in parameters.regions]
+        elif metric == "population":
+            metrics = metrics + [f"{metric}.{population}" for population in parameters.populations]
+        elif metric == "phase":
+            metrics = metrics + [f"{metric}.{phase}" for phase in parameters.phases]
+        else:
+            metrics.append(metric)
+
+    for key in keys:
+        for metric in metrics:
+            metric_key = f"{key}.{metric.upper()}"
+
+            group = load_json(
+                context.working_location,
+                make_key(group_key, f"{series.name}.metrics_temporal.{metric_key}.json"),
+            )
+
+            assert isinstance(group, dict)
+
+            save_figure(
+                context.working_location,
+                make_key(plot_key, f"{series.name}.metrics_temporal.{metric_key}.png"),
+                make_range_figure(group),
+            )
+
+
+@flow(name="plot-basic-metrics_plot-population-counts")
+def run_flow_plot_population_counts(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigPopulationCounts
+) -> None:
+    """Plot basic metrics subflow for population counts."""
+
+    group_key = make_key(series.name, "groups", "groups.BASIC")
+    plot_key = make_key(series.name, "plots", "plots.BASIC")
+    keys = [condition["key"] for condition in series.conditions]
+
+    group = load_dataframe(
+        context.working_location,
+        make_key(group_key, f"{series.name}.population_counts.{parameters.tick:06d}.csv"),
     )
 
-    if "counts_total" in parameters.plots and parameters.region is None:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_counts_total.BASIC.png"),
-            plot_counts_total(keys, all_results),
-        )
+    key_group = group[group["key"].isin(keys)]
 
-    if "height_average" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_height_average{region_key}.BASIC.png"),
-            plot_feature_average(keys, height_feature, all_results, reference_data),
-        )
-
-    if "height_distribution" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_height_distribution{region_key}.BASIC.png"),
-            plot_feature_distribution(
-                keys,
-                height_feature,
-                all_results,
-                parameters.bin_sizes[height_feature],
-                reference_data,
-            ),
-        )
-
-    if "height_individual" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_height_individual{region_key}.BASIC.png"),
-            plot_feature_individual(keys, height_feature, all_results, parameters.ids),
-        )
-
-    if "height_merge" in parameters.plots and reference_data is not None:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_height_merge.BASIC.png"),
-            plot_feature_merge(
-                keys,
-                "height",
-                all_results,
-                parameters.bin_sizes,
-                region_subsets,
-                reference_data,
-                parameters.ordered,
-            ),
-        )
-
-    if "phase_durations" in parameters.plots and parameters.region is None:
-        for phase in parameters.phases:
-            phase_plot = plot_phase_durations(keys, all_results, phase, parameters.phase_colors)
-
-            if phase_plot is None:
-                continue
-
-            save_figure(
-                context.working_location,
-                make_key(plot_key, f"{series.name}_phase_durations_{phase}.BASIC.png"),
-                phase_plot,
-            )
-
-    if "phase_fractions" in parameters.plots and parameters.region is None:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_phase_fractions.BASIC.png"),
-            plot_phase_fractions(keys, all_results, parameters.phases, parameters.phase_colors),
-        )
-
-    if "volume_average" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_volume_average{region_key}.BASIC.png"),
-            plot_feature_average(keys, volume_feature, all_results, reference_data),
-        )
-
-    if "volume_distribution" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_volume_distribution{region_key}.BASIC.png"),
-            plot_feature_distribution(
-                keys,
-                volume_feature,
-                all_results,
-                parameters.bin_sizes[volume_feature],
-                reference_data,
-            ),
-        )
-
-    if "volume_individual" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_volume_individual{region_key}.BASIC.png"),
-            plot_feature_individual(keys, volume_feature, all_results, parameters.ids),
-        )
-
-    if "volume_merge" in parameters.plots and reference_data is not None:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_volume_merge.BASIC.png"),
-            plot_feature_merge(
-                keys,
-                "volume",
-                all_results,
-                parameters.bin_sizes,
-                region_subsets,
-                reference_data,
-                parameters.ordered,
-            ),
-        )
-
-
-@flow(name="plot-basic-metrics_plot-spatial")
-def run_flow_plot_spatial(
-    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
-) -> None:
-    plot_key = make_key(series.name, "plots", "plots.BASIC")
-    region_key = f"_{parameters.region}" if parameters.region is not None else ""
-
-    height_feature = f"height.{parameters.region}" if parameters.region else "height"
-    volume_feature = f"volume.{parameters.region}" if parameters.region else "volume"
-
-    for index in range(0, len(series.seeds), parameters.chunk):
-        start = index
-        end = index + parameters.chunk
-
-        subset_key = f"T{parameters.tick:06d}_{series.seeds[start]:04d}_{series.seeds[end - 1]:04d}"
-        subset_region_key = f"{subset_key}{region_key}"
-
-        keys = [
-            (condition["key"], seed)
-            for condition in series.conditions
-            for seed in series.seeds[start:end]
-        ]
-
-        all_results = {}
-
-        for key, seed in keys:
-            series_key = f"{series.name}_{key}_{seed:04d}"
-            results_key = make_key(series.name, "results", f"{series_key}.csv")
-            results = load_dataframe(context.working_location, results_key)
-            convert_model_units(results, parameters.ds, parameters.dt, parameters.region)
-            all_results[(key, seed)] = results
-
-        reference_data = None
-        if parameters.reference:
-            reference_data = load_dataframe(context.working_location, parameters.reference)
-
-        if "height_locations" in parameters.plots:
-            save_figure(
-                context.working_location,
-                make_key(plot_key, f"{series.name}_height_locations_{subset_region_key}.BASIC.png"),
-                plot_feature_locations(
-                    keys, height_feature, all_results, parameters.tick, reference_data
-                ),
-            )
-
-        if "phase_locations" in parameters.plots and parameters.region is None:
-            save_figure(
-                context.working_location,
-                make_key(plot_key, f"{series.name}_phase_locations_{subset_key}.BASIC.png"),
-                plot_phase_locations(keys, all_results, parameters.tick, parameters.phase_colors),
-            )
-
-        if "population_locations" in parameters.plots and parameters.region is None:
-            save_figure(
-                context.working_location,
-                make_key(plot_key, f"{series.name}_population_locations_{subset_key}.BASIC.png"),
-                plot_population_locations(keys, all_results, parameters.tick),
-            )
-
-        if "volume_locations" in parameters.plots:
-            save_figure(
-                context.working_location,
-                make_key(plot_key, f"{series.name}_volume_locations_{subset_region_key}.BASIC.png"),
-                plot_feature_locations(
-                    keys, volume_feature, all_results, parameters.tick, reference_data
-                ),
-            )
+    save_figure(
+        context.working_location,
+        make_key(plot_key, f"{series.name}.population_counts.{parameters.tick:06d}.png"),
+        make_bar_figure(keys, key_group),
+    )
