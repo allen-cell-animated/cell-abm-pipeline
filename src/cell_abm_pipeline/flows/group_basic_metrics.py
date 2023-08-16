@@ -328,39 +328,25 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     """
 
     if "metrics_bins" in parameters.groups:
-        run_flow_group_metrics_bins(context, series, parameters.metrics_bins, return_state=True)
+        run_flow_group_metrics_bins(context, series, parameters.metrics_bins)
 
     if "metrics_distributions" in parameters.groups:
-        run_flow_group_metrics_distributions(
-            context, series, parameters.metrics_distributions, return_state=True
-        )
+        run_flow_group_metrics_distributions(context, series, parameters.metrics_distributions)
 
     if "metrics_individuals" in parameters.groups:
-        run_flow_group_metrics_individuals(
-            context, series, parameters.metrics_individuals, return_state=True
-        )
+        run_flow_group_metrics_individuals(context, series, parameters.metrics_individuals)
 
     if "metrics_spatial" in parameters.groups:
-        run_flow_group_metrics_spatial(
-            context, series, parameters.metrics_spatial, return_state=True
-        )
+        run_flow_group_metrics_spatial(context, series, parameters.metrics_spatial)
 
     if "metrics_temporal" in parameters.groups:
-        run_flow_group_metrics_temporal(
-            context, series, parameters.metrics_temporal, return_state=True
-        )
+        run_flow_group_metrics_temporal(context, series, parameters.metrics_temporal)
 
     if "population_counts" in parameters.groups:
-        run_flow_group_population_counts(
-            context, series, parameters.population_counts, return_state=True
-        )
+        run_flow_group_population_counts(context, series, parameters.population_counts)
 
 
-@flow(
-    name="group-basic-metrics_group-metrics-bins",
-    persist_result=False,
-    cache_result_in_memory=False,
-)
+@flow(name="group-basic-metrics_group-metrics-bins")
 def run_flow_group_metrics_bins(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigMetricsBins
 ) -> None:
@@ -424,11 +410,7 @@ def run_flow_group_metrics_bins(
             )
 
 
-@flow(
-    name="group-basic-metrics_group-metrics-distributions",
-    persist_result=False,
-    cache_result_in_memory=False,
-)
+@flow(name="group-basic-metrics_group-metrics-distributions")
 def run_flow_group_metrics_distributions(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigMetricsDistributions
 ) -> None:
@@ -498,11 +480,7 @@ def run_flow_group_metrics_distributions(
         )
 
 
-@flow(
-    name="group-basic-metrics_group-metrics-individuals",
-    persist_result=False,
-    cache_result_in_memory=False,
-)
+@flow(name="group-basic-metrics_group-metrics-individuals")
 def run_flow_group_metrics_individuals(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigMetricsIndividuals
 ) -> None:
@@ -555,11 +533,7 @@ def run_flow_group_metrics_individuals(
             )
 
 
-@flow(
-    name="group-basic-metrics_group-metrics-spatial",
-    persist_result=False,
-    cache_result_in_memory=False,
-)
+@flow(name="group-basic-metrics_group-metrics-spatial")
 def run_flow_group_metrics_spatial(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigMetricsSpatial
 ) -> None:
@@ -606,11 +580,7 @@ def run_flow_group_metrics_spatial(
                     )
 
 
-@flow(
-    name="group-basic-metrics_group-metrics-temporal",
-    persist_result=False,
-    cache_result_in_memory=False,
-)
+@flow(name="group-basic-metrics_group-metrics-temporal")
 def run_flow_group_metrics_temporal(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigMetricsTemporal
 ) -> None:
@@ -683,11 +653,7 @@ def run_flow_group_metrics_temporal(
             )
 
 
-@flow(
-    name="group-basic-metrics_group-population-counts",
-    persist_result=False,
-    cache_result_in_memory=False,
-)
+@flow(name="group-basic-metrics_group-population-counts")
 def run_flow_group_population_counts(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigPopulationCounts
 ) -> None:
