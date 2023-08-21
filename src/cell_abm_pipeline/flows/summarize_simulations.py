@@ -59,4 +59,4 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     summary_key = make_key(series.name, "{{timestamp}}", f"{series.name}.SUMMARY.txt")
     save_text(context.working_location, summary_key, summary)
 
-    print(summary)
+    print("\n" + summary)
