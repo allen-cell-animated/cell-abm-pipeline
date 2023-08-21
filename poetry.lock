@@ -2,13 +2,13 @@
 
 [[package]]
 name = "abm-colony-collection"
-version = "0.3.3"
+version = "0.3.4"
 description = "Collection of tasks for analyzing colony dynamics."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "abm_colony_collection-0.3.3-py3-none-any.whl", hash = "sha256:99847f69d291352b8ff667797ab92da48bc51efd8ad6b74219280cfa58f7fd90"},
-    {file = "abm_colony_collection-0.3.3.tar.gz", hash = "sha256:9f529fd35172047cd97ff4c669fc395fb6c87dc8d719e0b2ead1a1a474096ade"},
+    {file = "abm_colony_collection-0.3.4-py3-none-any.whl", hash = "sha256:758fb4e7e6db8d3a06ccc36d41b2c7d043a01e9677395dece4204a76caf40007"},
+    {file = "abm_colony_collection-0.3.4.tar.gz", hash = "sha256:586cfae5cad8285725f2306a86041c16f18f85b1bfaea4c70b08fde1dea2c399"},
 ]
 
 [package.dependencies]
@@ -21,13 +21,13 @@ scipy = ">=1.9.3,<2.0.0"
 
 [[package]]
 name = "abm-initialization-collection"
-version = "0.5.1"
-description = "Collection of tasks for initializing abm simulations."
+version = "0.5.2"
+description = "Collection of tasks for initializing ABM simulations."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "abm_initialization_collection-0.5.1-py3-none-any.whl", hash = "sha256:15ea8684c635ac9c12ca153d14cfb07863e1d902f2d21ff93a280a7b3bf88b1f"},
-    {file = "abm_initialization_collection-0.5.1.tar.gz", hash = "sha256:7635b2d9bdaa58952ac4da3ba62cfa11d2ff6d40590aa5c063c308ae2dea5aa8"},
+    {file = "abm_initialization_collection-0.5.2-py3-none-any.whl", hash = "sha256:564bdf41fcfbc71f6ede7bf0dba3ba8e81fbd81b2b13e34fbef73e805880ccd5"},
+    {file = "abm_initialization_collection-0.5.2.tar.gz", hash = "sha256:cc2dbc9cc15a93a1b58597fec5adfabe0d9d46fc98f73cafb0209694004e48a9"},
 ]
 
 [package.dependencies]
@@ -42,13 +42,13 @@ scipy = ">=1.9.3,<2.0.0"
 
 [[package]]
 name = "abm-shape-collection"
-version = "0.7.1"
+version = "0.7.2"
 description = "Collection of tasks for analyzing cell shapes."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "abm_shape_collection-0.7.1-py3-none-any.whl", hash = "sha256:17c04eff69378e9fb93ae0977800e2c76a51c20ece60c7b1b1288d019d30855c"},
-    {file = "abm_shape_collection-0.7.1.tar.gz", hash = "sha256:8e1dca63496c11eb3eea5d1765f51e48f3ea9384183fda587ebda9e876e4cb2e"},
+    {file = "abm_shape_collection-0.7.2-py3-none-any.whl", hash = "sha256:f8641c8685fe82d7d7dd07d7ab8ed14d2fff553873bed1a78a506172aad5c5cb"},
+    {file = "abm_shape_collection-0.7.2.tar.gz", hash = "sha256:722cd01e037a6d410842cd4dbb36dd63dcc87b734be6152598fb9cb33f9386b6"},
 ]
 
 [package.dependencies]
@@ -379,13 +379,13 @@ requests-oauthlib = "*"
 
 [[package]]
 name = "arcade-collection"
-version = "0.9.0"
+version = "0.9.3"
 description = "Collection of tasks for working with ARCADE."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "arcade_collection-0.9.0-py3-none-any.whl", hash = "sha256:b8e338a034e76a834b639834594129b1d85650a8ec775c86d7f74b811617dcae"},
-    {file = "arcade_collection-0.9.0.tar.gz", hash = "sha256:78d2bd7292b8e1e8cef6f960d8edab5f0e45418eb968e7e6f2b1fd6148492a10"},
+    {file = "arcade_collection-0.9.3-py3-none-any.whl", hash = "sha256:042800c2a25137b4756d084b309a3a6def342bf1690a4fa529fca001ec966477"},
+    {file = "arcade_collection-0.9.3.tar.gz", hash = "sha256:e918c918b933d5140691f3ae75b74e8ead71d6cfd04f67a7dbd6408c55279e89"},
 ]
 
 [package.dependencies]
@@ -944,13 +944,13 @@ files = [
 
 [[package]]
 name = "container-collection"
-version = "0.6.0"
+version = "0.6.1"
 description = "Collection of tasks for running containerized models."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "container_collection-0.6.0-py3-none-any.whl", hash = "sha256:08b09e5c7bce5ead882ca6b73c3a0e4cb49d65fc5203151c9ed19ff756c35100"},
-    {file = "container_collection-0.6.0.tar.gz", hash = "sha256:8b91dddba7e7151257fd6c705d1c6cf6fa2846ca5a2b2fa05a284bb452882c97"},
+    {file = "container_collection-0.6.1-py3-none-any.whl", hash = "sha256:0daa6b1d8ea7483ce7928afcb7bfc36871ee8b9fb9cc97bf0777d5772ab99d15"},
+    {file = "container_collection-0.6.1.tar.gz", hash = "sha256:9a2431582f3a7cb84e0a732241786f15c380164f89ce344f867aae9aaf1915a8"},
 ]
 
 [package.dependencies]
@@ -1982,13 +1982,13 @@ files = [
 
 [[package]]
 name = "io-collection"
-version = "0.8.0"
+version = "0.9.0"
 description = "Collection of tasks for I/O."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "io_collection-0.8.0-py3-none-any.whl", hash = "sha256:278cbfeacb93786dbebffed3a5a7651853bfe580291dacf4da5a5382a185688f"},
-    {file = "io_collection-0.8.0.tar.gz", hash = "sha256:27b5f2d79ddffe266666eb9dc3461a14afc32b01f2b3922d7e0d443324d62e0a"},
+    {file = "io_collection-0.9.0-py3-none-any.whl", hash = "sha256:1ee965af86561a38dd3723e3240c8275ececce737302aa88ce78bf3ff07486c0"},
+    {file = "io_collection-0.9.0.tar.gz", hash = "sha256:cd7bfd96db39499436b98d05fe9824260c7997047501c7e5920e639761b36df7"},
 ]
 
 [package.dependencies]
@@ -5362,4 +5362,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "7731dc12d36b0891553f4cdaf5b6d85d455f3d86e01423f1a446ed98754eda58"
+content-hash = "98aa582dbdfd375a8ce689f46427c572da2814b3d78bd276a5fb9be30d6b48b4"
