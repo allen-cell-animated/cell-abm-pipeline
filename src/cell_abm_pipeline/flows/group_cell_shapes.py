@@ -9,49 +9,22 @@ Working location structure:
     ├── analysis
     │   ├── analysis.PCA
     │   │   ├── (name)_(key)_(regions).PCA.csv
-    │   │   ├── (name)_(key)_(regions).PCA.pkl
-    │   │   ├── (name)_(key)_(regions).PCA.csv
-    │   │   ├── (name)_(key)_(regions).PCA.pkl
-    │   │   ├── ...
-    │   │   ├── ...
-    │   │   ├── (name)_(key)_(regions).PCA.csv
     │   │   └── (name)_(key)_(regions).PCA.pkl
     │   └── analysis.STATS
-    │       ├── (name)_(key)_(regions).STATS.csv
-    │       ├── (name)_(key)_(regions).STATS.csv
-    │       ├── ...
     │       └── (name)_(key)_(regions).STATS.csv
     ├── data
     │   └── data.LOCATIONS
-    │       ├── (name)_(key)_(seed).LOCATIONS.tar.xz
-    │       ├── (name)_(key)_(seed).LOCATIONS.tar.xz
-    │       ├── ...
     │       └── (name)_(key)_(seed).LOCATIONS.tar.xz
     └── groups
         └── groups.SHAPES
-            ├── (name).feature_correlations.(key).json
-            ├── (name).feature_correlations.(key).json
-            ├── ...
-            ├── (name).feature_correlations.(key).json
-            ├── (name).feature_correlations.(key).(mode).(property).csv
-            ├── (name).feature_correlations.(key).(mode).(property).csv
-            ├── ...
-            ├── (name).feature_correlations.(key).(mode).(property).csv
-            ├── (name).feature_distributions.(feature).json
-            ├── (name).feature_distributions.(feature).json
-            ├── ...
+            ├── (name).feature_correlations.(key).(region).csv
+            ├── (name).feature_correlations.(key).(mode).(property).(region).csv
             ├── (name).feature_distributions.(feature).json
             ├── (name).mode_correlations.csv
-            ├── (name).population_counts.csv
+            ├── (name).population_counts.(tick).csv
             ├── (name).population_stats.json
             ├── (name).shape_average.(key).(projection).json
-            ├── (name).shape_average.(key).(projection).json
-            ├── ...
-            ├── (name).shape_average.(key).(projection).json
             ├── (name).shape_errors.json
-            ├── (name).shape_modes.(key).(region).(mode).(projection).json
-            ├── (name).shape_modes.(key).(region).(mode).(projection).json
-            ├── ...
             ├── (name).shape_modes.(key).(region).(mode).(projection).json
             ├── (name).shape_samples.json
             └── (name).variance_explained.csv
@@ -65,6 +38,7 @@ loaded into alternative tools.
 """
 
 from dataclasses import dataclass, field
+from datetime import timedelta
 from typing import Optional, Union
 
 import numpy as np
@@ -82,12 +56,19 @@ from io_collection.keys import make_key
 from io_collection.load import load_dataframe, load_pickle, load_tar
 from io_collection.save import save_dataframe, save_json
 from prefect import flow, get_run_logger
+from prefect.tasks import task_input_hash
 from scipy.spatial import KDTree
 from scipy.stats import pearsonr
 
 from cell_abm_pipeline.flows.analyze_cell_shapes import PCA_COMPONENTS
 from cell_abm_pipeline.flows.calculate_coefficients import COEFFICIENT_ORDER
 from cell_abm_pipeline.tasks import bin_to_hex, calculate_data_bins
+
+OPTIONS = {
+    "cache_result_in_memory": False,
+    "cache_key_fn": task_input_hash,
+    "cache_expiration": timedelta(days=1),
+}
 
 GROUPS: list[str] = [
     "feature_correlations",
@@ -459,27 +440,28 @@ def run_flow_group_feature_correlations(
 
     for key in keys:
         feature_key = f"{series.name}.feature_correlations.{key}"
-        correlations: list[dict[str, Union[str, float]]] = []
 
         # Load model.
         model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
-        model = load_pickle(context.working_location, model_key)
+        model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)
 
         # Load dataframe.
         dataframe_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
-        data = load_dataframe(context.working_location, dataframe_key)
+        data = load_dataframe.with_options(**OPTIONS)(context.working_location, dataframe_key)
 
         # Transform data into shape mode space.
         columns = data.filter(like="shcoeffs").columns
         transform = model.transform(data[columns].values)
 
-        for component in range(parameters.components):
-            mode_key = f"PC{component + 1}"
-            component_data = transform[:, component]
+        for region in parameters.regions:
+            correlations: list[dict[str, Union[str, float]]] = []
 
-            for prop in parameters.properties:
-                for region in parameters.regions:
-                    prop_key = f"{prop.upper()}.{region}"
+            for component in range(parameters.components):
+                mode_key = f"PC{component + 1}"
+                component_data = transform[:, component]
+
+                for prop in parameters.properties:
+                    prop_key = prop.upper()
                     prop_data = data[f"{prop}.{region}".replace(".DEFAULT", "")]
 
                     slope, intercept = np.polyfit(component_data, prop_data, 1)
@@ -488,7 +470,6 @@ def run_flow_group_feature_correlations(
                         {
                             "mode": mode_key,
                             "property": prop.upper(),
-                            "region": region,
                             "correlation": pearsonr(prop_data, component_data).statistic,
                             "correlation_symmetric": pearsonr(
                                 prop_data, abs(component_data)
@@ -517,17 +498,17 @@ def run_flow_group_feature_correlations(
 
                     save_dataframe(
                         context.working_location,
-                        make_key(group_key, f"{feature_key}.{mode_key}.{prop_key}.csv"),
+                        make_key(group_key, f"{feature_key}.{mode_key}.{prop_key}.{region}.csv"),
                         bins_df,
                         index=False,
                     )
 
-        save_dataframe(
-            context.working_location,
-            make_key(group_key, f"{series.name}.feature_correlations.{key}.csv"),
-            pd.DataFrame(correlations),
-            index=False,
-        )
+            save_dataframe(
+                context.working_location,
+                make_key(group_key, f"{feature_key}.{region}.csv"),
+                pd.DataFrame(correlations),
+                index=False,
+            )
 
 
 @flow(name="group-cell-shapes_group-feature-distributions")
@@ -546,8 +527,12 @@ def run_flow_group_feature_distributions(
     ]
 
     if parameters.reference_model is not None and parameters.reference_data is not None:
-        ref_data = load_dataframe(context.working_location, parameters.reference_data, nrows=1)
-        ref_model = load_pickle(context.working_location, parameters.reference_model)
+        ref_data = load_dataframe.with_options(**OPTIONS)(
+            context.working_location, parameters.reference_data, nrows=1
+        )
+        ref_model = load_pickle.with_options(**OPTIONS)(
+            context.working_location, parameters.reference_model
+        )
         features = features + [f"PC{component + 1}" for component in range(parameters.components)]
 
     distribution_bins: dict[str, dict] = {feature: {} for feature in features}
@@ -557,7 +542,7 @@ def run_flow_group_feature_distributions(
     for key in keys:
         # Load dataframe.
         dataframe_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
-        data = load_dataframe(context.working_location, dataframe_key)
+        data = load_dataframe.with_options(**OPTIONS)(context.working_location, dataframe_key)
 
         # Calculate shape modes, if model is given.
         if parameters.reference_model is not None:
@@ -605,17 +590,21 @@ def run_flow_group_mode_correlations(
 
     for key in keys:
         model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
-        model = load_pickle(context.working_location, model_key)
+        model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)
         all_models[key] = model
 
         data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
-        data = load_dataframe(context.working_location, data_key)
+        data = load_dataframe.with_options(**OPTIONS)(context.working_location, data_key)
         all_data[key] = data
 
     if parameters.reference_model is not None and parameters.reference_data is not None:
         keys.append("reference")
-        all_models["reference"] = load_pickle(context.working_location, parameters.reference_model)
-        all_data["reference"] = load_dataframe(context.working_location, parameters.reference_data)
+        all_models["reference"] = load_pickle.with_options(**OPTIONS)(
+            context.working_location, parameters.reference_model
+        )
+        all_data["reference"] = load_dataframe.with_options(**OPTIONS)(
+            context.working_location, parameters.reference_data
+        )
 
     correlations: list[dict[str, Union[str, int, float]]] = []
 
@@ -690,7 +679,9 @@ def run_flow_group_population_counts(
 
     for key in keys:
         data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
-        data = load_dataframe(context.working_location, data_key, usecols=["TICK", "SEED"])
+        data = load_dataframe.with_options(**OPTIONS)(
+            context.working_location, data_key, usecols=["TICK", "SEED"]
+        )
         groups = data[data["TICK"] == parameters.tick].groupby("SEED")
 
         for seed in parameters.seeds:
@@ -707,7 +698,7 @@ def run_flow_group_population_counts(
 
     save_dataframe(
         context.working_location,
-        make_key(group_key, f"{series.name}.population_counts.csv"),
+        make_key(group_key, f"{series.name}.population_counts.{parameters.tick:06d}.csv"),
         pd.DataFrame(counts),
         index=False,
     )
@@ -728,7 +719,7 @@ def run_flow_group_population_stats(
 
     for key in keys:
         data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.STATS.csv")
-        data = load_dataframe(context.working_location, data_key)
+        data = load_dataframe.with_options(**OPTIONS)(context.working_location, data_key)
 
         for feature, group in data[~data["SAMPLE"].isna()].groupby("FEATURE"):
             feature_name = feature.replace("_", "")
@@ -770,11 +761,11 @@ def run_flow_group_shape_average(
     for key in keys:
         # Load model.
         model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
-        model = load_pickle(context.working_location, model_key)
+        model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)
 
         # Load dataframe.
         dataframe_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
-        data = load_dataframe(context.working_location, dataframe_key)
+        data = load_dataframe.with_options(**OPTIONS)(context.working_location, dataframe_key)
 
         # Transform data into shape mode space.
         columns = data.filter(like="shcoeffs").columns
@@ -843,7 +834,7 @@ def run_flow_group_shape_errors(
 
     for key in keys:
         data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
-        data = load_dataframe(context.working_location, data_key)
+        data = load_dataframe.with_options(**OPTIONS)(context.working_location, data_key)
 
         for region in parameters.regions:
             errors[key][region] = {
@@ -879,11 +870,11 @@ def run_flow_group_shape_modes(
     for key in keys:
         # Load model.
         model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
-        model = load_pickle(context.working_location, model_key)
+        model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)
 
         # Load dataframe.
         dataframe_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
-        data = load_dataframe(context.working_location, dataframe_key)
+        data = load_dataframe.with_options(**OPTIONS)(context.working_location, dataframe_key)
 
         # Extract shape modes.
         shape_modes = extract_shape_modes(
@@ -945,7 +936,7 @@ def run_flow_group_shape_samples(
         # Load location data.
         series_key = f"{series.name}_{key}_{parameters.seed:04d}"
         tar_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
-        tar = load_tar(context.working_location, tar_key)
+        tar = load_tar.with_options(**OPTIONS)(context.working_location, tar_key)
         locations = extract_tick_json(tar, series_key, parameters.tick, "LOCATIONS")
 
         for index in parameters.indices:
@@ -986,7 +977,7 @@ def run_flow_group_variance_explained(
 
     for key in keys:
         model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
-        model = load_pickle(context.working_location, model_key)
+        model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)
 
         variance.append(
             pd.DataFrame(

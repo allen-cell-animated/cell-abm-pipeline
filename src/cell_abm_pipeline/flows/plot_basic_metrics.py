@@ -338,12 +338,20 @@ def run_flow_plot_metrics_individuals(
                 make_key(group_key, f"{series.name}.metrics_individuals.{metric_key}.json"),
             )
 
-            group_flat = [line for item in group for line in item]
+            group_flat = [
+                {
+                    "x": line["time"],
+                    "y": line["value"],
+                    "color": parameters.phase_colors[line["phase"]],
+                }
+                for item in group
+                for line in item
+            ]
 
             save_figure(
                 context.working_location,
                 make_key(plot_key, f"{series.name}.metrics_individuals.{metric_key}.png"),
-                make_line_figure(group_flat, parameters.phase_colors, "phase"),
+                make_line_figure(group_flat),
             )
 
 
@@ -443,7 +451,15 @@ def run_flow_plot_population_counts(
         make_key(group_key, f"{series.name}.population_counts.{parameters.tick:06d}.csv"),
     )
 
-    key_group = group[group["key"].isin(keys)]
+    key_group = {
+        key: {
+            "COUNT": {
+                "mean": group[group["key"] == key]["count"].mean(),
+                "std": group[group["key"] == key]["count"].std(ddof=1),
+            }
+        }
+        for key in keys
+    }
 
     save_figure(
         context.working_location,
