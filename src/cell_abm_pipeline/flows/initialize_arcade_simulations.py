@@ -239,6 +239,7 @@ def run_flow_convert_to_arcade(
 
         margins = fov["margins"] if "margins" in fov else parameters.margins
         merged_samples = merge_region_samples(samples, margins)
+        key = f"{series.name}_{fov['key']}.X{margins[0]:03d}.Y{margins[1]:03d}.Z{margins[2]:03d}"
 
         cells = convert_to_cells_file(
             merged_samples,
@@ -249,15 +250,15 @@ def run_flow_convert_to_arcade(
             parameters.critical_heights,
             parameters.state_thresholds,
         )
-        cells_key = make_key(inits_key, f"{series.name}_{fov['key']}.CELLS.json")
+        cells_key = make_key(inits_key, f"{key}.CELLS.json")
         save_json(context.working_location, cells_key, cells)
 
         locations = convert_to_locations_file(merged_samples)
-        locations_key = make_key(inits_key, f"{series.name}_{fov['key']}.LOCATIONS.json")
+        locations_key = make_key(inits_key, f"{key}.LOCATIONS.json")
         save_json(context.working_location, locations_key, locations)
 
         setup = generate_setup_file(merged_samples, margins, parameters.potts_terms)
-        setup_key = make_key(inits_key, f"{series.name}_{fov['key']}.xml")
+        setup_key = make_key(inits_key, f"{key}.xml")
         save_text(context.working_location, setup_key, setup)
 
 
