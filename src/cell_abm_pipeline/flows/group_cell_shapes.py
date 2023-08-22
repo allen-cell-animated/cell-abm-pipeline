@@ -722,9 +722,7 @@ def run_flow_group_population_stats(
         data = load_dataframe.with_options(**OPTIONS)(context.working_location, data_key)
 
         for feature, group in data[~data["SAMPLE"].isna()].groupby("FEATURE"):
-            feature_name = feature.replace("_", "")
-            feature_name = "volume.DEFAULT" if feature == "volume" else feature_name
-            feature_name = "height.DEFAULT" if feature == "height" else feature_name
+            feature_name = f"{feature}.DEFAULT" if feature in ["VOLUME", "HEIGHT"] else feature
 
             stats[key][feature_name.upper()] = {
                 "mean": group["KS_STATISTIC"].mean(),
@@ -936,7 +934,7 @@ def run_flow_group_shape_samples(
         # Load location data.
         series_key = f"{series.name}_{key}_{parameters.seed:04d}"
         tar_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
-        tar = load_tar.with_options(**OPTIONS)(context.working_location, tar_key)
+        tar = load_tar(context.working_location, tar_key)
         locations = extract_tick_json(tar, series_key, parameters.tick, "LOCATIONS")
 
         for index in parameters.indices:

@@ -3,6 +3,7 @@ Workflow for analyzing cell shapes.
 """
 
 from dataclasses import dataclass, field
+from datetime import timedelta
 from typing import Optional
 
 import numpy as np
@@ -13,6 +14,13 @@ from io_collection.keys import check_key, make_key
 from io_collection.load import load_dataframe, load_pickle
 from io_collection.save import save_dataframe, save_pickle
 from prefect import flow
+from prefect.tasks import task_input_hash
+
+PREFECT_TASK_OPTIONS = {
+    "cache_result_in_memory": False,
+    "cache_key_fn": task_input_hash,
+    "cache_expiration": timedelta(days=1),
+}
 
 PCA_COMPONENTS = 8
 
@@ -238,7 +246,9 @@ def run_flow_fit_model(
         if check_key(context.working_location, model_key):
             continue
 
-        data = load_dataframe(context.working_location, data_key)
+        data = load_dataframe.with_options(**PREFECT_TASK_OPTIONS)(
+            context.working_location, data_key
+        )
 
         coeffs = data.filter(like="shcoeffs").values
         ordering = data["NUM_VOXELS"].values
@@ -261,8 +271,12 @@ def run_flow_analyze_stats(
     if parameters.reference is None:
         return
 
-    ref_data = load_dataframe(context.working_location, parameters.reference["data"])
-    ref_model = load_pickle(context.working_location, parameters.reference["model"])
+    ref_data = load_dataframe.with_options(**PREFECT_TASK_OPTIONS)(
+        context.working_location, parameters.reference["data"]
+    )
+    ref_model = load_pickle.with_options(**PREFECT_TASK_OPTIONS)(
+        context.working_location, parameters.reference["model"]
+    )
 
     for key in keys:
         stats_key = make_key(stats_path_key, f"{series.name}_{key}_{region_key}.STATS.csv")
@@ -271,7 +285,9 @@ def run_flow_analyze_stats(
             continue
 
         data_key = make_key(pca_path_key, f"{series.name}_{key}_{region_key}.PCA.csv")
-        data = load_dataframe(context.working_location, data_key)
+        data = load_dataframe.with_options(**PREFECT_TASK_OPTIONS)(
+            context.working_location, data_key
+        )
         data = data[data["SEED"].isin(series.seeds)]
 
         size_stats = calculate_size_stats(data, ref_data, parameters.regions, include_ticks=True)
