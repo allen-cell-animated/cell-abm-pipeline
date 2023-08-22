@@ -1,10 +1,11 @@
 # Cell ABM Pipeline
 
-[![Build Status](https://github.com/allen-cell-animated/cell-abm-pipeline/workflows/build/badge.svg)](https://github.com/allen-cell-animated/cell-abm-pipeline/actions?query=workflow%3Abuild)
-[![Codecov](https://img.shields.io/codecov/c/gh/allen-cell-animated/cell-abm-pipeline?token=1S5ZKVET7T)](https://codecov.io/gh/allen-cell-animated/cell-abm-pipeline)
-[![Lint Status](https://github.com/allen-cell-animated/cell-abm-pipeline/workflows/lint/badge.svg)](https://github.com/allen-cell-animated/cell-abm-pipeline/actions?query=workflow%3Alint)
-[![Documentation](https://github.com/allen-cell-animated/cell-abm-pipeline/workflows/documentation/badge.svg)](https://allen-cell-animated.github.io/cell-abm-pipeline/)
-[![Code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Build Status](https://allen-cell-animated.github.io/cell-abm-pipeline/_badges/build.svg)](https://github.com/allen-cell-animated/cell-abm-pipeline/actions?query=workflow%3Abuild)
+[![Lint Status](https://allen-cell-animated.github.io/cell-abm-pipeline/_badges/lint.svg)](https://github.com/allen-cell-animated/cell-abm-pipeline/actions?query=workflow%3Alint)
+[![Documentation](https://allen-cell-animated.github.io/cell-abm-pipeline/_badges/documentation.svg)](https://allen-cell-animated.github.io/cell-abm-pipeline/)
+[![Coverage](https://allen-cell-animated.github.io/cell-abm-pipeline/_badges/coverage.svg)](https://allen-cell-animated.github.io/cell-abm-pipeline/_coverage/)
+[![Code style](https://allen-cell-animated.github.io/cell-abm-pipeline/_badges/style.svg)](https://github.com/psf/black)
+[![License](https://allen-cell-animated.github.io/cell-abm-pipeline/_badges/license.svg)](https://github.com/allen-cell-animated/cell-abm-pipeline/blob/main/LICENSE)
 
 ## Installation
 
