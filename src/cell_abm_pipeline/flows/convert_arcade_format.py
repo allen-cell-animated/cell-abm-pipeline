@@ -1,5 +1,37 @@
 """
 Workflow for converting ARCADE simulations to other formats.
+
+Working location structure:
+
+.. code-block:: bash
+
+    (name)
+    ├── converted
+    │   ├── converted.COLORIZER
+    │   │   └── (name)_(key)_(seed)
+    │   │       ├── feature_(index).json
+    │   │       ├── frame_(index).png
+    │   │       ├── manifest.json
+    │   │       ├── outliers.json
+    │   │       ├── times.json
+    │   │       └── tracks.json
+    │   ├── converted.IMAGE
+    │   │   └── (name)_(key)_(seed)_(chunk)_(chunk).IMAGE.ome.tiff
+    │   ├── converted.MESH
+    │   │   └── (name)_(key)_(seed)_(tick)_(id)_(region).MESH.obj
+    │   └── converted.SIMULARIUM
+    │       └── (name)_(key)_(seed).simularium
+    ├── data
+    │   ├── data.CELLS
+    │   │   └── (name)_(key)_(seed).CELLS.tar.xz
+    │   └── data.LOCATIONS
+    │       └── (name)_(key)_(seed).LOCATIONS.tar.xz
+    └── results
+        └── (name)_(key)_(seed).csv
+
+Different formats use inputs from the **results**, **data/data.CELLS**, and
+**data/data.LOCATIONS** directories.
+Formatted data is saved to the **converted** directory.
 """
 
 from dataclasses import dataclass, field
@@ -20,91 +52,189 @@ from cell_abm_pipeline.flows.plot_basic_metrics import PHASE_COLORS
 
 FORMATS: list[str] = [
     "colorizer",
-    "image",
-    "mesh",
+    "images",
+    "meshes",
     "simularium",
 ]
 
-FEATURES: list[str] = [
+COLORIZER_FEATURES: list[str] = [
     "volume",
     "height",
 ]
 
 
 @dataclass
-class ParametersConfig:
-    """Parameter configuration for convert arcade format flow."""
+class ParametersConfigColorizer:
+    """Parameter configuration for convert ARCADE format flow - colorizer."""
 
-    box: tuple[int, int, int] = (1, 1, 1)
+    seeds: list[int] = field(default_factory=lambda: [0])
+    """Simulation seeds to use for converting to colorizer."""
 
-    frame_spec: tuple[int, int, int] = (0, 1153, 48)
-
-    chunk_size: int = 500
-
-    formats: list[str] = field(default_factory=lambda: FORMATS)
+    frame_spec: tuple[int, int, int] = (0, 1153, 1152)
+    """Specification for simulation ticks to use for converting to colorizer."""
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
 
-    binary: bool = False
+    box: tuple[int, int, int] = field(default_factory=lambda: (1, 1, 1))
+    """Size of bounding box."""
 
-    separate: bool = False
+    chunk_size: int = 500
+    """Image chunk size."""
+
+    features: list[str] = field(default_factory=lambda: COLORIZER_FEATURES)
+    """List of colorizer features."""
 
     ds: float = 1.0
+    """Spatial scaling in units/um."""
 
     dt: float = 1.0
+    """Temporal scaling in hours/tick."""
 
-    phase_colors: dict = field(default_factory=lambda: PHASE_COLORS)
+
+@dataclass
+class ParametersConfigImages:
+    """Parameter configuration for convert ARCADE format flow - images."""
+
+    seeds: list[int] = field(default_factory=lambda: [0])
+    """Simulation seeds to use for converting to images."""
+
+    frame_spec: tuple[int, int, int] = (0, 1153, 1152)
+    """Specification for simulation ticks to use for converting to images."""
+
+    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
+
+    box: tuple[int, int, int] = field(default_factory=lambda: (1, 1, 1))
+    """Size of bounding box."""
+
+    chunk_size: int = 500
+    """Image chunk size."""
+
+    binary: bool = False
+    """True if generate binary images, False otherwise."""
+
+    separate: bool = False
+    """True to generate separate images for each tick, False otherwise."""
+
+
+@dataclass
+class ParametersConfigMeshes:
+    """Parameter configuration for convert ARCADE format flow - meshes."""
+
+    seeds: list[int] = field(default_factory=lambda: [0])
+    """Simulation seeds to use for converting to meshes."""
+
+    frame_spec: tuple[int, int, int] = (0, 1153, 1152)
+    """Specification for simulation ticks to use for converting to meshes."""
+
+    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
+
+
+@dataclass
+class ParametersConfigSimularium:
+    """Parameter configuration for convert ARCADE format flow - simularium."""
+
+    seeds: list[int] = field(default_factory=lambda: [0])
+    """Simulation seeds to use for converting to simularium."""
+
+    frame_spec: tuple[int, int, int] = (0, 1153, 1152)
+    """Specification for simulation ticks to use for converting to simularium."""
+
+    box: tuple[int, int, int] = field(default_factory=lambda: (1, 1, 1))
+    """Size of bounding box."""
+
+    ds: float = 1.0
+    """Spatial scaling in units/um."""
+
+    dt: float = 1.0
+    """Temporal scaling in hours/tick."""
+
+    phase_colors: dict[str, str] = field(default_factory=lambda: PHASE_COLORS)
+    """Colors for each cell cycle phase."""
 
     resolution: Optional[int] = None
+    """Number of voxels per sphere (None indicates single sphere per cell)."""
 
-    features: list[str] = field(default_factory=lambda: FEATURES)
+
+@dataclass
+class ParametersConfig:
+    """Parameter configuration for convert ARCADE format flow."""
+
+    formats: list[str] = field(default_factory=lambda: FORMATS)
+    """List of convert formats."""
+
+    colorizer: ParametersConfigColorizer = ParametersConfigColorizer()
+    """Parameters for colorizer subflow."""
+
+    images: ParametersConfigImages = ParametersConfigImages()
+    """Parameters for images subflow."""
+
+    meshes: ParametersConfigMeshes = ParametersConfigMeshes()
+    """Parameters for meshes subflow."""
+
+    simularium: ParametersConfigSimularium = ParametersConfigSimularium()
+    """Parameters for simularium subflow."""
 
 
 @dataclass
 class ContextConfig:
-    """Context configuration for convert arcade format flow."""
+    """Context configuration for convert ARCADE format flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
 
 @dataclass
 class SeriesConfig:
-    """Series configuration for convert arcade format flow."""
+    """Series configuration for convert ARCADE format flow."""
 
     name: str
-
-    seeds: list[int]
+    """Name of the simulation series."""
 
     conditions: list[dict]
+    """List of series condition dictionaries (must include unique condition "key")."""
 
 
 @flow(name="convert-arcade-format")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    """Main convert arcade format flow."""
+    """
+    Main convert ARCADE format flow.
+
+    Calls the following subflows, if the format is specified:
+
+    - :py:func:`run_flow_convert_to_colorizer`
+    - :py:func:`run_flow_convert_to_images`
+    - :py:func:`run_flow_convert_to_meshes`
+    - :py:func:`run_flow_convert_to_simularium`
+    """
 
     if "colorizer" in parameters.formats:
-        run_flow_convert_to_colorizer(context, series, parameters)
+        run_flow_convert_to_colorizer(context, series, parameters.colorizer)
 
-    if "image" in parameters.formats:
-        run_flow_convert_to_images(context, series, parameters)
+    if "images" in parameters.formats:
+        run_flow_convert_to_images(context, series, parameters.images)
 
-    if "mesh" in parameters.formats:
-        run_flow_convert_to_meshes(context, series, parameters)
+    if "meshes" in parameters.formats:
+        run_flow_convert_to_meshes(context, series, parameters.meshes)
 
     if "simularium" in parameters.formats:
-        run_flow_convert_to_simularium(context, series, parameters)
+        run_flow_convert_to_simularium(context, series, parameters.simularium)
 
 
 @flow(name="convert-arcade-format_convert-to-colorizer")
 def run_flow_convert_to_colorizer(
-    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigColorizer
 ) -> None:
+    """Convert ARCADE format subflow for colorizer."""
+
     data_key = make_key(series.name, "data", "data.LOCATIONS")
     converted_key = make_key(series.name, "converted", "converted.COLORIZER")
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
-        for seed in series.seeds:
+        for seed in parameters.seeds:
             series_key = f"{series.name}_{key}_{seed:04d}"
 
             tar_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
@@ -157,15 +287,18 @@ def run_flow_convert_to_colorizer(
 
 @flow(name="convert-arcade-format_convert-to-images")
 def run_flow_convert_to_images(
-    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigImages
 ) -> None:
+    """Convert ARCADE format subflow for images."""
+
     data_key = make_key(series.name, "data", "data.LOCATIONS")
     converted_key = make_key(series.name, "converted", "converted.IMAGE")
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
-        for seed in series.seeds:
+        for seed in parameters.seeds:
             series_key = f"{series.name}_{key}_{seed:04d}"
+
             tar_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
             tar = load_tar(context.working_location, tar_key)
 
@@ -194,42 +327,48 @@ def run_flow_convert_to_images(
 
 @flow(name="convert-arcade-format_convert-to-meshes")
 def run_flow_convert_to_meshes(
-    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigMeshes
 ) -> None:
+    """Convert ARCADE format subflow for meshes."""
+
     data_key = make_key(series.name, "data", "data.LOCATIONS")
     converted_key = make_key(series.name, "converted", "converted.MESH")
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
-        for seed in series.seeds:
+        for seed in parameters.seeds:
             series_key = f"{series.name}_{key}_{seed:04d}"
+
             tar_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
             tar = load_tar(context.working_location, tar_key)
 
             meshes = convert_to_meshes(series_key, tar, parameters.frame_spec, parameters.regions)
 
             for frame, cell_id, region, mesh in meshes:
-                region_key = f"_{region}" if region != "DEFAULT" else ""
                 mesh_key = make_key(
-                    converted_key, f"{series_key}_{frame:06d}_{cell_id:02d}{region_key}.MESH.obj"
+                    converted_key, f"{series_key}_{frame:06d}_{cell_id:02d}_{region}.MESH.obj"
                 )
                 save_text(context.working_location, mesh_key, mesh)
 
 
 @flow(name="convert-arcade-format_convert-to-simularium")
 def run_flow_convert_to_simularium(
-    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigSimularium
 ) -> None:
+    """Convert ARCADE format subflow for simularium."""
+
     cells_data_key = make_key(series.name, "data", "data.CELLS")
     locs_data_key = make_key(series.name, "data", "data.LOCATIONS")
     converted_key = make_key(series.name, "converted", "converted.SIMULARIUM")
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
-        for seed in series.seeds:
+        for seed in parameters.seeds:
             series_key = f"{series.name}_{key}_{seed:04d}"
+
             cells_tar_key = make_key(cells_data_key, f"{series_key}.CELLS.tar.xz")
             cells_tar = load_tar(context.working_location, cells_tar_key)
+
             locs_tar_key = make_key(locs_data_key, f"{series_key}.LOCATIONS.tar.xz")
             locs_tar = load_tar(context.working_location, locs_tar_key)
 
@@ -244,5 +383,6 @@ def run_flow_convert_to_simularium(
                 parameters.phase_colors,
                 parameters.resolution,
             )
+
             simularium_key = make_key(converted_key, f"{series_key}.simularium")
             save_text(context.working_location, simularium_key, simularium)
