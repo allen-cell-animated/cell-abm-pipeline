@@ -34,7 +34,7 @@ class ParametersConfig:
 
     image: str
 
-    frames: list[int]
+    ticks: list[int]
 
     calculate_neighbors: CalculateNeighborsParametersConfig
 
@@ -101,27 +101,27 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
             neighbor_key = make_key(analysis_key, f"{series_key}.NEIGHBORS.csv")
             neighbor_key_exists = check_key(context.working_location, neighbor_key)
 
-            existing_frames = []
+            existing_ticks = []
             if neighbor_key_exists:
                 existing_neighbors = load_dataframe(
                     context.working_location, neighbor_key, usecols=["TICK"]
                 )
-                existing_frames = list(existing_neighbors["TICK"].unique())
+                existing_ticks = list(existing_neighbors["TICK"].unique())
 
-            for frame in parameters.frames:
-                if frame in existing_frames:
+            for tick in parameters.ticks:
+                if tick in existing_ticks:
                     continue
 
-                frame_key = make_key(analysis_key, f"{series_key}_{frame:06d}.NEIGHBORS.csv")
-                frame_key_exists = check_key(context.working_location, frame_key)
+                tick_key = make_key(analysis_key, f"{series_key}_{tick:06d}.NEIGHBORS.csv")
+                tick_key_exists = check_key(context.working_location, tick_key)
 
-                if frame_key_exists:
+                if tick_key_exists:
                     continue
 
                 parameters_config = copy.deepcopy(parameters.calculate_neighbors)
                 parameters_config.key = parameters_config.key % condition["key"]
                 parameters_config.seed = seed
-                parameters_config.frame = frame
+                parameters_config.tick = tick
 
                 config = {
                     "context": context_config,

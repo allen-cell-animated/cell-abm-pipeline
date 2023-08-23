@@ -31,7 +31,7 @@ class ParametersConfig:
 
     seed: int
 
-    frame: int
+    tick: int
 
     properties: list[str] = field(default_factory=lambda: SHAPE_PROPERTIES)
 
@@ -66,7 +66,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     locations_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
     locations_tar = load_tar(context.working_location, locations_key)
-    locations_json = extract_tick_json(locations_tar, series_key, parameters.frame, "LOCATIONS")
+    locations_json = extract_tick_json(locations_tar, series_key, parameters.tick, "LOCATIONS")
 
     all_props = []
 
@@ -91,7 +91,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         props["KEY"] = parameters.key
         props["ID"] = location["id"]
         props["SEED"] = parameters.seed
-        props["TICK"] = parameters.frame
+        props["TICK"] = parameters.tick
 
         all_props.append(props)
 
@@ -107,5 +107,5 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     region_key = f"_{parameters.region}" if parameters.region is not None else ""
     suffix = f"{region_key}{offset_key}{chunk_key}"
 
-    props_key = make_key(analysis_key, f"{series_key}_{parameters.frame:06d}{suffix}.PROPS.csv")
+    props_key = make_key(analysis_key, f"{series_key}_{parameters.tick:06d}{suffix}.PROPS.csv")
     save_dataframe(context.working_location, props_key, props_dataframe, index=False)

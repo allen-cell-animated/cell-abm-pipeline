@@ -36,7 +36,7 @@ class ParametersConfig:
 
     image: str
 
-    frames: list[int]
+    ticks: list[int]
 
     calculate_properties: CalculatePropertiesParametersConfig
 
@@ -111,31 +111,31 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
             prop_key = make_key(analysis_key, f"{series_key}{region}.PROPS.csv")
             prop_key_exists = check_key(context.working_location, prop_key)
 
-            existing_frames = []
+            existing_ticks = []
             if prop_key_exists:
                 existing_props = load_dataframe(
                     context.working_location, prop_key, usecols=["TICK"]
                 )
-                existing_frames = list(existing_props["TICK"].unique())
+                existing_ticks = list(existing_props["TICK"].unique())
 
-            for frame in parameters.frames:
-                if frame in existing_frames:
+            for tick in parameters.ticks:
+                if tick in existing_ticks:
                     continue
 
-                frame_key = make_key(analysis_key, f"{series_key}_{frame:06d}{region}.PROPS.csv")
-                frame_key_exists = check_key(context.working_location, frame_key)
+                tick_key = make_key(analysis_key, f"{series_key}_{tick:06d}{region}.PROPS.csv")
+                tick_key_exists = check_key(context.working_location, tick_key)
 
-                if frame_key_exists:
+                if tick_key_exists:
                     continue
 
-                total = results[results["TICK"] == frame].shape[0]
+                total = results[results["TICK"] == tick].shape[0]
                 chunk = parameters.calculate_properties.chunk
                 offsets = list(range(0, total, chunk)) if chunk is not None else [0]
                 completed_keys = []
 
                 for offset in offsets:
                     if chunk is not None:
-                        offset_key = frame_key.replace(
+                        offset_key = tick_key.replace(
                             ".PROPS.csv", f".{offset:04d}.{chunk:04d}.PROPS.csv"
                         )
                         offset_key_exists = check_key(context.working_location, offset_key)
@@ -147,7 +147,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
                     parameters_config = copy.deepcopy(parameters.calculate_properties)
                     parameters_config.key = parameters_config.key % condition["key"]
                     parameters_config.seed = seed
-                    parameters_config.frame = frame
+                    parameters_config.tick = tick
                     parameters_config.offset = offset
 
                     config = {
@@ -174,13 +174,13 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
                         print(" ".join(calculate_properties_command))
 
                 if len(completed_keys) == len(offsets) and chunk is not None:
-                    frame_props = []
+                    tick_props = []
 
                     for key in completed_keys:
-                        frame_props.append(load_dataframe(context.working_location, key))
+                        tick_props.append(load_dataframe(context.working_location, key))
 
-                    prop_dataframe = pd.concat(frame_props, ignore_index=True)
-                    save_dataframe(context.working_location, frame_key, prop_dataframe, index=False)
+                    prop_dataframe = pd.concat(tick_props, ignore_index=True)
+                    save_dataframe(context.working_location, tick_key, prop_dataframe, index=False)
 
                     for key in completed_keys:
                         remove_key(context.working_location, key)

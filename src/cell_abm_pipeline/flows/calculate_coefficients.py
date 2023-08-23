@@ -26,7 +26,7 @@ class ParametersConfig:
 
     scale: int
 
-    frame: int
+    tick: int
 
     region: Optional[str] = None
 
@@ -62,7 +62,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     locations_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
     locations_tar = load_tar(context.working_location, locations_key)
-    locations_json = extract_tick_json(locations_tar, series_key, parameters.frame, "LOCATIONS")
+    locations_json = extract_tick_json(locations_tar, series_key, parameters.tick, "LOCATIONS")
 
     all_coeffs = []
 
@@ -97,7 +97,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         coeffs["KEY"] = parameters.key
         coeffs["ID"] = location["id"]
         coeffs["SEED"] = parameters.seed
-        coeffs["TICK"] = parameters.frame
+        coeffs["TICK"] = parameters.tick
 
         all_coeffs.append(coeffs)
 
@@ -113,5 +113,5 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     region_key = f"_{parameters.region}" if parameters.region is not None else ""
     suffix = f"{region_key}{offset_key}{chunk_key}"
 
-    coeffs_key = make_key(analysis_key, f"{series_key}_{parameters.frame:06d}{suffix}.COEFFS.csv")
+    coeffs_key = make_key(analysis_key, f"{series_key}_{parameters.tick:06d}{suffix}.COEFFS.csv")
     save_dataframe(context.working_location, coeffs_key, coeffs_dataframe, index=False)

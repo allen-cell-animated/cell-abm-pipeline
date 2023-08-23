@@ -21,7 +21,7 @@ class ParametersConfig:
 
     seed: int
 
-    frame: int
+    tick: int
 
 
 @dataclass
@@ -48,7 +48,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     locations_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
     locations_tar = load_tar(context.working_location, locations_key)
-    locations_json = extract_tick_json(locations_tar, series_key, parameters.frame, "LOCATIONS")
+    locations_json = extract_tick_json(locations_tar, series_key, parameters.tick, "LOCATIONS")
 
     array = make_voxels_array(locations_json)
 
@@ -56,7 +56,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     depth_map = get_depth_map(array, neighbors_map)
     center_map = {location["id"]: location["center"] for location in locations_json}
 
-    attributes = {"KEY": parameters.key, "SEED": parameters.seed, "TICK": parameters.frame}
+    attributes = {"KEY": parameters.key, "SEED": parameters.seed, "TICK": parameters.tick}
     all_neighbors = []
 
     for voxel_id, voxel_neighbors in neighbors_map.items():
@@ -73,5 +73,5 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         all_neighbors.append(voxel_neighbors)
 
     neighbors_dataframe = pd.DataFrame(all_neighbors)
-    neighbors_key = make_key(analysis_key, f"{series_key}_{parameters.frame:06d}.NEIGHBORS.csv")
+    neighbors_key = make_key(analysis_key, f"{series_key}_{parameters.tick:06d}.NEIGHBORS.csv")
     save_dataframe(context.working_location, neighbors_key, neighbors_dataframe, index=False)
