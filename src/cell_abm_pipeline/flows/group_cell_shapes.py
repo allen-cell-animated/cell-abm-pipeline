@@ -67,7 +67,7 @@ from cell_abm_pipeline.tasks import bin_to_hex, calculate_data_bins
 OPTIONS = {
     "cache_result_in_memory": False,
     "cache_key_fn": task_input_hash,
-    "cache_expiration": timedelta(days=1),
+    "cache_expiration": timedelta(hours=12),
 }
 
 GROUPS: list[str] = [

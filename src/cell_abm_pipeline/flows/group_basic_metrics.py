@@ -43,7 +43,7 @@ from cell_abm_pipeline.tasks import bin_to_hex, calculate_category_durations, ca
 OPTIONS = {
     "cache_result_in_memory": False,
     "cache_key_fn": task_input_hash,
-    "cache_expiration": timedelta(days=1),
+    "cache_expiration": timedelta(hours=12),
 }
 
 GROUPS: list[str] = [
@@ -438,6 +438,24 @@ def run_flow_group_metrics_distributions(
 
             bounds = (parameters.bounds[metric][0], parameters.bounds[metric][1])
             bandwidth = parameters.bandwidth[metric]
+
+            if values.max() > bounds[1]:
+                logger.warning(
+                    "[ %s ] metric [ %s ] max [ %f ] greater than upper bound [ %f ]",
+                    key,
+                    metric,
+                    values.max(),
+                    bounds[1],
+                )
+
+            if values.min() < bounds[0]:
+                logger.warning(
+                    "[ %s ] metric [ %s ] min [ %f ] less than lower bound [ %f ]",
+                    key,
+                    metric,
+                    values.min(),
+                    bounds[0],
+                )
 
             distribution_means[metric][key] = np.mean(values)
             distribution_stdevs[metric][key] = np.std(values, ddof=1)
