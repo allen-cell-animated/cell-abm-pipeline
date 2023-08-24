@@ -131,6 +131,12 @@ class ParametersConfigMeshes:
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
 
+    box: tuple[int, int, int] = field(default_factory=lambda: (1, 1, 1))
+    """Size of bounding box."""
+
+    invert: bool = False
+    """True if mesh should have inverted faces, False otherwise."""
+
 
 @dataclass
 class ParametersConfigSimularium:
@@ -155,7 +161,10 @@ class ParametersConfigSimularium:
     """Colors for each cell cycle phase."""
 
     resolution: Optional[int] = None
-    """Number of voxels per sphere (None indicates single sphere per cell)."""
+    """Number of voxels per sphere (None for single sphere per cell, 0 for meshes)."""
+
+    url: Optional[str] = None
+    """Path to mesh files."""
 
 
 @dataclass
@@ -342,11 +351,18 @@ def run_flow_convert_to_meshes(
             tar_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
             tar = load_tar(context.working_location, tar_key)
 
-            meshes = convert_to_meshes(series_key, tar, parameters.frame_spec, parameters.regions)
+            meshes = convert_to_meshes(
+                series_key,
+                tar,
+                parameters.frame_spec,
+                parameters.regions,
+                parameters.box,
+                parameters.invert,
+            )
 
             for frame, cell_id, region, mesh in meshes:
                 mesh_key = make_key(
-                    converted_key, f"{series_key}_{frame:06d}_{cell_id:02d}_{region}.MESH.obj"
+                    converted_key, f"{series_key}_{frame:06d}_{cell_id:06d}_{region}.MESH.obj"
                 )
                 save_text(context.working_location, mesh_key, mesh)
 
@@ -372,6 +388,11 @@ def run_flow_convert_to_simularium(
             locs_tar_key = make_key(locs_data_key, f"{series_key}.LOCATIONS.tar.xz")
             locs_tar = load_tar(context.working_location, locs_tar_key)
 
+            if parameters.url is not None:
+                url = f"{parameters.url}/{make_key(series.name, 'converted', 'converted.MESH')}"
+            else:
+                url = None
+
             simularium = convert_to_simularium(
                 series_key,
                 cells_tar,
@@ -382,6 +403,7 @@ def run_flow_convert_to_simularium(
                 parameters.dt,
                 parameters.phase_colors,
                 parameters.resolution,
+                url,
             )
 
             simularium_key = make_key(converted_key, f"{series_key}.simularium")
