@@ -41,11 +41,19 @@ def get_expired_caches(base_url: str) -> list[str]:
             timeout=10,
         )
 
-        expired_caches = expired_caches + [
-            task_run["state"]["data"]["storage_key"]
+        task_runs_with_caches = [
+            (
+                task_run["state"]["data"]["storage_key"],
+                task_run["state"]["state_details"]["cache_expiration"],
+            )
             for task_run in response.json()
             if task_run["state"]["state_details"]["cache_expiration"] is not None
-            and pendulum.parse(task_run["state"]["state_details"]["cache_expiration"]).is_past()
+        ]
+
+        expired_caches = expired_caches + [
+            storage_key
+            for storage_key, cache_expiration in task_runs_with_caches
+            if pendulum.parse(cache_expiration).is_past()  # type: ignore[union-attr]
         ]
 
         if len(response.json()) == API_LIMIT:
