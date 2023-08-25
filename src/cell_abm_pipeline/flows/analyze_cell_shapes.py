@@ -1,5 +1,30 @@
 """
 Workflow for analyzing cell shapes.
+
+Working location structure:
+
+.. code-block:: bash
+
+    (name)
+    ├── analysis
+    │   ├── analysis.COEFFS
+    │   │   ├── (name)_(key)_(seed)_(region).COEFFS.csv
+    │   │   └── (name)_(key)_(seed)_(region).COEFFS.tar.xz
+    │   ├── analysis.PROPS
+    │   │   ├── (name)_(key)_(seed)_(region).PROPS.csv
+    │   │   └── (name)_(key)_(seed)_(region).PROPS.tar.xz
+    │   ├── analysis.PCA
+    │   │   ├── (name)_(key)_(regions).PCA.csv
+    │   │   └── (name)_(key)_(regions).PCA.pkl
+    │   └── analysis.STATS
+    │       └── (name)_(key)_(regions).STATS.csv
+    └── results
+        └── (name)_(key)_(seed).csv
+
+Data from the **results**, **analysis.COEFFS**, and (optionally) the
+**analysis.PROPS** directories are consolidated into the **analysis.PCA**
+directory.
+Statistical analysis is saved to the **analysis.STATS** directory.
 """
 
 from dataclasses import dataclass, field
@@ -91,23 +116,11 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     """
     Main analyze cell shapes flow.
 
-    Calls the following subflows:
+    Calls the following subflows, in order:
 
-    - :py:func:`run_flow_process_data`
-
-    Process spherical harmonics coefficients and parsed simulation results and
-    compile into a single dataframe that can used for PCA. If the combined data
-    already exists for a given key, that key is skipped.
-
-    - :py:func:`run_flow_fit_model`
-
-    Fit PCA for each key and save the resulting PCA object as a pickle. If the
-    model already exits for a given key, that key is skipped.
-
-    - :py:func:`run_flow_analyze_stats`
-
-    Perform statistical analysis of shape distributions. If the analysis file
-    already exists for a given key, that key is skipped.
+    1. :py:func:`run_flow_process_data`
+    2. :py:func:`run_flow_fit_model`
+    3. :py:func:`run_flow_analyze_stats`
     """
 
     run_flow_process_data(context, series, parameters)
@@ -121,7 +134,13 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 def run_flow_process_data(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
-    """Analyze cell shapes subflow for loading data."""
+    """
+    Analyze cell shapes subflow for loading data.
+
+    Process spherical harmonics coefficients and parsed simulation results and
+    compile into a single dataframe that can used for PCA. If the combined data
+    already exists for a given key, that key is skipped.
+    """
 
     results_path_key = make_key(series.name, "results")
     coeffs_path_key = make_key(series.name, "analysis", "analysis.COEFFS")
@@ -233,7 +252,12 @@ def run_flow_process_data(
 def run_flow_fit_model(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
-    """Analyze cell shapes subflow for fitting PCA model."""
+    """
+    Analyze cell shapes subflow for fitting PCA model.
+
+    Fit PCA for each key and save the resulting PCA object as a pickle. If the
+    model already exits for a given key, that key is skipped.
+    """
 
     pca_path_key = make_key(series.name, "analysis", "analysis.PCA")
     region_key = ":".join(sorted(parameters.regions))
@@ -259,7 +283,12 @@ def run_flow_fit_model(
 def run_flow_analyze_stats(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
-    """Analyze cell shapes subflow for analyzing shape distribution statistics."""
+    """
+    Analyze cell shapes subflow for analyzing shape distribution statistics.
+
+    Perform statistical analysis of shape distributions. If the analysis file
+    already exists for a given key, that key is skipped.
+    """
 
     pca_path_key = make_key(series.name, "analysis", "analysis.PCA")
     stats_path_key = make_key(series.name, "analysis", "analysis.STATS")
