@@ -24,18 +24,18 @@ class ParametersConfig:
 
     seed: int
 
-    scale: int
-
     tick: int
-
-    region: Optional[str] = None
-
-    order: int = COEFFICIENT_ORDER
-    """Order of the spherical harmonics coefficient parametrization."""
 
     offset: int = 0
 
     chunk: Optional[int] = None
+
+    region: Optional[str] = None
+
+    scale: Optional[int] = 1
+
+    order: int = COEFFICIENT_ORDER
+    """Order of the spherical harmonics coefficient parametrization."""
 
 
 @dataclass

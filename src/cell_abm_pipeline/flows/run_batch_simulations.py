@@ -1,5 +1,5 @@
 """
-Workflow for running containers using AWS Batch.
+Workflow for running containerized models using AWS Batch.
 """
 
 from dataclasses import dataclass, field

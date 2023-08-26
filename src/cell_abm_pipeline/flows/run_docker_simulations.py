@@ -1,5 +1,5 @@
 """
-Workflow for running containers using local Docker.
+Workflow for running containerized models using local Docker.
 """
 
 from dataclasses import dataclass, field

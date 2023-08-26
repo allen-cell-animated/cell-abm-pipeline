@@ -33,13 +33,13 @@ class ParametersConfig:
 
     tick: int
 
-    properties: list[str] = field(default_factory=lambda: SHAPE_PROPERTIES)
-
-    region: Optional[str] = None
-
     offset: int = 0
 
     chunk: Optional[int] = None
+
+    region: Optional[str] = None
+
+    properties: list[str] = field(default_factory=lambda: SHAPE_PROPERTIES)
 
 
 @dataclass
