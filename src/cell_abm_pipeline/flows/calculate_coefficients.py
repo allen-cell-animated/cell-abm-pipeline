@@ -32,7 +32,7 @@ class ParametersConfig:
 
     region: Optional[str] = None
 
-    scale: Optional[int] = 1
+    scale: int = 1
 
     order: int = COEFFICIENT_ORDER
     """Order of the spherical harmonics coefficient parametrization."""
@@ -57,7 +57,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     """Main calculate coefficients flow."""
 
     data_key = make_key(series.name, "data", "data.LOCATIONS")
-    analysis_key = make_key(series.name, "analysis", "analysis.COEFFS")
+    analysis_key = make_key(series.name, "analysis", "analysis.COEFFICIENTS")
     series_key = f"{series.name}_{parameters.key}_{parameters.seed:04d}"
 
     locations_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
@@ -113,5 +113,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     region_key = f"_{parameters.region}" if parameters.region is not None else ""
     suffix = f"{region_key}{offset_key}{chunk_key}"
 
-    coeffs_key = make_key(analysis_key, f"{series_key}_{parameters.tick:06d}{suffix}.COEFFS.csv")
+    coeffs_key = make_key(
+        analysis_key, f"{series_key}_{parameters.tick:06d}{suffix}.COEFFICIENTS.csv"
+    )
     save_dataframe(context.working_location, coeffs_key, coeffs_dataframe, index=False)

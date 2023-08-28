@@ -22,9 +22,9 @@ from cell_abm_pipeline.__config__ import make_dotlist_from_config
 
 
 class Calculation(Enum):
-    COEFFICIENTS = ("calculate_coefficients", "COEFFS", True)
-    NEIGHBORS = ("calculate_neighbors", "NEIGHBORS", False)
-    PROPERTIES = ("calculate_properties", "PROPS", True)
+    COEFFICIENTS = ("calculate_coefficients", True)
+    NEIGHBORS = ("calculate_neighbors", False)
+    PROPERTIES = ("calculate_properties", True)
 
 
 @dataclass
@@ -98,7 +98,8 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         return
 
     # Get the calculation type.
-    module_name, suffix, chunkable = parameters.calculate.value
+    suffix = parameters.calculate.name
+    module_name, chunkable = parameters.calculate.value
     analysis_key = make_key(series.name, "analysis", f"analysis.{suffix}")
 
     # Get the region suffix, if it exists.

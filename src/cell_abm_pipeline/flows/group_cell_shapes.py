@@ -10,8 +10,8 @@ Working location structure:
     │   ├── analysis.PCA
     │   │   ├── (name)_(key)_(regions).PCA.csv
     │   │   └── (name)_(key)_(regions).PCA.pkl
-    │   └── analysis.STATS
-    │       └── (name)_(key)_(regions).STATS.csv
+    │   └── analysis.STATISTICS
+    │       └── (name)_(key)_(regions).STATISTICS.csv
     ├── data
     │   └── data.LOCATIONS
     │       └── (name)_(key)_(seed).LOCATIONS.tar.xz
@@ -30,7 +30,7 @@ Working location structure:
             └── (name).variance_explained.csv
 
 Different groups use inputs from the **data/data.LOCATIONS**,
-**analysis/analysis.PCA**, and **analysis/analysis.STATS** directories.
+**analysis/analysis.PCA**, and **analysis/analysis.STATISTICS** directories.
 Grouped data is saved to the **groups/groups.SHAPES** directory.
 
 Different groups can be visualized using the corresponding plotting workflow or
@@ -710,7 +710,7 @@ def run_flow_group_population_stats(
 ) -> None:
     """Group cell shapes subflow for population stats."""
 
-    analysis_key = make_key(series.name, "analysis", "analysis.STATS")
+    analysis_key = make_key(series.name, "analysis", "analysis.STATISTICS")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
@@ -718,7 +718,7 @@ def run_flow_group_population_stats(
     stats: dict[str, dict] = {key: {} for key in keys}
 
     for key in keys:
-        data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.STATS.csv")
+        data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.STATISTICS.csv")
         data = load_dataframe.with_options(**OPTIONS)(context.working_location, data_key)
 
         for feature, group in data[~data["SAMPLE"].isna()].groupby("FEATURE"):

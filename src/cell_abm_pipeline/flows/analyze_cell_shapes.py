@@ -7,24 +7,24 @@ Working location structure:
 
     (name)
     ├── analysis
-    │   ├── analysis.COEFFS
-    │   │   ├── (name)_(key)_(seed)_(region).COEFFS.csv
-    │   │   └── (name)_(key)_(seed)_(region).COEFFS.tar.xz
-    │   ├── analysis.PROPS
-    │   │   ├── (name)_(key)_(seed)_(region).PROPS.csv
-    │   │   └── (name)_(key)_(seed)_(region).PROPS.tar.xz
+    │   ├── analysis.COEFFICIENTS
+    │   │   ├── (name)_(key)_(seed)_(region).COEFFICIENTS.csv
+    │   │   └── (name)_(key)_(seed)_(region).COEFFICIENTS.tar.xz
+    │   ├── analysis.PROPERTIES
+    │   │   ├── (name)_(key)_(seed)_(region).PROPERTIES.csv
+    │   │   └── (name)_(key)_(seed)_(region).PROPERTIES.tar.xz
     │   ├── analysis.PCA
     │   │   ├── (name)_(key)_(regions).PCA.csv
     │   │   └── (name)_(key)_(regions).PCA.pkl
-    │   └── analysis.STATS
-    │       └── (name)_(key)_(regions).STATS.csv
+    │   └── analysis.STATISTICS
+    │       └── (name)_(key)_(regions).STATISTICS.csv
     └── results
         └── (name)_(key)_(seed).csv
 
-Data from the **results**, **analysis.COEFFS**, and (optionally) the
-**analysis.PROPS** directories are consolidated into the **analysis.PCA**
+Data from the **results**, **analysis.COEFFICIENTS**, and (optionally) the
+**analysis.PROPERTIES** directories are consolidated into the **analysis.PCA**
 directory.
-Statistical analysis is saved to the **analysis.STATS** directory.
+Statistical analysis is saved to the **analysis.STATISTICS** directory.
 """
 
 from dataclasses import dataclass, field
@@ -143,8 +143,8 @@ def run_flow_process_data(
     """
 
     results_path_key = make_key(series.name, "results")
-    coeffs_path_key = make_key(series.name, "analysis", "analysis.COEFFS")
-    props_path_key = make_key(series.name, "analysis", "analysis.PROPS")
+    coeffs_path_key = make_key(series.name, "analysis", "analysis.COEFFICIENTS")
+    props_path_key = make_key(series.name, "analysis", "analysis.PROPERTIES")
     pca_path_key = make_key(series.name, "analysis", "analysis.PCA")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
@@ -174,7 +174,7 @@ def run_flow_process_data(
             for region in parameters.regions:
                 # Load coefficients for each region
                 coeffs_key = make_key(
-                    coeffs_path_key, f"{series.name}_{key}_{seed:04d}_{region}.COEFFS.csv"
+                    coeffs_path_key, f"{series.name}_{key}_{seed:04d}_{region}.COEFFICIENTS.csv"
                 )
                 coeffs_key = coeffs_key.replace("_DEFAULT", "")
                 region_coeffs = load_dataframe(
@@ -191,7 +191,7 @@ def run_flow_process_data(
 
                 # Load properties for each region (if it exists)
                 props_key = make_key(
-                    props_path_key, f"{series.name}_{key}_{seed:04d}_{region}.PROPS.csv"
+                    props_path_key, f"{series.name}_{key}_{seed:04d}_{region}.PROPERTIES.csv"
                 )
                 props_key = props_key.replace("_DEFAULT", "")
 
@@ -291,7 +291,7 @@ def run_flow_analyze_stats(
     """
 
     pca_path_key = make_key(series.name, "analysis", "analysis.PCA")
-    stats_path_key = make_key(series.name, "analysis", "analysis.STATS")
+    stats_path_key = make_key(series.name, "analysis", "analysis.STATISTICS")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
@@ -306,7 +306,7 @@ def run_flow_analyze_stats(
     )
 
     for key in keys:
-        stats_key = make_key(stats_path_key, f"{series.name}_{key}_{region_key}.STATS.csv")
+        stats_key = make_key(stats_path_key, f"{series.name}_{key}_{region_key}.STATISTICS.csv")
 
         if check_key(context.working_location, stats_key):
             continue
