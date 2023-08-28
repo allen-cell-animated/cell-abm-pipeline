@@ -379,13 +379,13 @@ requests-oauthlib = "*"
 
 [[package]]
 name = "arcade-collection"
-version = "0.9.3"
+version = "0.10.0"
 description = "Collection of tasks for working with ARCADE."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "arcade_collection-0.9.3-py3-none-any.whl", hash = "sha256:042800c2a25137b4756d084b309a3a6def342bf1690a4fa529fca001ec966477"},
-    {file = "arcade_collection-0.9.3.tar.gz", hash = "sha256:e918c918b933d5140691f3ae75b74e8ead71d6cfd04f67a7dbd6408c55279e89"},
+    {file = "arcade_collection-0.10.0-py3-none-any.whl", hash = "sha256:02fe6d5417861f53e29640d2d8fd28e7d6f008c2b0392e3e11503230649123fd"},
+    {file = "arcade_collection-0.10.0.tar.gz", hash = "sha256:f6a9cfbfda29c04bdeda8dbdf924334afba3b89c2ce42d7fc8152e218fbf6827"},
 ]
 
 [package.dependencies]
@@ -5362,4 +5362,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "98aa582dbdfd375a8ce689f46427c572da2814b3d78bd276a5fb9be30d6b48b4"
+content-hash = "8dad76825710f0a9b2885ef32c98c0aeec40c39dda3f6eb5561b414028bbf26f"
