@@ -1,8 +1,9 @@
 """
-Workflow for summarizing simulation files.
+Workflow for summarizing files in the manifest.
 """
 
 from dataclasses import dataclass, field
+from fnmatch import fnmatch
 
 from container_collection.manifest import summarize_manifest_files, update_manifest_contents
 from io_collection.keys import get_keys, make_key
@@ -13,16 +14,20 @@ from prefect import flow
 
 @dataclass
 class ParametersConfig:
-    """Parameter configuration for summarize simulations flow."""
+    """Parameter configuration for summarize manifest flow."""
 
     update_manifest: bool = True
 
     search_locations: list[str] = field(default_factory=lambda: [])
 
+    include_filters: list[str] = field(default_factory=lambda: ["*"])
+
+    exclude_filters: list[str] = field(default_factory=lambda: [])
+
 
 @dataclass
 class ContextConfig:
-    """Context configuration for summarize simulations flow."""
+    """Context configuration for summarize manifest flow."""
 
     working_location: str
 
@@ -31,7 +36,7 @@ class ContextConfig:
 
 @dataclass
 class SeriesConfig:
-    """Series configuration for summarize simulations flow."""
+    """Series configuration for summarize manifest flow."""
 
     name: str
 
@@ -42,14 +47,29 @@ class SeriesConfig:
     conditions: list[dict]
 
 
-@flow(name="summarize-simulations")
+@flow(name="summarize-manifest")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    """Main summarize simulations flow."""
+    """Main summarize manifest flow."""
 
     if parameters.update_manifest:
-        location_keys = {
-            location: get_keys(location, series.name) for location in parameters.search_locations
-        }
+        location_keys = {}
+
+        for location in parameters.search_locations:
+            all_keys = get_keys(location, series.name)
+
+            selected_keys = set()
+            unselected_keys = set()
+
+            # Filter files for matches to include filters.
+            for include in parameters.include_filters:
+                selected_keys.update([key for key in all_keys if fnmatch(key, include)])
+
+            # Filter files for matches to exclude filters.
+            for exclude in parameters.exclude_filters:
+                unselected_keys.update([key for key in all_keys if fnmatch(key, exclude)])
+
+            location_keys[location] = list(selected_keys - unselected_keys)
+
         manifest = update_manifest_contents(location_keys)
         save_dataframe(context.manifest_location, series.manifest_key, manifest, index=False)
     else:
