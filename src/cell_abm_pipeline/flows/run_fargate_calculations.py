@@ -24,6 +24,7 @@ from cell_abm_pipeline.__config__ import make_dotlist_from_config
 class Calculation(Enum):
     COEFFICIENTS = ("calculate_coefficients", True)
     NEIGHBORS = ("calculate_neighbors", False)
+    POSITIONS = ("calculate_positions", False)
     PROPERTIES = ("calculate_properties", True)
 
 
