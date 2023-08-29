@@ -201,7 +201,7 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
-    """Context configuration for group basic metrics flow."""
+    """Context configuration for plot basic metrics flow."""
 
     working_location: str
     """Location for input and output files (local path or S3 bucket)."""
@@ -209,7 +209,7 @@ class ContextConfig:
 
 @dataclass
 class SeriesConfig:
-    """Series configuration for group basic metrics flow."""
+    """Series configuration for plot basic metrics flow."""
 
     name: str
     """Name of the simulation series."""

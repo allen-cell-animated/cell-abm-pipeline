@@ -3,6 +3,7 @@ from .build_svg_image import build_svg_image
 from .calculate_category_durations import calculate_category_durations
 from .calculate_data_bins import calculate_data_bins
 from .make_bar_figure import make_bar_figure
+from .make_box_figure import make_box_figure
 from .make_density_figure import make_density_figure
 from .make_graph_frame import make_graph_frame
 from .make_heatmap_figure import make_heatmap_figure

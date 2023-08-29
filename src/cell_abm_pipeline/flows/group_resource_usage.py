@@ -7,8 +7,8 @@ Working location structure:
 
     (name)
     ├── data
-    │   └── data.(group)
-    │       └── (name)_(key)_(seed).(group).tar.xz
+    │   └── data.(category)
+    │       └── (name)_(key)_(seed).(category).tar.xz
     ├── groups
     │   └── groups.RESOURCES
     │       ├── (name).object_storage.csv
