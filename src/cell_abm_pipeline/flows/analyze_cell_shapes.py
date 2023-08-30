@@ -14,16 +14,18 @@ Working location structure:
     │   │   ├── (name)_(key)_(seed)_(region).PROPERTIES.csv
     │   │   └── (name)_(key)_(seed)_(region).PROPERTIES.tar.xz
     │   ├── analysis.PCA
-    │   │   ├── (name)_(key)_(regions).PCA.csv
     │   │   └── (name)_(key)_(regions).PCA.pkl
+    │   ├── analysis.SHAPES
+    │   │   └── (name)_(key)_(regions).SHAPES.csv
     │   └── analysis.STATISTICS
     │       └── (name)_(key)_(regions).STATISTICS.csv
     └── results
         └── (name)_(key)_(seed).csv
 
 Data from the **results**, **analysis.COEFFICIENTS**, and (optionally) the
-**analysis.PROPERTIES** directories are consolidated into the **analysis.PCA**
+**analysis.PROPERTIES** directories are processed into the **analysis.SHAPES**
 directory.
+PCA models are saved to the **analysis.PCA** directory.
 Statistical analysis is saved to the **analysis.STATISTICS** directory.
 """
 
@@ -33,7 +35,11 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
-from abm_shape_collection import calculate_shape_stats, calculate_size_stats, fit_pca_model
+from abm_shape_collection import (
+    calculate_feature_statistics,
+    calculate_shape_statistics,
+    fit_pca_model,
+)
 from arcade_collection.output import convert_model_units
 from io_collection.keys import check_key, make_key
 from io_collection.load import load_dataframe, load_pickle
@@ -67,19 +73,19 @@ class ParametersConfig:
     components: int = PCA_COMPONENTS
     """Number of principal components (i.e. shape modes)."""
 
-    valid_phases: list[str] = field(default_factory=lambda: VALID_PHASES)
-    """Valid phases for calculating shape modes."""
-
-    valid_ticks: list[int] = field(default_factory=lambda: [0])
-    """Valid ticks for calculating shape modes."""
-
     ds: float = 1.0
     """Spatial scaling in units/um."""
 
     dt: float = 1.0
     """Temporal scaling in hours/tick."""
 
-    sample_reps: int = 100
+    valid_phases: list[str] = field(default_factory=lambda: VALID_PHASES)
+    """Valid phases for processing cell shapes."""
+
+    valid_ticks: list[int] = field(default_factory=lambda: [0])
+    """Valid ticks for processing cell shapes."""
+
+    sample_replicates: int = 100
     """Number of replicates for calculating stats with sampling."""
 
     sample_size: int = 100
@@ -130,12 +136,12 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     run_flow_analyze_stats(context, series, parameters)
 
 
-@flow(name="analyze-cell-shapes_load-data")
+@flow(name="analyze-cell-shapes_process-data")
 def run_flow_process_data(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     """
-    Analyze cell shapes subflow for loading data.
+    Analyze cell shapes subflow for processing data.
 
     Process spherical harmonics coefficients and parsed simulation results and
     compile into a single dataframe that can used for PCA. If the combined data
@@ -145,19 +151,19 @@ def run_flow_process_data(
     results_path_key = make_key(series.name, "results")
     coeffs_path_key = make_key(series.name, "analysis", "analysis.COEFFICIENTS")
     props_path_key = make_key(series.name, "analysis", "analysis.PROPERTIES")
-    pca_path_key = make_key(series.name, "analysis", "analysis.PCA")
+    shapes_path_key = make_key(series.name, "analysis", "analysis.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
-        data_key = make_key(pca_path_key, f"{series.name}_{key}_{region_key}.PCA.csv")
+        data_key = make_key(shapes_path_key, f"{series.name}_{key}_{region_key}.SHAPES.csv")
 
         if check_key(context.working_location, data_key):
             continue
 
+        all_results = []
         all_coeffs = []
         all_props = []
-        all_results = []
 
         for seed in series.seeds:
             coeffs = None
@@ -172,7 +178,7 @@ def run_flow_process_data(
             all_results.append(results)
 
             for region in parameters.regions:
-                # Load coefficients for each region
+                # Load coefficients for region.
                 coeffs_key = make_key(
                     coeffs_path_key, f"{series.name}_{key}_{seed:04d}_{region}.COEFFICIENTS.csv"
                 )
@@ -189,7 +195,7 @@ def run_flow_process_data(
                 else:
                     coeffs = coeffs.join(region_coeffs, on=INDEX_COLUMNS, rsuffix=f".{region}")
 
-                # Load properties for each region (if it exists)
+                # Load properties for region (if it exists).
                 props_key = make_key(
                     props_path_key, f"{series.name}_{key}_{seed:04d}_{region}.PROPERTIES.csv"
                 )
@@ -239,12 +245,13 @@ def run_flow_process_data(
         # Convert units.
         convert_model_units(data, parameters.ds, parameters.dt, parameters.regions)
 
-        # Remove nans
+        # Remove nans.
         nan_indices = np.isnan(data.filter(like="shcoeffs")).any(axis=1)
         data = data[~nan_indices]
         nan_indices = np.isnan(data.filter(like="CENTER")).any(axis=1)
         data = data[~nan_indices]
 
+        # Save final dataframe.
         save_dataframe(context.working_location, data_key, data, index=False)
 
 
@@ -259,12 +266,13 @@ def run_flow_fit_model(
     model already exits for a given key, that key is skipped.
     """
 
+    shapes_path_key = make_key(series.name, "analysis", "analysis.SHAPES")
     pca_path_key = make_key(series.name, "analysis", "analysis.PCA")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
-        data_key = make_key(pca_path_key, f"{series.name}_{key}_{region_key}.PCA.csv")
+        data_key = make_key(shapes_path_key, f"{series.name}_{key}_{region_key}.SHAPES.csv")
         model_key = make_key(pca_path_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
 
         if check_key(context.working_location, model_key):
@@ -284,13 +292,13 @@ def run_flow_analyze_stats(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     """
-    Analyze cell shapes subflow for analyzing shape distribution statistics.
+    Analyze cell shapes subflow for analyzing distribution statistics.
 
     Perform statistical analysis of shape distributions. If the analysis file
     already exists for a given key, that key is skipped.
     """
 
-    pca_path_key = make_key(series.name, "analysis", "analysis.PCA")
+    shapes_path_key = make_key(series.name, "analysis", "analysis.SHAPES")
     stats_path_key = make_key(series.name, "analysis", "analysis.STATISTICS")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
@@ -305,43 +313,40 @@ def run_flow_analyze_stats(
         context.working_location, parameters.reference["model"]
     )
 
+    features = [
+        f"{feature}.{region}" if region != "DEFAULT" else feature
+        for region in parameters.regions
+        for feature in ["volume", "height"]
+    ]
+
     for key in keys:
         stats_key = make_key(stats_path_key, f"{series.name}_{key}_{region_key}.STATISTICS.csv")
 
         if check_key(context.working_location, stats_key):
             continue
 
-        data_key = make_key(pca_path_key, f"{series.name}_{key}_{region_key}.PCA.csv")
+        data_key = make_key(shapes_path_key, f"{series.name}_{key}_{region_key}.SHAPES.csv")
         data = load_dataframe.with_options(**OPTIONS)(context.working_location, data_key)
-        data = data[data["SEED"].isin(series.seeds)]
 
-        size_stats = calculate_size_stats(data, ref_data, parameters.regions, include_ticks=True)
-        sample_size_stats = calculate_size_stats(
-            data,
-            ref_data,
-            parameters.regions,
-            include_samples=True,
-            sample_reps=parameters.sample_reps,
-            sample_size=parameters.sample_size,
-        )
-        shape_stats = calculate_shape_stats(
-            ref_model, data, ref_data, parameters.components, include_ticks=True
-        )
-        sample_shape_stats = calculate_shape_stats(
-            ref_model,
-            data,
-            ref_data,
-            parameters.components,
-            include_samples=True,
-            sample_reps=parameters.sample_reps,
-            sample_size=parameters.sample_size,
-        )
+        all_stats = []
 
-        sample_size_stats = sample_size_stats.dropna(subset=["SAMPLE"])
-        sample_shape_stats = sample_shape_stats.dropna(subset=["SAMPLE"])
+        for sample in range(parameters.sample_replicates):
+            sample_data = (
+                data.sample(frac=1, random_state=sample)
+                .groupby("TICK")
+                .head(parameters.sample_size)
+            )
 
-        stats = pd.concat([size_stats, shape_stats, sample_size_stats, sample_shape_stats])
+            feature_stats = calculate_feature_statistics(features, sample_data, ref_data)
+            shape_stats = calculate_shape_statistics(
+                ref_model, sample_data, ref_data, parameters.components
+            )
 
-        convert_model_units(stats, parameters.ds, parameters.dt)
+            stats = pd.concat([feature_stats, shape_stats])
+            stats["INDEX"] = sample
 
-        save_dataframe(context.working_location, stats_key, stats, index=False)
+            all_stats.append(stats)
+
+        all_stats_df = pd.concat(all_stats)
+
+        save_dataframe(context.working_location, stats_key, all_stats_df, index=False)
