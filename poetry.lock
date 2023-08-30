@@ -2,13 +2,13 @@
 
 [[package]]
 name = "abm-colony-collection"
-version = "0.3.4"
+version = "0.4.0"
 description = "Collection of tasks for analyzing colony dynamics."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "abm_colony_collection-0.3.4-py3-none-any.whl", hash = "sha256:758fb4e7e6db8d3a06ccc36d41b2c7d043a01e9677395dece4204a76caf40007"},
-    {file = "abm_colony_collection-0.3.4.tar.gz", hash = "sha256:586cfae5cad8285725f2306a86041c16f18f85b1bfaea4c70b08fde1dea2c399"},
+    {file = "abm_colony_collection-0.4.0-py3-none-any.whl", hash = "sha256:ea468522ca37e9e8d1b12554e0220368aac60439272214fd3f206220dc81c1b3"},
+    {file = "abm_colony_collection-0.4.0.tar.gz", hash = "sha256:1190d5c5db6aba5dd64c92013f1e4f408282afe249adf4b65c11888379c25e43"},
 ]
 
 [package.dependencies]
@@ -42,13 +42,13 @@ scipy = ">=1.9.3,<2.0.0"
 
 [[package]]
 name = "abm-shape-collection"
-version = "0.7.2"
+version = "0.8.0"
 description = "Collection of tasks for analyzing cell shapes."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "abm_shape_collection-0.7.2-py3-none-any.whl", hash = "sha256:f8641c8685fe82d7d7dd07d7ab8ed14d2fff553873bed1a78a506172aad5c5cb"},
-    {file = "abm_shape_collection-0.7.2.tar.gz", hash = "sha256:722cd01e037a6d410842cd4dbb36dd63dcc87b734be6152598fb9cb33f9386b6"},
+    {file = "abm_shape_collection-0.8.0-py3-none-any.whl", hash = "sha256:2a0f18ad1f24aa014a63f6be17bb70cb53a1d2f2780e610eea94a57a37ca3824"},
+    {file = "abm_shape_collection-0.8.0.tar.gz", hash = "sha256:c71d6ab4864e8b636153ca4462a5641a249c08ba7c30b983b4af276c1d8092f5"},
 ]
 
 [package.dependencies]
@@ -5362,4 +5362,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "8dad76825710f0a9b2885ef32c98c0aeec40c39dda3f6eb5561b414028bbf26f"
+content-hash = "9aa98f4854ba2519adf3ceb0392e24ae6a6aabdf6d1884e445f70a2f29475f64"
