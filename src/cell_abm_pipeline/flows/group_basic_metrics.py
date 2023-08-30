@@ -260,7 +260,7 @@ class ParametersConfig:
     """Parameter configuration for group basic metrics flow."""
 
     groups: list[str] = field(default_factory=lambda: GROUPS)
-    """List of basic metric groups."""
+    """List of basic metrics groups."""
 
     metrics_bins: ParametersConfigMetricsBins = ParametersConfigMetricsBins()
     """Parameters for group metrics bins subflow."""

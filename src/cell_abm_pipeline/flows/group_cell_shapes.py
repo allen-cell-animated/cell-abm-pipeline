@@ -8,8 +8,9 @@ Working location structure:
     (name)
     ├── analysis
     │   ├── analysis.PCA
-    │   │   ├── (name)_(key)_(regions).PCA.csv
     │   │   └── (name)_(key)_(regions).PCA.pkl
+    │   ├── analysis.SHAPES
+    │   │   └── (name)_(key)_(regions).SHAPES.csv
     │   └── analysis.STATISTICS
     │       └── (name)_(key)_(regions).STATISTICS.csv
     ├── data
@@ -30,7 +31,8 @@ Working location structure:
             └── (name).variance_explained.csv
 
 Different groups use inputs from the **data/data.LOCATIONS**,
-**analysis/analysis.PCA**, and **analysis/analysis.STATISTICS** directories.
+**analysis/analysis.SHAPES**, **analysis/analysis.PCA**, and
+**analysis/analysis.STATISTICS** directories.
 Grouped data is saved to the **groups/groups.SHAPES** directory.
 
 Different groups can be visualized using the corresponding plotting workflow or
@@ -321,7 +323,7 @@ class ParametersConfig:
     """Parameter configuration for group cell shapes flow."""
 
     groups: list[str] = field(default_factory=lambda: GROUPS)
-    """List of cell shape groups."""
+    """List of cell shapes groups."""
 
     feature_correlations: ParametersConfigFeatureCorrelations = (
         ParametersConfigFeatureCorrelations()
@@ -433,20 +435,22 @@ def run_flow_group_feature_correlations(
 ) -> None:
     """Group cell shapes subflow for feature correlations."""
 
-    analysis_key = make_key(series.name, "analysis", "analysis.PCA")
+    analysis_shapes_key = make_key(series.name, "analysis", "analysis.SHAPES")
+    analysis_pca_key = make_key(series.name, "analysis", "analysis.PCA")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
         feature_key = f"{series.name}.feature_correlations.{key}"
+        series_key = f"{series.name}_{key}_{region_key}"
 
         # Load model.
-        model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
+        model_key = make_key(analysis_pca_key, f"{series_key}.PCA.pkl")
         model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)
 
         # Load dataframe.
-        dataframe_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
+        dataframe_key = make_key(analysis_shapes_key, f"{series_key}.SHAPES.csv")
         data = load_dataframe.with_options(**OPTIONS)(context.working_location, dataframe_key)
 
         # Transform data into shape mode space.
@@ -517,7 +521,7 @@ def run_flow_group_feature_distributions(
 ) -> None:
     """Group cell shapes subflow for feature distributions."""
 
-    analysis_key = make_key(series.name, "analysis", "analysis.PCA")
+    analysis_key = make_key(series.name, "analysis", "analysis.SHAPES")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
@@ -541,7 +545,7 @@ def run_flow_group_feature_distributions(
 
     for key in keys:
         # Load dataframe.
-        dataframe_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
+        dataframe_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.SHAPES.csv")
         data = load_dataframe.with_options(**OPTIONS)(context.working_location, dataframe_key)
 
         # Calculate shape modes, if model is given.
@@ -580,7 +584,8 @@ def run_flow_group_mode_correlations(
 ) -> None:
     """Group cell shapes subflow for mode correlations."""
 
-    analysis_key = make_key(series.name, "analysis", "analysis.PCA")
+    analysis_shapes_key = make_key(series.name, "analysis", "analysis.SHAPES")
+    analysis_pca_key = make_key(series.name, "analysis", "analysis.PCA")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
@@ -589,12 +594,16 @@ def run_flow_group_mode_correlations(
     all_data = {}
 
     for key in keys:
-        model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
+        series_key = f"{series.name}_{key}_{region_key}"
+
+        # Load model.
+        model_key = make_key(analysis_pca_key, f"{series_key}.PCA.pkl")
         model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)
         all_models[key] = model
 
-        data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
-        data = load_dataframe.with_options(**OPTIONS)(context.working_location, data_key)
+        # Load dataframe.
+        dataframe_key = make_key(analysis_shapes_key, f"{series_key}.SHAPES.csv")
+        data = load_dataframe.with_options(**OPTIONS)(context.working_location, dataframe_key)
         all_data[key] = data
 
     if parameters.reference_model is not None and parameters.reference_data is not None:
@@ -670,7 +679,7 @@ def run_flow_group_population_counts(
 ) -> None:
     """Group cell shapes subflow for population counts."""
 
-    analysis_key = make_key(series.name, "analysis", "analysis.PCA")
+    analysis_key = make_key(series.name, "analysis", "analysis.SHAPES")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
@@ -678,9 +687,9 @@ def run_flow_group_population_counts(
     counts = []
 
     for key in keys:
-        data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
+        dataframe_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.SHAPES.csv")
         data = load_dataframe.with_options(**OPTIONS)(
-            context.working_location, data_key, usecols=["TICK", "SEED"]
+            context.working_location, dataframe_key, usecols=["TICK", "SEED"]
         )
         groups = data[data["TICK"] == parameters.tick].groupby("SEED")
 
@@ -718,13 +727,15 @@ def run_flow_group_population_stats(
     stats: dict[str, dict] = {key: {} for key in keys}
 
     for key in keys:
-        data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.STATISTICS.csv")
-        data = load_dataframe.with_options(**OPTIONS)(context.working_location, data_key)
+        dataframe_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.STATISTICS.csv")
+        data = load_dataframe.with_options(**OPTIONS)(context.working_location, dataframe_key)
 
-        for feature, group in data[~data["SAMPLE"].isna()].groupby("FEATURE"):
+        for feature, group in data.groupby("FEATURE"):
             feature_name = f"{feature}.DEFAULT" if feature in ["VOLUME", "HEIGHT"] else feature
 
             stats[key][feature_name.upper()] = {
+                "size": int(group["SIZE"].sum()),
+                "replicates": len(group),
                 "mean": group["KS_STATISTIC"].mean(),
                 "std": group["KS_STATISTIC"].std(ddof=1),
             }
@@ -750,19 +761,22 @@ def run_flow_group_shape_average(
 
     logger = get_run_logger()
 
-    analysis_key = make_key(series.name, "analysis", "analysis.PCA")
+    analysis_shapes_key = make_key(series.name, "analysis", "analysis.SHAPES")
+    analysis_pca_key = make_key(series.name, "analysis", "analysis.PCA")
     data_key = make_key(series.name, "data", "data.LOCATIONS")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
+        series_key = f"{series.name}_{key}_{region_key}"
+
         # Load model.
-        model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
+        model_key = make_key(analysis_pca_key, f"{series_key}.PCA.pkl")
         model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)
 
         # Load dataframe.
-        dataframe_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
+        dataframe_key = make_key(analysis_shapes_key, f"{series_key}.SHAPES.csv")
         data = load_dataframe.with_options(**OPTIONS)(context.working_location, dataframe_key)
 
         # Transform data into shape mode space.
@@ -823,7 +837,7 @@ def run_flow_group_shape_errors(
 ) -> None:
     """Group cell shapes subflow for shape errors."""
 
-    analysis_key = make_key(series.name, "analysis", "analysis.PCA")
+    analysis_key = make_key(series.name, "analysis", "analysis.SHAPES")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
@@ -831,8 +845,8 @@ def run_flow_group_shape_errors(
     errors: dict[str, dict] = {key: {} for key in keys}
 
     for key in keys:
-        data_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
-        data = load_dataframe.with_options(**OPTIONS)(context.working_location, data_key)
+        dataframe_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.SHAPES.csv")
+        data = load_dataframe.with_options(**OPTIONS)(context.working_location, dataframe_key)
 
         for region in parameters.regions:
             errors[key][region] = {
@@ -858,7 +872,8 @@ def run_flow_group_shape_modes(
     point and projection. Consolidate shape modes from keys into single json.
     """
 
-    analysis_key = make_key(series.name, "analysis", "analysis.PCA")
+    analysis_shapes_key = make_key(series.name, "analysis", "analysis.SHAPES")
+    analysis_pca_key = make_key(series.name, "analysis", "analysis.PCA")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
@@ -866,12 +881,14 @@ def run_flow_group_shape_modes(
     projections = ["top", "side1", "side2"]
 
     for key in keys:
+        series_key = f"{series.name}_{key}_{region_key}"
+
         # Load model.
-        model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
+        model_key = make_key(analysis_pca_key, f"{series_key}.PCA.pkl")
         model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)
 
         # Load dataframe.
-        dataframe_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.csv")
+        dataframe_key = make_key(analysis_shapes_key, f"{series_key}.SHAPES.csv")
         data = load_dataframe.with_options(**OPTIONS)(context.working_location, dataframe_key)
 
         # Extract shape modes.
