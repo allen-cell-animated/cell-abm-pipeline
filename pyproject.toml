@@ -9,7 +9,7 @@ license = "BSD-3-Clause"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9,<3.12"
 prefect = "^2.11.3"
 hydra-core = "^1.2.0"
 io-collection = "^0.9.0"
