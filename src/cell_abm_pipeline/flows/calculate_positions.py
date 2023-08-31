@@ -57,7 +57,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     ]
     positions_dataframe = pd.DataFrame(positions, columns=["x", "y", "ids"])
     positions_unique = (
-        positions_dataframe.groupby(["x", "y"])["id"]
+        positions_dataframe.groupby(["x", "y"])["ids"]
         .apply(lambda x: list(np.unique(x)))
         .reset_index()
     )

@@ -19,6 +19,11 @@ def make_bar_figure(keys: list[str], data: dict) -> mpl.Figure:
         positions = np.arange(len(labels)) + index * width
         means = [data[key][label]["mean"] for label in labels]
         stds = [data[key][label]["std"] for label in labels]
+
+        # Replace nans with 0.
+        means = [0 if np.isnan(mean) else mean for mean in means]
+        stds = [0 if np.isnan(std) else std for std in stds]
+
         ax.bar(positions, means, yerr=stds, width=width)
 
     ax.set_xticks(np.arange(len(labels)) + offset, labels, rotation=90)

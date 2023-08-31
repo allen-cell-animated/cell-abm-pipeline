@@ -65,8 +65,8 @@ CELL_PHASES: list[str] = [
 ]
 
 BOUNDS: dict[str, list] = {
-    "volume.DEFAULT": [0, 5000],
-    "volume.NUCLEUS": [0, 1500],
+    "volume.DEFAULT": [0, 6000],
+    "volume.NUCLEUS": [0, 2000],
     "height.DEFAULT": [0, 20],
     "height.NUCLEUS": [0, 20],
     "phase.PROLIFERATIVE_G1": [0, 5],
@@ -355,7 +355,7 @@ def run_flow_group_metrics_bins(
 
         positions_key = make_key(analysis_key, f"{series_key}.POSITIONS.csv")
         positions = load_dataframe.with_options(**OPTIONS)(
-            context.working_location, positions_key, converters={"id": ast.literal_eval}
+            context.working_location, positions_key, converters={"ids": ast.literal_eval}
         )
 
         for tick in parameters.ticks:
@@ -365,12 +365,12 @@ def run_flow_group_metrics_bins(
 
             for metric in parameters.metrics:
                 if metric == "count":
-                    v = tick_positions["id"].map(len)
+                    v = tick_positions["ids"].map(len)
                 else:
                     tick_results = results[results["TICK"] == tick].set_index("ID")
                     v = [
                         np.mean([tick_results.loc[i][metric] for i in ids])
-                        for ids in tick_positions["id"]
+                        for ids in tick_positions["ids"]
                     ]
 
                 bins = bin_to_hex(x, y, v, parameters.scale)

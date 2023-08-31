@@ -127,8 +127,8 @@ LIMITS: dict[str, list] = {
 }
 
 BOUNDS: dict[str, list] = {
-    "volume.DEFAULT": [0, 5000],
-    "volume.NUCLEUS": [0, 1500],
+    "volume.DEFAULT": [0, 6000],
+    "volume.NUCLEUS": [0, 2000],
     "height.DEFAULT": [0, 20],
     "height.NUCLEUS": [0, 20],
     "PC1": [-50, 50],
@@ -521,6 +521,7 @@ def run_flow_group_feature_distributions(
 ) -> None:
     """Group cell shapes subflow for feature distributions."""
 
+    logger = get_run_logger()
     analysis_key = make_key(series.name, "analysis", "analysis.SHAPES")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
@@ -555,14 +556,32 @@ def run_flow_group_feature_distributions(
                 data[f"PC{component + 1}"] = transform[:, component]
 
         for feature in features:
-            feature_data = data[feature.replace(".DEFAULT", "")].values
+            values = data[feature.replace(".DEFAULT", "")].values
 
             bounds = (parameters.bounds[feature][0], parameters.bounds[feature][1])
             bandwidth = parameters.bandwidth[feature]
 
-            distribution_means[feature][key] = np.mean(feature_data)
-            distribution_stdevs[feature][key] = np.std(feature_data, ddof=1)
-            distribution_bins[feature][key] = calculate_data_bins(feature_data, bounds, bandwidth)
+            if values.max() > bounds[1]:
+                logger.warning(
+                    "[ %s ] feature [ %s ] max [ %f ] greater than upper bound [ %f ]",
+                    key,
+                    feature,
+                    values.max(),
+                    bounds[1],
+                )
+
+            if values.min() < bounds[0]:
+                logger.warning(
+                    "[ %s ] feature [ %s ] min [ %f ] less than lower bound [ %f ]",
+                    key,
+                    feature,
+                    values.min(),
+                    bounds[0],
+                )
+
+            distribution_means[feature][key] = np.mean(values)
+            distribution_stdevs[feature][key] = np.std(values, ddof=1)
+            distribution_bins[feature][key] = calculate_data_bins(values, bounds, bandwidth)
 
     for feature, distribution in distribution_bins.items():
         distribution["*"] = {

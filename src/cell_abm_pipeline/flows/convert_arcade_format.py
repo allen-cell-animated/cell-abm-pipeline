@@ -406,5 +406,12 @@ def run_flow_convert_to_simularium(
                 url,
             )
 
-            simularium_key = make_key(converted_key, f"{series_key}.simularium")
+            if parameters.resolution is None:
+                suffix = "SINGLE"
+            elif parameters.resolution == 0:
+                suffix = "MESHES"
+            else:
+                suffix = f"RESOLUTION{parameters.resolution}"
+
+            simularium_key = make_key(converted_key, f"{series_key}.{suffix}.simularium")
             save_text(context.working_location, simularium_key, simularium)
