@@ -64,7 +64,7 @@ from scipy.stats import pearsonr
 
 from cell_abm_pipeline.flows.analyze_cell_shapes import PCA_COMPONENTS
 from cell_abm_pipeline.flows.calculate_coefficients import COEFFICIENT_ORDER
-from cell_abm_pipeline.tasks import bin_to_hex, calculate_data_bins
+from cell_abm_pipeline.tasks import bin_to_hex, calculate_data_bins, check_data_bounds
 
 OPTIONS = {
     "cache_result_in_memory": False,
@@ -85,7 +85,7 @@ GROUPS: list[str] = [
     "variance_explained",
 ]
 
-PROPERTIES: list[str] = [
+CORRELATION_PROPERTIES: list[str] = [
     "volume",
     "height",
     "area",
@@ -93,6 +93,11 @@ PROPERTIES: list[str] = [
     "axis_minor_length",
     "eccentricity",
     "perimeter",
+]
+
+DISTRIBUTION_PROPERTIES: list[str] = [
+    "volume",
+    "height",
 ]
 
 PROJECTIONS: list[str] = [
@@ -161,11 +166,11 @@ BANDWIDTH: dict[str, float] = {
 class ParametersConfigFeatureCorrelations:
     """Parameter configuration for group cell shapes subflow - feature correlations."""
 
+    properties: list[str] = field(default_factory=lambda: CORRELATION_PROPERTIES)
+    """List of shape properties."""
+
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
-
-    properties: list[str] = field(default_factory=lambda: PROPERTIES)
-    """List of shape properties."""
 
     components: int = PCA_COMPONENTS
     """Number of principal components (i.e. shape modes)."""
@@ -187,7 +192,7 @@ class ParametersConfigFeatureDistributions:
     reference_data: Optional[str] = None
     """Full key for reference coefficients data."""
 
-    properties: list[str] = field(default_factory=lambda: PROPERTIES)
+    properties: list[str] = field(default_factory=lambda: DISTRIBUTION_PROPERTIES)
     """List of shape properties."""
 
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
@@ -521,7 +526,6 @@ def run_flow_group_feature_distributions(
 ) -> None:
     """Group cell shapes subflow for feature distributions."""
 
-    logger = get_run_logger()
     analysis_key = make_key(series.name, "analysis", "analysis.SHAPES")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
     region_key = ":".join(sorted(parameters.regions))
@@ -561,23 +565,7 @@ def run_flow_group_feature_distributions(
             bounds = (parameters.bounds[feature][0], parameters.bounds[feature][1])
             bandwidth = parameters.bandwidth[feature]
 
-            if values.max() > bounds[1]:
-                logger.warning(
-                    "[ %s ] feature [ %s ] max [ %f ] greater than upper bound [ %f ]",
-                    key,
-                    feature,
-                    values.max(),
-                    bounds[1],
-                )
-
-            if values.min() < bounds[0]:
-                logger.warning(
-                    "[ %s ] feature [ %s ] min [ %f ] less than lower bound [ %f ]",
-                    key,
-                    feature,
-                    values.min(),
-                    bounds[0],
-                )
+            check_data_bounds(values, bounds, f"[ {key} ] feature [ {feature} ]")
 
             distribution_means[feature][key] = np.mean(values)
             distribution_stdevs[feature][key] = np.std(values, ddof=1)

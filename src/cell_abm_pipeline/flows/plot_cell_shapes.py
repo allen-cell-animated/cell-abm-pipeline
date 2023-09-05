@@ -42,7 +42,11 @@ from io_collection.save import save_figure, save_text
 from prefect import flow
 
 from cell_abm_pipeline.flows.analyze_cell_shapes import PCA_COMPONENTS
-from cell_abm_pipeline.flows.group_cell_shapes import PROJECTIONS, PROPERTIES
+from cell_abm_pipeline.flows.group_cell_shapes import (
+    CORRELATION_PROPERTIES,
+    DISTRIBUTION_PROPERTIES,
+    PROJECTIONS,
+)
 from cell_abm_pipeline.tasks import (
     build_svg_image,
     make_bar_figure,
@@ -86,11 +90,11 @@ KEY_COLORS: list[str] = [
 class ParametersConfigFeatureCorrelations:
     """Parameter configuration for plot cell shapes subflow - feature correlations."""
 
-    regions: list[str] = field(default_factory=lambda: ["(region)"])
-    """List of subcellular regions."""
-
-    properties: list[str] = field(default_factory=lambda: PROPERTIES)
+    properties: list[str] = field(default_factory=lambda: CORRELATION_PROPERTIES)
     """List of shape properties."""
+
+    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
 
     components: int = PCA_COMPONENTS
     """Number of principal components (i.e. shape modes)."""
@@ -100,7 +104,7 @@ class ParametersConfigFeatureCorrelations:
 class ParametersConfigFeatureDistributions:
     """Parameter configuration for plot cell shapes subflow - feature distributions."""
 
-    properties: list[str] = field(default_factory=lambda: PROPERTIES)
+    properties: list[str] = field(default_factory=lambda: DISTRIBUTION_PROPERTIES)
     """List of shape properties."""
 
     regions: list[str] = field(default_factory=lambda: ["(region)"])

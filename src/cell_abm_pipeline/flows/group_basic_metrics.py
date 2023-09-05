@@ -6,6 +6,10 @@ Working location structure:
 .. code-block:: bash
 
     (name)
+    ├── analysis
+    │   └── analysis.POSITIONS
+    │       ├── (name)_(key)_(seed).POSITIONS.csv
+    │       └── (name)_(key)_(seed).POSITIONS.tar.xz
     ├── groups
     │   └── groups.BASIC
     │       ├── (name).metrics_bins.(key).(seed).(tick).(metric).csv
@@ -17,7 +21,8 @@ Working location structure:
     └── results
         └── (name)_(key)_(seed).csv
 
-Different groups use inputs from the **results** directory.
+Different groups use inputs from the **results** and
+**analysis/analysis.POSITIONS** directories.
 Grouped data is saved to the **groups/groups.BASIC** directory.
 
 Different groups can be visualized using the corresponding plotting workflow or
@@ -38,7 +43,12 @@ from io_collection.save import save_dataframe, save_json
 from prefect import flow, get_run_logger
 from prefect.tasks import task_input_hash
 
-from cell_abm_pipeline.tasks import bin_to_hex, calculate_category_durations, calculate_data_bins
+from cell_abm_pipeline.tasks import (
+    bin_to_hex,
+    calculate_category_durations,
+    calculate_data_bins,
+    check_data_bounds,
+)
 
 OPTIONS = {
     "cache_result_in_memory": False,
@@ -63,32 +73,6 @@ CELL_PHASES: list[str] = [
     "APOPTOTIC_EARLY",
     "APOPTOTIC_LATE",
 ]
-
-BOUNDS: dict[str, list] = {
-    "volume.DEFAULT": [0, 6000],
-    "volume.NUCLEUS": [0, 2000],
-    "height.DEFAULT": [0, 20],
-    "height.NUCLEUS": [0, 20],
-    "phase.PROLIFERATIVE_G1": [0, 5],
-    "phase.PROLIFERATIVE_S": [0, 20],
-    "phase.PROLIFERATIVE_G2": [0, 18],
-    "phase.PROLIFERATIVE_M": [0, 2],
-    "phase.APOPTOTIC_EARLY": [0, 6],
-    "phase.APOPTOTIC_LATE": [0, 12],
-}
-
-BANDWIDTH: dict[str, float] = {
-    "volume.DEFAULT": 100,
-    "volume.NUCLEUS": 50,
-    "height.DEFAULT": 1,
-    "height.NUCLEUS": 1,
-    "phase.PROLIFERATIVE_G1": 0.5,
-    "phase.PROLIFERATIVE_S": 0.5,
-    "phase.PROLIFERATIVE_G2": 0.5,
-    "phase.PROLIFERATIVE_M": 0.25,
-    "phase.APOPTOTIC_EARLY": 0.25,
-    "phase.APOPTOTIC_LATE": 0.5,
-}
 
 BIN_METRICS: list[str] = [
     "count",
@@ -121,6 +105,32 @@ TEMPORAL_METRICS: list[str] = [
     "volume",
     "height",
 ]
+
+BOUNDS: dict[str, list] = {
+    "volume.DEFAULT": [0, 6000],
+    "volume.NUCLEUS": [0, 2000],
+    "height.DEFAULT": [0, 20],
+    "height.NUCLEUS": [0, 20],
+    "phase.PROLIFERATIVE_G1": [0, 5],
+    "phase.PROLIFERATIVE_S": [0, 20],
+    "phase.PROLIFERATIVE_G2": [0, 18],
+    "phase.PROLIFERATIVE_M": [0, 2],
+    "phase.APOPTOTIC_EARLY": [0, 6],
+    "phase.APOPTOTIC_LATE": [0, 12],
+}
+
+BANDWIDTH: dict[str, float] = {
+    "volume.DEFAULT": 100,
+    "volume.NUCLEUS": 50,
+    "height.DEFAULT": 1,
+    "height.NUCLEUS": 1,
+    "phase.PROLIFERATIVE_G1": 0.5,
+    "phase.PROLIFERATIVE_S": 0.5,
+    "phase.PROLIFERATIVE_G2": 0.5,
+    "phase.PROLIFERATIVE_M": 0.25,
+    "phase.APOPTOTIC_EARLY": 0.25,
+    "phase.APOPTOTIC_LATE": 0.5,
+}
 
 
 @dataclass
@@ -439,23 +449,7 @@ def run_flow_group_metrics_distributions(
             bounds = (parameters.bounds[metric][0], parameters.bounds[metric][1])
             bandwidth = parameters.bandwidth[metric]
 
-            if values.max() > bounds[1]:
-                logger.warning(
-                    "[ %s ] metric [ %s ] max [ %f ] greater than upper bound [ %f ]",
-                    key,
-                    metric,
-                    values.max(),
-                    bounds[1],
-                )
-
-            if values.min() < bounds[0]:
-                logger.warning(
-                    "[ %s ] metric [ %s ] min [ %f ] less than lower bound [ %f ]",
-                    key,
-                    metric,
-                    values.min(),
-                    bounds[0],
-                )
+            check_data_bounds(values, bounds, f"[ {key} ] metric [ {metric} ]")
 
             distribution_means[metric][key] = np.mean(values)
             distribution_stdevs[metric][key] = np.std(values, ddof=1)
