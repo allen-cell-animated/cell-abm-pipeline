@@ -30,7 +30,7 @@ class Calculation(Enum):
 
 @dataclass
 class ParametersConfig:
-    """Parameter configuration for run calculate coefficients flow."""
+    """Parameter configuration for run fargate calculations flow."""
 
     image: str
 
@@ -47,7 +47,7 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
-    """Context configuration for run calculate coefficients flow."""
+    """Context configuration for run fargate calculations flow."""
 
     working_location: str
 
@@ -70,7 +70,7 @@ class ContextConfig:
 
 @dataclass
 class SeriesConfig:
-    """Series configuration for run calculate coefficients flow."""
+    """Series configuration for run fargate calculations flow."""
 
     name: str
 
@@ -79,9 +79,9 @@ class SeriesConfig:
     conditions: list[dict]
 
 
-@flow(name="run-calculate-coefficients")
+@flow(name="run-fargate-calculations")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    """Main run calculate coefficients flow."""
+    """Main run fargate calculations flow."""
 
     # Check that a valid calculation type is selected.
     if parameters.calculate is None:
