@@ -1,47 +1,82 @@
 """
 Workflow for plotting colony dynamics.
+
+Working location structure:
+
+.. code-block:: bash
+
+    (name)
+    ├── groups
+    │   └── groups.COLONIES
+    │       ├── (name).feature_distributions.(feature).json
+    │       ├── (name).feature_temporal.(key).(feature).json
+    │       ├── (name).neighbor_positions.(key).(seed).(tick).csv
+    │       └── (name).neighbor_positions.(key).(seed).(tick).(feature).csv
+    └── plots
+        └── plots.COLONIES
+            ├── (name).feature_distributions.(feature).png
+            ├── (name).feature_temporal.(key).(feature).json
+            └── (name).neighbor_positions.(key).(seed).(tick).(feature).png
+
+Plots use grouped data from the **groups/groups.COLONIES** directory.
+Plots are saved to the **plots/plots.COLONIES** directory.
 """
 
-import ast
 from dataclasses import dataclass, field
 
 from io_collection.keys import make_key
-from io_collection.load import load_dataframe
+from io_collection.load import load_dataframe, load_json
 from io_collection.save import save_figure
 from prefect import flow
 
-from cell_abm_pipeline.tasks.clusters import (
-    plot_cluster_counts,
-    plot_cluster_fractions,
-    plot_cluster_trajectory,
+from cell_abm_pipeline.flows.group_colony_dynamics import (
+    DISTRIBUTION_FEATURES,
+    POSITION_FEATURES,
+    TEMPORAL_FEATURES,
 )
-from cell_abm_pipeline.tasks.measures import (
-    plot_degree_distribution,
-    plot_degree_trajectory,
-    plot_graph_centralities,
-    plot_graph_distances,
-)
+from cell_abm_pipeline.tasks import make_graph_figure, make_histogram_figure, make_range_figure
 
-PLOTS_MEASURES = [
-    "degree_distribution",
-    "degree_means",
-    "degree_stds",
-    "graph_centralities",
-    "graph_distances",
+PLOTS: list[str] = [
+    "feature_distributions",
+    "feature_temporal",
+    "neighbor_positions",
 ]
 
-PLOTS_CLUSTERS = [
-    "cluster_counts",
-    "cluster_fractions",
-    "interdistance_mean",
-    "interdistance_std",
-    "intradistance_mean",
-    "intradistance_std",
-    "size_means",
-    "size_stds",
-]
 
-PLOTS = PLOTS_MEASURES + PLOTS_CLUSTERS
+FEATURE_COLORMAPS = {"depth": "magma_r", "group": "tab10"}
+
+
+@dataclass
+class ParametersConfigFeatureDistributions:
+    """Parameter configuration for plot colony dynamics subflow - feature distributions."""
+
+    features: list[str] = field(default_factory=lambda: DISTRIBUTION_FEATURES)
+    """List of colony features."""
+
+
+@dataclass
+class ParametersConfigFeatureTemporal:
+    """Parameter configuration for plot colony dynamics subflow - feature temporal."""
+
+    features: list[str] = field(default_factory=lambda: TEMPORAL_FEATURES)
+    """List of temporal features."""
+
+
+@dataclass
+class ParametersConfigNeighborPositions:
+    """Parameter configuration for plot colony dynamics subflow - neighbor positions."""
+
+    features: list[str] = field(default_factory=lambda: POSITION_FEATURES)
+    """List of position features."""
+
+    seed: int = 0
+    """Simulation seed to use for plotting neighbor positions."""
+
+    ticks: list[int] = field(default_factory=lambda: [0])
+    """Simulation ticks to use for plotting neighbor positions."""
+
+    colormaps: dict[str, str] = field(default_factory=lambda: FEATURE_COLORMAPS)
+    """Colormaps for each feature."""
 
 
 @dataclass
@@ -49,6 +84,18 @@ class ParametersConfig:
     """Parameter configuration for plot colony dynamics flow."""
 
     plots: list[str] = field(default_factory=lambda: PLOTS)
+    """List of colony dynamics plots."""
+
+    feature_distributions: ParametersConfigFeatureDistributions = (
+        ParametersConfigFeatureDistributions()
+    )
+    """Parameters for plot feature distributions subflow."""
+
+    feature_temporal: ParametersConfigFeatureTemporal = ParametersConfigFeatureTemporal()
+    """Parameters for plot feature temporal subflow."""
+
+    neighbor_positions: ParametersConfigNeighborPositions = ParametersConfigNeighborPositions()
+    """Parameters for plot neighbor positions subflow."""
 
 
 @dataclass
@@ -56,6 +103,7 @@ class ContextConfig:
     """Context configuration for plot colony dynamics flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
 
 @dataclass
@@ -63,150 +111,117 @@ class SeriesConfig:
     """Series configuration for plot colony dynamics flow."""
 
     name: str
+    """Name of the simulation series."""
 
     conditions: list[dict]
+    """List of series condition dictionaries (must include unique condition "key")."""
 
 
 @flow(name="plot-colony-dynamics")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    """Main plot colony dynamics flow."""
+    """
+    Main plot colony dynamics flow.
 
-    # Make plots for graph analysis on neighbor connections.
-    if any(plot in parameters.plots for plot in PLOTS_MEASURES):
-        run_flow_plot_measures(context, series, parameters)
+    Calls the following subflows, if the plot is specified:
 
-    # Make plots for cluster analysis on neighbor connections.
-    if any(plot in parameters.plots for plot in PLOTS_CLUSTERS):
-        run_flow_plot_clusters(context, series, parameters)
+    - :py:func:`run_flow_plot_feature_distributions`
+    - :py:func:`run_flow_plot_feature_temporal`
+    - :py:func:`run_flow_plot_neighbor_positions`
+    """
+
+    if "feature_distributions" in parameters.plots:
+        run_flow_plot_feature_distributions(context, series, parameters.feature_distributions)
+
+    if "feature_temporal" in parameters.plots:
+        run_flow_plot_feature_temporal(context, series, parameters.feature_temporal)
+
+    if "neighbor_positions" in parameters.plots:
+        run_flow_plot_neighbor_positions(context, series, parameters.neighbor_positions)
 
 
-@flow(name="plot-colony-dynamics_plot-measures")
-def run_flow_plot_measures(
-    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
+@flow(name="plot-colony-dynamics_plot-feature-distributions")
+def run_flow_plot_feature_distributions(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigFeatureDistributions
 ) -> None:
-    analysis_key = make_key(series.name, "analysis", "analysis.MEASURES")
-    plot_key = make_key(series.name, "plots", "plots.MEASURES")
+    """Plot colony dynamics subflow for feature distributions."""
+
+    group_key = make_key(series.name, "groups", "groups.COLONIES")
+    plot_key = make_key(series.name, "plots", "plots.COLONIES")
     keys = [condition["key"] for condition in series.conditions]
 
-    all_measures = {}
+    for feature in parameters.features:
+        feature_key = feature.upper()
 
-    for key in keys:
-        measures_key = make_key(analysis_key, f"{series.name}_{key}.MEASURES.csv")
-        measures = load_dataframe(
-            context.working_location, measures_key, converters={"DEGREES": ast.literal_eval}
+        group = load_json(
+            context.working_location,
+            make_key(group_key, f"{series.name}.feature_distributions.{feature_key}.json"),
         )
-        all_measures[key] = measures
 
-    if "degree_distribution" in parameters.plots:
+        assert isinstance(group, dict)
+
         save_figure(
             context.working_location,
-            make_key(plot_key, f"{series.name}_degree_distribution.MEASURES.png"),
-            plot_degree_distribution(keys, all_measures),
-        )
-
-    if "degree_means" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_degree_means.MEASURES.png"),
-            plot_degree_trajectory(keys, all_measures, "DEGREE_MEAN"),
-        )
-
-    if "degree_stds" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_degree_stds.MEASURES.png"),
-            plot_degree_trajectory(keys, all_measures, "DEGREE_STD"),
-        )
-
-    if "graph_centralities" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_graph_centralities.MEASURES.png"),
-            plot_graph_centralities(keys, all_measures),
-        )
-
-    if "graph_distances" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_graph_distances.MEASURES.png"),
-            plot_graph_distances(keys, all_measures),
+            make_key(plot_key, f"{series.name}.feature_distributions.{feature_key}.png"),
+            make_histogram_figure(keys, group),
         )
 
 
-@flow(name="plot-colony-dynamics_plot-clusters")
-def run_flow_plot_clusters(
-    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
+@flow(name="plot-colony-dynamics_plot-feature-temporal")
+def run_flow_plot_feature_temporal(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigFeatureTemporal
 ) -> None:
-    analysis_key = make_key(series.name, "analysis", "analysis.CLUSTERS")
-    plot_key = make_key(series.name, "plots", "plots.CLUSTERS")
+    """Plot colony dynamics subflow for temporal features."""
+
+    group_key = make_key(series.name, "groups", "groups.COLONIES")
+    plot_key = make_key(series.name, "plots", "plots.COLONIES")
     keys = [condition["key"] for condition in series.conditions]
 
-    all_clusters = {}
+    for key in keys:
+        for feature in parameters.features:
+            feature_key = f"{key}.{feature.upper()}"
+
+            group = load_json(
+                context.working_location,
+                make_key(group_key, f"{series.name}.feature_temporal.{feature_key}.json"),
+            )
+
+            assert isinstance(group, dict)
+
+            save_figure(
+                context.working_location,
+                make_key(plot_key, f"{series.name}.feature_temporal.{feature_key}.png"),
+                make_range_figure(group),
+            )
+
+
+@flow(name="plot-colony-dynamics_plot-neighbor-positions")
+def run_flow_plot_neighbor_positions(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigNeighborPositions
+) -> None:
+    """Plot colony dynamics subflow for neighbor positions."""
+
+    group_key = make_key(series.name, "groups", "groups.COLONIES")
+    plot_key = make_key(series.name, "plots", "plots.COLONIES")
+    keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
-        clusters_key = make_key(analysis_key, f"{series.name}_{key}.CLUSTERS.csv")
-        clusters = load_dataframe(
-            context.working_location,
-            clusters_key,
-            converters={
-                "INTRA_DISTANCE_MEAN": ast.literal_eval,
-                "INTRA_DISTANCE_STD": ast.literal_eval,
-            },
-        )
-        all_clusters[key] = clusters
+        for tick in parameters.ticks:
+            for feature in parameters.features:
+                edge_key = f"{key}.{parameters.seed:04d}.{tick:06d}"
+                node_key = f"{key}.{parameters.seed:04d}.{tick:06d}.{feature.upper()}"
 
-    if "cluster_counts" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_cluster_counts.CLUSTERS.png"),
-            plot_cluster_counts(keys, all_clusters),
-        )
+                edge_group = load_dataframe(
+                    context.working_location,
+                    make_key(group_key, f"{series.name}.neighbor_positions.{edge_key}.csv"),
+                )
 
-    if "cluster_fractions" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_cluster_fractions.CLUSTERS.png"),
-            plot_cluster_fractions(keys, all_clusters),
-        )
+                node_group = load_dataframe(
+                    context.working_location,
+                    make_key(group_key, f"{series.name}.neighbor_positions.{node_key}.csv"),
+                )
 
-    if "interdistance_mean" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_interdistance_mean.CLUSTERS.png"),
-            plot_cluster_trajectory(keys, all_clusters, "INTER_DISTANCE_MEAN"),
-        )
-
-    if "interdistance_std" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_interdistance_std.CLUSTERS.png"),
-            plot_cluster_trajectory(keys, all_clusters, "INTER_DISTANCE_STD"),
-        )
-
-    if "intradistance_mean" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_intradistance_mean.CLUSTERS.png"),
-            plot_cluster_trajectory(keys, all_clusters, "INTRA_DISTANCE_MEAN"),
-        )
-
-    if "intradistance_std" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_intradistance_std.CLUSTERS.png"),
-            plot_cluster_trajectory(keys, all_clusters, "INTRA_DISTANCE_STD"),
-        )
-
-    if "size_means" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_size_means.CLUSTERS.png"),
-            plot_cluster_trajectory(keys, all_clusters, "CLUSTER_SIZE_MEAN"),
-        )
-
-    if "size_stds" in parameters.plots:
-        save_figure(
-            context.working_location,
-            make_key(plot_key, f"{series.name}_size_stds.CLUSTERS.png"),
-            plot_cluster_trajectory(keys, all_clusters, "CLUSTER_SIZE_STD"),
-        )
+                save_figure(
+                    context.working_location,
+                    make_key(plot_key, f"{series.name}.neighbor_positions.{node_key}.png"),
+                    make_graph_figure(node_group, edge_group, parameters.colormaps[feature]),
+                )
