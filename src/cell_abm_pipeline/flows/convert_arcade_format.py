@@ -19,6 +19,8 @@ Working location structure:
     │   │   └── (name)_(key)_(seed)_(chunk)_(chunk).IMAGE.ome.tiff
     │   ├── converted.MESH
     │   │   └── (name)_(key)_(seed)_(tick)_(id)_(region).MESH.obj
+    │   ├── converted.PROJECTION
+    │   │   └── (name)_(key)_(seed)_(tick)_(regions).PROJECTION.png
     │   └── converted.SIMULARIUM
     │       └── (name)_(key)_(seed).simularium
     ├── data
@@ -37,15 +39,17 @@ Formatted data is saved to the **converted** directory.
 from dataclasses import dataclass, field
 from typing import Optional
 
+import numpy as np
 from arcade_collection.output import (
     convert_to_colorizer,
     convert_to_images,
     convert_to_meshes,
+    convert_to_projection,
     convert_to_simularium,
 )
 from io_collection.keys import make_key
 from io_collection.load import load_dataframe, load_tar
-from io_collection.save import save_image, save_json, save_text
+from io_collection.save import save_figure, save_image, save_json, save_text
 from prefect import flow
 
 from cell_abm_pipeline.flows.plot_basic_metrics import PHASE_COLORS
@@ -54,6 +58,7 @@ FORMATS: list[str] = [
     "colorizer",
     "images",
     "meshes",
+    "projections",
     "simularium",
 ]
 
@@ -79,17 +84,17 @@ class ParametersConfigColorizer:
     box: tuple[int, int, int] = field(default_factory=lambda: (1, 1, 1))
     """Size of bounding box."""
 
-    chunk_size: int = 500
-    """Image chunk size."""
-
-    features: list[str] = field(default_factory=lambda: COLORIZER_FEATURES)
-    """List of colorizer features."""
-
     ds: float = 1.0
     """Spatial scaling in units/um."""
 
     dt: float = 1.0
     """Temporal scaling in hours/tick."""
+
+    chunk_size: int = 500
+    """Image chunk size."""
+
+    features: list[str] = field(default_factory=lambda: COLORIZER_FEATURES)
+    """List of colorizer features."""
 
 
 @dataclass
@@ -139,6 +144,32 @@ class ParametersConfigMeshes:
 
 
 @dataclass
+class ParametersConfigProjections:
+    """Parameter configuration for convert ARCADE format flow - projections."""
+
+    seeds: list[int] = field(default_factory=lambda: [0])
+    """Simulation seeds to use for converting to projections."""
+
+    frame_spec: tuple[int, int, int] = (0, 1153, 1152)
+    """Specification for simulation ticks to use for converting to projections."""
+
+    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
+
+    box: tuple[int, int, int] = field(default_factory=lambda: (1, 1, 1))
+    """Size of bounding box."""
+
+    ds: float = 1.0
+    """Spatial scaling in units/um."""
+
+    dt: float = 1.0
+    """Temporal scaling in hours/tick."""
+
+    scale: int = 100
+    """Size of scale bar (in um)."""
+
+
+@dataclass
 class ParametersConfigSimularium:
     """Parameter configuration for convert ARCADE format flow - simularium."""
 
@@ -183,6 +214,9 @@ class ParametersConfig:
     meshes: ParametersConfigMeshes = ParametersConfigMeshes()
     """Parameters for meshes subflow."""
 
+    projections: ParametersConfigProjections = ParametersConfigProjections()
+    """Parameters for projections subflow."""
+
     simularium: ParametersConfigSimularium = ParametersConfigSimularium()
     """Parameters for simularium subflow."""
 
@@ -216,6 +250,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     - :py:func:`run_flow_convert_to_colorizer`
     - :py:func:`run_flow_convert_to_images`
     - :py:func:`run_flow_convert_to_meshes`
+    - :py:func:`run_flow_convert_to_projections`
     - :py:func:`run_flow_convert_to_simularium`
     """
 
@@ -227,6 +262,9 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     if "meshes" in parameters.formats:
         run_flow_convert_to_meshes(context, series, parameters.meshes)
+
+    if "projections" in parameters.formats:
+        run_flow_convert_to_projections(context, series, parameters.projections)
 
     if "simularium" in parameters.formats:
         run_flow_convert_to_simularium(context, series, parameters.simularium)
@@ -365,6 +403,42 @@ def run_flow_convert_to_meshes(
                     converted_key, f"{series_key}_{frame:06d}_{cell_id:06d}_{region}.MESH.obj"
                 )
                 save_text(context.working_location, mesh_key, mesh)
+
+
+@flow(name="convert-arcade-format_convert-to-projections")
+def run_flow_convert_to_projections(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigProjections
+) -> None:
+    """Convert ARCADE format subflow for projections."""
+
+    data_key = make_key(series.name, "data", "data.LOCATIONS")
+    converted_key = make_key(series.name, "converted", "converted.PROJECTION")
+    region_key = ":".join(sorted(parameters.regions))
+    keys = [condition["key"] for condition in series.conditions]
+
+    for key in keys:
+        for seed in parameters.seeds:
+            series_key = f"{series.name}_{key}_{seed:04d}"
+
+            tar_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
+            tar = load_tar(context.working_location, tar_key)
+
+            for frame in np.arange(*parameters.frame_spec):
+                projection = convert_to_projection(
+                    series_key,
+                    tar,
+                    frame,
+                    parameters.regions,
+                    parameters.box,
+                    parameters.ds,
+                    parameters.dt,
+                    parameters.scale,
+                )
+
+                projection_key = make_key(
+                    converted_key, f"{series_key}_{frame:06d}_{region_key}.PROJECTION.png"
+                )
+                save_figure(context.working_location, projection_key, projection)
 
 
 @flow(name="convert-arcade-format_convert-to-simularium")
