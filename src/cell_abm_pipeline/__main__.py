@@ -3,8 +3,10 @@ import importlib
 import os
 import sys
 from datetime import datetime
+from types import ModuleType
+from typing import Optional
 
-from omegaconf import OmegaConf
+from omegaconf import DictConfig, OmegaConf
 from prefect.blocks.system import Secret
 from prefect.deployments import Deployment
 
@@ -15,7 +17,7 @@ from cell_abm_pipeline.__config__ import (
 )
 
 
-def main():
+def main() -> None:
     if len(sys.argv) < 2:
         return
 
@@ -59,7 +61,7 @@ def main():
         run_flow(module, config)
 
 
-def get_module(module_name):
+def get_module(module_name: str) -> Optional[ModuleType]:
     module_spec = importlib.util.find_spec(f"..flows.{module_name}", package=__name__)
 
     if module_spec is not None:
@@ -74,7 +76,7 @@ def get_module(module_name):
     return module
 
 
-def create_flow_template(module_name):
+def create_flow_template(module_name: str) -> None:
     path = os.path.dirname(os.path.abspath(__file__))
 
     with open(f"{path}/__template__.py", "r", encoding="utf-8") as file:
@@ -86,7 +88,7 @@ def create_flow_template(module_name):
         file.write(template)
 
 
-def run_flow(module, config):
+def run_flow(module: ModuleType, config: DictConfig) -> None:
     context = OmegaConf.to_object(config.context)
     series = OmegaConf.to_object(config.series)
     parameters = OmegaConf.to_object(config.parameters)
@@ -94,16 +96,20 @@ def run_flow(module, config):
     module.run_flow(context, series, parameters)
 
 
-def create_deployment(module, config):
+def create_deployment(module: ModuleType, config: DictConfig) -> None:
     context = OmegaConf.to_object(config.context)
     series = OmegaConf.to_object(config.series)
     parameters = OmegaConf.to_object(config.parameters)
+
+    assert isinstance(context, dict)
+    assert isinstance(series, dict)
+    assert isinstance(parameters, dict)
 
     flow_name = module.__name__.split(".")[-1].replace("_", "-")
 
     name = input("Deployment name: ")
     name = name.replace("{{timestamp}}", datetime.now().strftime("%Y-%m-%d"))
-    name = name.replace("{{name}}", series.name)
+    name = name.replace("{{name}}", series["name"])
 
     work_queue_name = input("Deployment queue (default if None): ")
     work_queue_name = "default" if work_queue_name == "" else work_queue_name

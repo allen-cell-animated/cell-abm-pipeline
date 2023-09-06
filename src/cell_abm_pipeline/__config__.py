@@ -1,11 +1,12 @@
 import os
 import re
 from dataclasses import dataclass, field, fields, make_dataclass
-from typing import Any
+from types import ModuleType
+from typing import Any, Union
 
 from hydra import compose, initialize_config_dir
 from hydra.core.config_store import ConfigStore
-from omegaconf import MISSING, OmegaConf
+from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
 
 defaults = [
     "_self_",
@@ -30,8 +31,11 @@ class ParametersConfig:
     name: str
 
 
-def make_dotlist_from_config(config):
+def make_dotlist_from_config(config: dict) -> list[str]:
     container = OmegaConf.to_container(OmegaConf.structured(config))
+
+    assert isinstance(container, dict)
+
     queue = list(container.items())
     dotlist = []
 
@@ -50,7 +54,7 @@ def make_dotlist_from_config(config):
     return dotlist
 
 
-def make_config_from_dotlist(module, args):
+def make_config_from_dotlist(module: ModuleType, args: list[str]) -> DictConfig:
     context_config = generate_config(module.ContextConfig, "context", args)
     series_config = generate_config(module.SeriesConfig, "series", args)
     parameters_config = generate_config(module.ParametersConfig, "parameters", args)
@@ -66,10 +70,10 @@ def make_config_from_dotlist(module, args):
     return config
 
 
-def make_config_from_yaml(module, args):
+def make_config_from_yaml(module: ModuleType, args: list[str]) -> DictConfig:
     config_store = ConfigStore.instance()
 
-    config = make_dataclass(
+    config_dataclass = make_dataclass(
         "Config",
         [
             ("defaults", list[Any], field(default_factory=lambda: defaults)),
@@ -79,7 +83,7 @@ def make_config_from_yaml(module, args):
         ],
     )
 
-    config_store.store(name="config", node=config)
+    config_store.store(name="config", node=config_dataclass)
 
     config_dir = os.path.join(os.path.abspath(os.getcwd()), "configs")
     initialize_config_dir(config_dir, version_base=None)
@@ -89,7 +93,7 @@ def make_config_from_yaml(module, args):
     return config
 
 
-def make_config_from_file(schema, file):
+def make_config_from_file(schema: Any, file: str) -> Union[ListConfig, DictConfig]:
     config = OmegaConf.load(file)
 
     config_keys = list(config.keys())
@@ -102,14 +106,14 @@ def make_config_from_file(schema, file):
     return OmegaConf.merge(schema, config)
 
 
-def generate_config(config_class, group, arguments):
-    dotlist = [arg.replace(group, "", 1).strip(".") for arg in arguments if arg.startswith(group)]
+def generate_config(config_class: Any, group: str, args: list[str]) -> DictConfig:
+    dotlist = [arg.replace(group, "", 1).strip(".") for arg in args if arg.startswith(group)]
     config = OmegaConf.structured(config_class)
     config.merge_with_dotlist(dotlist)
     return config
 
 
-def display_config(config):
+def display_config(config: DictConfig) -> None:
     active = False
     config_lines = []
     list_entries = []
