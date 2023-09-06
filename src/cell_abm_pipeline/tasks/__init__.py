@@ -10,6 +10,5 @@ from .make_graph_figure import make_graph_figure
 from .make_heatmap_figure import make_heatmap_figure
 from .make_histogram_figure import make_histogram_figure
 from .make_line_figure import make_line_figure
-from .make_projection_frame import make_projection_frame
 from .make_range_figure import make_range_figure
 from .make_scatter_figure import make_scatter_figure
