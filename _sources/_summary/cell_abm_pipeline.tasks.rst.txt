@@ -1,0 +1,47 @@
+﻿tasks
+=====
+
+.. automodule:: cell_abm_pipeline.tasks
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+
+.. autosummary::
+   :toctree:
+   :template: custom_task_module.rst
+   :recursive:
+
+   bin_to_hex
+   build_svg_image
+   calculate_category_durations
+   calculate_data_bins
+   check_data_bounds
+   make_bar_figure
+   make_box_figure
+   make_density_figure
+   make_graph_figure
+   make_heatmap_figure
+   make_histogram_figure
+   make_line_figure
+   make_range_figure
+   make_scatter_figure
+   physicell
+

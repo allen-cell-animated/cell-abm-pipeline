@@ -1,0 +1,22 @@
+make\_bar\_figure
+=================
+
+.. automodule:: cell_abm_pipeline.tasks.make_bar_figure
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

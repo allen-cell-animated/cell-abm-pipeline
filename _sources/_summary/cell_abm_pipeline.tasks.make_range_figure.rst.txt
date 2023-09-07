@@ -1,0 +1,22 @@
+make\_range\_figure
+===================
+
+.. automodule:: cell_abm_pipeline.tasks.make_range_figure
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,5 +1,5 @@
-﻿tasks.physicell
-===============
+physicell
+=========
 
 .. automodule:: cell_abm_pipeline.tasks.physicell
    :members:
@@ -20,18 +20,3 @@
    
    
    
-
-
-
-
-.. currentmodule:: cell_abm_pipeline.tasks
-
-.. autosummary::
-   :toctree:
-   :template: custom_task_module.rst
-   :recursive:
-
-   physicell.convert_physicell_to_simularium
-   physicell.parse_mcds_file
-   physicell.render_physicell_template
-

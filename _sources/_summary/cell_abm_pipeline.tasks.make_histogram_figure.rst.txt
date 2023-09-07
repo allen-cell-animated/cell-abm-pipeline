@@ -1,0 +1,22 @@
+make\_histogram\_figure
+=======================
+
+.. automodule:: cell_abm_pipeline.tasks.make_histogram_figure
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

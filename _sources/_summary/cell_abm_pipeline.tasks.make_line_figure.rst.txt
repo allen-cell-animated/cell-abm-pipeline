@@ -1,0 +1,22 @@
+make\_line\_figure
+==================
+
+.. automodule:: cell_abm_pipeline.tasks.make_line_figure
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

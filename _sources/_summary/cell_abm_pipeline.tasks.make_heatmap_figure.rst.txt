@@ -1,0 +1,22 @@
+make\_heatmap\_figure
+=====================
+
+.. automodule:: cell_abm_pipeline.tasks.make_heatmap_figure
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

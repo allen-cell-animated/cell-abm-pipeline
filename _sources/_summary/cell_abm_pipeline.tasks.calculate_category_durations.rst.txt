@@ -1,0 +1,22 @@
+calculate\_category\_durations
+==============================
+
+.. automodule:: cell_abm_pipeline.tasks.calculate_category_durations
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

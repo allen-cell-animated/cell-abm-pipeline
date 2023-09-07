@@ -14,14 +14,14 @@ analyze\_colony\_dynamics
       :nosignatures:
    
       run_flow
-      run_flow_analyze_clusters
       run_flow_analyze_measures
       run_flow_generate_networks
+      run_flow_process_data
    
    .. autofunction:: cell_abm_pipeline.flows.analyze_colony_dynamics.run_flow
-   .. autofunction:: cell_abm_pipeline.flows.analyze_colony_dynamics.run_flow_analyze_clusters
    .. autofunction:: cell_abm_pipeline.flows.analyze_colony_dynamics.run_flow_analyze_measures
    .. autofunction:: cell_abm_pipeline.flows.analyze_colony_dynamics.run_flow_generate_networks
+   .. autofunction:: cell_abm_pipeline.flows.analyze_colony_dynamics.run_flow_process_data
    
    
 

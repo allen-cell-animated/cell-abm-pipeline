@@ -1,0 +1,22 @@
+make\_box\_figure
+=================
+
+.. automodule:: cell_abm_pipeline.tasks.make_box_figure
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

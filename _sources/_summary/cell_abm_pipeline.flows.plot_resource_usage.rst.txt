@@ -14,8 +14,12 @@ plot\_resource\_usage
       :nosignatures:
    
       run_flow
+      run_flow_plot_object_storage
+      run_flow_plot_wall_clock
    
    .. autofunction:: cell_abm_pipeline.flows.plot_resource_usage.run_flow
+   .. autofunction:: cell_abm_pipeline.flows.plot_resource_usage.run_flow_plot_object_storage
+   .. autofunction:: cell_abm_pipeline.flows.plot_resource_usage.run_flow_plot_wall_clock
    
    
 
@@ -28,12 +32,20 @@ plot\_resource\_usage
    
       ContextConfig
       ParametersConfig
+      ParametersConfigObjectStorage
+      ParametersConfigWallClock
       SeriesConfig
    
    .. autoclass:: cell_abm_pipeline.flows.plot_resource_usage.ContextConfig
       :members:
       :exclude-members: __init__
    .. autoclass:: cell_abm_pipeline.flows.plot_resource_usage.ParametersConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.plot_resource_usage.ParametersConfigObjectStorage
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.plot_resource_usage.ParametersConfigWallClock
       :members:
       :exclude-members: __init__
    .. autoclass:: cell_abm_pipeline.flows.plot_resource_usage.SeriesConfig

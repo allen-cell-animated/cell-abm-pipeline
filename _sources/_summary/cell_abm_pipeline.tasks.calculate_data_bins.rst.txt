@@ -1,0 +1,22 @@
+calculate\_data\_bins
+=====================
+
+.. automodule:: cell_abm_pipeline.tasks.calculate_data_bins
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

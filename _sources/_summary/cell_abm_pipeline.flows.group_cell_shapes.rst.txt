@@ -1,0 +1,107 @@
+group\_cell\_shapes
+===================
+
+.. automodule:: cell_abm_pipeline.flows.group_cell_shapes
+   
+   
+   
+
+   
+   
+   .. rubric:: Flows
+
+   .. autosummary::
+      :nosignatures:
+   
+      run_flow
+      run_flow_group_feature_correlations
+      run_flow_group_feature_distributions
+      run_flow_group_mode_correlations
+      run_flow_group_population_counts
+      run_flow_group_population_stats
+      run_flow_group_shape_average
+      run_flow_group_shape_errors
+      run_flow_group_shape_modes
+      run_flow_group_shape_samples
+      run_flow_group_variance_explained
+   
+   .. autofunction:: cell_abm_pipeline.flows.group_cell_shapes.run_flow
+   .. autofunction:: cell_abm_pipeline.flows.group_cell_shapes.run_flow_group_feature_correlations
+   .. autofunction:: cell_abm_pipeline.flows.group_cell_shapes.run_flow_group_feature_distributions
+   .. autofunction:: cell_abm_pipeline.flows.group_cell_shapes.run_flow_group_mode_correlations
+   .. autofunction:: cell_abm_pipeline.flows.group_cell_shapes.run_flow_group_population_counts
+   .. autofunction:: cell_abm_pipeline.flows.group_cell_shapes.run_flow_group_population_stats
+   .. autofunction:: cell_abm_pipeline.flows.group_cell_shapes.run_flow_group_shape_average
+   .. autofunction:: cell_abm_pipeline.flows.group_cell_shapes.run_flow_group_shape_errors
+   .. autofunction:: cell_abm_pipeline.flows.group_cell_shapes.run_flow_group_shape_modes
+   .. autofunction:: cell_abm_pipeline.flows.group_cell_shapes.run_flow_group_shape_samples
+   .. autofunction:: cell_abm_pipeline.flows.group_cell_shapes.run_flow_group_variance_explained
+   
+   
+
+   
+   
+   .. rubric:: Configs
+
+   .. autosummary::
+      :nosignatures:
+   
+      ContextConfig
+      ParametersConfig
+      ParametersConfigFeatureCorrelations
+      ParametersConfigFeatureDistributions
+      ParametersConfigModeCorrelations
+      ParametersConfigPopulationCounts
+      ParametersConfigPopulationStats
+      ParametersConfigShapeAverage
+      ParametersConfigShapeErrors
+      ParametersConfigShapeModes
+      ParametersConfigShapeSamples
+      ParametersConfigVarianceExplained
+      SeriesConfig
+   
+   .. autoclass:: cell_abm_pipeline.flows.group_cell_shapes.ContextConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.group_cell_shapes.ParametersConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigFeatureCorrelations
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigFeatureDistributions
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigModeCorrelations
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigPopulationCounts
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigPopulationStats
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigShapeAverage
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigShapeErrors
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigShapeModes
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigShapeSamples
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigVarianceExplained
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.group_cell_shapes.SeriesConfig
+      :members:
+      :exclude-members: __init__
+   
+   
+
+   
+   
+   

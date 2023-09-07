@@ -1,0 +1,22 @@
+bin\_to\_hex
+============
+
+.. automodule:: cell_abm_pipeline.tasks.bin_to_hex
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
