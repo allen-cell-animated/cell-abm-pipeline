@@ -1,3 +1,5 @@
+"""Tasks for working with cell-scale agent-based models."""
+
 from .bin_to_hex import bin_to_hex
 from .build_svg_image import build_svg_image
 from .calculate_category_durations import calculate_category_durations

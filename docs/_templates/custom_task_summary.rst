@@ -51,8 +51,6 @@
 {% block modules %}
 {% if modules %}
 
-.. currentmodule:: {{module | custom_module }}
-
 .. autosummary::
    :toctree:
    :template: custom_task_module.rst

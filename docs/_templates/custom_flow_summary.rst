@@ -51,7 +51,7 @@
 {% block modules %}
 {% if modules %}
 
-.. currentmodule:: {{module | custom_module }}
+.. currentmodule:: {{ module | custom_module }}
 
 .. autosummary::
    :toctree:
