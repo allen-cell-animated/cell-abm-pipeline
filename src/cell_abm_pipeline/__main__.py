@@ -101,25 +101,23 @@ def create_deployment(module: ModuleType, config: DictConfig) -> None:
     series = OmegaConf.to_object(config.series)
     parameters = OmegaConf.to_object(config.parameters)
 
-    assert isinstance(context, dict)
-    assert isinstance(series, dict)
-    assert isinstance(parameters, dict)
-
     flow_name = module.__name__.split(".")[-1].replace("_", "-")
 
     name = input("Deployment name: ")
     name = name.replace("{{timestamp}}", datetime.now().strftime("%Y-%m-%d"))
-    name = name.replace("{{name}}", series["name"])
+
+    if series is not None and hasattr(series, "name"):
+        name = name.replace("{{name}}", series.name)
 
     work_queue_name = input("Deployment queue (default if None): ")
     work_queue_name = "default" if work_queue_name == "" else work_queue_name
 
     infra_overrides = {}
 
-    if hasattr(context, "region"):
+    if context is not None and hasattr(context, "region"):
         infra_overrides = {"env": {"AWS_DEFAULT_REGION": context.region}}
 
-    deployment = Deployment(name=name, flow_name=flow_name)
+    deployment = Deployment.build_from_flow(flow=module.run_flow, name=name)
     checksum = hashlib.md5(OmegaConf.to_yaml(config, resolve=True).encode("utf-8")).hexdigest()
 
     full_name = f"\033[1m{flow_name}/{name}\033[0m"
@@ -157,7 +155,7 @@ def create_deployment(module: ModuleType, config: DictConfig) -> None:
             apply=True,
         )
 
-        print(f"Deployment {full_name} created.")
+        print(f"Deployment {full_name} created in queue \033[92m{ work_queue_name }\033[0m.")
     elif deployment.work_queue_name != work_queue_name:
         response = input(f"Update {full_name} queue to \033[92m{ work_queue_name }\033[0m [y/n]? ")
         if response[0] != "y":
