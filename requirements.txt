@@ -1,9 +1,9 @@
 abm-colony-collection==0.4.0 ; python_version >= "3.9" and python_version < "3.12" \
     --hash=sha256:1190d5c5db6aba5dd64c92013f1e4f408282afe249adf4b65c11888379c25e43 \
     --hash=sha256:ea468522ca37e9e8d1b12554e0220368aac60439272214fd3f206220dc81c1b3
-abm-initialization-collection==0.5.2 ; python_version >= "3.9" and python_version < "3.12" \
-    --hash=sha256:564bdf41fcfbc71f6ede7bf0dba3ba8e81fbd81b2b13e34fbef73e805880ccd5 \
-    --hash=sha256:cc2dbc9cc15a93a1b58597fec5adfabe0d9d46fc98f73cafb0209694004e48a9
+abm-initialization-collection==0.6.0 ; python_version >= "3.9" and python_version < "3.12" \
+    --hash=sha256:2a11b98364b1e2baa72f1c80efd5dbc8c37f121745c8addbe461e8b8024b17c7 \
+    --hash=sha256:52b44155f1f17847ded50daca33437964865d0e37af181f1fa3d04bc18880abc
 abm-shape-collection==0.8.0 ; python_version >= "3.9" and python_version < "3.12" \
     --hash=sha256:2a0f18ad1f24aa014a63f6be17bb70cb53a1d2f2780e610eea94a57a37ca3824 \
     --hash=sha256:c71d6ab4864e8b636153ca4462a5641a249c08ba7c30b983b4af276c1d8092f5

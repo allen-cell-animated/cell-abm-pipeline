@@ -63,7 +63,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
             "outlier",
             "fov_seg_path",
             "this_cell_index",
-            "mem_shape_volume_lcc",
+            "MEM_shape_volume",
         ],
     )
 
