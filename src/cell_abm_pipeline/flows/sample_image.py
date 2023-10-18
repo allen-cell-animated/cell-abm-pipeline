@@ -10,10 +10,10 @@ Working location structure:
     │    └── (name)_(key).(extension)
     ├── plots
     │    └── plots.SAMPLE
-    │        └── (name)_(key)_C(channel).SAMPLE.png
+    │        └── (name)_(key)_C(channel)_R(resolution).SAMPLE.png
     └── samples
         └── samples.RAW
-            └── (name)_(key)_C(channel).RAW.csv
+            └── (name)_(key)_C(channel)_R(resolution).RAW.csv
 
 The **images** directory contains the input image to be sampled.
 Resulting sample(s) are placed into the **samples/samples.RAW** directory and
@@ -100,7 +100,10 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     )
 
     for channel in parameters.channels:
-        channel_key = f"{series.name}_{parameters.key}_C{channel:02}"
+        resolution_key = f"R{round(parameters.resolution * 10):03d}"
+        channel_key = f"C{channel:02d}"
+        item_key = f"{series.name}_{parameters.key}_{channel_key}_{resolution_key}"
+
         samples = get_image_samples(image, sample_indices, channel)
         samples = scale_sample_coordinates(
             samples,
@@ -109,10 +112,10 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
             parameters.scale_xy,
             parameters.scale_z,
         )
-        sample_key = make_key(series.name, "samples", "samples.RAW", f"{channel_key}.RAW.csv")
+        sample_key = make_key(series.name, "samples", "samples.RAW", f"{item_key}.RAW.csv")
         save_dataframe(context.working_location, sample_key, samples, index=False)
 
         if parameters.contact_sheet:
             contact_sheet = plot_contact_sheet(samples)
-            plot_key = make_key(series.name, "plots", "plots.SAMPLE", f"{channel_key}.SAMPLE.png")
+            plot_key = make_key(series.name, "plots", "plots.SAMPLE", f"{item_key}.SAMPLE.png")
             save_figure(context.working_location, plot_key, contact_sheet)

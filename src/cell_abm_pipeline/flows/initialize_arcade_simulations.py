@@ -36,12 +36,12 @@ PROCESS_SAMPLE_COMMAND = ["abmpipe", "process-sample", "::"]
 
 VOLUMES: dict[str, tuple[float, float]] = {
     "DEFAULT": (1865.0, 517.0),
-    "NUCLEUS": (542.0, 157.0),
+    "NUCLEUS": (543.0, 157.0),
 }
 
 HEIGHTS: dict[str, tuple[float, float]] = {
-    "DEFAULT": (9.65, 2.4),
-    "NUCLEUS": (6.75, 1.7),
+    "DEFAULT": (9.75, 2.4),
+    "NUCLEUS": (6.86, 1.7),
 }
 
 CRITICAL_VOLUMES: dict[str, tuple[float, float]] = {

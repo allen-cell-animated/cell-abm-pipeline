@@ -8,12 +8,12 @@ Working location structure:
     (name)
     ├── plots
     │    └── plots.SAMPLE
-    │        └── (name)_(key)_C(channel).SAMPLE.png
+    │        └── (name)_(key)_C(channel)_R(resolution).SAMPLE.png
     └── samples
         ├── samples.PROCESSED
-        │    └── (name)_(key)_C(channel).PROCESSED.csv
+        │    └── (name)_(key)_C(channel)_R(resolution).PROCESSED.csv
         └── samples.RAW
-            └── (name)_(key)_C(channel).RAW.csv
+            └── (name)_(key)_C(channel)_R(resolution).RAW.csv
 
 Samples to be processed are loaded from the **samples/samples.RAW** directory.
 Contact sheet plots from this task will overwrite existing contact sheets
@@ -87,8 +87,10 @@ class SeriesConfig:
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     """Main process sample flow."""
 
-    channel_key = f"{series.name}_{parameters.key}_C{parameters.channel:02}"
-    sample_key = make_key(series.name, "samples", "samples.RAW", f"{channel_key}.RAW.csv")
+    channel_key = f"C{parameters.channel:02d}"
+    resolution_key = f"R{round(parameters.resolution * 10):03d}"
+    item_key = f"{series.name}_{parameters.key}_{channel_key}_{resolution_key}"
+    sample_key = make_key(series.name, "samples", "samples.RAW", f"{item_key}.RAW.csv")
 
     raw_samples = load_dataframe(context.working_location, sample_key)
     processed_samples = raw_samples.copy()
@@ -110,11 +112,11 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         processed_samples = exclude_selected_ids(processed_samples, parameters.exclude_ids)
 
     processed_key = make_key(
-        series.name, "samples", "samples.PROCESSED", f"{channel_key}.PROCESSED.csv"
+        series.name, "samples", "samples.PROCESSED", f"{item_key}.PROCESSED.csv"
     )
     save_dataframe(context.working_location, processed_key, processed_samples, index=False)
 
     if parameters.contact_sheet:
         contact_sheet = plot_contact_sheet(processed_samples, raw_samples)
-        plot_key = make_key(series.name, "plots", "plots.SAMPLE", f"{channel_key}.SAMPLE.png")
+        plot_key = make_key(series.name, "plots", "plots.SAMPLE", f"{item_key}.SAMPLE.png")
         save_figure(context.working_location, plot_key, contact_sheet)
