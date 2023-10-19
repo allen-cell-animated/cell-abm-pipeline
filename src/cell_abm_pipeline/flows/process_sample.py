@@ -8,12 +8,12 @@ Working location structure:
     (name)
     ├── plots
     │    └── plots.SAMPLE
-    │        └── (name)_(key)_C(channel)_R(resolution).SAMPLE.png
+    │        └── (name)_(key).SAMPLE.png
     └── samples
         ├── samples.PROCESSED
-        │    └── (name)_(key)_C(channel)_R(resolution).PROCESSED.csv
+        │    └── (name)_(key).PROCESSED.csv
         └── samples.RAW
-            └── (name)_(key)_C(channel)_R(resolution).RAW.csv
+            └── (name)_(key).RAW.csv
 
 Samples to be processed are loaded from the **samples/samples.RAW** directory.
 Contact sheet plots from this task will overwrite existing contact sheets
@@ -35,11 +35,11 @@ from io_collection.load import load_dataframe
 from io_collection.save import save_dataframe, save_figure
 from prefect import flow
 
-# Threshold for number of samples touching edge of FOV to be considered edge
+UNCONNECTED_THRESHOLD: float = 2.0
+
 EDGE_THRESHOLD: int = 1
 
-# Distance (in um) to nearest neighbor to be considered unconnected
-UNCONNECTED_THRESHOLD: float = 2.0
+EDGE_PADDING: float = 1.0
 
 
 @dataclass
@@ -48,23 +48,29 @@ class ParametersConfig:
 
     key: str
 
-    channel: int
-
     remove_unconnected: bool = True
+    """True to remove unconnected regions, False otherwise."""
 
     unconnected_threshold: float = UNCONNECTED_THRESHOLD
+    """Distance for removing unconnected regions."""
 
     unconnected_filter: str = "connectivity"
+    """Filter type for assigning unconnected coordinates."""
 
     remove_edges: bool = True
+    """True to remove cells touching the edge of the bounds, False otherwise."""
 
     edge_threshold: int = EDGE_THRESHOLD
+    """Number of edge positions per axis needed to assign edge region."""
 
-    edge_padding: float = 1.0
+    edge_padding: float = EDGE_PADDING
+    """Distance from axis limits to assign edge positions."""
 
     include_ids: Optional[list[int]] = None
+    """List of ids to include."""
 
     exclude_ids: Optional[list[int]] = None
+    """List of ids to exclude."""
 
     contact_sheet: bool = True
 
@@ -74,6 +80,7 @@ class ContextConfig:
     """Context configuration for process sample flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
 
 @dataclass
@@ -81,15 +88,14 @@ class SeriesConfig:
     """Series configuration for process sample flow."""
 
     name: str
+    """Name of the simulation series."""
 
 
 @flow(name="process-sample")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     """Main process sample flow."""
 
-    channel_key = f"C{parameters.channel:02d}"
-    resolution_key = f"R{round(parameters.resolution * 10):03d}"
-    item_key = f"{series.name}_{parameters.key}_{channel_key}_{resolution_key}"
+    item_key = f"{series.name}_{parameters.key}"
     sample_key = make_key(series.name, "samples", "samples.RAW", f"{item_key}.RAW.csv")
 
     raw_samples = load_dataframe(context.working_location, sample_key)

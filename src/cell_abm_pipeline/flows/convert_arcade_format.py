@@ -117,7 +117,7 @@ class ParametersConfigImages:
     """Image chunk size."""
 
     binary: bool = False
-    """True if generate binary images, False otherwise."""
+    """True to generate binary images, False otherwise."""
 
     separate: bool = False
     """True to generate separate images for each tick, False otherwise."""

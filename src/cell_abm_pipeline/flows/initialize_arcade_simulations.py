@@ -17,18 +17,18 @@ from container_collection.docker import (
     remove_docker_volume,
     run_docker_command,
 )
-from io_collection.keys import change_key, check_key, make_key
+from io_collection.keys import check_key, make_key
 from io_collection.load import load_dataframe
 from io_collection.save import save_json, save_text
 from prefect import flow
 
 from cell_abm_pipeline.__config__ import make_dotlist_from_config
-from cell_abm_pipeline.flows.process_sample import ContextConfig as ProcessSampleContextConfig
-from cell_abm_pipeline.flows.process_sample import ParametersConfig as ProcessSampleParametersConfig
-from cell_abm_pipeline.flows.process_sample import SeriesConfig as ProcessSampleSeriesConfig
-from cell_abm_pipeline.flows.sample_image import ContextConfig as SampleImageContextConfig
-from cell_abm_pipeline.flows.sample_image import ParametersConfig as SampleImageParametersConfig
-from cell_abm_pipeline.flows.sample_image import SeriesConfig as SampleImageSeriesConfig
+from cell_abm_pipeline.flows.process_sample import ContextConfig as ContextConfigProcessSample
+from cell_abm_pipeline.flows.process_sample import ParametersConfig as ParametersConfigProcessSample
+from cell_abm_pipeline.flows.process_sample import SeriesConfig as SeriesConfigProcessSample
+from cell_abm_pipeline.flows.sample_image import ContextConfig as ContextConfigSampleImage
+from cell_abm_pipeline.flows.sample_image import ParametersConfig as ParametersConfigSampleImage
+from cell_abm_pipeline.flows.sample_image import SeriesConfig as SeriesConfigSampleImage
 
 SAMPLE_IMAGE_COMMAND = ["abmpipe", "sample-image", "::"]
 
@@ -56,7 +56,7 @@ CRITICAL_HEIGHTS: dict[str, tuple[float, float]] = {
 
 STATE_THRESHOLDS: dict[str, float] = {
     "APOPTOTIC_LATE": 0.25,
-    "APOPTOTIC_EARLY": 1,
+    "APOPTOTIC_EARLY": 0.90,
     "PROLIFERATIVE_G1": 1.124,
     "PROLIFERATIVE_S": 1.726,
     "PROLIFERATIVE_G2": 1.969,
@@ -65,24 +65,15 @@ STATE_THRESHOLDS: dict[str, float] = {
 
 POTTS_TERMS: list[str] = [
     "volume",
-    "surface",
     "adhesion",
-    "height",
-    "junction",
-    "substrate",
-    "persistence",
 ]
 
 
 @dataclass
-class ParametersConfig:
-    """Parameter configuration for initialize arcade simulations flow."""
+class ParametersConfigConvertToArcade:
+    """Parameter configuration for initialize arcade simulations subflow - convert to arcade."""
 
-    image: str
-
-    sample_image: dict[str, SampleImageParametersConfig]
-
-    process_sample: dict[str, ProcessSampleParametersConfig]
+    regions: dict[str, str] = field(default_factory=lambda: {"DEFAULT": "%s"})
 
     margins: tuple[int, int, int] = (0, 0, 0)
 
@@ -97,6 +88,21 @@ class ParametersConfig:
     state_thresholds: dict[str, float] = field(default_factory=lambda: STATE_THRESHOLDS)
 
     potts_terms: list[str] = field(default_factory=lambda: POTTS_TERMS)
+
+
+@dataclass
+class ParametersConfig:
+    """Parameter configuration for initialize arcade simulations flow."""
+
+    image: str
+
+    resolution: float
+
+    sample_images: dict[str, ParametersConfigSampleImage]
+
+    process_samples: dict[str, ParametersConfigProcessSample]
+
+    convert_to_arcade: ParametersConfigConvertToArcade = ParametersConfigConvertToArcade()
 
 
 @dataclass
@@ -149,16 +155,17 @@ def run_flow_sample_images(
     docker_args = get_docker_arguments(context)
 
     if context.working_location.startswith("s3://"):
-        context_config = SampleImageContextConfig(working_location=context.working_location)
+        context_config = ContextConfigSampleImage(working_location=context.working_location)
     else:
-        context_config = SampleImageContextConfig(working_location="/mnt")
+        context_config = ContextConfigSampleImage(working_location="/mnt")
 
-    series_config = SampleImageSeriesConfig(name=series.name)
+    series_config = SeriesConfigSampleImage(name=series.name)
 
     for fov in series.conditions:
-        for _, sample_image in parameters.sample_image.items():
+        for _, sample_image in parameters.sample_images.items():
             parameters_config = copy.deepcopy(sample_image)
             parameters_config.key = parameters_config.key % fov["key"]
+            parameters_config.resolution = parameters.resolution
 
             config = {
                 "context": context_config,
@@ -177,22 +184,22 @@ def run_flow_sample_images(
 def run_flow_process_samples(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
-    samples_key = make_key(series.name, "samples", "samples.PROCESSED")
     docker_args = get_docker_arguments(context)
 
     if context.working_location.startswith("s3://"):
-        context_config = ProcessSampleContextConfig(working_location=context.working_location)
+        context_config = ContextConfigProcessSample(working_location=context.working_location)
     else:
-        context_config = ProcessSampleContextConfig(working_location="/mnt")
+        context_config = ContextConfigProcessSample(working_location="/mnt")
 
-    series_config = ProcessSampleSeriesConfig(name=series.name)
+    series_config = SeriesConfigProcessSample(name=series.name)
+    resolution_key = f"R{round(parameters.resolution * 10):03d}"
 
     for fov in series.conditions:
         fov_key = fov["key"]
 
-        for region, process_sample in parameters.process_sample.items():
+        for _, process_sample in parameters.process_samples.items():
             parameters_config = copy.deepcopy(process_sample)
-            parameters_config.key = parameters_config.key % fov_key
+            parameters_config.key = f"{parameters_config.key % fov_key}_{resolution_key}"
 
             if "include_ids" in fov:
                 parameters_config.include_ids = fov["include_ids"]
@@ -209,11 +216,6 @@ def run_flow_process_samples(
             process_sample_command = PROCESS_SAMPLE_COMMAND + make_dotlist_from_config(config)
             run_docker_command(parameters.image, process_sample_command, **docker_args)
 
-            channel_key = f"{parameters_config.key}_C{parameters_config.channel:02d}"
-            old_key = make_key(samples_key, f"{series.name}_{channel_key}.PROCESSED.csv")
-            new_key = make_key(samples_key, f"{series.name}_{fov_key}.PROCESSED.{region}.csv")
-            change_key(context.working_location, old_key, new_key)
-
     if "volume" in docker_args:
         remove_docker_volume(docker_args["volume"])
 
@@ -225,30 +227,61 @@ def run_flow_convert_to_arcade(
     samples_key = make_key(series.name, "samples", "samples.PROCESSED")
     inits_key = make_key(series.name, "inits", "inits.ARCADE")
 
+    resolution = parameters.resolution
+    resolution_key = f"R{round(resolution * 10):03d}"
+
     if check_key(context.reference_location, series.reference_key):
         reference = load_dataframe(context.reference_location, series.reference_key)
+
+        volume_columns = [column for column in reference.columns if "volume" in column]
+        reference[volume_columns] = reference[volume_columns] / resolution**3
+
+        height_columns = [column for column in reference.columns if "height" in column]
+        reference[height_columns] = reference[height_columns] / resolution
     else:
         reference = None
+
+    volumes = {
+        region: (values[0] / resolution**3, values[1] / resolution**3)
+        for region, values in parameters.convert_to_arcade.volumes.items()
+    }
+    heights = {
+        region: (values[0] / resolution, values[1] / resolution)
+        for region, values in parameters.convert_to_arcade.heights.items()
+    }
+
+    critical_volumes: dict[str, tuple[float, float]] = {
+        region: (values[0] / resolution**3, values[1] / resolution**3)
+        for region, values in parameters.convert_to_arcade.critical_volumes.items()
+    }
+    critical_heights: dict[str, tuple[float, float]] = {
+        region: (values[0] / resolution, values[1] / resolution)
+        for region, values in parameters.convert_to_arcade.critical_heights.items()
+    }
 
     for fov in series.conditions:
         samples = {}
 
-        for region in parameters.process_sample.keys():
-            key = make_key(samples_key, f"{series.name}_{fov['key']}.PROCESSED.{region}.csv")
+        for region, region_key_template in parameters.convert_to_arcade.regions.items():
+            region_key = region_key_template % fov["key"]
+            key = make_key(
+                samples_key, f"{series.name}_{region_key}_{resolution_key}.PROCESSED.csv"
+            )
             samples[region] = load_dataframe(context.working_location, key)
 
-        margins = fov["margins"] if "margins" in fov else parameters.margins
+        margins = fov["margins"] if "margins" in fov else parameters.convert_to_arcade.margins
         merged_samples = merge_region_samples(samples, margins)
-        key = f"{series.name}_{fov['key']}.X{margins[0]:03d}.Y{margins[1]:03d}.Z{margins[2]:03d}"
+        x, y, z = margins
+        key = f"{series.name}_{fov['key']}_X{x:03d}_Y{y:03d}_Z{z:03d}_{resolution_key}"
 
         cells = convert_to_cells_file(
             merged_samples,
             reference[reference["KEY"] == fov["key"]],
-            parameters.volumes,
-            parameters.heights,
-            parameters.critical_volumes,
-            parameters.critical_heights,
-            parameters.state_thresholds,
+            volumes,
+            heights,
+            critical_volumes,
+            critical_heights,
+            parameters.convert_to_arcade.state_thresholds,
         )
         cells_key = make_key(inits_key, f"{key}.CELLS.json")
         save_json(context.working_location, cells_key, cells)
@@ -257,7 +290,9 @@ def run_flow_convert_to_arcade(
         locations_key = make_key(inits_key, f"{key}.LOCATIONS.json")
         save_json(context.working_location, locations_key, locations)
 
-        setup = generate_setup_file(merged_samples, margins, parameters.potts_terms)
+        setup = generate_setup_file(
+            merged_samples, margins, parameters.convert_to_arcade.potts_terms
+        )
         setup_key = make_key(inits_key, f"{key}.xml")
         save_text(context.working_location, setup_key, setup)
 
