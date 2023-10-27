@@ -266,18 +266,18 @@
     <span class="n">remove_docker_volume</span><span class="p">,</span>
     <span class="n">run_docker_command</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">io_collection.keys</span> <span class="kn">import</span> <span class="n">change_key</span><span class="p">,</span> <span class="n">check_key</span><span class="p">,</span> <span class="n">make_key</span>
+<span class="kn">from</span> <span class="nn">io_collection.keys</span> <span class="kn">import</span> <span class="n">check_key</span><span class="p">,</span> <span class="n">make_key</span>
 <span class="kn">from</span> <span class="nn">io_collection.load</span> <span class="kn">import</span> <span class="n">load_dataframe</span>
 <span class="kn">from</span> <span class="nn">io_collection.save</span> <span class="kn">import</span> <span class="n">save_json</span><span class="p">,</span> <span class="n">save_text</span>
 <span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
 
 <span class="kn">from</span> <span class="nn">cell_abm_pipeline.__config__</span> <span class="kn">import</span> <span class="n">make_dotlist_from_config</span>
-<span class="kn">from</span> <span class="nn">cell_abm_pipeline.flows.process_sample</span> <span class="kn">import</span> <span class="n">ContextConfig</span> <span class="k">as</span> <span class="n">ProcessSampleContextConfig</span>
-<span class="kn">from</span> <span class="nn">cell_abm_pipeline.flows.process_sample</span> <span class="kn">import</span> <span class="n">ParametersConfig</span> <span class="k">as</span> <span class="n">ProcessSampleParametersConfig</span>
-<span class="kn">from</span> <span class="nn">cell_abm_pipeline.flows.process_sample</span> <span class="kn">import</span> <span class="n">SeriesConfig</span> <span class="k">as</span> <span class="n">ProcessSampleSeriesConfig</span>
-<span class="kn">from</span> <span class="nn">cell_abm_pipeline.flows.sample_image</span> <span class="kn">import</span> <span class="n">ContextConfig</span> <span class="k">as</span> <span class="n">SampleImageContextConfig</span>
-<span class="kn">from</span> <span class="nn">cell_abm_pipeline.flows.sample_image</span> <span class="kn">import</span> <span class="n">ParametersConfig</span> <span class="k">as</span> <span class="n">SampleImageParametersConfig</span>
-<span class="kn">from</span> <span class="nn">cell_abm_pipeline.flows.sample_image</span> <span class="kn">import</span> <span class="n">SeriesConfig</span> <span class="k">as</span> <span class="n">SampleImageSeriesConfig</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.flows.process_sample</span> <span class="kn">import</span> <span class="n">ContextConfig</span> <span class="k">as</span> <span class="n">ContextConfigProcessSample</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.flows.process_sample</span> <span class="kn">import</span> <span class="n">ParametersConfig</span> <span class="k">as</span> <span class="n">ParametersConfigProcessSample</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.flows.process_sample</span> <span class="kn">import</span> <span class="n">SeriesConfig</span> <span class="k">as</span> <span class="n">SeriesConfigProcessSample</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.flows.sample_image</span> <span class="kn">import</span> <span class="n">ContextConfig</span> <span class="k">as</span> <span class="n">ContextConfigSampleImage</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.flows.sample_image</span> <span class="kn">import</span> <span class="n">ParametersConfig</span> <span class="k">as</span> <span class="n">ParametersConfigSampleImage</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.flows.sample_image</span> <span class="kn">import</span> <span class="n">SeriesConfig</span> <span class="k">as</span> <span class="n">SeriesConfigSampleImage</span>
 
 <span class="n">SAMPLE_IMAGE_COMMAND</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;abmpipe&quot;</span><span class="p">,</span> <span class="s2">&quot;sample-image&quot;</span><span class="p">,</span> <span class="s2">&quot;::&quot;</span><span class="p">]</span>
 
@@ -285,12 +285,12 @@
 
 <span class="n">VOLUMES</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;DEFAULT&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1865.0</span><span class="p">,</span> <span class="mf">517.0</span><span class="p">),</span>
-    <span class="s2">&quot;NUCLEUS&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">542.0</span><span class="p">,</span> <span class="mf">157.0</span><span class="p">),</span>
+    <span class="s2">&quot;NUCLEUS&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">543.0</span><span class="p">,</span> <span class="mf">157.0</span><span class="p">),</span>
 <span class="p">}</span>
 
 <span class="n">HEIGHTS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;DEFAULT&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">9.65</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">),</span>
-    <span class="s2">&quot;NUCLEUS&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">6.75</span><span class="p">,</span> <span class="mf">1.7</span><span class="p">),</span>
+    <span class="s2">&quot;DEFAULT&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">9.75</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">),</span>
+    <span class="s2">&quot;NUCLEUS&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">6.86</span><span class="p">,</span> <span class="mf">1.7</span><span class="p">),</span>
 <span class="p">}</span>
 
 <span class="n">CRITICAL_VOLUMES</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
@@ -305,7 +305,7 @@
 
 <span class="n">STATE_THRESHOLDS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;APOPTOTIC_LATE&quot;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span>
-    <span class="s2">&quot;APOPTOTIC_EARLY&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;APOPTOTIC_EARLY&quot;</span><span class="p">:</span> <span class="mf">0.90</span><span class="p">,</span>
     <span class="s2">&quot;PROLIFERATIVE_G1&quot;</span><span class="p">:</span> <span class="mf">1.124</span><span class="p">,</span>
     <span class="s2">&quot;PROLIFERATIVE_S&quot;</span><span class="p">:</span> <span class="mf">1.726</span><span class="p">,</span>
     <span class="s2">&quot;PROLIFERATIVE_G2&quot;</span><span class="p">:</span> <span class="mf">1.969</span><span class="p">,</span>
@@ -314,24 +314,15 @@
 
 <span class="n">POTTS_TERMS</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;volume&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;surface&quot;</span><span class="p">,</span>
     <span class="s2">&quot;adhesion&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;height&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;junction&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;substrate&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;persistence&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
 
-<div class="viewcode-block" id="ParametersConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ParametersConfig</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for initialize arcade simulations flow.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ParametersConfigConvertToArcade"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ParametersConfigConvertToArcade</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for initialize arcade simulations subflow - convert to arcade.&quot;&quot;&quot;</span>
 
-    <span class="n">image</span><span class="p">:</span> <span class="nb">str</span>
-
-    <span class="n">sample_image</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SampleImageParametersConfig</span><span class="p">]</span>
-
-    <span class="n">process_sample</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ProcessSampleParametersConfig</span><span class="p">]</span>
+    <span class="n">regions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;DEFAULT&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">})</span>
 
     <span class="n">margins</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
@@ -346,6 +337,21 @@
     <span class="n">state_thresholds</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">STATE_THRESHOLDS</span><span class="p">)</span>
 
     <span class="n">potts_terms</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">POTTS_TERMS</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ParametersConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ParametersConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for initialize arcade simulations flow.&quot;&quot;&quot;</span>
+
+    <span class="n">image</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span>
+
+    <span class="n">sample_images</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ParametersConfigSampleImage</span><span class="p">]</span>
+
+    <span class="n">process_samples</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ParametersConfigProcessSample</span><span class="p">]</span>
+
+    <span class="n">convert_to_arcade</span><span class="p">:</span> <span class="n">ParametersConfigConvertToArcade</span> <span class="o">=</span> <span class="n">ParametersConfigConvertToArcade</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ContextConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -398,16 +404,17 @@
     <span class="n">docker_args</span> <span class="o">=</span> <span class="n">get_docker_arguments</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;s3://&quot;</span><span class="p">):</span>
-        <span class="n">context_config</span> <span class="o">=</span> <span class="n">SampleImageContextConfig</span><span class="p">(</span><span class="n">working_location</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">)</span>
+        <span class="n">context_config</span> <span class="o">=</span> <span class="n">ContextConfigSampleImage</span><span class="p">(</span><span class="n">working_location</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">context_config</span> <span class="o">=</span> <span class="n">SampleImageContextConfig</span><span class="p">(</span><span class="n">working_location</span><span class="o">=</span><span class="s2">&quot;/mnt&quot;</span><span class="p">)</span>
+        <span class="n">context_config</span> <span class="o">=</span> <span class="n">ContextConfigSampleImage</span><span class="p">(</span><span class="n">working_location</span><span class="o">=</span><span class="s2">&quot;/mnt&quot;</span><span class="p">)</span>
 
-    <span class="n">series_config</span> <span class="o">=</span> <span class="n">SampleImageSeriesConfig</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">series_config</span> <span class="o">=</span> <span class="n">SeriesConfigSampleImage</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">fov</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">conditions</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">sample_image</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sample_image</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">sample_image</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sample_images</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">parameters_config</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">sample_image</span><span class="p">)</span>
             <span class="n">parameters_config</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">parameters_config</span><span class="o">.</span><span class="n">key</span> <span class="o">%</span> <span class="n">fov</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span>
+            <span class="n">parameters_config</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">resolution</span>
 
             <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s2">&quot;context&quot;</span><span class="p">:</span> <span class="n">context_config</span><span class="p">,</span>
@@ -426,22 +433,22 @@
 <span class="k">def</span> <span class="nf">run_flow_process_samples</span><span class="p">(</span>
     <span class="n">context</span><span class="p">:</span> <span class="n">ContextConfig</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="n">SeriesConfig</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersConfig</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">samples_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;samples.PROCESSED&quot;</span><span class="p">)</span>
     <span class="n">docker_args</span> <span class="o">=</span> <span class="n">get_docker_arguments</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;s3://&quot;</span><span class="p">):</span>
-        <span class="n">context_config</span> <span class="o">=</span> <span class="n">ProcessSampleContextConfig</span><span class="p">(</span><span class="n">working_location</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">)</span>
+        <span class="n">context_config</span> <span class="o">=</span> <span class="n">ContextConfigProcessSample</span><span class="p">(</span><span class="n">working_location</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">context_config</span> <span class="o">=</span> <span class="n">ProcessSampleContextConfig</span><span class="p">(</span><span class="n">working_location</span><span class="o">=</span><span class="s2">&quot;/mnt&quot;</span><span class="p">)</span>
+        <span class="n">context_config</span> <span class="o">=</span> <span class="n">ContextConfigProcessSample</span><span class="p">(</span><span class="n">working_location</span><span class="o">=</span><span class="s2">&quot;/mnt&quot;</span><span class="p">)</span>
 
-    <span class="n">series_config</span> <span class="o">=</span> <span class="n">ProcessSampleSeriesConfig</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">series_config</span> <span class="o">=</span> <span class="n">SeriesConfigProcessSample</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">resolution_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;R</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">resolution</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="k">for</span> <span class="n">fov</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">conditions</span><span class="p">:</span>
         <span class="n">fov_key</span> <span class="o">=</span> <span class="n">fov</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span>
 
-        <span class="k">for</span> <span class="n">region</span><span class="p">,</span> <span class="n">process_sample</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">process_sample</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">process_sample</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">process_samples</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">parameters_config</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">process_sample</span><span class="p">)</span>
-            <span class="n">parameters_config</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">parameters_config</span><span class="o">.</span><span class="n">key</span> <span class="o">%</span> <span class="n">fov_key</span>
+            <span class="n">parameters_config</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">parameters_config</span><span class="o">.</span><span class="n">key</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">fov_key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">resolution_key</span><span class="si">}</span><span class="s2">&quot;</span>
 
             <span class="k">if</span> <span class="s2">&quot;include_ids&quot;</span> <span class="ow">in</span> <span class="n">fov</span><span class="p">:</span>
                 <span class="n">parameters_config</span><span class="o">.</span><span class="n">include_ids</span> <span class="o">=</span> <span class="n">fov</span><span class="p">[</span><span class="s2">&quot;include_ids&quot;</span><span class="p">]</span>
@@ -458,11 +465,6 @@
             <span class="n">process_sample_command</span> <span class="o">=</span> <span class="n">PROCESS_SAMPLE_COMMAND</span> <span class="o">+</span> <span class="n">make_dotlist_from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
             <span class="n">run_docker_command</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="n">process_sample_command</span><span class="p">,</span> <span class="o">**</span><span class="n">docker_args</span><span class="p">)</span>
 
-            <span class="n">channel_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">parameters_config</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">_C</span><span class="si">{</span><span class="n">parameters_config</span><span class="o">.</span><span class="n">channel</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="n">old_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">samples_key</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">channel_key</span><span class="si">}</span><span class="s2">.PROCESSED.csv&quot;</span><span class="p">)</span>
-            <span class="n">new_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">samples_key</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">fov_key</span><span class="si">}</span><span class="s2">.PROCESSED.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
-            <span class="n">change_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">old_key</span><span class="p">,</span> <span class="n">new_key</span><span class="p">)</span>
-
     <span class="k">if</span> <span class="s2">&quot;volume&quot;</span> <span class="ow">in</span> <span class="n">docker_args</span><span class="p">:</span>
         <span class="n">remove_docker_volume</span><span class="p">(</span><span class="n">docker_args</span><span class="p">[</span><span class="s2">&quot;volume&quot;</span><span class="p">])</span></div>
 
@@ -474,30 +476,61 @@
     <span class="n">samples_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;samples.PROCESSED&quot;</span><span class="p">)</span>
     <span class="n">inits_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;inits&quot;</span><span class="p">,</span> <span class="s2">&quot;inits.ARCADE&quot;</span><span class="p">)</span>
 
+    <span class="n">resolution</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">resolution</span>
+    <span class="n">resolution_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;R</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">resolution</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">&quot;</span>
+
     <span class="k">if</span> <span class="n">check_key</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">reference_location</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">reference_key</span><span class="p">):</span>
         <span class="n">reference</span> <span class="o">=</span> <span class="n">load_dataframe</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">reference_location</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">reference_key</span><span class="p">)</span>
+
+        <span class="n">volume_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">column</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">reference</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="s2">&quot;volume&quot;</span> <span class="ow">in</span> <span class="n">column</span><span class="p">]</span>
+        <span class="n">reference</span><span class="p">[</span><span class="n">volume_columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">reference</span><span class="p">[</span><span class="n">volume_columns</span><span class="p">]</span> <span class="o">/</span> <span class="n">resolution</span><span class="o">**</span><span class="mi">3</span>
+
+        <span class="n">height_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">column</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">reference</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="s2">&quot;height&quot;</span> <span class="ow">in</span> <span class="n">column</span><span class="p">]</span>
+        <span class="n">reference</span><span class="p">[</span><span class="n">height_columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">reference</span><span class="p">[</span><span class="n">height_columns</span><span class="p">]</span> <span class="o">/</span> <span class="n">resolution</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">reference</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">volumes</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">region</span><span class="p">:</span> <span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">resolution</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">resolution</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">region</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">convert_to_arcade</span><span class="o">.</span><span class="n">volumes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="n">heights</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">region</span><span class="p">:</span> <span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">resolution</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">region</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">convert_to_arcade</span><span class="o">.</span><span class="n">heights</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+
+    <span class="n">critical_volumes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">region</span><span class="p">:</span> <span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">resolution</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">resolution</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">region</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">convert_to_arcade</span><span class="o">.</span><span class="n">critical_volumes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="n">critical_heights</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">region</span><span class="p">:</span> <span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">resolution</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">region</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">convert_to_arcade</span><span class="o">.</span><span class="n">critical_heights</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
 
     <span class="k">for</span> <span class="n">fov</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">conditions</span><span class="p">:</span>
         <span class="n">samples</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">process_sample</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">samples_key</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">fov</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.PROCESSED.</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">region</span><span class="p">,</span> <span class="n">region_key_template</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">convert_to_arcade</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">region_key</span> <span class="o">=</span> <span class="n">region_key_template</span> <span class="o">%</span> <span class="n">fov</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span>
+                <span class="n">samples_key</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">region_key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">resolution_key</span><span class="si">}</span><span class="s2">.PROCESSED.csv&quot;</span>
+            <span class="p">)</span>
             <span class="n">samples</span><span class="p">[</span><span class="n">region</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_dataframe</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
 
-        <span class="n">margins</span> <span class="o">=</span> <span class="n">fov</span><span class="p">[</span><span class="s2">&quot;margins&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;margins&quot;</span> <span class="ow">in</span> <span class="n">fov</span> <span class="k">else</span> <span class="n">parameters</span><span class="o">.</span><span class="n">margins</span>
+        <span class="n">margins</span> <span class="o">=</span> <span class="n">fov</span><span class="p">[</span><span class="s2">&quot;margins&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;margins&quot;</span> <span class="ow">in</span> <span class="n">fov</span> <span class="k">else</span> <span class="n">parameters</span><span class="o">.</span><span class="n">convert_to_arcade</span><span class="o">.</span><span class="n">margins</span>
         <span class="n">merged_samples</span> <span class="o">=</span> <span class="n">merge_region_samples</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">margins</span><span class="p">)</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">fov</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.X</span><span class="si">{</span><span class="n">margins</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">.Y</span><span class="si">{</span><span class="n">margins</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">.Z</span><span class="si">{</span><span class="n">margins</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">margins</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">fov</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_X</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">_Y</span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">_Z</span><span class="si">{</span><span class="n">z</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">resolution_key</span><span class="si">}</span><span class="s2">&quot;</span>
 
         <span class="n">cells</span> <span class="o">=</span> <span class="n">convert_to_cells_file</span><span class="p">(</span>
             <span class="n">merged_samples</span><span class="p">,</span>
             <span class="n">reference</span><span class="p">[</span><span class="n">reference</span><span class="p">[</span><span class="s2">&quot;KEY&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">fov</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]],</span>
-            <span class="n">parameters</span><span class="o">.</span><span class="n">volumes</span><span class="p">,</span>
-            <span class="n">parameters</span><span class="o">.</span><span class="n">heights</span><span class="p">,</span>
-            <span class="n">parameters</span><span class="o">.</span><span class="n">critical_volumes</span><span class="p">,</span>
-            <span class="n">parameters</span><span class="o">.</span><span class="n">critical_heights</span><span class="p">,</span>
-            <span class="n">parameters</span><span class="o">.</span><span class="n">state_thresholds</span><span class="p">,</span>
+            <span class="n">volumes</span><span class="p">,</span>
+            <span class="n">heights</span><span class="p">,</span>
+            <span class="n">critical_volumes</span><span class="p">,</span>
+            <span class="n">critical_heights</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">convert_to_arcade</span><span class="o">.</span><span class="n">state_thresholds</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">cells_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">inits_key</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">.CELLS.json&quot;</span><span class="p">)</span>
         <span class="n">save_json</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">cells_key</span><span class="p">,</span> <span class="n">cells</span><span class="p">)</span>
@@ -506,7 +539,9 @@
         <span class="n">locations_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">inits_key</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">.LOCATIONS.json&quot;</span><span class="p">)</span>
         <span class="n">save_json</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">locations_key</span><span class="p">,</span> <span class="n">locations</span><span class="p">)</span>
 
-        <span class="n">setup</span> <span class="o">=</span> <span class="n">generate_setup_file</span><span class="p">(</span><span class="n">merged_samples</span><span class="p">,</span> <span class="n">margins</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">potts_terms</span><span class="p">)</span>
+        <span class="n">setup</span> <span class="o">=</span> <span class="n">generate_setup_file</span><span class="p">(</span>
+            <span class="n">merged_samples</span><span class="p">,</span> <span class="n">margins</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">convert_to_arcade</span><span class="o">.</span><span class="n">potts_terms</span>
+        <span class="p">)</span>
         <span class="n">setup_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">inits_key</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">.xml&quot;</span><span class="p">)</span>
         <span class="n">save_text</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">setup_key</span><span class="p">,</span> <span class="n">setup</span><span class="p">)</span></div>
 

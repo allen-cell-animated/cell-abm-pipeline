@@ -259,10 +259,10 @@
 <span class="sd">    │    └── (name)_(key).(extension)</span>
 <span class="sd">    ├── plots</span>
 <span class="sd">    │    └── plots.SAMPLE</span>
-<span class="sd">    │        └── (name)_(key)_C(channel).SAMPLE.png</span>
+<span class="sd">    │        └── (name)_(key)_C(channel)_R(resolution).SAMPLE.png</span>
 <span class="sd">    └── samples</span>
 <span class="sd">        └── samples.RAW</span>
-<span class="sd">            └── (name)_(key)_C(channel).RAW.csv</span>
+<span class="sd">            └── (name)_(key)_C(channel)_R(resolution).RAW.csv</span>
 
 <span class="sd">The **images** directory contains the input image to be sampled.</span>
 <span class="sd">Resulting sample(s) are placed into the **samples/samples.RAW** directory and</span>
@@ -349,7 +349,10 @@
     <span class="p">)</span>
 
     <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
-        <span class="n">channel_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">_C</span><span class="si">{</span><span class="n">channel</span><span class="si">:</span><span class="s2">02</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">resolution_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;R</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">resolution</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">channel_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;C</span><span class="si">{</span><span class="n">channel</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">item_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">channel_key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">resolution_key</span><span class="si">}</span><span class="s2">&quot;</span>
+
         <span class="n">samples</span> <span class="o">=</span> <span class="n">get_image_samples</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">sample_indices</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span>
         <span class="n">samples</span> <span class="o">=</span> <span class="n">scale_sample_coordinates</span><span class="p">(</span>
             <span class="n">samples</span><span class="p">,</span>
@@ -358,12 +361,12 @@
             <span class="n">parameters</span><span class="o">.</span><span class="n">scale_xy</span><span class="p">,</span>
             <span class="n">parameters</span><span class="o">.</span><span class="n">scale_z</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">sample_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;samples.RAW&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">channel_key</span><span class="si">}</span><span class="s2">.RAW.csv&quot;</span><span class="p">)</span>
+        <span class="n">sample_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;samples.RAW&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">item_key</span><span class="si">}</span><span class="s2">.RAW.csv&quot;</span><span class="p">)</span>
         <span class="n">save_dataframe</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">sample_key</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">contact_sheet</span><span class="p">:</span>
             <span class="n">contact_sheet</span> <span class="o">=</span> <span class="n">plot_contact_sheet</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
-            <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.SAMPLE&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">channel_key</span><span class="si">}</span><span class="s2">.SAMPLE.png&quot;</span><span class="p">)</span>
+            <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.SAMPLE&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">item_key</span><span class="si">}</span><span class="s2">.SAMPLE.png&quot;</span><span class="p">)</span>
             <span class="n">save_figure</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">,</span> <span class="n">contact_sheet</span><span class="p">)</span></div>
 </pre></div>
         </article>

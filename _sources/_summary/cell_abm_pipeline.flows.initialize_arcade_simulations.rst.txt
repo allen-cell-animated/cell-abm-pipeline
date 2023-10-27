@@ -36,12 +36,16 @@ initialize\_arcade\_simulations
    
       ContextConfig
       ParametersConfig
+      ParametersConfigConvertToArcade
       SeriesConfig
    
    .. autoclass:: cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig
       :members:
       :exclude-members: __init__
    .. autoclass:: cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade
       :members:
       :exclude-members: __init__
    .. autoclass:: cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig

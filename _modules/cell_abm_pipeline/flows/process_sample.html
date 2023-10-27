@@ -257,12 +257,12 @@
 <span class="sd">    (name)</span>
 <span class="sd">    ├── plots</span>
 <span class="sd">    │    └── plots.SAMPLE</span>
-<span class="sd">    │        └── (name)_(key)_C(channel).SAMPLE.png</span>
+<span class="sd">    │        └── (name)_(key).SAMPLE.png</span>
 <span class="sd">    └── samples</span>
 <span class="sd">        ├── samples.PROCESSED</span>
-<span class="sd">        │    └── (name)_(key)_C(channel).PROCESSED.csv</span>
+<span class="sd">        │    └── (name)_(key).PROCESSED.csv</span>
 <span class="sd">        └── samples.RAW</span>
-<span class="sd">            └── (name)_(key)_C(channel).RAW.csv</span>
+<span class="sd">            └── (name)_(key).RAW.csv</span>
 
 <span class="sd">Samples to be processed are loaded from the **samples/samples.RAW** directory.</span>
 <span class="sd">Contact sheet plots from this task will overwrite existing contact sheets</span>
@@ -284,11 +284,11 @@
 <span class="kn">from</span> <span class="nn">io_collection.save</span> <span class="kn">import</span> <span class="n">save_dataframe</span><span class="p">,</span> <span class="n">save_figure</span>
 <span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
 
-<span class="c1"># Threshold for number of samples touching edge of FOV to be considered edge</span>
+<span class="n">UNCONNECTED_THRESHOLD</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span>
+
 <span class="n">EDGE_THRESHOLD</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
 
-<span class="c1"># Distance (in um) to nearest neighbor to be considered unconnected</span>
-<span class="n">UNCONNECTED_THRESHOLD</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="n">EDGE_PADDING</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
 
 
 <div class="viewcode-block" id="ParametersConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.process_sample.html#cell_abm_pipeline.flows.process_sample.ParametersConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -297,23 +297,29 @@
 
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
 
-    <span class="n">channel</span><span class="p">:</span> <span class="nb">int</span>
-
     <span class="n">remove_unconnected</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;True to remove unconnected regions, False otherwise.&quot;&quot;&quot;</span>
 
     <span class="n">unconnected_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">UNCONNECTED_THRESHOLD</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Distance for removing unconnected regions.&quot;&quot;&quot;</span>
 
     <span class="n">unconnected_filter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;connectivity&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter type for assigning unconnected coordinates.&quot;&quot;&quot;</span>
 
     <span class="n">remove_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;True to remove cells touching the edge of the bounds, False otherwise.&quot;&quot;&quot;</span>
 
     <span class="n">edge_threshold</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">EDGE_THRESHOLD</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of edge positions per axis needed to assign edge region.&quot;&quot;&quot;</span>
 
-    <span class="n">edge_padding</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">edge_padding</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">EDGE_PADDING</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Distance from axis limits to assign edge positions.&quot;&quot;&quot;</span>
 
     <span class="n">include_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of ids to include.&quot;&quot;&quot;</span>
 
     <span class="n">exclude_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of ids to exclude.&quot;&quot;&quot;</span>
 
     <span class="n">contact_sheet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></div>
 
@@ -322,22 +328,24 @@
 <span class="k">class</span> <span class="nc">ContextConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Context configuration for process sample flow.&quot;&quot;&quot;</span>
 
-    <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Location for input and output files (local path or S3 bucket).&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="SeriesConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.process_sample.html#cell_abm_pipeline.flows.process_sample.SeriesConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SeriesConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Series configuration for process sample flow.&quot;&quot;&quot;</span>
 
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Name of the simulation series.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="run_flow"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.process_sample.html#cell_abm_pipeline.flows.process_sample.run_flow">[docs]</a><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;process-sample&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">run_flow</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">ContextConfig</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="n">SeriesConfig</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Main process sample flow.&quot;&quot;&quot;</span>
 
-    <span class="n">channel_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">_C</span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">channel</span><span class="si">:</span><span class="s2">02</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="n">sample_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;samples.RAW&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">channel_key</span><span class="si">}</span><span class="s2">.RAW.csv&quot;</span><span class="p">)</span>
+    <span class="n">item_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">sample_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;samples.RAW&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">item_key</span><span class="si">}</span><span class="s2">.RAW.csv&quot;</span><span class="p">)</span>
 
     <span class="n">raw_samples</span> <span class="o">=</span> <span class="n">load_dataframe</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">sample_key</span><span class="p">)</span>
     <span class="n">processed_samples</span> <span class="o">=</span> <span class="n">raw_samples</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -359,13 +367,13 @@
         <span class="n">processed_samples</span> <span class="o">=</span> <span class="n">exclude_selected_ids</span><span class="p">(</span><span class="n">processed_samples</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">exclude_ids</span><span class="p">)</span>
 
     <span class="n">processed_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span>
-        <span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;samples.PROCESSED&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">channel_key</span><span class="si">}</span><span class="s2">.PROCESSED.csv&quot;</span>
+        <span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="s2">&quot;samples.PROCESSED&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">item_key</span><span class="si">}</span><span class="s2">.PROCESSED.csv&quot;</span>
     <span class="p">)</span>
     <span class="n">save_dataframe</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">processed_key</span><span class="p">,</span> <span class="n">processed_samples</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">contact_sheet</span><span class="p">:</span>
         <span class="n">contact_sheet</span> <span class="o">=</span> <span class="n">plot_contact_sheet</span><span class="p">(</span><span class="n">processed_samples</span><span class="p">,</span> <span class="n">raw_samples</span><span class="p">)</span>
-        <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.SAMPLE&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">channel_key</span><span class="si">}</span><span class="s2">.SAMPLE.png&quot;</span><span class="p">)</span>
+        <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.SAMPLE&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">item_key</span><span class="si">}</span><span class="s2">.SAMPLE.png&quot;</span><span class="p">)</span>
         <span class="n">save_figure</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">,</span> <span class="n">contact_sheet</span><span class="p">)</span></div>
 </pre></div>
         </article>

@@ -309,7 +309,10 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParametersConfig</span></code></a></p></td>
 <td><p>Parameter configuration for initialize arcade simulations flow.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SeriesConfig</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParametersConfigConvertToArcade</span></code></a></p></td>
+<td><p>Parameter configuration for initialize arcade simulations subflow - convert to arcade.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SeriesConfig</span></code></a></p></td>
 <td><p>Series configuration for initialize arcade simulations flow.</p></td>
 </tr>
 </tbody>
@@ -351,48 +354,69 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.sample_image">
-<span class="sig-name descname"><span class="pre">sample_image</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="cell_abm_pipeline.flows.sample_image.html#cell_abm_pipeline.flows.sample_image.ParametersConfig" title="cell_abm_pipeline.flows.sample_image.ParametersConfig"><span class="pre">cell_abm_pipeline.flows.sample_image.ParametersConfig</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.sample_image" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.resolution">
+<span class="sig-name descname"><span class="pre">resolution</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.resolution" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.process_sample">
-<span class="sig-name descname"><span class="pre">process_sample</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="cell_abm_pipeline.flows.process_sample.html#cell_abm_pipeline.flows.process_sample.ParametersConfig" title="cell_abm_pipeline.flows.process_sample.ParametersConfig"><span class="pre">cell_abm_pipeline.flows.process_sample.ParametersConfig</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.process_sample" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.sample_images">
+<span class="sig-name descname"><span class="pre">sample_images</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="cell_abm_pipeline.flows.sample_image.html#cell_abm_pipeline.flows.sample_image.ParametersConfig" title="cell_abm_pipeline.flows.sample_image.ParametersConfig"><span class="pre">cell_abm_pipeline.flows.sample_image.ParametersConfig</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.sample_images" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.margins">
-<span class="sig-name descname"><span class="pre">margins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.margins" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.process_samples">
+<span class="sig-name descname"><span class="pre">process_samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="cell_abm_pipeline.flows.process_sample.html#cell_abm_pipeline.flows.process_sample.ParametersConfig" title="cell_abm_pipeline.flows.process_sample.ParametersConfig"><span class="pre">cell_abm_pipeline.flows.process_sample.ParametersConfig</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.process_samples" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.volumes">
-<span class="sig-name descname"><span class="pre">volumes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.volumes" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.convert_to_arcade">
+<span class="sig-name descname"><span class="pre">convert_to_arcade</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade"><span class="pre">ParametersConfigConvertToArcade</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ParametersConfigConvertToArcade(regions={'DEFAULT':</span> <span class="pre">'%s'},</span> <span class="pre">margins=(0,</span> <span class="pre">0,</span> <span class="pre">0),</span> <span class="pre">volumes={'DEFAULT':</span> <span class="pre">(1865.0,</span> <span class="pre">517.0),</span> <span class="pre">'NUCLEUS':</span> <span class="pre">(543.0,</span> <span class="pre">157.0)},</span> <span class="pre">heights={'DEFAULT':</span> <span class="pre">(9.75,</span> <span class="pre">2.4),</span> <span class="pre">'NUCLEUS':</span> <span class="pre">(6.86,</span> <span class="pre">1.7)},</span> <span class="pre">critical_volumes={'DEFAULT':</span> <span class="pre">(1300.0,</span> <span class="pre">200.0),</span> <span class="pre">'NUCLEUS':</span> <span class="pre">(400.0,</span> <span class="pre">50.0)},</span> <span class="pre">critical_heights={'DEFAULT':</span> <span class="pre">(9.0,</span> <span class="pre">2.0),</span> <span class="pre">'NUCLEUS':</span> <span class="pre">(6.5,</span> <span class="pre">1.5)},</span> <span class="pre">state_thresholds={'APOPTOTIC_LATE':</span> <span class="pre">0.25,</span> <span class="pre">'APOPTOTIC_EARLY':</span> <span class="pre">0.9,</span> <span class="pre">'PROLIFERATIVE_G1':</span> <span class="pre">1.124,</span> <span class="pre">'PROLIFERATIVE_S':</span> <span class="pre">1.726,</span> <span class="pre">'PROLIFERATIVE_G2':</span> <span class="pre">1.969,</span> <span class="pre">'PROLIFERATIVE_M':</span> <span class="pre">2},</span> <span class="pre">potts_terms=['volume',</span> <span class="pre">'adhesion'])</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.convert_to_arcade" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ParametersConfigConvertToArcade</span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/initialize_arcade_simulations.html#ParametersConfigConvertToArcade"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade" title="Permalink to this definition">#</a></dt>
+<dd><p>Parameter configuration for initialize arcade simulations subflow - convert to arcade.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.regions">
+<span class="sig-name descname"><span class="pre">regions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.regions" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.heights">
-<span class="sig-name descname"><span class="pre">heights</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.heights" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.margins">
+<span class="sig-name descname"><span class="pre">margins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.margins" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.critical_volumes">
-<span class="sig-name descname"><span class="pre">critical_volumes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.critical_volumes" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.volumes">
+<span class="sig-name descname"><span class="pre">volumes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.volumes" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.critical_heights">
-<span class="sig-name descname"><span class="pre">critical_heights</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.critical_heights" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.heights">
+<span class="sig-name descname"><span class="pre">heights</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.heights" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.state_thresholds">
-<span class="sig-name descname"><span class="pre">state_thresholds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.state_thresholds" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.critical_volumes">
+<span class="sig-name descname"><span class="pre">critical_volumes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.critical_volumes" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.potts_terms">
-<span class="sig-name descname"><span class="pre">potts_terms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.potts_terms" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.critical_heights">
+<span class="sig-name descname"><span class="pre">critical_heights</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.critical_heights" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.state_thresholds">
+<span class="sig-name descname"><span class="pre">state_thresholds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.state_thresholds" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.potts_terms">
+<span class="sig-name descname"><span class="pre">potts_terms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.potts_terms" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -490,15 +514,21 @@
 </li>
 <li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig"><code class="docutils literal notranslate"><span class="pre">ParametersConfig</span></code></a><ul>
 <li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.image"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.image</span></code></a></li>
-<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.sample_image"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.sample_image</span></code></a></li>
-<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.process_sample"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.process_sample</span></code></a></li>
-<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.margins"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.margins</span></code></a></li>
-<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.volumes"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.volumes</span></code></a></li>
-<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.heights"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.heights</span></code></a></li>
-<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.critical_volumes"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.critical_volumes</span></code></a></li>
-<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.critical_heights"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.critical_heights</span></code></a></li>
-<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.state_thresholds"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.state_thresholds</span></code></a></li>
-<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.potts_terms"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.potts_terms</span></code></a></li>
+<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.resolution"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.resolution</span></code></a></li>
+<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.sample_images"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.sample_images</span></code></a></li>
+<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.process_samples"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.process_samples</span></code></a></li>
+<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.convert_to_arcade"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.convert_to_arcade</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade"><code class="docutils literal notranslate"><span class="pre">ParametersConfigConvertToArcade</span></code></a><ul>
+<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.regions"><code class="docutils literal notranslate"><span class="pre">ParametersConfigConvertToArcade.regions</span></code></a></li>
+<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.margins"><code class="docutils literal notranslate"><span class="pre">ParametersConfigConvertToArcade.margins</span></code></a></li>
+<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.volumes"><code class="docutils literal notranslate"><span class="pre">ParametersConfigConvertToArcade.volumes</span></code></a></li>
+<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.heights"><code class="docutils literal notranslate"><span class="pre">ParametersConfigConvertToArcade.heights</span></code></a></li>
+<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.critical_volumes"><code class="docutils literal notranslate"><span class="pre">ParametersConfigConvertToArcade.critical_volumes</span></code></a></li>
+<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.critical_heights"><code class="docutils literal notranslate"><span class="pre">ParametersConfigConvertToArcade.critical_heights</span></code></a></li>
+<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.state_thresholds"><code class="docutils literal notranslate"><span class="pre">ParametersConfigConvertToArcade.state_thresholds</span></code></a></li>
+<li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.potts_terms"><code class="docutils literal notranslate"><span class="pre">ParametersConfigConvertToArcade.potts_terms</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig"><code class="docutils literal notranslate"><span class="pre">SeriesConfig</span></code></a><ul>
