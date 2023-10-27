@@ -54,9 +54,9 @@
             </div>
         </aside>
         <h2>
-            <span class="text">42 statements &nbsp;</span>
+            <span class="text">44 statements &nbsp;</span>
             <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">0<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">42<span class="text"> missing</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">44<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_225eb92fe287c98e_summarize_manifest_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
-            created at 2023-09-07 17:08 +0000
+            created at 2023-10-27 15:38 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -92,10 +92,10 @@
     <p class="pln"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="str">    &#9474;    &#9492;&#9472;&#9472; (name)_(key).(extension)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="str">    &#9500;&#9472;&#9472; plots</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="str">    &#9474;    &#9492;&#9472;&#9472; plots.SAMPLE</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="str">    &#9474;        &#9492;&#9472;&#9472; (name)_(key)_C(channel).SAMPLE.png</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="str">    &#9474;        &#9492;&#9472;&#9472; (name)_(key)_C(channel)_R(resolution).SAMPLE.png</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="str">    &#9492;&#9472;&#9472; samples</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="str">        &#9492;&#9472;&#9472; samples.RAW</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="str">            &#9492;&#9472;&#9472; (name)_(key)_C(channel).RAW.csv</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="str">            &#9492;&#9472;&#9472; (name)_(key)_C(channel)_R(resolution).RAW.csv</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t"><span class="str">The **images** directory contains the input image to be sampled.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t"><span class="str">Resulting sample(s) are placed into the **samples/samples.RAW** directory and</span>&nbsp;</span><span class="r"></span></p>
@@ -182,22 +182,25 @@
     <p class="pln"><span class="n"><a id="t100" href="#t100">100</a></span><span class="t">    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t101" href="#t101">101</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t">    <span class="key">for</span> <span class="nam">channel</span> <span class="key">in</span> <span class="nam">parameters</span><span class="op">.</span><span class="nam">channels</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t">        <span class="nam">channel_key</span> <span class="op">=</span> <span class="str">f"{series.name}_{parameters.key}_C{channel:02}"</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t104" href="#t104">104</a></span><span class="t">        <span class="nam">samples</span> <span class="op">=</span> <span class="nam">get_image_samples</span><span class="op">(</span><span class="nam">image</span><span class="op">,</span> <span class="nam">sample_indices</span><span class="op">,</span> <span class="nam">channel</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t105" href="#t105">105</a></span><span class="t">        <span class="nam">samples</span> <span class="op">=</span> <span class="nam">scale_sample_coordinates</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t106" href="#t106">106</a></span><span class="t">            <span class="nam">samples</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t107" href="#t107">107</a></span><span class="t">            <span class="nam">parameters</span><span class="op">.</span><span class="nam">coordinate_type</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t108" href="#t108">108</a></span><span class="t">            <span class="nam">parameters</span><span class="op">.</span><span class="nam">resolution</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t109" href="#t109">109</a></span><span class="t">            <span class="nam">parameters</span><span class="op">.</span><span class="nam">scale_xy</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t110" href="#t110">110</a></span><span class="t">            <span class="nam">parameters</span><span class="op">.</span><span class="nam">scale_z</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t111" href="#t111">111</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t112" href="#t112">112</a></span><span class="t">        <span class="nam">sample_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"samples"</span><span class="op">,</span> <span class="str">"samples.RAW"</span><span class="op">,</span> <span class="str">f"{channel_key}.RAW.csv"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t113" href="#t113">113</a></span><span class="t">        <span class="nam">save_dataframe</span><span class="op">(</span><span class="nam">context</span><span class="op">.</span><span class="nam">working_location</span><span class="op">,</span> <span class="nam">sample_key</span><span class="op">,</span> <span class="nam">samples</span><span class="op">,</span> <span class="nam">index</span><span class="op">=</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t114" href="#t114">114</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t115" href="#t115">115</a></span><span class="t">        <span class="key">if</span> <span class="nam">parameters</span><span class="op">.</span><span class="nam">contact_sheet</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t116" href="#t116">116</a></span><span class="t">            <span class="nam">contact_sheet</span> <span class="op">=</span> <span class="nam">plot_contact_sheet</span><span class="op">(</span><span class="nam">samples</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t117" href="#t117">117</a></span><span class="t">            <span class="nam">plot_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"plots"</span><span class="op">,</span> <span class="str">"plots.SAMPLE"</span><span class="op">,</span> <span class="str">f"{channel_key}.SAMPLE.png"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t118" href="#t118">118</a></span><span class="t">            <span class="nam">save_figure</span><span class="op">(</span><span class="nam">context</span><span class="op">.</span><span class="nam">working_location</span><span class="op">,</span> <span class="nam">plot_key</span><span class="op">,</span> <span class="nam">contact_sheet</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t">        <span class="nam">resolution_key</span> <span class="op">=</span> <span class="str">f"R{round(parameters.resolution * 10):03d}"</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t104" href="#t104">104</a></span><span class="t">        <span class="nam">channel_key</span> <span class="op">=</span> <span class="str">f"C{channel:02d}"</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t105" href="#t105">105</a></span><span class="t">        <span class="nam">item_key</span> <span class="op">=</span> <span class="str">f"{series.name}_{parameters.key}_{channel_key}_{resolution_key}"</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t106" href="#t106">106</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t107" href="#t107">107</a></span><span class="t">        <span class="nam">samples</span> <span class="op">=</span> <span class="nam">get_image_samples</span><span class="op">(</span><span class="nam">image</span><span class="op">,</span> <span class="nam">sample_indices</span><span class="op">,</span> <span class="nam">channel</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t108" href="#t108">108</a></span><span class="t">        <span class="nam">samples</span> <span class="op">=</span> <span class="nam">scale_sample_coordinates</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t109" href="#t109">109</a></span><span class="t">            <span class="nam">samples</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t110" href="#t110">110</a></span><span class="t">            <span class="nam">parameters</span><span class="op">.</span><span class="nam">coordinate_type</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t111" href="#t111">111</a></span><span class="t">            <span class="nam">parameters</span><span class="op">.</span><span class="nam">resolution</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t112" href="#t112">112</a></span><span class="t">            <span class="nam">parameters</span><span class="op">.</span><span class="nam">scale_xy</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t113" href="#t113">113</a></span><span class="t">            <span class="nam">parameters</span><span class="op">.</span><span class="nam">scale_z</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t114" href="#t114">114</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t115" href="#t115">115</a></span><span class="t">        <span class="nam">sample_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"samples"</span><span class="op">,</span> <span class="str">"samples.RAW"</span><span class="op">,</span> <span class="str">f"{item_key}.RAW.csv"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t116" href="#t116">116</a></span><span class="t">        <span class="nam">save_dataframe</span><span class="op">(</span><span class="nam">context</span><span class="op">.</span><span class="nam">working_location</span><span class="op">,</span> <span class="nam">sample_key</span><span class="op">,</span> <span class="nam">samples</span><span class="op">,</span> <span class="nam">index</span><span class="op">=</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t117" href="#t117">117</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t118" href="#t118">118</a></span><span class="t">        <span class="key">if</span> <span class="nam">parameters</span><span class="op">.</span><span class="nam">contact_sheet</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t119" href="#t119">119</a></span><span class="t">            <span class="nam">contact_sheet</span> <span class="op">=</span> <span class="nam">plot_contact_sheet</span><span class="op">(</span><span class="nam">samples</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t120" href="#t120">120</a></span><span class="t">            <span class="nam">plot_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"plots"</span><span class="op">,</span> <span class="str">"plots.SAMPLE"</span><span class="op">,</span> <span class="str">f"{item_key}.SAMPLE.png"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t121" href="#t121">121</a></span><span class="t">            <span class="nam">save_figure</span><span class="op">(</span><span class="nam">context</span><span class="op">.</span><span class="nam">working_location</span><span class="op">,</span> <span class="nam">plot_key</span><span class="op">,</span> <span class="nam">contact_sheet</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -207,7 +210,7 @@
             <a id="nextFileLink" class="nav" href="d_225eb92fe287c98e_summarize_manifest_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
-            created at 2023-09-07 17:08 +0000
+            created at 2023-10-27 15:38 +0000
         </p>
     </div>
 </footer>
