@@ -413,7 +413,7 @@ def run_flow_convert_to_projections(
 
     data_key = make_key(series.name, "data", "data.LOCATIONS")
     converted_key = make_key(series.name, "converted", "converted.PROJECTION")
-    region_key = ":".join(sorted(parameters.regions))
+    region_key = "_".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:

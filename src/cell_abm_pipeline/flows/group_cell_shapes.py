@@ -443,7 +443,7 @@ def run_flow_group_feature_correlations(
     analysis_shapes_key = make_key(series.name, "analysis", "analysis.SHAPES")
     analysis_pca_key = make_key(series.name, "analysis", "analysis.PCA")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
-    region_key = ":".join(sorted(parameters.regions))
+    region_key = "_".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
@@ -528,7 +528,7 @@ def run_flow_group_feature_distributions(
 
     analysis_key = make_key(series.name, "analysis", "analysis.SHAPES")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
-    region_key = ":".join(sorted(parameters.regions))
+    region_key = "_".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     features = [
@@ -594,7 +594,7 @@ def run_flow_group_mode_correlations(
     analysis_shapes_key = make_key(series.name, "analysis", "analysis.SHAPES")
     analysis_pca_key = make_key(series.name, "analysis", "analysis.PCA")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
-    region_key = ":".join(sorted(parameters.regions))
+    region_key = "_".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     all_models = {}
@@ -688,7 +688,7 @@ def run_flow_group_population_counts(
 
     analysis_key = make_key(series.name, "analysis", "analysis.SHAPES")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
-    region_key = ":".join(sorted(parameters.regions))
+    region_key = "_".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     counts = []
@@ -728,7 +728,7 @@ def run_flow_group_population_stats(
 
     analysis_key = make_key(series.name, "analysis", "analysis.STATISTICS")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
-    region_key = ":".join(sorted(parameters.regions))
+    region_key = "_".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     stats: dict[str, dict] = {key: {} for key in keys}
@@ -772,7 +772,7 @@ def run_flow_group_shape_average(
     analysis_pca_key = make_key(series.name, "analysis", "analysis.PCA")
     data_key = make_key(series.name, "data", "data.LOCATIONS")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
-    region_key = ":".join(sorted(parameters.regions))
+    region_key = "_".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
@@ -846,7 +846,7 @@ def run_flow_group_shape_errors(
 
     analysis_key = make_key(series.name, "analysis", "analysis.SHAPES")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
-    region_key = ":".join(sorted(parameters.regions))
+    region_key = "_".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     errors: dict[str, dict] = {key: {} for key in keys}
@@ -882,7 +882,7 @@ def run_flow_group_shape_modes(
     analysis_shapes_key = make_key(series.name, "analysis", "analysis.SHAPES")
     analysis_pca_key = make_key(series.name, "analysis", "analysis.PCA")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
-    region_key = ":".join(sorted(parameters.regions))
+    region_key = "_".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     projections = ["top", "side1", "side2"]
@@ -992,7 +992,7 @@ def run_flow_group_variance_explained(
 
     analysis_key = make_key(series.name, "analysis", "analysis.PCA")
     group_key = make_key(series.name, "groups", "groups.SHAPES")
-    region_key = ":".join(sorted(parameters.regions))
+    region_key = "_".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     variance = []

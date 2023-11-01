@@ -152,7 +152,7 @@ def run_flow_process_data(
     coeffs_path_key = make_key(series.name, "analysis", "analysis.COEFFICIENTS")
     props_path_key = make_key(series.name, "analysis", "analysis.PROPERTIES")
     shapes_path_key = make_key(series.name, "analysis", "analysis.SHAPES")
-    region_key = ":".join(sorted(parameters.regions))
+    region_key = "_".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
@@ -268,7 +268,7 @@ def run_flow_fit_model(
 
     shapes_path_key = make_key(series.name, "analysis", "analysis.SHAPES")
     pca_path_key = make_key(series.name, "analysis", "analysis.PCA")
-    region_key = ":".join(sorted(parameters.regions))
+    region_key = "_".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
@@ -300,7 +300,7 @@ def run_flow_analyze_stats(
 
     shapes_path_key = make_key(series.name, "analysis", "analysis.SHAPES")
     stats_path_key = make_key(series.name, "analysis", "analysis.STATISTICS")
-    region_key = ":".join(sorted(parameters.regions))
+    region_key = "_".join(sorted(parameters.regions))
     keys = [condition["key"] for condition in series.conditions]
 
     if parameters.reference is None:
