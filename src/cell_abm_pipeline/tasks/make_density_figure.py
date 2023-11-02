@@ -29,7 +29,7 @@ def make_density_figure(data: pd.DataFrame, scale: float) -> mpl.Figure:
         )
         ax.add_patch(hexagon)
 
-    ax.set_xbound([data["x"].min() - scale, data["x"].max() + scale])
-    ax.set_ybound([data["y"].min() - scale, data["y"].max() + scale])
+    ax.set_xbound(data["x"].min() - scale, data["x"].max() + scale)
+    ax.set_ybound(data["y"].min() - scale, data["y"].max() + scale)
 
     return fig
