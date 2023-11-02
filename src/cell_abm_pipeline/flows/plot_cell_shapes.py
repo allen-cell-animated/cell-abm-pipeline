@@ -68,7 +68,7 @@ PLOTS: list[str] = [
 ]
 
 
-REGION_COLORS: dict[str, str] = {"DEFAULT": "#F200FF", "NUCLEUS": "#3AADA7"}
+REGION_COLORS: dict[str, str] = {"DEFAULT": "#FF00FF", "NUCLEUS": "#00FFFF"}
 
 KEY_COLORS: list[str] = [
     "#7F3C8D",

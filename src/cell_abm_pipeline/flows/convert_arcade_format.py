@@ -40,7 +40,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 import numpy as np
-from arcade_collection.output import (
+from arcade_collection.convert import (
     convert_to_colorizer,
     convert_to_images,
     convert_to_meshes,
@@ -53,6 +53,7 @@ from io_collection.save import save_figure, save_image, save_json, save_text
 from prefect import flow
 
 from cell_abm_pipeline.flows.plot_basic_metrics import PHASE_COLORS
+from cell_abm_pipeline.flows.plot_cell_shapes import REGION_COLORS
 
 FORMATS: list[str] = [
     "colorizer",
@@ -167,6 +168,9 @@ class ParametersConfigProjections:
 
     scale: int = 100
     """Size of scale bar (in um)."""
+
+    region_colors: dict[str, str] = field(default_factory=lambda: REGION_COLORS)
+    """Colors for each cell region."""
 
 
 @dataclass
@@ -433,6 +437,7 @@ def run_flow_convert_to_projections(
                     parameters.ds,
                     parameters.dt,
                     parameters.scale,
+                    parameters.region_colors,
                 )
 
                 projection_key = make_key(
@@ -469,10 +474,11 @@ def run_flow_convert_to_simularium(
 
             simularium = convert_to_simularium(
                 series_key,
-                cells_tar,
-                locs_tar,
+                "potts",
+                {"cells": cells_tar, "locations": locs_tar},
                 parameters.frame_spec,
                 parameters.box,
+                parameters.ds,
                 parameters.ds,
                 parameters.dt,
                 parameters.phase_colors,
