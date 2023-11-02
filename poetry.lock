@@ -1983,13 +1983,13 @@ files = [
 
 [[package]]
 name = "io-collection"
-version = "0.9.0"
+version = "0.10.0"
 description = "Collection of tasks for I/O."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "io_collection-0.9.0-py3-none-any.whl", hash = "sha256:1ee965af86561a38dd3723e3240c8275ececce737302aa88ce78bf3ff07486c0"},
-    {file = "io_collection-0.9.0.tar.gz", hash = "sha256:cd7bfd96db39499436b98d05fe9824260c7997047501c7e5920e639761b36df7"},
+    {file = "io_collection-0.10.0-py3-none-any.whl", hash = "sha256:30a07edd974b9cde9ed7f72c6ba5d8e5189c303cd646347480358537f31c5713"},
+    {file = "io_collection-0.10.0.tar.gz", hash = "sha256:36c6ac838ce02714780dd57e3d796dc7b4be0f6ce9aaf4cf194e7b5521365ad7"},
 ]
 
 [package.dependencies]
@@ -5331,4 +5331,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "3a8cb4fe987ccf8c2bb2d8434acd09007728f208dce271beec3d4b4da57bda02"
+content-hash = "78e627e0ac315190fd0ac5c36147ead8f8717fe83518793bacaa88863dda9e90"

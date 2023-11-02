@@ -828,9 +828,9 @@ importlib-resources==5.12.0 ; python_version >= "3.9" and python_version < "3.10
 iniconfig==2.0.0 ; python_version >= "3.9" and python_version < "3.12" \
     --hash=sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3 \
     --hash=sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374
-io-collection==0.9.0 ; python_version >= "3.9" and python_version < "3.12" \
-    --hash=sha256:1ee965af86561a38dd3723e3240c8275ececce737302aa88ce78bf3ff07486c0 \
-    --hash=sha256:cd7bfd96db39499436b98d05fe9824260c7997047501c7e5920e639761b36df7
+io-collection==0.10.0 ; python_version >= "3.9" and python_version < "3.12" \
+    --hash=sha256:30a07edd974b9cde9ed7f72c6ba5d8e5189c303cd646347480358537f31c5713 \
+    --hash=sha256:36c6ac838ce02714780dd57e3d796dc7b4be0f6ce9aaf4cf194e7b5521365ad7
 isort==5.12.0 ; python_version >= "3.9" and python_version < "3.12" \
     --hash=sha256:8bef7dde241278824a6d83f44a544709b065191b95b6e50894bdc722fcba0504 \
     --hash=sha256:f84c2818376e66cf843d497486ea8fed8700b340f308f076c6fb1229dff318b6
