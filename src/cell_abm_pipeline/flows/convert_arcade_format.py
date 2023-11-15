@@ -37,7 +37,6 @@ Formatted data is saved to the **converted** directory.
 """
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 import numpy as np
 from arcade_collection.convert import (
@@ -45,7 +44,8 @@ from arcade_collection.convert import (
     convert_to_images,
     convert_to_meshes,
     convert_to_projection,
-    convert_to_simularium,
+    convert_to_simularium_objects,
+    convert_to_simularium_shapes,
 )
 from io_collection.keys import make_key
 from io_collection.load import load_dataframe, load_tar
@@ -60,7 +60,8 @@ FORMATS: list[str] = [
     "images",
     "meshes",
     "projections",
-    "simularium",
+    "simularium_shapes",
+    "simularium_objects",
 ]
 
 COLORIZER_FEATURES: list[str] = [
@@ -174,8 +175,8 @@ class ParametersConfigProjections:
 
 
 @dataclass
-class ParametersConfigSimularium:
-    """Parameter configuration for convert ARCADE format flow - simularium."""
+class ParametersConfigSimulariumShapes:
+    """Parameter configuration for convert ARCADE format flow - simularium shapes."""
 
     seeds: list[int] = field(default_factory=lambda: [0])
     """Simulation seeds to use for converting to simularium."""
@@ -195,11 +196,37 @@ class ParametersConfigSimularium:
     phase_colors: dict[str, str] = field(default_factory=lambda: PHASE_COLORS)
     """Colors for each cell cycle phase."""
 
-    resolution: Optional[int] = None
-    """Number of voxels per sphere (None for single sphere per cell, 0 for meshes)."""
+    resolution: int = 0
+    """Number of voxels represented by a sphere (0 for single sphere per cell)."""
 
-    url: Optional[str] = None
-    """Path to mesh files."""
+
+@dataclass
+class ParametersConfigSimulariumObjects:
+    """Parameter configuration for convert ARCADE format flow - simularium objects."""
+
+    seeds: list[int] = field(default_factory=lambda: [0])
+    """Simulation seeds to use for converting to simularium."""
+
+    frame_spec: tuple[int, int, int] = (0, 1153, 1152)
+    """Specification for simulation ticks to use for converting to simularium."""
+
+    box: tuple[int, int, int] = field(default_factory=lambda: (1, 1, 1))
+    """Size of bounding box."""
+
+    ds: float = 1.0
+    """Spatial scaling in units/um."""
+
+    dt: float = 1.0
+    """Temporal scaling in hours/tick."""
+
+    phase_colors: dict[str, str] = field(default_factory=lambda: PHASE_COLORS)
+    """Colors for each cell cycle phase."""
+
+    url: str = ""
+    """URL for object files."""
+
+    group_size: int = 1
+    """Mesh group size."""
 
 
 @dataclass
@@ -221,8 +248,11 @@ class ParametersConfig:
     projections: ParametersConfigProjections = ParametersConfigProjections()
     """Parameters for projections subflow."""
 
-    simularium: ParametersConfigSimularium = ParametersConfigSimularium()
-    """Parameters for simularium subflow."""
+    simularium_shapes: ParametersConfigSimulariumShapes = ParametersConfigSimulariumShapes()
+    """Parameters for simularium shapes subflow."""
+
+    simularium_objects: ParametersConfigSimulariumObjects = ParametersConfigSimulariumObjects()
+    """Parameters for simularium objects subflow."""
 
 
 @dataclass
@@ -255,7 +285,8 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     - :py:func:`run_flow_convert_to_images`
     - :py:func:`run_flow_convert_to_meshes`
     - :py:func:`run_flow_convert_to_projections`
-    - :py:func:`run_flow_convert_to_simularium`
+    - :py:func:`run_flow_convert_to_simularium_shapes`
+    - :py:func:`run_flow_convert_to_simularium_objects`
     """
 
     if "colorizer" in parameters.formats:
@@ -270,8 +301,11 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     if "projections" in parameters.formats:
         run_flow_convert_to_projections(context, series, parameters.projections)
 
-    if "simularium" in parameters.formats:
-        run_flow_convert_to_simularium(context, series, parameters.simularium)
+    if "simularium_shapes" in parameters.formats:
+        run_flow_convert_to_simularium_shapes(context, series, parameters.simularium_shapes)
+
+    if "simularium_objects" in parameters.formats:
+        run_flow_convert_to_simularium_objects(context, series, parameters.simularium_objects)
 
 
 @flow(name="convert-arcade-format_convert-to-colorizer")
@@ -446,16 +480,18 @@ def run_flow_convert_to_projections(
                 save_figure(context.working_location, projection_key, projection)
 
 
-@flow(name="convert-arcade-format_convert-to-simularium")
-def run_flow_convert_to_simularium(
-    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigSimularium
+@flow(name="convert-arcade-format_convert-to-simularium-shapes")
+def run_flow_convert_to_simularium_shapes(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigSimulariumShapes
 ) -> None:
-    """Convert ARCADE format subflow for simularium."""
+    """Convert ARCADE format subflow for simularium with shapes."""
 
     cells_data_key = make_key(series.name, "data", "data.CELLS")
     locs_data_key = make_key(series.name, "data", "data.LOCATIONS")
     converted_key = make_key(series.name, "converted", "converted.SIMULARIUM")
     keys = [condition["key"] for condition in series.conditions]
+
+    suffix = f"SHAPES{parameters.resolution}"
 
     for key in keys:
         for seed in parameters.seeds:
@@ -467,12 +503,7 @@ def run_flow_convert_to_simularium(
             locs_tar_key = make_key(locs_data_key, f"{series_key}.LOCATIONS.tar.xz")
             locs_tar = load_tar(context.working_location, locs_tar_key)
 
-            if parameters.url is not None:
-                url = f"{parameters.url}/{make_key(series.name, 'converted', 'converted.MESH')}"
-            else:
-                url = None
-
-            simularium = convert_to_simularium(
+            simularium = convert_to_simularium_shapes(
                 series_key,
                 "potts",
                 {"cells": cells_tar, "locations": locs_tar},
@@ -483,15 +514,71 @@ def run_flow_convert_to_simularium(
                 parameters.dt,
                 parameters.phase_colors,
                 parameters.resolution,
-                url,
             )
 
-            if parameters.resolution is None:
-                suffix = "SINGLE"
-            elif parameters.resolution == 0:
-                suffix = "MESHES"
-            else:
-                suffix = f"RESOLUTION{parameters.resolution}"
+            simularium_key = make_key(converted_key, f"{series_key}.{suffix}.simularium")
+            save_text(context.working_location, simularium_key, simularium)
+
+
+@flow(name="convert-arcade-format_convert-to-simularium-objects")
+def run_flow_convert_to_simularium_objects(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigSimulariumObjects
+) -> None:
+    """Convert ARCADE format subflow for simularium with objects."""
+
+    data_key = make_key(series.name, "data", "data.LOCATIONS")
+    converted_key = make_key(series.name, "converted", "converted.SIMULARIUM")
+    keys = [condition["key"] for condition in series.conditions]
+
+    suffix = f"OBJECTS{parameters.group_size}"
+    regions = ["DEFAULT", "NUCLEUS"]
+    invert = {"DEFAULT": True, "NUCLEUS": False}
+
+    for key in keys:
+        for seed in parameters.seeds:
+            series_key = f"{series.name}_{key}_{seed:04d}"
+
+            results_key = make_key(series.name, "results", f"{series_key}.csv")
+            results = load_dataframe(context.working_location, results_key)
+
+            tar_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
+            tar = load_tar(context.working_location, tar_key)
+
+            categories = results[["TICK", "PHASE", "ID"]].rename(
+                columns={"TICK": "FRAME", "PHASE": "CATEGORY"}
+            )
+
+            meshes = convert_to_meshes(
+                series_key,
+                tar,
+                parameters.frame_spec,
+                regions,
+                parameters.box,
+                invert,
+                parameters.group_size,
+                categories,
+            )
+
+            mesh_path_key = make_key(converted_key, f"{series_key}.{suffix}")
+
+            for frame, index, region, mesh in meshes:
+                mesh_key = make_key(mesh_path_key, f"{frame:06d}_{region}_{index:03d}.MESH.obj")
+                save_text(context.working_location, mesh_key, mesh)
+
+            simularium = convert_to_simularium_objects(
+                series_key,
+                "potts",
+                categories,
+                parameters.frame_spec,
+                regions,
+                parameters.box,
+                parameters.ds,
+                parameters.ds,
+                parameters.dt,
+                parameters.phase_colors,
+                parameters.group_size,
+                make_key(parameters.url, mesh_path_key),
+            )
 
             simularium_key = make_key(converted_key, f"{series_key}.{suffix}.simularium")
             save_text(context.working_location, simularium_key, simularium)
