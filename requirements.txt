@@ -130,9 +130,9 @@ appdirs==1.4.4 ; python_version >= "3.9" and python_version < "3.12" \
 apprise==1.2.1 ; python_version >= "3.9" and python_version < "3.12" \
     --hash=sha256:679fb5d6232ec7748eef308bda9fe0f0707fa5e48eab247bfde83c3a024a21d1 \
     --hash=sha256:67e0c227eecee260000980dbbf8ba1e5eebdbe494f4730808297c9e645c03579
-arcade-collection==0.12.0 ; python_version >= "3.9" and python_version < "3.12" \
-    --hash=sha256:06e6fd5a353abda46927104a672fbdabaefc4527d1940e291c003854f9251d5b \
-    --hash=sha256:f3ea0ab1c3ea023cecd6923329378b4a27f01d186aec08a749c822158c8f18ea
+arcade-collection==0.13.0 ; python_version >= "3.9" and python_version < "3.12" \
+    --hash=sha256:5ad10f5f24dd305e85fe7a4fd8e8771bc31099945c855ed5c557090a598ff02b \
+    --hash=sha256:a43c29e6de8638f7d659aab6c128e67a4ff53bcffded872ae2b139f479b4909b
 asciitree==0.3.3 ; python_version >= "3.9" and python_version < "3.12" \
     --hash=sha256:4aa4b9b649f85e3fcb343363d97564aa1fb62e249677f2e18a96765145cc0f6e
 asgi-lifespan==2.0.0 ; python_version >= "3.9" and python_version < "3.12" \
