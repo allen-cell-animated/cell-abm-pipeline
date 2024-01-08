@@ -9,6 +9,8 @@ from .calculate_data_bins import calculate_data_bins
 from .check_data_bounds import check_data_bounds
 from .make_bar_figure import make_bar_figure
 from .make_box_figure import make_box_figure
+from .make_centroids_figure import make_centroids_figure
+from .make_contour_figure import make_contour_figure
 from .make_density_figure import make_density_figure
 from .make_graph_figure import make_graph_figure
 from .make_heatmap_figure import make_heatmap_figure
