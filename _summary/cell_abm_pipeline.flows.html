@@ -175,6 +175,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.group_resource_usage.html">group_resource_usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.initialize_arcade_simulations.html">initialize_arcade_simulations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.initialize_physicell_simulations.html">initialize_physicell_simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.make_simulation_movies.html">make_simulation_movies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.organize_analysis_files.html">organize_analysis_files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.parse_arcade_simulations.html">parse_arcade_simulations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.parse_physicell_simulations.html">parse_physicell_simulations</a></li>
@@ -200,6 +201,8 @@
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.check_data_bounds.html">check_data_bounds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_bar_figure.html">make_bar_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_box_figure.html">make_box_figure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_centroids_figure.html">make_centroids_figure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_contour_figure.html">make_contour_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_density_figure.html">make_density_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_graph_figure.html">make_graph_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_heatmap_figure.html">make_heatmap_figure</a></li>
@@ -305,43 +308,46 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.initialize_physicell_simulations.html#module-cell_abm_pipeline.flows.initialize_physicell_simulations" title="cell_abm_pipeline.flows.initialize_physicell_simulations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_physicell_simulations</span></code></a></p></td>
 <td><p>Workflow for initializing PhysiCell simulations.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.organize_analysis_files.html#module-cell_abm_pipeline.flows.organize_analysis_files" title="cell_abm_pipeline.flows.organize_analysis_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">organize_analysis_files</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.make_simulation_movies.html#module-cell_abm_pipeline.flows.make_simulation_movies" title="cell_abm_pipeline.flows.make_simulation_movies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_simulation_movies</span></code></a></p></td>
+<td><p>Workflow for making simulation movies.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.organize_analysis_files.html#module-cell_abm_pipeline.flows.organize_analysis_files" title="cell_abm_pipeline.flows.organize_analysis_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">organize_analysis_files</span></code></a></p></td>
 <td><p>Workflow for organizing analysis files.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.parse_arcade_simulations.html#module-cell_abm_pipeline.flows.parse_arcade_simulations" title="cell_abm_pipeline.flows.parse_arcade_simulations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_arcade_simulations</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.parse_arcade_simulations.html#module-cell_abm_pipeline.flows.parse_arcade_simulations" title="cell_abm_pipeline.flows.parse_arcade_simulations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_arcade_simulations</span></code></a></p></td>
 <td><p>Workflow for parsing ARCADE simulations into tidy data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.parse_physicell_simulations.html#module-cell_abm_pipeline.flows.parse_physicell_simulations" title="cell_abm_pipeline.flows.parse_physicell_simulations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_physicell_simulations</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.parse_physicell_simulations.html#module-cell_abm_pipeline.flows.parse_physicell_simulations" title="cell_abm_pipeline.flows.parse_physicell_simulations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_physicell_simulations</span></code></a></p></td>
 <td><p>Workflow for parsing PhysiCell simulations into tidy data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.plot_basic_metrics.html#module-cell_abm_pipeline.flows.plot_basic_metrics" title="cell_abm_pipeline.flows.plot_basic_metrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_basic_metrics</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.plot_basic_metrics.html#module-cell_abm_pipeline.flows.plot_basic_metrics" title="cell_abm_pipeline.flows.plot_basic_metrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_basic_metrics</span></code></a></p></td>
 <td><p>Workflow for plotting basic metrics.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.plot_cell_shapes.html#module-cell_abm_pipeline.flows.plot_cell_shapes" title="cell_abm_pipeline.flows.plot_cell_shapes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cell_shapes</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.plot_cell_shapes.html#module-cell_abm_pipeline.flows.plot_cell_shapes" title="cell_abm_pipeline.flows.plot_cell_shapes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cell_shapes</span></code></a></p></td>
 <td><p>Workflow for plotting cell shapes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.plot_colony_dynamics.html#module-cell_abm_pipeline.flows.plot_colony_dynamics" title="cell_abm_pipeline.flows.plot_colony_dynamics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_colony_dynamics</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.plot_colony_dynamics.html#module-cell_abm_pipeline.flows.plot_colony_dynamics" title="cell_abm_pipeline.flows.plot_colony_dynamics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_colony_dynamics</span></code></a></p></td>
 <td><p>Workflow for plotting colony dynamics.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.plot_resource_usage.html#module-cell_abm_pipeline.flows.plot_resource_usage" title="cell_abm_pipeline.flows.plot_resource_usage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_resource_usage</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.plot_resource_usage.html#module-cell_abm_pipeline.flows.plot_resource_usage" title="cell_abm_pipeline.flows.plot_resource_usage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_resource_usage</span></code></a></p></td>
 <td><p>Workflow for plotting resource usage.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.process_sample.html#module-cell_abm_pipeline.flows.process_sample" title="cell_abm_pipeline.flows.process_sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_sample</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.process_sample.html#module-cell_abm_pipeline.flows.process_sample" title="cell_abm_pipeline.flows.process_sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_sample</span></code></a></p></td>
 <td><p>Workflow for processing image samples with selected processing steps.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.run_batch_simulations.html#module-cell_abm_pipeline.flows.run_batch_simulations" title="cell_abm_pipeline.flows.run_batch_simulations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_batch_simulations</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.run_batch_simulations.html#module-cell_abm_pipeline.flows.run_batch_simulations" title="cell_abm_pipeline.flows.run_batch_simulations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_batch_simulations</span></code></a></p></td>
 <td><p>Workflow for running containerized models using AWS Batch.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.run_docker_simulations.html#module-cell_abm_pipeline.flows.run_docker_simulations" title="cell_abm_pipeline.flows.run_docker_simulations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_docker_simulations</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.run_docker_simulations.html#module-cell_abm_pipeline.flows.run_docker_simulations" title="cell_abm_pipeline.flows.run_docker_simulations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_docker_simulations</span></code></a></p></td>
 <td><p>Workflow for running containerized models using local Docker.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.run_fargate_calculations.html#module-cell_abm_pipeline.flows.run_fargate_calculations" title="cell_abm_pipeline.flows.run_fargate_calculations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_fargate_calculations</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.run_fargate_calculations.html#module-cell_abm_pipeline.flows.run_fargate_calculations" title="cell_abm_pipeline.flows.run_fargate_calculations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_fargate_calculations</span></code></a></p></td>
 <td><p>Workflow for running containerized calculations using Fargate.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.sample_image.html#module-cell_abm_pipeline.flows.sample_image" title="cell_abm_pipeline.flows.sample_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_image</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.sample_image.html#module-cell_abm_pipeline.flows.sample_image" title="cell_abm_pipeline.flows.sample_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_image</span></code></a></p></td>
 <td><p>Workflow for sampling cell ids from an image.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.summarize_manifest.html#module-cell_abm_pipeline.flows.summarize_manifest" title="cell_abm_pipeline.flows.summarize_manifest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">summarize_manifest</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="cell_abm_pipeline.flows.summarize_manifest.html#module-cell_abm_pipeline.flows.summarize_manifest" title="cell_abm_pipeline.flows.summarize_manifest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">summarize_manifest</span></code></a></p></td>
 <td><p>Workflow for summarizing files in the manifest.</p></td>
 </tr>
 </tbody>
@@ -378,7 +384,7 @@
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Allen Institute for Cell Science
+                Copyright &#169; 2024, Allen Institute for Cell Science
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

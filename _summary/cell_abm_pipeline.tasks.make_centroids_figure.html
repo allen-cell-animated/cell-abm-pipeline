@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="calculate_category_durations" href="cell_abm_pipeline.tasks.calculate_category_durations.html" /><link rel="prev" title="bin_to_hex" href="cell_abm_pipeline.tasks.bin_to_hex.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="make_contour_figure" href="cell_abm_pipeline.tasks.make_contour_figure.html" /><link rel="prev" title="make_box_figure" href="cell_abm_pipeline.tasks.make_box_figure.html" />
 
     <!-- Generated with Sphinx 7.0.1 and Furo 2023.05.20 -->
-        <title>build_svg_image - Cell ABM Pipeline 0.0.0</title>
+        <title>make_centroids_figure - Cell ABM Pipeline 0.0.0</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
@@ -195,13 +195,13 @@
 <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="cell_abm_pipeline.tasks.html">tasks</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of tasks</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.bin_to_hex.html">bin_to_hex</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">build_svg_image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.build_svg_image.html">build_svg_image</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.calculate_category_durations.html">calculate_category_durations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.calculate_data_bins.html">calculate_data_bins</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.check_data_bounds.html">check_data_bounds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_bar_figure.html">make_bar_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_box_figure.html">make_box_figure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_centroids_figure.html">make_centroids_figure</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">make_centroids_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_contour_figure.html">make_contour_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_density_figure.html">make_density_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_graph_figure.html">make_graph_figure</a></li>
@@ -251,11 +251,11 @@
           </label>
         </div>
         <article role="main">
-          <section id="module-cell_abm_pipeline.tasks.build_svg_image">
-<span id="build-svg-image"></span><h1>build_svg_image<a class="headerlink" href="#module-cell_abm_pipeline.tasks.build_svg_image" title="Permalink to this heading">#</a></h1>
+          <section id="module-cell_abm_pipeline.tasks.make_centroids_figure">
+<span id="make-centroids-figure"></span><h1>make_centroids_figure<a class="headerlink" href="#module-cell_abm_pipeline.tasks.make_centroids_figure" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="cell_abm_pipeline.tasks.build_svg_image.build_svg_image">
-<span class="sig-name descname"><span class="pre">build_svg_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/tasks/build_svg_image.html#build_svg_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.tasks.build_svg_image.build_svg_image" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="cell_abm_pipeline.tasks.make_centroids_figure.make_centroids_figure">
+<span class="sig-name descname"><span class="pre">make_centroids_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Figure</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/tasks/make_centroids_figure.html#make_centroids_figure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.tasks.make_centroids_figure.make_centroids_figure" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -265,23 +265,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="cell_abm_pipeline.tasks.calculate_category_durations.html">
+          <a class="next-page" href="cell_abm_pipeline.tasks.make_contour_figure.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">calculate_category_durations</div>
+                <div class="title">make_contour_figure</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="cell_abm_pipeline.tasks.bin_to_hex.html">
+          <a class="prev-page" href="cell_abm_pipeline.tasks.make_box_figure.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">bin_to_hex</div>
+                <div class="title">make_box_figure</div>
                 
               </div>
             </a>
@@ -315,8 +315,8 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">build_svg_image</a><ul>
-<li><a class="reference internal" href="#cell_abm_pipeline.tasks.build_svg_image.build_svg_image"><code class="docutils literal notranslate"><span class="pre">build_svg_image()</span></code></a></li>
+<li><a class="reference internal" href="#">make_centroids_figure</a><ul>
+<li><a class="reference internal" href="#cell_abm_pipeline.tasks.make_centroids_figure.make_centroids_figure"><code class="docutils literal notranslate"><span class="pre">make_centroids_figure()</span></code></a></li>
 </ul>
 </li>
 </ul>

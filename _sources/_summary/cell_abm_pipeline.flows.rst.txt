@@ -48,6 +48,7 @@
    group_resource_usage
    initialize_arcade_simulations
    initialize_physicell_simulations
+   make_simulation_movies
    organize_analysis_files
    parse_arcade_simulations
    parse_physicell_simulations

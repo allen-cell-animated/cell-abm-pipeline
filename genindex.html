@@ -173,6 +173,7 @@
 <li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.group_resource_usage.html">group_resource_usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html">initialize_arcade_simulations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html">initialize_physicell_simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html">make_simulation_movies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html">organize_analysis_files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html">parse_arcade_simulations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.parse_physicell_simulations.html">parse_physicell_simulations</a></li>
@@ -198,6 +199,8 @@
 <li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.check_data_bounds.html">check_data_bounds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.make_bar_figure.html">make_bar_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.make_box_figure.html">make_box_figure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.make_centroids_figure.html">make_centroids_figure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.make_contour_figure.html">make_contour_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.make_density_figure.html">make_density_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.make_graph_figure.html">make_graph_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.tasks.make_heatmap_figure.html">make_heatmap_figure</a></li>
@@ -248,7 +251,7 @@
           
 <section class="genindex-section">
   <h1 id="index">Index</h1>
-  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#K"><strong>K</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#Q"><strong>Q</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a></div>
+  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#K"><strong>K</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#Q"><strong>Q</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a> | <a href="#X"><strong>X</strong></a> | <a href="#Y"><strong>Y</strong></a></div>
 </section>
 <section id="A" class="genindex-section">
   <h2>A</h2>
@@ -288,8 +291,6 @@
           <li><a href="_summary/cell_abm_pipeline.flows.group_basic_metrics.html#cell_abm_pipeline.flows.group_basic_metrics.ParametersConfigMetricsDistributions.bounds">(ParametersConfigMetricsDistributions attribute)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigColorizer.box">box (ParametersConfigColorizer attribute)</a>
 
         <ul>
@@ -299,13 +300,19 @@
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigProjections.box">(ParametersConfigProjections attribute)</a>
 </li>
+          <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigScan.box">(ParametersConfigScan attribute)</a>
+</li>
           <li><a href="_summary/cell_abm_pipeline.flows.plot_cell_shapes.html#cell_abm_pipeline.flows.plot_cell_shapes.ParametersConfigShapeAverage.box">(ParametersConfigShapeAverage attribute)</a>
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.plot_cell_shapes.html#cell_abm_pipeline.flows.plot_cell_shapes.ParametersConfigShapeModes.box">(ParametersConfigShapeModes attribute)</a>
 </li>
-          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimularium.box">(ParametersConfigSimularium attribute)</a>
+          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumObjects.box">(ParametersConfigSimulariumObjects attribute)</a>
+</li>
+          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumShapes.box">(ParametersConfigSimulariumShapes attribute)</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="_summary/cell_abm_pipeline.flows.convert_physicell_format.html#cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig.box_size">box_size (ParametersConfig attribute)</a>
 </li>
         <li><a href="_summary/cell_abm_pipeline.tasks.build_svg_image.html#cell_abm_pipeline.tasks.build_svg_image.build_svg_image">build_svg_image() (in module cell_abm_pipeline.tasks.build_svg_image)</a>
@@ -455,6 +462,13 @@
 </li>
         </ul></li>
         <li>
+    cell_abm_pipeline.flows.make_simulation_movies
+
+        <ul>
+          <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#module-cell_abm_pipeline.flows.make_simulation_movies">module</a>
+</li>
+        </ul></li>
+        <li>
     cell_abm_pipeline.flows.organize_analysis_files
 
         <ul>
@@ -587,8 +601,6 @@
           <li><a href="_summary/cell_abm_pipeline.tasks.check_data_bounds.html#module-cell_abm_pipeline.tasks.check_data_bounds">module</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     cell_abm_pipeline.tasks.make_bar_figure
 
@@ -596,11 +608,27 @@
           <li><a href="_summary/cell_abm_pipeline.tasks.make_bar_figure.html#module-cell_abm_pipeline.tasks.make_bar_figure">module</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     cell_abm_pipeline.tasks.make_box_figure
 
         <ul>
           <li><a href="_summary/cell_abm_pipeline.tasks.make_box_figure.html#module-cell_abm_pipeline.tasks.make_box_figure">module</a>
+</li>
+        </ul></li>
+        <li>
+    cell_abm_pipeline.tasks.make_centroids_figure
+
+        <ul>
+          <li><a href="_summary/cell_abm_pipeline.tasks.make_centroids_figure.html#module-cell_abm_pipeline.tasks.make_centroids_figure">module</a>
+</li>
+        </ul></li>
+        <li>
+    cell_abm_pipeline.tasks.make_contour_figure
+
+        <ul>
+          <li><a href="_summary/cell_abm_pipeline.tasks.make_contour_figure.html#module-cell_abm_pipeline.tasks.make_contour_figure">module</a>
 </li>
         </ul></li>
         <li>
@@ -667,6 +695,8 @@
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.download_images.html#cell_abm_pipeline.flows.download_images.ParametersConfig.cells_per_fov">cells_per_fov (ParametersConfig attribute)</a>
 </li>
+        <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfig.centroids">centroids (ParametersConfig attribute)</a>
+</li>
         <li><a href="_summary/cell_abm_pipeline.flows.generate_voronoi_tessellation.html#cell_abm_pipeline.flows.generate_voronoi_tessellation.ParametersConfig.channel">channel (ParametersConfig attribute)</a>
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.sample_image.html#cell_abm_pipeline.flows.sample_image.ParametersConfig.channels">channels (ParametersConfig attribute)</a>
@@ -713,7 +743,7 @@
           <li><a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigVarianceExplained.components">(ParametersConfigVarianceExplained attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.plot_cell_shapes.html#cell_abm_pipeline.flows.plot_cell_shapes.ParametersConfigVarianceExplained.components">[1]</a>
 </li>
         </ul></li>
-        <li><a href="_summary/cell_abm_pipeline.flows.analyze_cell_shapes.html#cell_abm_pipeline.flows.analyze_cell_shapes.SeriesConfig.conditions">conditions (SeriesConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.analyze_colony_dynamics.html#cell_abm_pipeline.flows.analyze_colony_dynamics.SeriesConfig.conditions">[1]</a>, <a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.SeriesConfig.conditions">[2]</a>, <a href="_summary/cell_abm_pipeline.flows.convert_physicell_format.html#cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig.conditions">[3]</a>, <a href="_summary/cell_abm_pipeline.flows.generate_voronoi_tessellation.html#cell_abm_pipeline.flows.generate_voronoi_tessellation.SeriesConfig.conditions">[4]</a>, <a href="_summary/cell_abm_pipeline.flows.group_basic_metrics.html#cell_abm_pipeline.flows.group_basic_metrics.SeriesConfig.conditions">[5]</a>, <a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.SeriesConfig.conditions">[6]</a>, <a href="_summary/cell_abm_pipeline.flows.group_colony_dynamics.html#cell_abm_pipeline.flows.group_colony_dynamics.SeriesConfig.conditions">[7]</a>, <a href="_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig.conditions">[8]</a>, <a href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html#cell_abm_pipeline.flows.organize_analysis_files.SeriesConfig.conditions">[9]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_basic_metrics.html#cell_abm_pipeline.flows.plot_basic_metrics.SeriesConfig.conditions">[10]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_cell_shapes.html#cell_abm_pipeline.flows.plot_cell_shapes.SeriesConfig.conditions">[11]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_colony_dynamics.html#cell_abm_pipeline.flows.plot_colony_dynamics.SeriesConfig.conditions">[12]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_resource_usage.html#cell_abm_pipeline.flows.plot_resource_usage.SeriesConfig.conditions">[13]</a>, <a href="_summary/cell_abm_pipeline.flows.run_batch_simulations.html#cell_abm_pipeline.flows.run_batch_simulations.SeriesConfig.conditions">[14]</a>, <a href="_summary/cell_abm_pipeline.flows.run_docker_simulations.html#cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.conditions">[15]</a>, <a href="_summary/cell_abm_pipeline.flows.run_fargate_calculations.html#cell_abm_pipeline.flows.run_fargate_calculations.SeriesConfig.conditions">[16]</a>, <a href="_summary/cell_abm_pipeline.flows.summarize_manifest.html#cell_abm_pipeline.flows.summarize_manifest.SeriesConfig.conditions">[17]</a>
+        <li><a href="_summary/cell_abm_pipeline.flows.analyze_cell_shapes.html#cell_abm_pipeline.flows.analyze_cell_shapes.SeriesConfig.conditions">conditions (SeriesConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.analyze_colony_dynamics.html#cell_abm_pipeline.flows.analyze_colony_dynamics.SeriesConfig.conditions">[1]</a>, <a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.SeriesConfig.conditions">[2]</a>, <a href="_summary/cell_abm_pipeline.flows.convert_physicell_format.html#cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig.conditions">[3]</a>, <a href="_summary/cell_abm_pipeline.flows.generate_voronoi_tessellation.html#cell_abm_pipeline.flows.generate_voronoi_tessellation.SeriesConfig.conditions">[4]</a>, <a href="_summary/cell_abm_pipeline.flows.group_basic_metrics.html#cell_abm_pipeline.flows.group_basic_metrics.SeriesConfig.conditions">[5]</a>, <a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.SeriesConfig.conditions">[6]</a>, <a href="_summary/cell_abm_pipeline.flows.group_colony_dynamics.html#cell_abm_pipeline.flows.group_colony_dynamics.SeriesConfig.conditions">[7]</a>, <a href="_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig.conditions">[8]</a>, <a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.SeriesConfig.conditions">[9]</a>, <a href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html#cell_abm_pipeline.flows.organize_analysis_files.SeriesConfig.conditions">[10]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_basic_metrics.html#cell_abm_pipeline.flows.plot_basic_metrics.SeriesConfig.conditions">[11]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_cell_shapes.html#cell_abm_pipeline.flows.plot_cell_shapes.SeriesConfig.conditions">[12]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_colony_dynamics.html#cell_abm_pipeline.flows.plot_colony_dynamics.SeriesConfig.conditions">[13]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_resource_usage.html#cell_abm_pipeline.flows.plot_resource_usage.SeriesConfig.conditions">[14]</a>, <a href="_summary/cell_abm_pipeline.flows.run_batch_simulations.html#cell_abm_pipeline.flows.run_batch_simulations.SeriesConfig.conditions">[15]</a>, <a href="_summary/cell_abm_pipeline.flows.run_docker_simulations.html#cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.conditions">[16]</a>, <a href="_summary/cell_abm_pipeline.flows.run_fargate_calculations.html#cell_abm_pipeline.flows.run_fargate_calculations.SeriesConfig.conditions">[17]</a>, <a href="_summary/cell_abm_pipeline.flows.summarize_manifest.html#cell_abm_pipeline.flows.summarize_manifest.SeriesConfig.conditions">[18]</a>
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html#cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig.contact_sheet">contact_sheet (ParametersConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.process_sample.html#cell_abm_pipeline.flows.process_sample.ParametersConfig.contact_sheet">[1]</a>, <a href="_summary/cell_abm_pipeline.flows.sample_image.html#cell_abm_pipeline.flows.sample_image.ParametersConfig.contact_sheet">[2]</a>
 </li>
@@ -749,6 +779,8 @@
           <li><a href="_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig">(class in cell_abm_pipeline.flows.initialize_arcade_simulations)</a>
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html#cell_abm_pipeline.flows.initialize_physicell_simulations.ContextConfig">(class in cell_abm_pipeline.flows.initialize_physicell_simulations)</a>
+</li>
+          <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ContextConfig">(class in cell_abm_pipeline.flows.make_simulation_movies)</a>
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html#cell_abm_pipeline.flows.organize_analysis_files.ContextConfig">(class in cell_abm_pipeline.flows.organize_analysis_files)</a>
 </li>
@@ -814,7 +846,9 @@
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigProjections.ds">(ParametersConfigProjections attribute)</a>
 </li>
-          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimularium.ds">(ParametersConfigSimularium attribute)</a>
+          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumObjects.ds">(ParametersConfigSimulariumObjects attribute)</a>
+</li>
+          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumShapes.ds">(ParametersConfigSimulariumShapes attribute)</a>
 </li>
         </ul></li>
     </ul></td>
@@ -822,6 +856,8 @@
         <li><a href="_summary/cell_abm_pipeline.flows.analyze_cell_shapes.html#cell_abm_pipeline.flows.analyze_cell_shapes.ParametersConfig.dt">dt (ParametersConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.analyze_colony_dynamics.html#cell_abm_pipeline.flows.analyze_colony_dynamics.ParametersConfig.dt">[1]</a>
 
         <ul>
+          <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigCentroids.dt">(ParametersConfigCentroids attribute)</a>
+</li>
           <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigColorizer.dt">(ParametersConfigColorizer attribute)</a>
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.group_basic_metrics.html#cell_abm_pipeline.flows.group_basic_metrics.ParametersConfigMetricsBins.dt">(ParametersConfigMetricsBins attribute)</a>
@@ -836,7 +872,9 @@
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigProjections.dt">(ParametersConfigProjections attribute)</a>
 </li>
-          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimularium.dt">(ParametersConfigSimularium attribute)</a>
+          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumObjects.dt">(ParametersConfigSimulariumObjects attribute)</a>
+</li>
+          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumShapes.dt">(ParametersConfigSimulariumShapes attribute)</a>
 </li>
         </ul></li>
     </ul></td>
@@ -887,20 +925,26 @@
           <li><a href="_summary/cell_abm_pipeline.flows.group_colony_dynamics.html#cell_abm_pipeline.flows.group_colony_dynamics.ParametersConfigNeighborPositions.features">(ParametersConfigNeighborPositions attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.plot_colony_dynamics.html#cell_abm_pipeline.flows.plot_colony_dynamics.ParametersConfigNeighborPositions.features">[1]</a>
 </li>
         </ul></li>
+        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfig.formats">formats (ParametersConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.convert_physicell_format.html#cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig.formats">[1]</a>, <a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfig.formats">[2]</a>
+</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfig.formats">formats (ParametersConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.convert_physicell_format.html#cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig.formats">[1]</a>
-</li>
-        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigColorizer.frame_spec">frame_spec (ParametersConfigColorizer attribute)</a>
+        <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigCentroids.frame_spec">frame_spec (ParametersConfigCentroids attribute)</a>
 
         <ul>
+          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigColorizer.frame_spec">(ParametersConfigColorizer attribute)</a>
+</li>
           <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigImages.frame_spec">(ParametersConfigImages attribute)</a>
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigMeshes.frame_spec">(ParametersConfigMeshes attribute)</a>
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigProjections.frame_spec">(ParametersConfigProjections attribute)</a>
 </li>
-          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimularium.frame_spec">(ParametersConfigSimularium attribute)</a>
+          <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigScan.frame_spec">(ParametersConfigScan attribute)</a>
+</li>
+          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumObjects.frame_spec">(ParametersConfigSimulariumObjects attribute)</a>
+</li>
+          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumShapes.frame_spec">(ParametersConfigSimulariumShapes attribute)</a>
 </li>
         </ul></li>
     </ul></td>
@@ -917,6 +961,8 @@
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumObjects.group_size">group_size (ParametersConfigSimulariumObjects attribute)</a>
+</li>
         <li><a href="_summary/cell_abm_pipeline.flows.group_basic_metrics.html#cell_abm_pipeline.flows.group_basic_metrics.ParametersConfig.groups">groups (ParametersConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.ParametersConfig.groups">[1]</a>, <a href="_summary/cell_abm_pipeline.flows.group_colony_dynamics.html#cell_abm_pipeline.flows.group_colony_dynamics.ParametersConfig.groups">[2]</a>, <a href="_summary/cell_abm_pipeline.flows.group_resource_usage.html#cell_abm_pipeline.flows.group_resource_usage.ParametersConfig.groups">[3]</a>
 
         <ul>
@@ -949,9 +995,11 @@
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html#cell_abm_pipeline.flows.parse_arcade_simulations.ParametersConfig.include_filters">include_filters (ParametersConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.parse_physicell_simulations.html#cell_abm_pipeline.flows.parse_physicell_simulations.ParametersConfig.include_filters">[1]</a>, <a href="_summary/cell_abm_pipeline.flows.summarize_manifest.html#cell_abm_pipeline.flows.summarize_manifest.ParametersConfig.include_filters">[2]</a>
 </li>
+        <li><a href="_summary/cell_abm_pipeline.flows.process_sample.html#cell_abm_pipeline.flows.process_sample.ParametersConfig.include_ids">include_ids (ParametersConfig attribute)</a>
+</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="_summary/cell_abm_pipeline.flows.process_sample.html#cell_abm_pipeline.flows.process_sample.ParametersConfig.include_ids">include_ids (ParametersConfig attribute)</a>
+        <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigScan.index_spec">index_spec (ParametersConfigScan attribute)</a>
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigShapeSamples.indices">indices (ParametersConfigShapeSamples attribute)</a>
 </li>
@@ -996,6 +1044,10 @@
         <li><a href="_summary/cell_abm_pipeline.tasks.make_bar_figure.html#cell_abm_pipeline.tasks.make_bar_figure.make_bar_figure">make_bar_figure() (in module cell_abm_pipeline.tasks.make_bar_figure)</a>
 </li>
         <li><a href="_summary/cell_abm_pipeline.tasks.make_box_figure.html#cell_abm_pipeline.tasks.make_box_figure.make_box_figure">make_box_figure() (in module cell_abm_pipeline.tasks.make_box_figure)</a>
+</li>
+        <li><a href="_summary/cell_abm_pipeline.tasks.make_centroids_figure.html#cell_abm_pipeline.tasks.make_centroids_figure.make_centroids_figure">make_centroids_figure() (in module cell_abm_pipeline.tasks.make_centroids_figure)</a>
+</li>
+        <li><a href="_summary/cell_abm_pipeline.tasks.make_contour_figure.html#cell_abm_pipeline.tasks.make_contour_figure.make_contour_figure">make_contour_figure() (in module cell_abm_pipeline.tasks.make_contour_figure)</a>
 </li>
         <li><a href="_summary/cell_abm_pipeline.tasks.make_density_figure.html#cell_abm_pipeline.tasks.make_density_figure.make_density_figure">make_density_figure() (in module cell_abm_pipeline.tasks.make_density_figure)</a>
 </li>
@@ -1091,6 +1143,8 @@
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html#module-cell_abm_pipeline.flows.initialize_physicell_simulations">cell_abm_pipeline.flows.initialize_physicell_simulations</a>
 </li>
+          <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#module-cell_abm_pipeline.flows.make_simulation_movies">cell_abm_pipeline.flows.make_simulation_movies</a>
+</li>
           <li><a href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html#module-cell_abm_pipeline.flows.organize_analysis_files">cell_abm_pipeline.flows.organize_analysis_files</a>
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html#module-cell_abm_pipeline.flows.parse_arcade_simulations">cell_abm_pipeline.flows.parse_arcade_simulations</a>
@@ -1133,6 +1187,10 @@
 </li>
           <li><a href="_summary/cell_abm_pipeline.tasks.make_box_figure.html#module-cell_abm_pipeline.tasks.make_box_figure">cell_abm_pipeline.tasks.make_box_figure</a>
 </li>
+          <li><a href="_summary/cell_abm_pipeline.tasks.make_centroids_figure.html#module-cell_abm_pipeline.tasks.make_centroids_figure">cell_abm_pipeline.tasks.make_centroids_figure</a>
+</li>
+          <li><a href="_summary/cell_abm_pipeline.tasks.make_contour_figure.html#module-cell_abm_pipeline.tasks.make_contour_figure">cell_abm_pipeline.tasks.make_contour_figure</a>
+</li>
           <li><a href="_summary/cell_abm_pipeline.tasks.make_density_figure.html#module-cell_abm_pipeline.tasks.make_density_figure">cell_abm_pipeline.tasks.make_density_figure</a>
 </li>
           <li><a href="_summary/cell_abm_pipeline.tasks.make_graph_figure.html#module-cell_abm_pipeline.tasks.make_graph_figure">cell_abm_pipeline.tasks.make_graph_figure</a>
@@ -1158,7 +1216,7 @@
   <h2>N</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="_summary/cell_abm_pipeline.flows.analyze_cell_shapes.html#cell_abm_pipeline.flows.analyze_cell_shapes.SeriesConfig.name">name (SeriesConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.analyze_colony_dynamics.html#cell_abm_pipeline.flows.analyze_colony_dynamics.SeriesConfig.name">[1]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_coefficients.html#cell_abm_pipeline.flows.calculate_coefficients.SeriesConfig.name">[2]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_neighbors.html#cell_abm_pipeline.flows.calculate_neighbors.SeriesConfig.name">[3]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_positions.html#cell_abm_pipeline.flows.calculate_positions.SeriesConfig.name">[4]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_properties.html#cell_abm_pipeline.flows.calculate_properties.SeriesConfig.name">[5]</a>, <a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.SeriesConfig.name">[6]</a>, <a href="_summary/cell_abm_pipeline.flows.convert_physicell_format.html#cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig.name">[7]</a>, <a href="_summary/cell_abm_pipeline.flows.download_images.html#cell_abm_pipeline.flows.download_images.SeriesConfig.name">[8]</a>, <a href="_summary/cell_abm_pipeline.flows.generate_voronoi_tessellation.html#cell_abm_pipeline.flows.generate_voronoi_tessellation.SeriesConfig.name">[9]</a>, <a href="_summary/cell_abm_pipeline.flows.group_basic_metrics.html#cell_abm_pipeline.flows.group_basic_metrics.SeriesConfig.name">[10]</a>, <a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.SeriesConfig.name">[11]</a>, <a href="_summary/cell_abm_pipeline.flows.group_colony_dynamics.html#cell_abm_pipeline.flows.group_colony_dynamics.SeriesConfig.name">[12]</a>, <a href="_summary/cell_abm_pipeline.flows.group_resource_usage.html#cell_abm_pipeline.flows.group_resource_usage.SeriesConfig.name">[13]</a>, <a href="_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig.name">[14]</a>, <a href="_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html#cell_abm_pipeline.flows.initialize_physicell_simulations.SeriesConfig.name">[15]</a>, <a href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html#cell_abm_pipeline.flows.organize_analysis_files.SeriesConfig.name">[16]</a>, <a href="_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html#cell_abm_pipeline.flows.parse_arcade_simulations.SeriesConfig.name">[17]</a>, <a href="_summary/cell_abm_pipeline.flows.parse_physicell_simulations.html#cell_abm_pipeline.flows.parse_physicell_simulations.SeriesConfig.name">[18]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_basic_metrics.html#cell_abm_pipeline.flows.plot_basic_metrics.SeriesConfig.name">[19]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_cell_shapes.html#cell_abm_pipeline.flows.plot_cell_shapes.SeriesConfig.name">[20]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_colony_dynamics.html#cell_abm_pipeline.flows.plot_colony_dynamics.SeriesConfig.name">[21]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_resource_usage.html#cell_abm_pipeline.flows.plot_resource_usage.SeriesConfig.name">[22]</a>, <a href="_summary/cell_abm_pipeline.flows.process_sample.html#cell_abm_pipeline.flows.process_sample.SeriesConfig.name">[23]</a>, <a href="_summary/cell_abm_pipeline.flows.run_batch_simulations.html#cell_abm_pipeline.flows.run_batch_simulations.SeriesConfig.name">[24]</a>, <a href="_summary/cell_abm_pipeline.flows.run_docker_simulations.html#cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.name">[25]</a>, <a href="_summary/cell_abm_pipeline.flows.run_fargate_calculations.html#cell_abm_pipeline.flows.run_fargate_calculations.SeriesConfig.name">[26]</a>, <a href="_summary/cell_abm_pipeline.flows.sample_image.html#cell_abm_pipeline.flows.sample_image.SeriesConfig.name">[27]</a>, <a href="_summary/cell_abm_pipeline.flows.summarize_manifest.html#cell_abm_pipeline.flows.summarize_manifest.SeriesConfig.name">[28]</a>
+        <li><a href="_summary/cell_abm_pipeline.flows.analyze_cell_shapes.html#cell_abm_pipeline.flows.analyze_cell_shapes.SeriesConfig.name">name (SeriesConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.analyze_colony_dynamics.html#cell_abm_pipeline.flows.analyze_colony_dynamics.SeriesConfig.name">[1]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_coefficients.html#cell_abm_pipeline.flows.calculate_coefficients.SeriesConfig.name">[2]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_neighbors.html#cell_abm_pipeline.flows.calculate_neighbors.SeriesConfig.name">[3]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_positions.html#cell_abm_pipeline.flows.calculate_positions.SeriesConfig.name">[4]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_properties.html#cell_abm_pipeline.flows.calculate_properties.SeriesConfig.name">[5]</a>, <a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.SeriesConfig.name">[6]</a>, <a href="_summary/cell_abm_pipeline.flows.convert_physicell_format.html#cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig.name">[7]</a>, <a href="_summary/cell_abm_pipeline.flows.download_images.html#cell_abm_pipeline.flows.download_images.SeriesConfig.name">[8]</a>, <a href="_summary/cell_abm_pipeline.flows.generate_voronoi_tessellation.html#cell_abm_pipeline.flows.generate_voronoi_tessellation.SeriesConfig.name">[9]</a>, <a href="_summary/cell_abm_pipeline.flows.group_basic_metrics.html#cell_abm_pipeline.flows.group_basic_metrics.SeriesConfig.name">[10]</a>, <a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.SeriesConfig.name">[11]</a>, <a href="_summary/cell_abm_pipeline.flows.group_colony_dynamics.html#cell_abm_pipeline.flows.group_colony_dynamics.SeriesConfig.name">[12]</a>, <a href="_summary/cell_abm_pipeline.flows.group_resource_usage.html#cell_abm_pipeline.flows.group_resource_usage.SeriesConfig.name">[13]</a>, <a href="_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig.name">[14]</a>, <a href="_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html#cell_abm_pipeline.flows.initialize_physicell_simulations.SeriesConfig.name">[15]</a>, <a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.SeriesConfig.name">[16]</a>, <a href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html#cell_abm_pipeline.flows.organize_analysis_files.SeriesConfig.name">[17]</a>, <a href="_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html#cell_abm_pipeline.flows.parse_arcade_simulations.SeriesConfig.name">[18]</a>, <a href="_summary/cell_abm_pipeline.flows.parse_physicell_simulations.html#cell_abm_pipeline.flows.parse_physicell_simulations.SeriesConfig.name">[19]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_basic_metrics.html#cell_abm_pipeline.flows.plot_basic_metrics.SeriesConfig.name">[20]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_cell_shapes.html#cell_abm_pipeline.flows.plot_cell_shapes.SeriesConfig.name">[21]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_colony_dynamics.html#cell_abm_pipeline.flows.plot_colony_dynamics.SeriesConfig.name">[22]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_resource_usage.html#cell_abm_pipeline.flows.plot_resource_usage.SeriesConfig.name">[23]</a>, <a href="_summary/cell_abm_pipeline.flows.process_sample.html#cell_abm_pipeline.flows.process_sample.SeriesConfig.name">[24]</a>, <a href="_summary/cell_abm_pipeline.flows.run_batch_simulations.html#cell_abm_pipeline.flows.run_batch_simulations.SeriesConfig.name">[25]</a>, <a href="_summary/cell_abm_pipeline.flows.run_docker_simulations.html#cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.name">[26]</a>, <a href="_summary/cell_abm_pipeline.flows.run_fargate_calculations.html#cell_abm_pipeline.flows.run_fargate_calculations.SeriesConfig.name">[27]</a>, <a href="_summary/cell_abm_pipeline.flows.sample_image.html#cell_abm_pipeline.flows.sample_image.SeriesConfig.name">[28]</a>, <a href="_summary/cell_abm_pipeline.flows.summarize_manifest.html#cell_abm_pipeline.flows.summarize_manifest.SeriesConfig.name">[29]</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
@@ -1233,6 +1291,8 @@
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html#cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig">(class in cell_abm_pipeline.flows.initialize_physicell_simulations)</a>
 </li>
+          <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfig">(class in cell_abm_pipeline.flows.make_simulation_movies)</a>
+</li>
           <li><a href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html#cell_abm_pipeline.flows.organize_analysis_files.ParametersConfig">(class in cell_abm_pipeline.flows.organize_analysis_files)</a>
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html#cell_abm_pipeline.flows.parse_arcade_simulations.ParametersConfig">(class in cell_abm_pipeline.flows.parse_arcade_simulations)</a>
@@ -1260,6 +1320,8 @@
           <li><a href="_summary/cell_abm_pipeline.flows.summarize_manifest.html#cell_abm_pipeline.flows.summarize_manifest.ParametersConfig">(class in cell_abm_pipeline.flows.summarize_manifest)</a>
 </li>
         </ul></li>
+        <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigCentroids">ParametersConfigCentroids (class in cell_abm_pipeline.flows.make_simulation_movies)</a>
+</li>
         <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigColorizer">ParametersConfigColorizer (class in cell_abm_pipeline.flows.convert_arcade_format)</a>
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade">ParametersConfigConvertToArcade (class in cell_abm_pipeline.flows.initialize_arcade_simulations)</a>
@@ -1314,14 +1376,14 @@
           <li><a href="_summary/cell_abm_pipeline.flows.plot_basic_metrics.html#cell_abm_pipeline.flows.plot_basic_metrics.ParametersConfigMetricsSpatial">(class in cell_abm_pipeline.flows.plot_basic_metrics)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="_summary/cell_abm_pipeline.flows.group_basic_metrics.html#cell_abm_pipeline.flows.group_basic_metrics.ParametersConfigMetricsTemporal">ParametersConfigMetricsTemporal (class in cell_abm_pipeline.flows.group_basic_metrics)</a>
 
         <ul>
           <li><a href="_summary/cell_abm_pipeline.flows.plot_basic_metrics.html#cell_abm_pipeline.flows.plot_basic_metrics.ParametersConfigMetricsTemporal">(class in cell_abm_pipeline.flows.plot_basic_metrics)</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigModeCorrelations">ParametersConfigModeCorrelations (class in cell_abm_pipeline.flows.group_cell_shapes)</a>
 
         <ul>
@@ -1358,6 +1420,8 @@
         </ul></li>
         <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigProjections">ParametersConfigProjections (class in cell_abm_pipeline.flows.convert_arcade_format)</a>
 </li>
+        <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigScan">ParametersConfigScan (class in cell_abm_pipeline.flows.make_simulation_movies)</a>
+</li>
         <li><a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigShapeAverage">ParametersConfigShapeAverage (class in cell_abm_pipeline.flows.group_cell_shapes)</a>
 
         <ul>
@@ -1378,7 +1442,9 @@
         </ul></li>
         <li><a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigShapeSamples">ParametersConfigShapeSamples (class in cell_abm_pipeline.flows.group_cell_shapes)</a>
 </li>
-        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimularium">ParametersConfigSimularium (class in cell_abm_pipeline.flows.convert_arcade_format)</a>
+        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumObjects">ParametersConfigSimulariumObjects (class in cell_abm_pipeline.flows.convert_arcade_format)</a>
+</li>
+        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumShapes">ParametersConfigSimulariumShapes (class in cell_abm_pipeline.flows.convert_arcade_format)</a>
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigVarianceExplained">ParametersConfigVarianceExplained (class in cell_abm_pipeline.flows.group_cell_shapes)</a>
 
@@ -1403,7 +1469,9 @@
         <ul>
           <li><a href="_summary/cell_abm_pipeline.flows.plot_basic_metrics.html#cell_abm_pipeline.flows.plot_basic_metrics.ParametersConfigMetricsSpatial.phase_colors">(ParametersConfigMetricsSpatial attribute)</a>
 </li>
-          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimularium.phase_colors">(ParametersConfigSimularium attribute)</a>
+          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumObjects.phase_colors">(ParametersConfigSimulariumObjects attribute)</a>
+</li>
+          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumShapes.phase_colors">(ParametersConfigSimulariumShapes attribute)</a>
 </li>
         </ul></li>
         <li><a href="_summary/cell_abm_pipeline.flows.group_basic_metrics.html#cell_abm_pipeline.flows.group_basic_metrics.ParametersConfigMetricsDistributions.phases">phases (ParametersConfigMetricsDistributions attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.plot_basic_metrics.html#cell_abm_pipeline.flows.plot_basic_metrics.ParametersConfigMetricsDistributions.phases">[1]</a>
@@ -1496,6 +1564,12 @@
           <li><a href="_summary/cell_abm_pipeline.flows.calculate_coefficients.html#cell_abm_pipeline.flows.calculate_coefficients.ParametersConfig.region">(ParametersConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_properties.html#cell_abm_pipeline.flows.calculate_properties.ParametersConfig.region">[1]</a>, <a href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html#cell_abm_pipeline.flows.organize_analysis_files.ParametersConfig.region">[2]</a>
 </li>
         </ul></li>
+        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigProjections.region_colors">region_colors (ParametersConfigProjections attribute)</a>
+
+        <ul>
+          <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigScan.region_colors">(ParametersConfigScan attribute)</a>
+</li>
+        </ul></li>
         <li><a href="_summary/cell_abm_pipeline.flows.analyze_cell_shapes.html#cell_abm_pipeline.flows.analyze_cell_shapes.ParametersConfig.regions">regions (ParametersConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html#cell_abm_pipeline.flows.parse_arcade_simulations.ParametersConfig.regions">[1]</a>
 
         <ul>
@@ -1527,6 +1601,8 @@
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigProjections.regions">(ParametersConfigProjections attribute)</a>
 </li>
+          <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigScan.regions">(ParametersConfigScan attribute)</a>
+</li>
           <li><a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigShapeAverage.regions">(ParametersConfigShapeAverage attribute)</a>
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigShapeErrors.regions">(ParametersConfigShapeErrors attribute)</a>
@@ -1545,7 +1621,7 @@
         <li><a href="_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.resolution">resolution (ParametersConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.sample_image.html#cell_abm_pipeline.flows.sample_image.ParametersConfig.resolution">[1]</a>
 
         <ul>
-          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimularium.resolution">(ParametersConfigSimularium attribute)</a>
+          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumShapes.resolution">(ParametersConfigSimulariumShapes attribute)</a>
 </li>
         </ul></li>
         <li><a href="_summary/cell_abm_pipeline.flows.run_batch_simulations.html#cell_abm_pipeline.flows.run_batch_simulations.ParametersConfig.retries">retries (ParametersConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.run_docker_simulations.html#cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.retries">[1]</a>
@@ -1586,6 +1662,8 @@
           <li><a href="_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow">(in module cell_abm_pipeline.flows.initialize_arcade_simulations)</a>
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html#cell_abm_pipeline.flows.initialize_physicell_simulations.run_flow">(in module cell_abm_pipeline.flows.initialize_physicell_simulations)</a>
+</li>
+          <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.run_flow">(in module cell_abm_pipeline.flows.make_simulation_movies)</a>
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html#cell_abm_pipeline.flows.organize_analysis_files.run_flow">(in module cell_abm_pipeline.flows.organize_analysis_files)</a>
 </li>
@@ -1632,12 +1710,12 @@
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_projections">run_flow_convert_to_projections() (in module cell_abm_pipeline.flows.convert_arcade_format)</a>
 </li>
-        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium">run_flow_convert_to_simularium() (in module cell_abm_pipeline.flows.convert_arcade_format)</a>
-
-        <ul>
-          <li><a href="_summary/cell_abm_pipeline.flows.convert_physicell_format.html#cell_abm_pipeline.flows.convert_physicell_format.run_flow_convert_to_simularium">(in module cell_abm_pipeline.flows.convert_physicell_format)</a>
+        <li><a href="_summary/cell_abm_pipeline.flows.convert_physicell_format.html#cell_abm_pipeline.flows.convert_physicell_format.run_flow_convert_to_simularium">run_flow_convert_to_simularium() (in module cell_abm_pipeline.flows.convert_physicell_format)</a>
 </li>
-        </ul></li>
+        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium_objects">run_flow_convert_to_simularium_objects() (in module cell_abm_pipeline.flows.convert_arcade_format)</a>
+</li>
+        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium_shapes">run_flow_convert_to_simularium_shapes() (in module cell_abm_pipeline.flows.convert_arcade_format)</a>
+</li>
         <li><a href="_summary/cell_abm_pipeline.flows.analyze_cell_shapes.html#cell_abm_pipeline.flows.analyze_cell_shapes.run_flow_fit_model">run_flow_fit_model() (in module cell_abm_pipeline.flows.analyze_cell_shapes)</a>
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.analyze_colony_dynamics.html#cell_abm_pipeline.flows.analyze_colony_dynamics.run_flow_generate_networks">run_flow_generate_networks() (in module cell_abm_pipeline.flows.analyze_colony_dynamics)</a>
@@ -1687,6 +1765,10 @@
         <li><a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.run_flow_group_variance_explained">run_flow_group_variance_explained() (in module cell_abm_pipeline.flows.group_cell_shapes)</a>
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.group_resource_usage.html#cell_abm_pipeline.flows.group_resource_usage.run_flow_group_wall_clock">run_flow_group_wall_clock() (in module cell_abm_pipeline.flows.group_resource_usage)</a>
+</li>
+        <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.run_flow_make_centroids_movie">run_flow_make_centroids_movie() (in module cell_abm_pipeline.flows.make_simulation_movies)</a>
+</li>
+        <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.run_flow_make_scan_movie">run_flow_make_scan_movie() (in module cell_abm_pipeline.flows.make_simulation_movies)</a>
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html#cell_abm_pipeline.flows.organize_analysis_files.run_flow_merge_files">run_flow_merge_files() (in module cell_abm_pipeline.flows.organize_analysis_files)</a>
 </li>
@@ -1778,6 +1860,8 @@
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.sample_image.html#cell_abm_pipeline.flows.sample_image.ParametersConfig.scale_z">scale_z (ParametersConfig attribute)</a>
 </li>
+        <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfig.scan">scan (ParametersConfig attribute)</a>
+</li>
         <li><a href="_summary/cell_abm_pipeline.flows.summarize_manifest.html#cell_abm_pipeline.flows.summarize_manifest.ParametersConfig.search_locations">search_locations (ParametersConfig attribute)</a>
 
         <ul>
@@ -1802,9 +1886,11 @@
           <li><a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.ParametersConfigShapeSamples.seed">(ParametersConfigShapeSamples attribute)</a>
 </li>
         </ul></li>
-        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigColorizer.seeds">seeds (ParametersConfigColorizer attribute)</a>
+        <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigCentroids.seeds">seeds (ParametersConfigCentroids attribute)</a>
 
         <ul>
+          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigColorizer.seeds">(ParametersConfigColorizer attribute)</a>
+</li>
           <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigImages.seeds">(ParametersConfigImages attribute)</a>
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigMeshes.seeds">(ParametersConfigMeshes attribute)</a>
@@ -1819,7 +1905,11 @@
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigProjections.seeds">(ParametersConfigProjections attribute)</a>
 </li>
-          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimularium.seeds">(ParametersConfigSimularium attribute)</a>
+          <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigScan.seeds">(ParametersConfigScan attribute)</a>
+</li>
+          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumObjects.seeds">(ParametersConfigSimulariumObjects attribute)</a>
+</li>
+          <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumShapes.seeds">(ParametersConfigSimulariumShapes attribute)</a>
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.analyze_cell_shapes.html#cell_abm_pipeline.flows.analyze_cell_shapes.SeriesConfig.seeds">(SeriesConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.analyze_colony_dynamics.html#cell_abm_pipeline.flows.analyze_colony_dynamics.SeriesConfig.seeds">[1]</a>, <a href="_summary/cell_abm_pipeline.flows.convert_physicell_format.html#cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig.seeds">[2]</a>, <a href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html#cell_abm_pipeline.flows.organize_analysis_files.SeriesConfig.seeds">[3]</a>, <a href="_summary/cell_abm_pipeline.flows.run_batch_simulations.html#cell_abm_pipeline.flows.run_batch_simulations.SeriesConfig.seeds">[4]</a>, <a href="_summary/cell_abm_pipeline.flows.run_docker_simulations.html#cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.seeds">[5]</a>, <a href="_summary/cell_abm_pipeline.flows.run_fargate_calculations.html#cell_abm_pipeline.flows.run_fargate_calculations.SeriesConfig.seeds">[6]</a>, <a href="_summary/cell_abm_pipeline.flows.summarize_manifest.html#cell_abm_pipeline.flows.summarize_manifest.SeriesConfig.seeds">[7]</a>
 </li>
@@ -1861,6 +1951,8 @@
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html#cell_abm_pipeline.flows.initialize_physicell_simulations.SeriesConfig">(class in cell_abm_pipeline.flows.initialize_physicell_simulations)</a>
 </li>
+          <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.SeriesConfig">(class in cell_abm_pipeline.flows.make_simulation_movies)</a>
+</li>
           <li><a href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html#cell_abm_pipeline.flows.organize_analysis_files.SeriesConfig">(class in cell_abm_pipeline.flows.organize_analysis_files)</a>
 </li>
           <li><a href="_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html#cell_abm_pipeline.flows.parse_arcade_simulations.SeriesConfig">(class in cell_abm_pipeline.flows.parse_arcade_simulations)</a>
@@ -1898,7 +1990,9 @@
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.ParametersConfig.shape_samples">shape_samples (ParametersConfig attribute)</a>
 </li>
-        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfig.simularium">simularium (ParametersConfig attribute)</a>
+        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfig.simularium_objects">simularium_objects (ParametersConfig attribute)</a>
+</li>
+        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfig.simularium_shapes">simularium_shapes (ParametersConfig attribute)</a>
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.state_thresholds">state_thresholds (ParametersConfigConvertToArcade attribute)</a>
 </li>
@@ -1966,7 +2060,7 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="_summary/cell_abm_pipeline.flows.summarize_manifest.html#cell_abm_pipeline.flows.summarize_manifest.ParametersConfig.update_manifest">update_manifest (ParametersConfig attribute)</a>
 </li>
-        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimularium.url">url (ParametersConfigSimularium attribute)</a>
+        <li><a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumObjects.url">url (ParametersConfigSimulariumObjects attribute)</a>
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.run_batch_simulations.html#cell_abm_pipeline.flows.run_batch_simulations.ContextConfig.user">user (ContextConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.run_fargate_calculations.html#cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.user">[1]</a>
 </li>
@@ -1982,11 +2076,13 @@
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.analyze_cell_shapes.html#cell_abm_pipeline.flows.analyze_cell_shapes.ParametersConfig.valid_ticks">valid_ticks (ParametersConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.analyze_colony_dynamics.html#cell_abm_pipeline.flows.analyze_colony_dynamics.ParametersConfig.valid_ticks">[1]</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.ParametersConfig.variance_explained">variance_explained (ParametersConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.plot_cell_shapes.html#cell_abm_pipeline.flows.plot_cell_shapes.ParametersConfig.variance_explained">[1]</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="_summary/cell_abm_pipeline.flows.run_batch_simulations.html#cell_abm_pipeline.flows.run_batch_simulations.ContextConfig.vcpus">vcpus (ContextConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.run_fargate_calculations.html#cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.vcpus">[1]</a>
+</li>
+        <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigScan.view">view (ParametersConfigScan attribute)</a>
 </li>
         <li><a href="_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.volumes">volumes (ParametersConfigConvertToArcade attribute)</a>
 </li>
@@ -2002,8 +2098,38 @@
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="_summary/cell_abm_pipeline.flows.analyze_cell_shapes.html#cell_abm_pipeline.flows.analyze_cell_shapes.ContextConfig.working_location">working_location (ContextConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.analyze_colony_dynamics.html#cell_abm_pipeline.flows.analyze_colony_dynamics.ContextConfig.working_location">[1]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_coefficients.html#cell_abm_pipeline.flows.calculate_coefficients.ContextConfig.working_location">[2]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_neighbors.html#cell_abm_pipeline.flows.calculate_neighbors.ContextConfig.working_location">[3]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_positions.html#cell_abm_pipeline.flows.calculate_positions.ContextConfig.working_location">[4]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_properties.html#cell_abm_pipeline.flows.calculate_properties.ContextConfig.working_location">[5]</a>, <a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ContextConfig.working_location">[6]</a>, <a href="_summary/cell_abm_pipeline.flows.convert_physicell_format.html#cell_abm_pipeline.flows.convert_physicell_format.ContextConfig.working_location">[7]</a>, <a href="_summary/cell_abm_pipeline.flows.download_images.html#cell_abm_pipeline.flows.download_images.ContextConfig.working_location">[8]</a>, <a href="_summary/cell_abm_pipeline.flows.generate_voronoi_tessellation.html#cell_abm_pipeline.flows.generate_voronoi_tessellation.ContextConfig.working_location">[9]</a>, <a href="_summary/cell_abm_pipeline.flows.group_basic_metrics.html#cell_abm_pipeline.flows.group_basic_metrics.ContextConfig.working_location">[10]</a>, <a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.ContextConfig.working_location">[11]</a>, <a href="_summary/cell_abm_pipeline.flows.group_colony_dynamics.html#cell_abm_pipeline.flows.group_colony_dynamics.ContextConfig.working_location">[12]</a>, <a href="_summary/cell_abm_pipeline.flows.group_resource_usage.html#cell_abm_pipeline.flows.group_resource_usage.ContextConfig.working_location">[13]</a>, <a href="_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig.working_location">[14]</a>, <a href="_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html#cell_abm_pipeline.flows.initialize_physicell_simulations.ContextConfig.working_location">[15]</a>, <a href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html#cell_abm_pipeline.flows.organize_analysis_files.ContextConfig.working_location">[16]</a>, <a href="_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html#cell_abm_pipeline.flows.parse_arcade_simulations.ContextConfig.working_location">[17]</a>, <a href="_summary/cell_abm_pipeline.flows.parse_physicell_simulations.html#cell_abm_pipeline.flows.parse_physicell_simulations.ContextConfig.working_location">[18]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_basic_metrics.html#cell_abm_pipeline.flows.plot_basic_metrics.ContextConfig.working_location">[19]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_cell_shapes.html#cell_abm_pipeline.flows.plot_cell_shapes.ContextConfig.working_location">[20]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_colony_dynamics.html#cell_abm_pipeline.flows.plot_colony_dynamics.ContextConfig.working_location">[21]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_resource_usage.html#cell_abm_pipeline.flows.plot_resource_usage.ContextConfig.working_location">[22]</a>, <a href="_summary/cell_abm_pipeline.flows.process_sample.html#cell_abm_pipeline.flows.process_sample.ContextConfig.working_location">[23]</a>, <a href="_summary/cell_abm_pipeline.flows.run_batch_simulations.html#cell_abm_pipeline.flows.run_batch_simulations.ContextConfig.working_location">[24]</a>, <a href="_summary/cell_abm_pipeline.flows.run_docker_simulations.html#cell_abm_pipeline.flows.run_docker_simulations.ContextConfig.working_location">[25]</a>, <a href="_summary/cell_abm_pipeline.flows.run_fargate_calculations.html#cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.working_location">[26]</a>, <a href="_summary/cell_abm_pipeline.flows.sample_image.html#cell_abm_pipeline.flows.sample_image.ContextConfig.working_location">[27]</a>, <a href="_summary/cell_abm_pipeline.flows.summarize_manifest.html#cell_abm_pipeline.flows.summarize_manifest.ContextConfig.working_location">[28]</a>
+        <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigCentroids.window">window (ParametersConfigCentroids attribute)</a>
 </li>
+        <li><a href="_summary/cell_abm_pipeline.flows.analyze_cell_shapes.html#cell_abm_pipeline.flows.analyze_cell_shapes.ContextConfig.working_location">working_location (ContextConfig attribute)</a>, <a href="_summary/cell_abm_pipeline.flows.analyze_colony_dynamics.html#cell_abm_pipeline.flows.analyze_colony_dynamics.ContextConfig.working_location">[1]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_coefficients.html#cell_abm_pipeline.flows.calculate_coefficients.ContextConfig.working_location">[2]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_neighbors.html#cell_abm_pipeline.flows.calculate_neighbors.ContextConfig.working_location">[3]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_positions.html#cell_abm_pipeline.flows.calculate_positions.ContextConfig.working_location">[4]</a>, <a href="_summary/cell_abm_pipeline.flows.calculate_properties.html#cell_abm_pipeline.flows.calculate_properties.ContextConfig.working_location">[5]</a>, <a href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ContextConfig.working_location">[6]</a>, <a href="_summary/cell_abm_pipeline.flows.convert_physicell_format.html#cell_abm_pipeline.flows.convert_physicell_format.ContextConfig.working_location">[7]</a>, <a href="_summary/cell_abm_pipeline.flows.download_images.html#cell_abm_pipeline.flows.download_images.ContextConfig.working_location">[8]</a>, <a href="_summary/cell_abm_pipeline.flows.generate_voronoi_tessellation.html#cell_abm_pipeline.flows.generate_voronoi_tessellation.ContextConfig.working_location">[9]</a>, <a href="_summary/cell_abm_pipeline.flows.group_basic_metrics.html#cell_abm_pipeline.flows.group_basic_metrics.ContextConfig.working_location">[10]</a>, <a href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html#cell_abm_pipeline.flows.group_cell_shapes.ContextConfig.working_location">[11]</a>, <a href="_summary/cell_abm_pipeline.flows.group_colony_dynamics.html#cell_abm_pipeline.flows.group_colony_dynamics.ContextConfig.working_location">[12]</a>, <a href="_summary/cell_abm_pipeline.flows.group_resource_usage.html#cell_abm_pipeline.flows.group_resource_usage.ContextConfig.working_location">[13]</a>, <a href="_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html#cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig.working_location">[14]</a>, <a href="_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html#cell_abm_pipeline.flows.initialize_physicell_simulations.ContextConfig.working_location">[15]</a>, <a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ContextConfig.working_location">[16]</a>, <a href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html#cell_abm_pipeline.flows.organize_analysis_files.ContextConfig.working_location">[17]</a>, <a href="_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html#cell_abm_pipeline.flows.parse_arcade_simulations.ContextConfig.working_location">[18]</a>, <a href="_summary/cell_abm_pipeline.flows.parse_physicell_simulations.html#cell_abm_pipeline.flows.parse_physicell_simulations.ContextConfig.working_location">[19]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_basic_metrics.html#cell_abm_pipeline.flows.plot_basic_metrics.ContextConfig.working_location">[20]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_cell_shapes.html#cell_abm_pipeline.flows.plot_cell_shapes.ContextConfig.working_location">[21]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_colony_dynamics.html#cell_abm_pipeline.flows.plot_colony_dynamics.ContextConfig.working_location">[22]</a>, <a href="_summary/cell_abm_pipeline.flows.plot_resource_usage.html#cell_abm_pipeline.flows.plot_resource_usage.ContextConfig.working_location">[23]</a>, <a href="_summary/cell_abm_pipeline.flows.process_sample.html#cell_abm_pipeline.flows.process_sample.ContextConfig.working_location">[24]</a>, <a href="_summary/cell_abm_pipeline.flows.run_batch_simulations.html#cell_abm_pipeline.flows.run_batch_simulations.ContextConfig.working_location">[25]</a>, <a href="_summary/cell_abm_pipeline.flows.run_docker_simulations.html#cell_abm_pipeline.flows.run_docker_simulations.ContextConfig.working_location">[26]</a>, <a href="_summary/cell_abm_pipeline.flows.run_fargate_calculations.html#cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.working_location">[27]</a>, <a href="_summary/cell_abm_pipeline.flows.sample_image.html#cell_abm_pipeline.flows.sample_image.ContextConfig.working_location">[28]</a>, <a href="_summary/cell_abm_pipeline.flows.summarize_manifest.html#cell_abm_pipeline.flows.summarize_manifest.ContextConfig.working_location">[29]</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="X" class="genindex-section">
+  <h2>X</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigCentroids.x_bounds">x_bounds (ParametersConfigCentroids attribute)</a>
+
+        <ul>
+          <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigScan.x_bounds">(ParametersConfigScan attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="Y" class="genindex-section">
+  <h2>Y</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigCentroids.y_bounds">y_bounds (ParametersConfigCentroids attribute)</a>
+
+        <ul>
+          <li><a href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html#cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigScan.y_bounds">(ParametersConfigScan attribute)</a>
+</li>
+        </ul></li>
     </ul></td>
   </tr></table>
 </section>
@@ -2020,7 +2146,7 @@
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Allen Institute for Cell Science
+                Copyright &#169; 2024, Allen Institute for Cell Science
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

@@ -18,14 +18,16 @@ convert\_arcade\_format
       run_flow_convert_to_images
       run_flow_convert_to_meshes
       run_flow_convert_to_projections
-      run_flow_convert_to_simularium
+      run_flow_convert_to_simularium_objects
+      run_flow_convert_to_simularium_shapes
    
    .. autofunction:: cell_abm_pipeline.flows.convert_arcade_format.run_flow
    .. autofunction:: cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_colorizer
    .. autofunction:: cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_images
    .. autofunction:: cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_meshes
    .. autofunction:: cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_projections
-   .. autofunction:: cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium
+   .. autofunction:: cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium_objects
+   .. autofunction:: cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium_shapes
    
    
 
@@ -42,7 +44,8 @@ convert\_arcade\_format
       ParametersConfigImages
       ParametersConfigMeshes
       ParametersConfigProjections
-      ParametersConfigSimularium
+      ParametersConfigSimulariumObjects
+      ParametersConfigSimulariumShapes
       SeriesConfig
    
    .. autoclass:: cell_abm_pipeline.flows.convert_arcade_format.ContextConfig
@@ -63,7 +66,10 @@ convert\_arcade\_format
    .. autoclass:: cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigProjections
       :members:
       :exclude-members: __init__
-   .. autoclass:: cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimularium
+   .. autoclass:: cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumObjects
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumShapes
       :members:
       :exclude-members: __init__
    .. autoclass:: cell_abm_pipeline.flows.convert_arcade_format.SeriesConfig

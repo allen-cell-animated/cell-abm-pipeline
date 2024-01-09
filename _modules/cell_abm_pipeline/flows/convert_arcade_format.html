@@ -174,6 +174,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../_summary/cell_abm_pipeline.flows.group_resource_usage.html">group_resource_usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html">initialize_arcade_simulations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html">initialize_physicell_simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../_summary/cell_abm_pipeline.flows.make_simulation_movies.html">make_simulation_movies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../_summary/cell_abm_pipeline.flows.organize_analysis_files.html">organize_analysis_files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html">parse_arcade_simulations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../_summary/cell_abm_pipeline.flows.parse_physicell_simulations.html">parse_physicell_simulations</a></li>
@@ -199,6 +200,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../_summary/cell_abm_pipeline.tasks.check_data_bounds.html">check_data_bounds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../_summary/cell_abm_pipeline.tasks.make_bar_figure.html">make_bar_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../_summary/cell_abm_pipeline.tasks.make_box_figure.html">make_box_figure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../_summary/cell_abm_pipeline.tasks.make_centroids_figure.html">make_centroids_figure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../_summary/cell_abm_pipeline.tasks.make_contour_figure.html">make_contour_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../_summary/cell_abm_pipeline.tasks.make_density_figure.html">make_density_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../_summary/cell_abm_pipeline.tasks.make_graph_figure.html">make_graph_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../_summary/cell_abm_pipeline.tasks.make_heatmap_figure.html">make_heatmap_figure</a></li>
@@ -286,15 +289,15 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">arcade_collection.output</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">arcade_collection.convert</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">convert_to_colorizer</span><span class="p">,</span>
     <span class="n">convert_to_images</span><span class="p">,</span>
     <span class="n">convert_to_meshes</span><span class="p">,</span>
     <span class="n">convert_to_projection</span><span class="p">,</span>
-    <span class="n">convert_to_simularium</span><span class="p">,</span>
+    <span class="n">convert_to_simularium_objects</span><span class="p">,</span>
+    <span class="n">convert_to_simularium_shapes</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">io_collection.keys</span> <span class="kn">import</span> <span class="n">make_key</span>
 <span class="kn">from</span> <span class="nn">io_collection.load</span> <span class="kn">import</span> <span class="n">load_dataframe</span><span class="p">,</span> <span class="n">load_tar</span>
@@ -302,13 +305,15 @@
 <span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
 
 <span class="kn">from</span> <span class="nn">cell_abm_pipeline.flows.plot_basic_metrics</span> <span class="kn">import</span> <span class="n">PHASE_COLORS</span>
+<span class="kn">from</span> <span class="nn">cell_abm_pipeline.flows.plot_cell_shapes</span> <span class="kn">import</span> <span class="n">REGION_COLORS</span>
 
 <span class="n">FORMATS</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;colorizer&quot;</span><span class="p">,</span>
     <span class="s2">&quot;images&quot;</span><span class="p">,</span>
     <span class="s2">&quot;meshes&quot;</span><span class="p">,</span>
     <span class="s2">&quot;projections&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;simularium&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;simularium_shapes&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;simularium_objects&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
 <span class="n">COLORIZER_FEATURES</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
@@ -415,12 +420,15 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Temporal scaling in hours/tick.&quot;&quot;&quot;</span>
 
     <span class="n">scale</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Size of scale bar (in um).&quot;&quot;&quot;</span></div>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Size of scale bar (in um).&quot;&quot;&quot;</span>
+
+    <span class="n">region_colors</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">REGION_COLORS</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Colors for each cell region.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="ParametersConfigSimularium"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimularium">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ParametersConfigSimularium</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for convert ARCADE format flow - simularium.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ParametersConfigSimulariumShapes"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumShapes">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ParametersConfigSimulariumShapes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for convert ARCADE format flow - simularium shapes.&quot;&quot;&quot;</span>
 
     <span class="n">seeds</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulation seeds to use for converting to simularium.&quot;&quot;&quot;</span>
@@ -440,11 +448,37 @@
     <span class="n">phase_colors</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">PHASE_COLORS</span><span class="p">)</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Colors for each cell cycle phase.&quot;&quot;&quot;</span>
 
-    <span class="n">resolution</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of voxels per sphere (None for single sphere per cell, 0 for meshes).&quot;&quot;&quot;</span>
+    <span class="n">resolution</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of voxels represented by a sphere (0 for single sphere per cell).&quot;&quot;&quot;</span></div>
 
-    <span class="n">url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Path to mesh files.&quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="ParametersConfigSimulariumObjects"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumObjects">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ParametersConfigSimulariumObjects</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for convert ARCADE format flow - simularium objects.&quot;&quot;&quot;</span>
+
+    <span class="n">seeds</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulation seeds to use for converting to simularium.&quot;&quot;&quot;</span>
+
+    <span class="n">frame_spec</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1153</span><span class="p">,</span> <span class="mi">1152</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Specification for simulation ticks to use for converting to simularium.&quot;&quot;&quot;</span>
+
+    <span class="n">box</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Size of bounding box.&quot;&quot;&quot;</span>
+
+    <span class="n">ds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Spatial scaling in units/um.&quot;&quot;&quot;</span>
+
+    <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Temporal scaling in hours/tick.&quot;&quot;&quot;</span>
+
+    <span class="n">phase_colors</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">PHASE_COLORS</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Colors for each cell cycle phase.&quot;&quot;&quot;</span>
+
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;URL for object files.&quot;&quot;&quot;</span>
+
+    <span class="n">group_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mesh group size.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="ParametersConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -466,8 +500,11 @@
     <span class="n">projections</span><span class="p">:</span> <span class="n">ParametersConfigProjections</span> <span class="o">=</span> <span class="n">ParametersConfigProjections</span><span class="p">()</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters for projections subflow.&quot;&quot;&quot;</span>
 
-    <span class="n">simularium</span><span class="p">:</span> <span class="n">ParametersConfigSimularium</span> <span class="o">=</span> <span class="n">ParametersConfigSimularium</span><span class="p">()</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters for simularium subflow.&quot;&quot;&quot;</span></div>
+    <span class="n">simularium_shapes</span><span class="p">:</span> <span class="n">ParametersConfigSimulariumShapes</span> <span class="o">=</span> <span class="n">ParametersConfigSimulariumShapes</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters for simularium shapes subflow.&quot;&quot;&quot;</span>
+
+    <span class="n">simularium_objects</span><span class="p">:</span> <span class="n">ParametersConfigSimulariumObjects</span> <span class="o">=</span> <span class="n">ParametersConfigSimulariumObjects</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters for simularium objects subflow.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="ContextConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.ContextConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -500,7 +537,8 @@
 <span class="sd">    - :py:func:`run_flow_convert_to_images`</span>
 <span class="sd">    - :py:func:`run_flow_convert_to_meshes`</span>
 <span class="sd">    - :py:func:`run_flow_convert_to_projections`</span>
-<span class="sd">    - :py:func:`run_flow_convert_to_simularium`</span>
+<span class="sd">    - :py:func:`run_flow_convert_to_simularium_shapes`</span>
+<span class="sd">    - :py:func:`run_flow_convert_to_simularium_objects`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="s2">&quot;colorizer&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">formats</span><span class="p">:</span>
@@ -515,8 +553,11 @@
     <span class="k">if</span> <span class="s2">&quot;projections&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">formats</span><span class="p">:</span>
         <span class="n">run_flow_convert_to_projections</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">series</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">projections</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="s2">&quot;simularium&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">formats</span><span class="p">:</span>
-        <span class="n">run_flow_convert_to_simularium</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">series</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">simularium</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="s2">&quot;simularium_shapes&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">formats</span><span class="p">:</span>
+        <span class="n">run_flow_convert_to_simularium_shapes</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">series</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">simularium_shapes</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;simularium_objects&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">formats</span><span class="p">:</span>
+        <span class="n">run_flow_convert_to_simularium_objects</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">series</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">simularium_objects</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="run_flow_convert_to_colorizer"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_colorizer">[docs]</a><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;convert-arcade-format_convert-to-colorizer&quot;</span><span class="p">)</span>
@@ -662,7 +703,7 @@
 
     <span class="n">data_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;data.LOCATIONS&quot;</span><span class="p">)</span>
     <span class="n">converted_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;converted&quot;</span><span class="p">,</span> <span class="s2">&quot;converted.PROJECTION&quot;</span><span class="p">)</span>
-    <span class="n">region_key</span> <span class="o">=</span> <span class="s2">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">regions</span><span class="p">))</span>
+    <span class="n">region_key</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">regions</span><span class="p">))</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">condition</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">conditions</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
@@ -682,6 +723,7 @@
                     <span class="n">parameters</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span>
                     <span class="n">parameters</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
                     <span class="n">parameters</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span>
+                    <span class="n">parameters</span><span class="o">.</span><span class="n">region_colors</span><span class="p">,</span>
                 <span class="p">)</span>
 
                 <span class="n">projection_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span>
@@ -690,16 +732,18 @@
                 <span class="n">save_figure</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">projection_key</span><span class="p">,</span> <span class="n">projection</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="run_flow_convert_to_simularium"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium">[docs]</a><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;convert-arcade-format_convert-to-simularium&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">run_flow_convert_to_simularium</span><span class="p">(</span>
-    <span class="n">context</span><span class="p">:</span> <span class="n">ContextConfig</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="n">SeriesConfig</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersConfigSimularium</span>
+<div class="viewcode-block" id="run_flow_convert_to_simularium_shapes"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium_shapes">[docs]</a><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;convert-arcade-format_convert-to-simularium-shapes&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">run_flow_convert_to_simularium_shapes</span><span class="p">(</span>
+    <span class="n">context</span><span class="p">:</span> <span class="n">ContextConfig</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="n">SeriesConfig</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersConfigSimulariumShapes</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert ARCADE format subflow for simularium.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert ARCADE format subflow for simularium with shapes.&quot;&quot;&quot;</span>
 
     <span class="n">cells_data_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;data.CELLS&quot;</span><span class="p">)</span>
     <span class="n">locs_data_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;data.LOCATIONS&quot;</span><span class="p">)</span>
     <span class="n">converted_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;converted&quot;</span><span class="p">,</span> <span class="s2">&quot;converted.SIMULARIUM&quot;</span><span class="p">)</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">condition</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">conditions</span><span class="p">]</span>
+
+    <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SHAPES</span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">resolution</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">seeds</span><span class="p">:</span>
@@ -711,30 +755,82 @@
             <span class="n">locs_tar_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">locs_data_key</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series_key</span><span class="si">}</span><span class="s2">.LOCATIONS.tar.xz&quot;</span><span class="p">)</span>
             <span class="n">locs_tar</span> <span class="o">=</span> <span class="n">load_tar</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">locs_tar_key</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;converted&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;converted.MESH&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">url</span> <span class="o">=</span> <span class="kc">None</span>
-
-            <span class="n">simularium</span> <span class="o">=</span> <span class="n">convert_to_simularium</span><span class="p">(</span>
+            <span class="n">simularium</span> <span class="o">=</span> <span class="n">convert_to_simularium_shapes</span><span class="p">(</span>
                 <span class="n">series_key</span><span class="p">,</span>
-                <span class="n">cells_tar</span><span class="p">,</span>
-                <span class="n">locs_tar</span><span class="p">,</span>
+                <span class="s2">&quot;potts&quot;</span><span class="p">,</span>
+                <span class="p">{</span><span class="s2">&quot;cells&quot;</span><span class="p">:</span> <span class="n">cells_tar</span><span class="p">,</span> <span class="s2">&quot;locations&quot;</span><span class="p">:</span> <span class="n">locs_tar</span><span class="p">},</span>
                 <span class="n">parameters</span><span class="o">.</span><span class="n">frame_spec</span><span class="p">,</span>
                 <span class="n">parameters</span><span class="o">.</span><span class="n">box</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span>
                 <span class="n">parameters</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span>
                 <span class="n">parameters</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
                 <span class="n">parameters</span><span class="o">.</span><span class="n">phase_colors</span><span class="p">,</span>
                 <span class="n">parameters</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span>
-                <span class="n">url</span><span class="p">,</span>
             <span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">resolution</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;SINGLE&quot;</span>
-            <span class="k">elif</span> <span class="n">parameters</span><span class="o">.</span><span class="n">resolution</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;MESHES&quot;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;RESOLUTION</span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">resolution</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">simularium_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">converted_key</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series_key</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.simularium&quot;</span><span class="p">)</span>
+            <span class="n">save_text</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">simularium_key</span><span class="p">,</span> <span class="n">simularium</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="run_flow_convert_to_simularium_objects"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.convert_arcade_format.html#cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium_objects">[docs]</a><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;convert-arcade-format_convert-to-simularium-objects&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">run_flow_convert_to_simularium_objects</span><span class="p">(</span>
+    <span class="n">context</span><span class="p">:</span> <span class="n">ContextConfig</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="n">SeriesConfig</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersConfigSimulariumObjects</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert ARCADE format subflow for simularium with objects.&quot;&quot;&quot;</span>
+
+    <span class="n">data_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;data.LOCATIONS&quot;</span><span class="p">)</span>
+    <span class="n">converted_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;converted&quot;</span><span class="p">,</span> <span class="s2">&quot;converted.SIMULARIUM&quot;</span><span class="p">)</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">condition</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">conditions</span><span class="p">]</span>
+
+    <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;OBJECTS</span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">group_size</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">regions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;DEFAULT&quot;</span><span class="p">,</span> <span class="s2">&quot;NUCLEUS&quot;</span><span class="p">]</span>
+    <span class="n">invert</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;DEFAULT&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;NUCLEUS&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">seeds</span><span class="p">:</span>
+            <span class="n">series_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">seed</span><span class="si">:</span><span class="s2">04d</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="n">results_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;results&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series_key</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">load_dataframe</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">results_key</span><span class="p">)</span>
+
+            <span class="n">tar_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">data_key</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series_key</span><span class="si">}</span><span class="s2">.LOCATIONS.tar.xz&quot;</span><span class="p">)</span>
+            <span class="n">tar</span> <span class="o">=</span> <span class="n">load_tar</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">tar_key</span><span class="p">)</span>
+
+            <span class="n">categories</span> <span class="o">=</span> <span class="n">results</span><span class="p">[[</span><span class="s2">&quot;TICK&quot;</span><span class="p">,</span> <span class="s2">&quot;PHASE&quot;</span><span class="p">,</span> <span class="s2">&quot;ID&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;TICK&quot;</span><span class="p">:</span> <span class="s2">&quot;FRAME&quot;</span><span class="p">,</span> <span class="s2">&quot;PHASE&quot;</span><span class="p">:</span> <span class="s2">&quot;CATEGORY&quot;</span><span class="p">}</span>
+            <span class="p">)</span>
+
+            <span class="n">meshes</span> <span class="o">=</span> <span class="n">convert_to_meshes</span><span class="p">(</span>
+                <span class="n">series_key</span><span class="p">,</span>
+                <span class="n">tar</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">.</span><span class="n">frame_spec</span><span class="p">,</span>
+                <span class="n">regions</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">.</span><span class="n">box</span><span class="p">,</span>
+                <span class="n">invert</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">.</span><span class="n">group_size</span><span class="p">,</span>
+                <span class="n">categories</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">mesh_path_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">converted_key</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series_key</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">frame</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">mesh</span> <span class="ow">in</span> <span class="n">meshes</span><span class="p">:</span>
+                <span class="n">mesh_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">mesh_path_key</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">frame</span><span class="si">:</span><span class="s2">06d</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">index</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">.MESH.obj&quot;</span><span class="p">)</span>
+                <span class="n">save_text</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">mesh_key</span><span class="p">,</span> <span class="n">mesh</span><span class="p">)</span>
+
+            <span class="n">simularium</span> <span class="o">=</span> <span class="n">convert_to_simularium_objects</span><span class="p">(</span>
+                <span class="n">series_key</span><span class="p">,</span>
+                <span class="s2">&quot;potts&quot;</span><span class="p">,</span>
+                <span class="n">categories</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">.</span><span class="n">frame_spec</span><span class="p">,</span>
+                <span class="n">regions</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">.</span><span class="n">box</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">.</span><span class="n">phase_colors</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">.</span><span class="n">group_size</span><span class="p">,</span>
+                <span class="n">make_key</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">mesh_path_key</span><span class="p">),</span>
+            <span class="p">)</span>
 
             <span class="n">simularium_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">converted_key</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series_key</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.simularium&quot;</span><span class="p">)</span>
             <span class="n">save_text</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">working_location</span><span class="p">,</span> <span class="n">simularium_key</span><span class="p">,</span> <span class="n">simularium</span><span class="p">)</span></div>
@@ -750,7 +846,7 @@
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Allen Institute for Cell Science
+                Copyright &#169; 2024, Allen Institute for Cell Science
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

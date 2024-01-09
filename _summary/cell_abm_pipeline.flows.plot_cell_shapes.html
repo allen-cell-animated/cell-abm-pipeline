@@ -175,6 +175,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.group_resource_usage.html">group_resource_usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.initialize_arcade_simulations.html">initialize_arcade_simulations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.initialize_physicell_simulations.html">initialize_physicell_simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.make_simulation_movies.html">make_simulation_movies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.organize_analysis_files.html">organize_analysis_files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.parse_arcade_simulations.html">parse_arcade_simulations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.parse_physicell_simulations.html">parse_physicell_simulations</a></li>
@@ -200,6 +201,8 @@
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.check_data_bounds.html">check_data_bounds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_bar_figure.html">make_bar_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_box_figure.html">make_box_figure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_centroids_figure.html">make_centroids_figure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_contour_figure.html">make_contour_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_density_figure.html">make_density_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_graph_figure.html">make_graph_figure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.tasks.make_heatmap_figure.html">make_heatmap_figure</a></li>
@@ -497,7 +500,7 @@ Plots are saved to the <strong>plots/plots.SHAPES</strong> directory.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.plot_cell_shapes.ParametersConfig.shape_modes">
-<span class="sig-name descname"><span class="pre">shape_modes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#cell_abm_pipeline.flows.plot_cell_shapes.ParametersConfigShapeModes" title="cell_abm_pipeline.flows.plot_cell_shapes.ParametersConfigShapeModes"><span class="pre">ParametersConfigShapeModes</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ParametersConfigShapeModes(regions=['(region)'],</span> <span class="pre">components=8,</span> <span class="pre">projections=['top',</span> <span class="pre">'side1',</span> <span class="pre">'side2'],</span> <span class="pre">point=0,</span> <span class="pre">box=(100,</span> <span class="pre">100),</span> <span class="pre">scale=1,</span> <span class="pre">colors={'DEFAULT':</span> <span class="pre">'#F200FF',</span> <span class="pre">'NUCLEUS':</span> <span class="pre">'#3AADA7'})</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.plot_cell_shapes.ParametersConfig.shape_modes" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">shape_modes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#cell_abm_pipeline.flows.plot_cell_shapes.ParametersConfigShapeModes" title="cell_abm_pipeline.flows.plot_cell_shapes.ParametersConfigShapeModes"><span class="pre">ParametersConfigShapeModes</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ParametersConfigShapeModes(regions=['(region)'],</span> <span class="pre">components=8,</span> <span class="pre">projections=['top',</span> <span class="pre">'side1',</span> <span class="pre">'side2'],</span> <span class="pre">point=0,</span> <span class="pre">box=(100,</span> <span class="pre">100),</span> <span class="pre">scale=1,</span> <span class="pre">colors={'DEFAULT':</span> <span class="pre">'#FF00FF',</span> <span class="pre">'NUCLEUS':</span> <span class="pre">'#00FFFF'})</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.plot_cell_shapes.ParametersConfig.shape_modes" title="Permalink to this definition">#</a></dt>
 <dd><p>Parameters for plot shape modes subflow.</p>
 </dd></dl>
 
@@ -732,7 +735,7 @@ Plots are saved to the <strong>plots/plots.SHAPES</strong> directory.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Allen Institute for Cell Science
+                Copyright &#169; 2024, Allen Institute for Cell Science
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

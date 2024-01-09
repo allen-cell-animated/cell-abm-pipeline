@@ -1,0 +1,22 @@
+make\_centroids\_figure
+=======================
+
+.. automodule:: cell_abm_pipeline.tasks.make_centroids_figure
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
