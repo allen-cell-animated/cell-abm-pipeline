@@ -60,7 +60,7 @@ class ParametersConfigCentroids:
     seeds: list[int] = field(default_factory=lambda: [0])
     """Simulation seeds to use for creating centroid movies."""
 
-    index_spec: tuple[int, int, int] = (0, 1, 1)
+    frame_spec: tuple[int, int, int] = (0, 1, 1)
     """Specification for simulation ticks to use for creating centroid movies."""
 
     x_bounds: tuple[int, int] = field(default_factory=lambda: (0, 1))
@@ -71,6 +71,9 @@ class ParametersConfigCentroids:
 
     dt: float = 1.0
     """Temporal scaling in hours/tick."""
+
+    window: int = 0
+    """Window size for centroid tail."""
 
 
 @dataclass
@@ -140,29 +143,30 @@ def run_flow_make_centroids_movie(
             results_key = make_key(series.name, "results", f"{series_key}.csv")
             results = load_dataframe(context.working_location, results_key)
 
-            index_keys = []
+            frame_keys = []
 
-            for index in np.arange(*parameters.index_spec):
-                index_key = make_key(movie_key, f"{series_key}", f"{index:06d}.CENTROIDS.png")
-                index_keys.append(index_key)
+            for frame in np.arange(*parameters.frame_spec):
+                frame_key = make_key(movie_key, f"{series_key}", f"{frame:06d}.CENTROIDS.png")
+                frame_keys.append(frame_key)
 
-                if check_key(context.working_location, index_key):
+                if check_key(context.working_location, frame_key):
                     continue
 
                 save_figure(
                     context.working_location,
-                    index_key,
+                    frame_key,
                     make_centroids_figure(
                         results,
-                        index,
+                        frame,
                         parameters.x_bounds,
                         parameters.y_bounds,
                         parameters.dt,
+                        parameters.window,
                     ),
                 )
 
             output_key = make_key(movie_key, f"{series_key}.CENTROIDS.gif")
-            save_gif(context.working_location, output_key, index_keys)
+            save_gif(context.working_location, output_key, frame_keys)
 
 
 @flow(name="make-simulation-movies_make-scan-movie")
@@ -181,6 +185,7 @@ def run_flow_make_scan_movie(
         return
 
     indices = list(np.arange(*parameters.index_spec))
+    view = "top" if parameters.view == "top" else "side1"
 
     for key in keys:
         for seed in parameters.seeds:
@@ -197,7 +202,7 @@ def run_flow_make_scan_movie(
                     frame,
                     parameters.regions,
                     parameters.box,
-                    {parameters.view: indices},
+                    {view: indices},
                 )
 
                 index_keys = []
@@ -215,7 +220,7 @@ def run_flow_make_scan_movie(
                         make_contour_figure(
                             contours,
                             index,
-                            parameters.view,
+                            view,
                             parameters.regions,
                             parameters.x_bounds,
                             parameters.y_bounds,

@@ -9,11 +9,11 @@ from prefect import task
 @task
 def make_centroids_figure(
     data: pd.DataFrame,
-    index: int,
+    frame: int,
     xlim: tuple[float, float],
     ylim: tuple[float, float],
     dt: float,
-    window: int = 144,
+    window: int,
 ) -> mpl.Figure:
     fig = plt.figure(figsize=(4, 4), constrained_layout=True)
 
@@ -27,6 +27,7 @@ def make_centroids_figure(
     ax.set_ylim((ylim[1], ylim[0]))
 
     ticks = sorted(data["TICK"].unique())
+    index = ticks.index(frame)
 
     lower = ticks[max(0, index - window)]
     upper = ticks[index]

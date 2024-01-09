@@ -20,11 +20,16 @@ def make_contour_figure(
 
     ax = fig.add_subplot()
 
-    ax.invert_yaxis()
+    if view == "top":
+        ax.invert_yaxis()
+        ax.set_xlim(xlim)
+        ax.set_ylim((ylim[1], ylim[0]))
+    else:
+        ax.set_xlim(xlim)
+        ax.set_ylim(ylim)
+
     ax.get_xaxis().set_ticks([])
     ax.get_yaxis().set_ticks([])
-    ax.set_xlim(xlim)
-    ax.set_ylim((ylim[1], ylim[0]))
     ax.set_facecolor("#000")
 
     for region in regions:
