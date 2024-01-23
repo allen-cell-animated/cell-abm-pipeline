@@ -12,13 +12,17 @@ def convert_physicell_to_simularium(
     tar_file: TarFile,
     box_size: tuple[float, float, float],
     timestep: float,
+    frame_spec: tuple[float, float, float],
     substrate_color: str,
     cell_colors: list[str],
     max_owner_cells: int = 10000,
 ) -> str:
     with tempfile.TemporaryDirectory() as temp_directory:
-        # Extract contents of archive into temporary directory.
-        tar_file.extractall(temp_directory)
+        # Extract specified contents of archive into temporary directory.
+        tar_file.extract("initial_mesh0.mat", temp_directory)
+        for timepoint in np.arange(*frame_spec):
+            tar_file.extract(f"output{timepoint:08d}.xml", temp_directory)
+            tar_file.extract(f"output{timepoint:08d}_cells_physicell.mat", temp_directory)
 
         # Set sizing.
         box_size_array = np.array(box_size)

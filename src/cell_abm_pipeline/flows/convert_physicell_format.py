@@ -52,6 +52,8 @@ class ParametersConfig:
 
     cell_colors: list[str] = field(default_factory=lambda: CELL_COLORS)
 
+    frame_spec: tuple[int, int, int] = (0, 1, 1)
+
 
 @dataclass
 class ContextConfig:
@@ -97,6 +99,7 @@ def run_flow_convert_to_simularium(
                 tar_file,
                 parameters.box_size,
                 parameters.timestep,
+                parameters.frame_spec,
                 parameters.substrate_color,
                 parameters.cell_colors,
             )
