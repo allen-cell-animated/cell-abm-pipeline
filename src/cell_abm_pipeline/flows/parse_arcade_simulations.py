@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 
 from arcade_collection.output import merge_parsed_results, parse_cells_file, parse_locations_file
 from container_collection.manifest import filter_manifest_files
-from io_collection.keys import make_key
+from io_collection.keys import check_key, make_key
 from io_collection.load import load_dataframe, load_tar
 from io_collection.save import save_dataframe
 from prefect import flow
@@ -53,6 +53,11 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     )
 
     for key, files in filtered_files.items():
+        results_key = make_key(series.name, "{{timestamp}}", "results", f"{key}.csv")
+
+        if check_key(context.working_location, results_key):
+            continue
+
         cells_tar = load_tar(**files["CELLS.tar.xz"])
         cells = parse_cells_file(cells_tar, parameters.regions)
 
@@ -60,5 +65,4 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         locs = parse_locations_file(locs_tar, parameters.regions)
 
         results = merge_parsed_results(cells, locs)
-        results_key = make_key(series.name, "{{timestamp}}", "results", f"{key}.csv")
         save_dataframe(context.working_location, results_key, results, index=False)
