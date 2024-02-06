@@ -20,6 +20,8 @@ SHAPE_PROPERTIES = [
     "eccentricity",
     "orientation",
     "perimeter",
+    "extent",
+    "solidity",
 ]
 
 
