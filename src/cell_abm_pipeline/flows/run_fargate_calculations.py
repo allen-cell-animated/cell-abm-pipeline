@@ -24,13 +24,15 @@ from cell_abm_pipeline.__config__ import make_dotlist_from_config
 class Calculation(Enum):
     """Registered calculation types."""
 
-    COEFFICIENTS = ("calculate_coefficients", True)
+    COEFFICIENTS = ("calculate_coefficients", "COEFFICIENTS", True)
 
-    NEIGHBORS = ("calculate_neighbors", False)
+    NEIGHBORS = ("calculate_neighbors", "NEIGHBORS", False)
 
-    POSITIONS = ("calculate_positions", False)
+    POSITIONS = ("calculate_positions", "POSITIONS", False)
 
-    PROPERTIES = ("calculate_properties", True)
+    PROPERTIES = ("calculate_properties", "PROPERTIES", True)
+
+    IMAGE_PROPERTIES = ("calculate_image_properties", "PROPERTIES", False)
 
 
 @dataclass
@@ -104,8 +106,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         return
 
     # Get the calculation type.
-    suffix = parameters.calculate.name
-    module_name, chunkable = parameters.calculate.value
+    module_name, suffix, chunkable = parameters.calculate.value
     analysis_key = make_key(series.name, "analysis", f"analysis.{suffix}")
 
     # Get the region suffix, if it exists.
@@ -114,16 +115,17 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         region = f"_{parameters.overrides['region']}"
 
     # Create and register the task definition for the calculation.
-    task_definition = make_fargate_task(
-        module_name,
-        parameters.image,
-        context.account,
-        context.region,
-        context.user,
-        context.vcpus,
-        context.memory,
-    )
-    task_definition_arn = register_fargate_task(task_definition)
+    if parameters.submit_tasks:
+        task_definition = make_fargate_task(
+            module_name,
+            parameters.image,
+            context.account,
+            context.region,
+            context.user,
+            context.vcpus,
+            context.memory,
+        )
+        task_definition_arn = register_fargate_task(task_definition)
 
     # Import the module for the specified calculation.
     module = importlib.import_module(f"..{module_name}", package=__name__)
