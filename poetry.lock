@@ -42,13 +42,13 @@ scipy = ">=1.9.3,<2.0.0"
 
 [[package]]
 name = "abm-shape-collection"
-version = "0.8.0"
+version = "0.9.0"
 description = "Collection of tasks for analyzing cell shapes."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "abm_shape_collection-0.8.0-py3-none-any.whl", hash = "sha256:2a0f18ad1f24aa014a63f6be17bb70cb53a1d2f2780e610eea94a57a37ca3824"},
-    {file = "abm_shape_collection-0.8.0.tar.gz", hash = "sha256:c71d6ab4864e8b636153ca4462a5641a249c08ba7c30b983b4af276c1d8092f5"},
+    {file = "abm_shape_collection-0.9.0-py3-none-any.whl", hash = "sha256:eac213da6a2a363b48d55ee330f4c5adc687406b6f7dcb0ca66962594e1ba349"},
+    {file = "abm_shape_collection-0.9.0.tar.gz", hash = "sha256:e865601e0ba0af3e6442fe63924ba757003178e7bcef3c70ed7e562c55f008b2"},
 ]
 
 [package.dependencies]
@@ -5435,4 +5435,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "0a6292805b84f5abe22b4e99049a5cf9d8f0ac4c849a89204bae8cec966566d2"
+content-hash = "4a55d92a5f442965c3c088d4725185979b3cef22446358ffec34edb6e1215479"
