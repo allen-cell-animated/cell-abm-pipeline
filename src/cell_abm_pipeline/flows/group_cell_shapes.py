@@ -25,6 +25,7 @@ Working location structure:
             ├── (name).population_counts.(tick).csv
             ├── (name).population_stats.json
             ├── (name).shape_average.(key).(projection).json
+            ├── (name).shape_contours.(key).(seed).(tick).(region).(projection).json
             ├── (name).shape_errors.json
             ├── (name).shape_modes.(key).(region).(mode).(projection).json
             ├── (name).shape_samples.json
@@ -51,6 +52,7 @@ from abm_shape_collection import (
     extract_mesh_projections,
     extract_mesh_wireframe,
     extract_shape_modes,
+    extract_voxel_contours,
     make_voxels_array,
 )
 from arcade_collection.output import extract_tick_json, get_location_voxels
@@ -79,6 +81,7 @@ GROUPS: list[str] = [
     "population_counts",
     "population_stats",
     "shape_average",
+    "shape_contours",
     "shape_errors",
     "shape_modes",
     "shape_samples",
@@ -268,6 +271,26 @@ class ParametersConfigShapeAverage:
 
 
 @dataclass
+class ParametersConfigShapeContours:
+    """Parameter configuration for group cell shapes subflow - shape contours."""
+
+    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
+
+    seed: int = 0
+    """Simulation random seed to use for grouping shape contours."""
+
+    tick: int = 0
+    """Simulation tick to use for grouping shape contours."""
+
+    projection: str = "top"
+    """Selected shape projection."""
+
+    box: tuple[int, int, int] = field(default_factory=lambda: (1, 1, 1))
+    """Size of projection bounding box."""
+
+
+@dataclass
 class ParametersConfigShapeErrors:
     """Parameter configuration for group cell shapes subflow - shape errors."""
 
@@ -352,6 +375,9 @@ class ParametersConfig:
     shape_average: ParametersConfigShapeAverage = ParametersConfigShapeAverage()
     """Parameters for group shape average subflow."""
 
+    shape_contours: ParametersConfigShapeContours = ParametersConfigShapeContours()
+    """Parameters for group shape contours subflow."""
+
     shape_errors: ParametersConfigShapeErrors = ParametersConfigShapeErrors()
     """Parameters for group shape errors subflow."""
 
@@ -397,6 +423,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     - :py:func:`run_flow_group_population_counts`
     - :py:func:`run_flow_group_population_stats`
     - :py:func:`run_flow_group_shape_average`
+    - :py:func:`run_flow_group_shape_contours`
     - :py:func:`run_flow_group_shape_errors`
     - :py:func:`run_flow_group_shape_modes`
     - :py:func:`run_flow_group_shape_samples`
@@ -420,6 +447,9 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     if "shape_average" in parameters.groups:
         run_flow_group_shape_average(context, series, parameters.shape_average)
+
+    if "shape_contours" in parameters.groups:
+        run_flow_group_shape_contours(context, series, parameters.shape_contours)
 
     if "shape_errors" in parameters.groups:
         run_flow_group_shape_errors(context, series, parameters.shape_errors)
@@ -835,6 +865,47 @@ def run_flow_group_shape_average(
                 context.working_location,
                 make_key(group_key, f"{series.name}.shape_average.{key}.{projection.upper()}.json"),
                 shape_average,
+            )
+
+
+@flow(name="group-cell-shapes_group-shape-contours")
+def run_flow_group_shape_contours(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigShapeContours
+) -> None:
+    """Group cell shapes subflow for shape contours."""
+
+    data_key = make_key(series.name, "data", "data.LOCATIONS")
+    group_key = make_key(series.name, "groups", "groups.SHAPES")
+    keys = [condition["key"] for condition in series.conditions]
+
+    projection = parameters.projection
+
+    for key in keys:
+        series_key = f"{series.name}_{key}_{parameters.seed:04d}"
+        tar_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
+        tar = load_tar(context.working_location, tar_key)
+        locations = extract_tick_json(tar, series_key, parameters.tick, "LOCATIONS")
+
+        for region in parameters.regions:
+            all_contours = []
+
+            for location in locations:
+                voxels = get_location_voxels(location, region)
+                all_contours.append(
+                    {
+                        "id": location["id"],
+                        "contours": extract_voxel_contours(voxels, projection, parameters.box),
+                    }
+                )
+
+            contour_key = f"{key}.{parameters.seed:04d}.{parameters.tick:06d}.{region}"
+            save_json(
+                context.working_location,
+                make_key(
+                    group_key,
+                    f"{series.name}.shape_contours.{contour_key}.{projection.upper()}.json",
+                ),
+                all_contours,
             )
 
 
