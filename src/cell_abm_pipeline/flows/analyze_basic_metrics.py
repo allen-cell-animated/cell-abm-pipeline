@@ -12,11 +12,12 @@ Working location structure:
     └── results
         └── (name)_(key)_(seed).csv
 
-Data from the **results** are processed into the **analysis.METRICS** directory.
+Data from **results** are processed into the **analysis.METRICS** directory.
 """
 
 from dataclasses import dataclass, field
 from datetime import timedelta
+from typing import Optional
 
 import pandas as pd
 from arcade_collection.output import convert_model_units
@@ -40,10 +41,10 @@ class ParametersConfig:
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
 
-    ds: float = 1.0
+    ds: Optional[float] = None
     """Spatial scaling in units/um."""
 
-    dt: float = 1.0
+    dt: Optional[float] = None
     """Temporal scaling in hours/tick."""
 
 
@@ -109,7 +110,7 @@ def run_flow_process_data(
         all_results = []
 
         for key in keys:
-            if superkey not in key:
+            if f"_{superkey}_" not in key and not key.endswith(superkey):
                 continue
 
             for seed in series.seeds:
