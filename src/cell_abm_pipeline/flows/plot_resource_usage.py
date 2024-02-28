@@ -7,16 +7,16 @@ Working location structure:
 
     (name)
     ├── groups
-    │   └── groups.RESOURCES
+    │   └── groups.RESOURCE_USAGE
     │       ├── (name).object_storage.csv
     │       └── (name).wall_clock.csv
     └── plots
-        └── plots.RESOURCES
+        └── plots.RESOURCE_USAGE
             ├── (name).object_storage.(category).png
             └── (name).wall_clock.png
 
-Plots use grouped data from the **groups/groups.RESOURCES** directory.
-Plots are saved to the **plots/plots.RESOURCES** directory.
+Plots use grouped data from the **groups/groups.RESOURCE_USAGE** directory.
+Plots are saved to the **plots/plots.RESOURCE_USAGE** directory.
 """
 
 from dataclasses import dataclass, field
@@ -105,8 +105,8 @@ def run_flow_plot_object_storage(
 ) -> None:
     """Plot resource usage subflow for object storage."""
 
-    group_key = make_key(series.name, "groups", "groups.RESOURCES")
-    plot_key = make_key(series.name, "plots", "plots.RESOURCES")
+    group_key = make_key(series.name, "groups", "groups.RESOURCE_USAGE")
+    plot_key = make_key(series.name, "plots", "plots.RESOURCE_USAGE")
     keys = [condition["key"] for condition in series.conditions]
 
     group = load_dataframe(
@@ -132,8 +132,8 @@ def run_flow_plot_wall_clock(
 ) -> None:
     """Plot resource usage subflow for wall clock."""
 
-    group_key = make_key(series.name, "groups", "groups.RESOURCES")
-    plot_key = make_key(series.name, "plots", "plots.RESOURCES")
+    group_key = make_key(series.name, "groups", "groups.RESOURCE_USAGE")
+    plot_key = make_key(series.name, "plots", "plots.RESOURCE_USAGE")
     keys = [condition["key"] for condition in series.conditions]
 
     group = load_dataframe(

@@ -10,14 +10,14 @@ Working location structure:
     │   └── data.(category)
     │       └── (name)_(key)_(seed).(category).tar.xz
     ├── groups
-    │   └── groups.RESOURCES
+    │   └── groups.RESOURCE_USAGE
     │       ├── (name).object_storage.csv
     │       └── (name).wall_clock.csv
     └── logs
         └── (job_id).log
 
 Different groups use inputs from the **data** and **logs** directories.
-Grouped data is saved to the **groups/groups.RESOURCES** directory.
+Grouped data is saved to the **groups/groups.RESOURCE_USAGE** directory.
 """
 
 import os
@@ -125,7 +125,7 @@ def run_flow_group_object_storage(
 ) -> None:
     """Group resource usage subflow for object storage size."""
 
-    group_key = make_key(series.name, "groups", "groups.RESOURCES")
+    group_key = make_key(series.name, "groups", "groups.RESOURCE_USAGE")
 
     all_sizes = []
 
@@ -161,7 +161,7 @@ def run_flow_group_wall_clock(
 ) -> None:
     """Group resource usage subflow for wall clock time."""
 
-    group_key = make_key(series.name, "groups", "groups.RESOURCES")
+    group_key = make_key(series.name, "groups", "groups.RESOURCE_USAGE")
 
     all_times = []
 
