@@ -107,7 +107,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     # Get the calculation type.
     module_name, suffix, chunkable = parameters.calculate.value
-    analysis_key = make_key(series.name, "analysis", f"analysis.{suffix}")
+    calc_path_key = make_key(series.name, "calculations", f"calculations.{suffix}")
 
     # Get the region suffix, if it exists.
     region = ""
@@ -144,7 +144,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
                 results = load_dataframe(context.working_location, results_key)
 
             # Check if the compiled calculation result already exists.
-            calc_key = make_key(analysis_key, f"{series_key}{region}.{suffix}.csv")
+            calc_key = make_key(calc_path_key, f"{series_key}{region}.{suffix}.csv")
             calc_key_exists = check_key(context.working_location, calc_key)
 
             # If the compiled calculation result already exists, load the calculated ticks.
@@ -159,7 +159,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
                     continue
 
                 # Check if the individual calculation result already exists.
-                tick_key = make_key(analysis_key, f"{series_key}_{tick:06d}{region}.{suffix}.csv")
+                tick_key = make_key(calc_path_key, f"{series_key}_{tick:06d}{region}.{suffix}.csv")
                 tick_key_exists = check_key(context.working_location, tick_key)
 
                 # Skip the tick if the individual calculation result exists.

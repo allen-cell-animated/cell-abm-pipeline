@@ -1,5 +1,5 @@
 """
-Workflow for organizing analysis files.
+Workflow for organizing calculation files.
 """
 
 import re
@@ -15,7 +15,7 @@ from prefect import flow
 
 @dataclass
 class ParametersConfig:
-    """Parameter configuration for organize analysis files flow."""
+    """Parameter configuration for organize calculation files flow."""
 
     suffix: str
 
@@ -26,14 +26,14 @@ class ParametersConfig:
 
 @dataclass
 class ContextConfig:
-    """Context configuration for organize analysis files flow."""
+    """Context configuration for organize calculation files flow."""
 
     working_location: str
 
 
 @dataclass
 class SeriesConfig:
-    """Series configuration for organize analysis files flow."""
+    """Series configuration for organize calculation files flow."""
 
     name: str
 
@@ -42,9 +42,9 @@ class SeriesConfig:
     conditions: list[dict]
 
 
-@flow(name="organize-analysis-files")
+@flow(name="organize-calculation-files")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    """Main organize analysis files flow."""
+    """Main organize calculation files flow."""
 
     # Iterate through conditions and seeds to merge contents of individual
     # ticks into a single csv. If merged csv exists and the specified tick
@@ -63,18 +63,18 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     run_flow_remove_files(context, series, parameters)
 
 
-@flow(name="organize-analysis-files_merge-files")
+@flow(name="organize-calculation-files_merge-files")
 def run_flow_merge_files(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     suffix = parameters.suffix
-    analysis_key = make_key(series.name, "analysis", f"analysis.{suffix}")
+    calc_key = make_key(series.name, "calculations", f"calculations.{suffix}")
     region = f"_{parameters.region}" if parameters.region is not None else ""
 
     for condition in series.conditions:
         for seed in series.seeds:
             series_key = f"{series.name}_{condition['key']}_{seed:04d}"
-            file_key = make_key(analysis_key, f"{series_key}{region}.{suffix}.csv")
+            file_key = make_key(calc_key, f"{series_key}{region}.{suffix}.csv")
             file_key_exists = check_key(context.working_location, file_key)
 
             existing_ticks = []
@@ -88,7 +88,7 @@ def run_flow_merge_files(
                 if tick in existing_ticks:
                     continue
 
-                tick_key = make_key(analysis_key, f"{series_key}_{tick:06d}{region}.{suffix}.csv")
+                tick_key = make_key(calc_key, f"{series_key}_{tick:06d}{region}.{suffix}.csv")
                 contents.append(load_dataframe(context.working_location, tick_key))
 
             if not contents:
@@ -104,18 +104,18 @@ def run_flow_merge_files(
             save_dataframe(context.working_location, file_key, contents_dataframe, index=False)
 
 
-@flow(name="organize-analysis-files_compress-files")
+@flow(name="organize-calculation-files_compress-files")
 def run_flow_compress_files(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     suffix = parameters.suffix
-    analysis_key = make_key(series.name, "analysis", f"analysis.{suffix}")
+    calc_key = make_key(series.name, "calculations", f"calculations.{suffix}")
     region = f"_{parameters.region}" if parameters.region is not None else ""
 
     for condition in series.conditions:
         for seed in series.seeds:
             series_key = f"{series.name}_{condition['key']}_{seed:04d}"
-            file_key = make_key(analysis_key, f"{series_key}{region}.{suffix}.tar.xz")
+            file_key = make_key(calc_key, f"{series_key}{region}.{suffix}.tar.xz")
             file_key_exists = check_key(context.working_location, file_key)
 
             existing_ticks = []
@@ -132,7 +132,7 @@ def run_flow_compress_files(
                 if tick in existing_ticks:
                     continue
 
-                tick_key = make_key(analysis_key, f"{series_key}_{tick:06d}{region}.{suffix}.csv")
+                tick_key = make_key(calc_key, f"{series_key}_{tick:06d}{region}.{suffix}.csv")
                 contents.append(tick_key)
 
             if not contents:
@@ -141,18 +141,18 @@ def run_flow_compress_files(
             save_tar(context.working_location, file_key, contents)
 
 
-@flow(name="organize-analysis-files_remove-files")
+@flow(name="organize-calculation-files_remove-files")
 def run_flow_remove_files(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     suffix = parameters.suffix
-    analysis_key = make_key(series.name, "analysis", f"analysis.{suffix}")
+    calc_key = make_key(series.name, "calculations", f"calculations.{suffix}")
     region = f"_{parameters.region}" if parameters.region is not None else ""
 
     for condition in series.conditions:
         for seed in series.seeds:
             series_key = f"{series.name}_{condition['key']}_{seed:04d}"
-            file_key = make_key(analysis_key, f"{series_key}{region}.{suffix}.tar.xz")
+            file_key = make_key(calc_key, f"{series_key}{region}.{suffix}.tar.xz")
             file_key_exists = check_key(context.working_location, file_key)
 
             if not file_key_exists:
@@ -161,7 +161,7 @@ def run_flow_remove_files(
             existing_contents = load_tar(context.working_location, file_key)
 
             for member in existing_contents.getmembers():
-                tick_key = make_key(analysis_key, member.name)
+                tick_key = make_key(calc_key, member.name)
 
                 if check_key(context.working_location, tick_key):
                     remove_key(context.working_location, tick_key)
