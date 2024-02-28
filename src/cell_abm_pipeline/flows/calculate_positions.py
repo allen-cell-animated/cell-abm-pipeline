@@ -43,7 +43,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     """Main calculate positions flow."""
 
     data_key = make_key(series.name, "data", "data.LOCATIONS")
-    analysis_key = make_key(series.name, "analysis", "analysis.POSITIONS")
+    calc_key = make_key(series.name, "calculations", "calculations.POSITIONS")
     series_key = f"{series.name}_{parameters.key}_{parameters.seed:04d}"
 
     locations_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
@@ -66,5 +66,5 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     positions_unique["SEED"] = parameters.seed
     positions_unique["TICK"] = parameters.tick
 
-    positions_key = make_key(analysis_key, f"{series_key}_{parameters.tick:06d}.POSITIONS.csv")
+    positions_key = make_key(calc_key, f"{series_key}_{parameters.tick:06d}.POSITIONS.csv")
     save_dataframe(context.working_location, positions_key, positions_unique, index=False)

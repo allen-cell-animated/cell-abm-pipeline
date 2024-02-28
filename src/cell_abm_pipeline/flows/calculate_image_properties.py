@@ -50,7 +50,7 @@ class SeriesConfig:
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
     """Main calculate image properties flow."""
 
-    analysis_key = make_key(series.name, "analysis", "analysis.PROPERTIES")
+    calc_key = make_key(series.name, "calculations", "calculations.PROPERTIES")
     series_key = f"{series.name}_{parameters.key}_{parameters.seed:04d}"
 
     results_key = make_key(series.name, "results", f"{series_key}.csv")
@@ -75,5 +75,5 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     region_key = f"_{parameters.region}" if parameters.region is not None else ""
     suffix = region_key
 
-    props_key = make_key(analysis_key, f"{series_key}_{parameters.tick:06d}{suffix}.PROPERTIES.csv")
+    props_key = make_key(calc_key, f"{series_key}_{parameters.tick:06d}{suffix}.PROPERTIES.csv")
     save_dataframe(context.working_location, props_key, props_dataframe, index=False)

@@ -63,7 +63,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     """Main calculate properties flow."""
 
     data_key = make_key(series.name, "data", "data.LOCATIONS")
-    analysis_key = make_key(series.name, "analysis", "analysis.PROPERTIES")
+    calc_key = make_key(series.name, "calculations", "calculations.PROPERTIES")
     series_key = f"{series.name}_{parameters.key}_{parameters.seed:04d}"
 
     locations_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
@@ -109,5 +109,5 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     region_key = f"_{parameters.region}" if parameters.region is not None else ""
     suffix = f"{region_key}{offset_key}{chunk_key}"
 
-    props_key = make_key(analysis_key, f"{series_key}_{parameters.tick:06d}{suffix}.PROPERTIES.csv")
+    props_key = make_key(calc_key, f"{series_key}_{parameters.tick:06d}{suffix}.PROPERTIES.csv")
     save_dataframe(context.working_location, props_key, props_dataframe, index=False)
