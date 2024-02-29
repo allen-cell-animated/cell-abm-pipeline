@@ -88,7 +88,7 @@ class SeriesConfig:
 
     inits: list[dict] = field(default_factory=lambda: [])
 
-    groups: list[Optional[str]] = field(default_factory=lambda: [None])
+    groups: dict[str, Optional[str]] = field(default_factory=lambda: {"_": ""})
 
 
 @flow(name="run-batch-simulations")
@@ -105,14 +105,17 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     all_job_arns: list[str] = []
 
-    for group in series.groups:
-        group_key = series.name if group is None else f"{series.name}_{group}"
+    for group in series.groups.keys():
+        if series.groups[group] is None:
+            continue
+
+        group_key = series.name if group == "_" else f"{series.name}_{group}"
         group_conditions = [
             condition
             for condition in series.conditions
-            if group is None or condition["group"] == group
+            if group is "_" or condition["group"] == group
         ]
-        group_inits = [init for init in series.inits if group is None or init["group"] == group]
+        group_inits = [init for init in series.inits if group == "_" or init["group"] == group]
 
         # Find missing conditions.
         missing_conditions = find_missing_conditions(
