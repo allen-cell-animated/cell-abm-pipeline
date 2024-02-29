@@ -7,30 +7,40 @@ Working location structure:
 
     (name)
     ├── analysis
-    │   ├── analysis.COEFFICIENTS
-    │   │   ├── (name)_(key)_(seed)_(region).COEFFICIENTS.csv
-    │   │   └── (name)_(key)_(seed)_(region).COEFFICIENTS.tar.xz
-    │   ├── analysis.PROPERTIES
-    │   │   ├── (name)_(key)_(seed)_(region).PROPERTIES.csv
-    │   │   └── (name)_(key)_(seed)_(region).PROPERTIES.tar.xz
-    │   ├── analysis.PCA
-    │   │   └── (name)_(key)_(regions).PCA.pkl
-    │   ├── analysis.SHAPES
-    │   │   └── (name)_(key)_(regions).SHAPES.csv
-    │   └── analysis.STATISTICS
-    │       └── (name)_(key)_(regions).STATISTICS.csv
-    └── results
-        └── (name)_(key)_(seed).csv
+    │   ├── analysis.BASIC_METRICS
+    │   │   └── (name)_(key).BASIC_METRICS.csv
+    │   ├── analysis.CELL_SHAPES_COEFFICIENTS
+    │   │   └── (name)_(key).CELL_SHAPES_COEFFICIENTS.csv
+    │   ├── analysis.CELL_SHAPES_DATA
+    │   │   └── (name)_(key).CELL_SHAPES_DATA.csv
+    │   ├── analysis.CELL_SHAPES_MODELS
+    │   │   └── (name)_(key).CELL_SHAPES_MODELS.pkl
+    │   ├── analysis.CELL_SHAPES_PROPERTIES
+    │   │   └── (name)_(key).CELL_SHAPES_PROPERTIES.csv
+    │   └── analysis.CELL_SHAPES_STATISTICS
+    │       └── (name)_(key).CELL_SHAPES_STATISTICS.csv
+    └── calculations
+        ├── calculations.COEFFICIENTS
+        │   ├── (name)_(key)_(seed)_(region).COEFFICIENTS.csv
+        │   └── (name)_(key)_(seed)_(region).COEFFICIENTS.tar.xz
+        └── calculations.PROPERTIES
+            ├── (name)_(key)_(seed)_(region).PROPERTIES.csv
+            └── (name)_(key)_(seed)_(region).PROPERTIES.tar.xz
 
-Data from the **results**, **analysis.COEFFICIENTS**, and (optionally) the
-**analysis.PROPERTIES** directories are processed into the **analysis.SHAPES**
-directory.
-PCA models are saved to the **analysis.PCA** directory.
-Statistical analysis is saved to the **analysis.STATISTICS** directory.
+Data from the **calculations.PROPERTIES** directories are processed into the
+**analysis.CELL_SHAPES_PROPERTIES** directory.
+Data from the **calculations.COEFFICIENTS** directories are processed into the
+**analysis.CELL_SHAPES_COEFFICIENTS** directory.
+Data from the **analysis.BASIC_METRICS** directory is combined with data from
+the **analysis.CELL_SHAPES_PROPERTIES** and **analysis.CELL_SHAPES_COEFFICIENTS**
+directories into the **analysis.CELL_SHAPES_DATA** directory.
+PCA models are saved to the **analysis.CELL_SHAPES_MODELS** directory.
+Statistical analysis is saved to the **analysis.CELL_SHAPES_STATISTICS** directory.
 """
 
 from dataclasses import dataclass, field
 from datetime import timedelta
+from itertools import groupby
 from typing import Optional
 
 import numpy as np
@@ -44,7 +54,7 @@ from arcade_collection.output import convert_model_units
 from io_collection.keys import check_key, make_key
 from io_collection.load import load_dataframe, load_pickle
 from io_collection.save import save_dataframe, save_pickle
-from prefect import flow
+from prefect import flow, get_run_logger
 from prefect.tasks import task_input_hash
 
 OPTIONS = {
@@ -73,17 +83,17 @@ class ParametersConfig:
     components: int = PCA_COMPONENTS
     """Number of principal components (i.e. shape modes)."""
 
-    ds: float = 1.0
+    ds: Optional[float] = None
     """Spatial scaling in units/um."""
 
-    dt: float = 1.0
+    dt: Optional[float] = None
     """Temporal scaling in hours/tick."""
 
     valid_phases: list[str] = field(default_factory=lambda: VALID_PHASES)
     """Valid phases for processing cell shapes."""
 
-    valid_ticks: list[int] = field(default_factory=lambda: [0])
-    """Valid ticks for processing cell shapes."""
+    valid_times: list[int] = field(default_factory=lambda: [0])
+    """Valid times for processing cell shapes."""
 
     sample_replicates: int = 100
     """Number of replicates for calculating stats with sampling."""
@@ -93,6 +103,9 @@ class ParametersConfig:
 
     outlier: Optional[float] = None
     """Standard deviation threshold for outliers."""
+
+    features: list[str] = field(default_factory=lambda: [])
+    """List of features."""
 
 
 @dataclass
@@ -124,139 +137,246 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     Calls the following subflows, in order:
 
-    1. :py:func:`run_flow_process_data`
-    2. :py:func:`run_flow_fit_model`
-    3. :py:func:`run_flow_analyze_stats`
+    1. :py:func:`run_flow_process_properties`
+    2. :py:func:`run_flow_process_coefficients`
+    3. :py:func:`run_flow_combine_data`
+    4. :py:func:`run_flow_fit_models`
+    5. :py:func:`run_flow_analyze_stats`
     """
 
-    run_flow_process_data(context, series, parameters)
+    run_flow_process_properties(context, series, parameters)
 
-    run_flow_fit_model(context, series, parameters)
+    run_flow_process_coefficients(context, series, parameters)
+
+    run_flow_combine_data(context, series, parameters)
+
+    run_flow_fit_models(context, series, parameters)
 
     run_flow_analyze_stats(context, series, parameters)
 
 
-@flow(name="analyze-cell-shapes_process-data")
-def run_flow_process_data(
+@flow(name="analyze-cell-shapes_process-properties")
+def run_flow_process_properties(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     """
-    Analyze cell shapes subflow for processing data.
+    Analyze cell shapes subflow for processing properties.
 
-    Process spherical harmonics coefficients and parsed simulation results and
-    compile into a single dataframe that can used for PCA. If the combined data
-    already exists for a given key, that key is skipped.
+    Processes cell shape properties and compiles into a single dataframe. If
+    the combined dataframe already exists for a given key, that key is skipped.
     """
 
-    results_path_key = make_key(series.name, "results")
-    coeffs_path_key = make_key(series.name, "analysis", "analysis.COEFFICIENTS")
-    props_path_key = make_key(series.name, "analysis", "analysis.PROPERTIES")
-    shapes_path_key = make_key(series.name, "analysis", "analysis.SHAPES")
-    region_key = "_".join(sorted(parameters.regions))
-    keys = [condition["key"] for condition in series.conditions]
+    logger = get_run_logger()
 
-    for key in keys:
-        data_key = make_key(shapes_path_key, f"{series.name}_{key}_{region_key}.SHAPES.csv")
+    tag = "CELL_SHAPES_PROPERTIES"
 
-        if check_key(context.working_location, data_key):
+    props_path_key = make_key(series.name, "calculations", "calculations.PROPERTIES")
+    analysis_path_key = make_key(series.name, "analysis", f"analysis.{tag}")
+
+    keys = [condition["key"].split("_") for condition in series.conditions]
+    superkeys = {
+        superkey: ["_".join(k) for k in key_group]
+        for index in range(len(keys[0]))
+        for superkey, key_group in groupby(sorted(keys, key=lambda k: k[index]), lambda k: k[index])
+    }
+
+    for superkey, key_group in superkeys.items():
+        logger.info("Processing properties for superkey [ %s ]", superkey)
+        analysis_key = make_key(analysis_path_key, f"{series.name}_{superkey}.{tag}.csv")
+
+        if check_key(context.working_location, analysis_key):
             continue
 
-        all_results = []
-        all_coeffs = []
         all_props = []
 
-        for seed in series.seeds:
-            coeffs = None
+        for key in key_group:
+            for seed in series.seeds:
+                props_key_template = f"{series.name}_{key}_{seed:04d}_%s.PROPERTIES.csv"
+                props = None
+
+                for region in parameters.regions:
+                    props_key = make_key(props_path_key, props_key_template % region)
+                    props_key = props_key.replace("_DEFAULT", "")
+
+                    props_df = load_dataframe.with_options(**OPTIONS)(
+                        context.working_location, props_key, converters={"KEY": str}
+                    )
+                    props_df.set_index(INDEX_COLUMNS, inplace=True)
+
+                    if props is None:
+                        props = props_df
+                        if region != "DEFAULT":
+                            props = props.add_suffix(f".{region}")
+                    else:
+                        props = props.join(props_df, on=INDEX_COLUMNS, rsuffix=f".{region}")
+
+                all_props.append(props)
+
+        # Combine into single dataframe.
+        props_df = pd.concat(all_props).reset_index()
+
+        # Convert units.
+        convert_model_units(props_df, parameters.ds, parameters.dt, parameters.regions)
+
+        # Save final dataframe.
+        save_dataframe(context.working_location, analysis_key, props_df, index=False)
+
+
+@flow(name="analyze-cell-shapes_process-coefficients")
+def run_flow_process_coefficients(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
+) -> None:
+    """
+    Analyze cell shapes subflow for processing coefficients.
+
+    Processes cell shape spherical harmonics coefficients and compiles into a
+    single dataframe. If the combined dataframe already exists for a given key,
+    that key is skipped.
+    """
+
+    logger = get_run_logger()
+
+    tag = "CELL_SHAPES_COEFFICIENTS"
+
+    coeffs_path_key = make_key(series.name, "calculations", "calculations.COEFFICIENTS")
+    analysis_path_key = make_key(series.name, "analysis", f"analysis.{tag}")
+
+    keys = [condition["key"].split("_") for condition in series.conditions]
+    superkeys = {
+        superkey: ["_".join(k) for k in key_group]
+        for index in range(len(keys[0]))
+        for superkey, key_group in groupby(sorted(keys, key=lambda k: k[index]), lambda k: k[index])
+    }
+
+    for superkey, key_group in superkeys.items():
+        logger.info("Processing coefficients for superkey [ %s ]", superkey)
+        analysis_key = make_key(analysis_path_key, f"{series.name}_{superkey}.{tag}.csv")
+
+        if check_key(context.working_location, analysis_key):
+            continue
+
+        all_coeffs = []
+
+        for key in key_group:
+            for seed in series.seeds:
+                coeffs_key_template = f"{series.name}_{key}_{seed:04d}_%s.COEFFICIENTS.csv"
+                coeffs = None
+
+                for region in parameters.regions:
+                    coeffs_key = make_key(coeffs_path_key, coeffs_key_template % region)
+                    coeffs_key = coeffs_key.replace("_DEFAULT", "")
+
+                    coeffs_df = load_dataframe.with_options(**OPTIONS)(
+                        context.working_location, coeffs_key, converters={"KEY": str}
+                    )
+                    coeffs_df.set_index(INDEX_COLUMNS, inplace=True)
+
+                    if coeffs is None:
+                        coeffs = coeffs_df
+                        if region != "DEFAULT":
+                            coeffs = coeffs.add_suffix(f".{region}")
+                    else:
+                        coeffs = coeffs.join(coeffs_df, on=INDEX_COLUMNS, rsuffix=f".{region}")
+
+                all_coeffs.append(coeffs)
+
+        # Combine into single dataframe.
+        coeffs_df = pd.concat(all_coeffs).reset_index()
+
+        # Convert units.
+        convert_model_units(coeffs_df, parameters.ds, parameters.dt, parameters.regions)
+
+        # Save final dataframe.
+        save_dataframe(context.working_location, analysis_key, coeffs_df, index=False)
+
+
+@flow(name="analyze-cell-shapes_combine-data")
+def run_flow_combine_data(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
+) -> None:
+    """
+    Analyze cell shapes subflow for combining data.
+
+    Combine processed spherical harmonics coefficients, cell shape properties,
+    and parsed simulation results into a single dataframe that can be used for
+    PCA. If the combined dataframe already exists for a given key, that key is
+    skipped.
+    """
+
+    logger = get_run_logger()
+    tag = "CELL_SHAPES_DATA"
+
+    metrics_path_key = make_key(series.name, "analysis", "analysis.BASIC_METRICS")
+    props_path_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_PROPERTIES")
+    coeffs_path_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_COEFFICIENTS")
+    analysis_path_key = make_key(series.name, "analysis", f"analysis.{tag}")
+
+    keys = [condition["key"] for condition in series.conditions]
+    superkeys = {key_group for key in keys for key_group in key.split("_")}
+
+    for superkey in superkeys:
+        logger.info("Combining data for superkey [ %s ]", superkey)
+
+        key_template = f"{series.name}_{superkey}.%s.csv"
+        analysis_key = make_key(analysis_path_key, key_template % tag)
+
+        if check_key(context.working_location, analysis_key):
+            continue
+
+        metrics_key = make_key(metrics_path_key, key_template % "BASIC_METRICS")
+        metrics = load_dataframe.with_options(**OPTIONS)(context.working_location, metrics_key)
+        metrics.set_index(INDEX_COLUMNS, inplace=True)
+
+        props_key = make_key(props_path_key, key_template % "CELL_SHAPES_PROPERTIES")
+        if check_key(context.working_location, props_key):
+            props = load_dataframe.with_options(**OPTIONS)(context.working_location, props_key)
+            props.drop("time", axis=1, inplace=True, errors="ignore")
+            props.set_index(INDEX_COLUMNS, inplace=True)
+        else:
             props = None
 
-            # Load parsed results
-            results_key = make_key(results_path_key, f"{series.name}_{key}_{seed:04d}.csv")
-            results = load_dataframe(context.working_location, results_key)
-            results["KEY"] = key
-            results["SEED"] = seed
-            results.set_index(INDEX_COLUMNS, inplace=True)
-            all_results.append(results)
+        coeffs_key = make_key(coeffs_path_key, key_template % "CELL_SHAPES_COEFFICIENTS")
+        if check_key(context.working_location, coeffs_key):
+            coeffs = load_dataframe.with_options(**OPTIONS)(context.working_location, coeffs_key)
+            coeffs.drop("time", axis=1, inplace=True, errors="ignore")
+            coeffs.set_index(INDEX_COLUMNS, inplace=True)
+        else:
+            coeffs = None
 
-            for region in parameters.regions:
-                # Load coefficients for region.
-                coeffs_key = make_key(
-                    coeffs_path_key, f"{series.name}_{key}_{seed:04d}_{region}.COEFFICIENTS.csv"
-                )
-                coeffs_key = coeffs_key.replace("_DEFAULT", "")
-                region_coeffs = load_dataframe(
-                    context.working_location, coeffs_key, converters={"KEY": str}
-                )
-                region_coeffs.set_index(INDEX_COLUMNS, inplace=True)
-
-                if coeffs is None:
-                    coeffs = region_coeffs
-                    if region != "DEFAULT":
-                        coeffs = coeffs.add_suffix(f".{region}")
-                else:
-                    coeffs = coeffs.join(region_coeffs, on=INDEX_COLUMNS, rsuffix=f".{region}")
-
-                # Load properties for region (if it exists).
-                props_key = make_key(
-                    props_path_key, f"{series.name}_{key}_{seed:04d}_{region}.PROPERTIES.csv"
-                )
-                props_key = props_key.replace("_DEFAULT", "")
-
-                if not check_key(context.working_location, props_key):
-                    props = None
-                    continue
-
-                region_props = load_dataframe(
-                    context.working_location, props_key, converters={"KEY": str}
-                )
-                region_props.set_index(INDEX_COLUMNS, inplace=True)
-
-                if props is None:
-                    props = region_props
-                    if region != "DEFAULT":
-                        props = props.add_suffix(f".{region}")
-                else:
-                    props = props.join(region_props, on=INDEX_COLUMNS, rsuffix=f".{region}")
-
-            all_coeffs.append(coeffs)
-            all_props.append(props)
-
-        results_data = pd.concat(all_results)
-        coeffs_data = pd.concat(all_coeffs)
-        props_data = None if any(prop is None for prop in all_props) else pd.concat(all_props)
+        # Skip if both coefficients and properties are missing.
+        if props is None and coeffs is None:
+            continue
 
         # Filter coefficient outliers.
-        if parameters.outlier is not None:
-            outlier_filter = abs(
-                coeffs_data - coeffs_data.mean()
-            ) <= parameters.outlier * coeffs_data.std(ddof=1)
-            coeffs_data = coeffs_data[outlier_filter].dropna()
+        if parameters.outlier is not None and coeffs is not None:
+            outlier_filter = abs(coeffs - coeffs.mean()) <= parameters.outlier * coeffs.std(ddof=1)
+            coeffs = coeffs[outlier_filter].dropna()
 
-        # Join results, coefficients, and properties data.
-        if props_data is None:
-            data = coeffs_data.join(results_data, on=INDEX_COLUMNS).reset_index()
+        # Join metrics, coefficients, and properties data.
+        if props is None:
+            data = metrics.join(coeffs, on=INDEX_COLUMNS).reset_index()
+        elif coeffs is None:
+            data = metrics.join(props, on=INDEX_COLUMNS).reset_index()
         else:
-            data = coeffs_data.join(props_data, on=INDEX_COLUMNS)
-            data = data.join(results_data, on=INDEX_COLUMNS).reset_index()
+            data = metrics.join(props, on=INDEX_COLUMNS)
+            data = data.join(coeffs, on=INDEX_COLUMNS).reset_index()
 
         # Filter for cell phase and selected ticks.
         data = data[data["PHASE"].isin(parameters.valid_phases)]
-        data = data[data["TICK"].isin(parameters.valid_ticks)]
-
-        # Convert units.
-        convert_model_units(data, parameters.ds, parameters.dt, parameters.regions)
+        data = data[data["time"].isin(parameters.valid_times)]
 
         # Remove nans.
-        nan_indices = np.isnan(data.filter(like="shcoeffs")).any(axis=1)
+        nan_indices = np.isnan(data.filter(like="shcoeff")).any(axis=1)
         data = data[~nan_indices]
         nan_indices = np.isnan(data.filter(like="CENTER")).any(axis=1)
         data = data[~nan_indices]
 
         # Save final dataframe.
-        save_dataframe(context.working_location, data_key, data, index=False)
+        save_dataframe(context.working_location, analysis_key, data, index=False)
 
 
-@flow(name="analyze-cell-shapes_fit-model")
-def run_flow_fit_model(
+@flow(name="analyze-cell-shapes_fit-models")
+def run_flow_fit_models(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     """
@@ -266,25 +386,52 @@ def run_flow_fit_model(
     model already exits for a given key, that key is skipped.
     """
 
-    shapes_path_key = make_key(series.name, "analysis", "analysis.SHAPES")
-    pca_path_key = make_key(series.name, "analysis", "analysis.PCA")
-    region_key = "_".join(sorted(parameters.regions))
-    keys = [condition["key"] for condition in series.conditions]
+    logger = get_run_logger()
 
-    for key in keys:
-        data_key = make_key(shapes_path_key, f"{series.name}_{key}_{region_key}.SHAPES.csv")
-        model_key = make_key(pca_path_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
+    data_path_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_DATA")
+    model_path_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_MODELS")
+
+    keys = [condition["key"] for condition in series.conditions]
+    superkeys = {key_group for key in keys for key_group in key.split("_")}
+
+    for superkey in superkeys:
+        logger.info("Fitting models for superkey [ %s ]", superkey)
+
+        key_template = f"{series.name}_{superkey}.%s"
+        data_key = make_key(data_path_key, key_template % "CELL_SHAPES_DATA.csv")
+        model_key = make_key(model_path_key, key_template % "CELL_SHAPES_MODELS.pkl")
 
         if check_key(context.working_location, model_key):
             continue
 
         data = load_dataframe.with_options(**OPTIONS)(context.working_location, data_key)
+        ordering = data["volume"].values
 
-        coeffs = data.filter(like="shcoeffs").values
-        ordering = data["NUM_VOXELS"].values
-        model = fit_pca_model(coeffs, parameters.components, ordering)
+        models = {}
 
-        save_pickle(context.working_location, model_key, model)
+        # Fit model for shape modes.
+        coeff_columns = [
+            column
+            for column in data.filter(like="shcoeff")
+            if ("." not in column and "DEFAULT" in parameters.regions)
+            or ("." in column and column.split(".")[1] in parameters.regions)
+        ]
+        coeffs = data[coeff_columns].values
+        if coeffs.any():
+            models["modes"] = fit_pca_model(coeffs, parameters.components, ordering)
+
+        # Fit model for features.
+        feature_columns = [
+            f"{feature}.{region}" if region != "DEFAULT" else feature
+            for region in parameters.regions
+            for feature in parameters.features
+        ]
+        features = data[feature_columns].values
+        if features.any():
+            models["features"] = fit_pca_model(features, parameters.components, ordering)
+
+        # Save models.
+        save_pickle(context.working_location, model_key, models)
 
 
 @flow(name="analyze-cell-shapes_analyze-stats")
@@ -298,10 +445,13 @@ def run_flow_analyze_stats(
     already exists for a given key, that key is skipped.
     """
 
-    shapes_path_key = make_key(series.name, "analysis", "analysis.SHAPES")
-    stats_path_key = make_key(series.name, "analysis", "analysis.STATISTICS")
-    region_key = "_".join(sorted(parameters.regions))
+    logger = get_run_logger()
+
+    data_path_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_DATA")
+    stats_path_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_STATISTICS")
+
     keys = [condition["key"] for condition in series.conditions]
+    superkeys = {key_group for key in keys for key_group in key.split("_")}
 
     if parameters.reference is None:
         return
@@ -311,36 +461,49 @@ def run_flow_analyze_stats(
     )
     ref_model = load_pickle.with_options(**OPTIONS)(
         context.working_location, parameters.reference["model"]
-    )
+    )["modes"]
 
     features = [
         f"{feature}.{region}" if region != "DEFAULT" else feature
         for region in parameters.regions
-        for feature in ["volume", "height"]
+        for feature in parameters.features
     ]
 
-    for key in keys:
-        stats_key = make_key(stats_path_key, f"{series.name}_{key}_{region_key}.STATISTICS.csv")
+    for superkey in superkeys:
+        logger.info("Fitting models for superkey [ %s ]", superkey)
+
+        key_template = f"{series.name}_{superkey}.%s"
+        data_key = make_key(data_path_key, key_template % "CELL_SHAPES_DATA.csv")
+        stats_key = make_key(stats_path_key, key_template % "CELL_SHAPES_STATISTICS.csv")
 
         if check_key(context.working_location, stats_key):
             continue
 
-        data_key = make_key(shapes_path_key, f"{series.name}_{key}_{region_key}.SHAPES.csv")
         data = load_dataframe.with_options(**OPTIONS)(context.working_location, data_key)
 
         all_stats = []
 
+        contains_features = all(feature in data.columns for feature in features)
+        contains_coeffs = any(column for column in data.columns if "shcoeff" in column)
+
         for sample in range(parameters.sample_replicates):
             sample_data = (
                 data.sample(frac=1, random_state=sample)
-                .groupby("TICK")
+                .groupby("time")
                 .head(parameters.sample_size)
             )
 
-            feature_stats = calculate_feature_statistics(features, sample_data, ref_data)
-            shape_stats = calculate_shape_statistics(
-                ref_model, sample_data, ref_data, parameters.components
-            )
+            if contains_features:
+                feature_stats = calculate_feature_statistics(features, sample_data, ref_data)
+            else:
+                feature_stats = pd.DataFrame()
+
+            if contains_coeffs:
+                shape_stats = calculate_shape_statistics(
+                    ref_model, sample_data, ref_data, parameters.components
+                )
+            else:
+                shape_stats = pd.DataFrame()
 
             stats = pd.concat([feature_stats, shape_stats])
             stats["INDEX"] = sample
