@@ -7,16 +7,17 @@ Working location structure:
 
     (name)
     ├── analysis
-    │   └── analysis.METRICS
-    │       └── (name)_(key).METRICS.csv
+    │   └── analysis.BASIC_METRICS
+    │       └── (name)_(key).BASIC_METRICS.csv
     └── results
         └── (name)_(key)_(seed).csv
 
-Data from **results** are processed into the **analysis.METRICS** directory.
+Data from **results** are processed into the **analysis.BASIC_METRICS** directory.
 """
 
 from dataclasses import dataclass, field
 from datetime import timedelta
+from itertools import groupby
 from typing import Optional
 
 import pandas as pd
@@ -77,42 +78,45 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     Calls the following subflows, in order:
 
-    1. :py:func:`run_flow_process_data`
+    1. :py:func:`run_flow_process_results`
     """
 
-    run_flow_process_data(context, series, parameters)
+    run_flow_process_results(context, series, parameters)
 
 
-@flow(name="analyze-basic-metrics_process-data")
-def run_flow_process_data(
+@flow(name="analyze-basic-metrics_process-results")
+def run_flow_process_results(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
     """
-    Analyze basic metrics subflow for processing data.
+    Analyze basic metrics subflow for processing results.
 
     Processes parsed simulation results and compiles into a single dataframe. If
-    the combined data already exists for a given key, that key is skipped.
+    the combined dataframe already exists for a given key, that key is skipped.
     """
+
     logger = get_run_logger()
 
     results_path_key = make_key(series.name, "results")
-    metrics_path_key = make_key(series.name, "analysis", "analysis.METRICS")
-    keys = [condition["key"] for condition in series.conditions]
-    superkeys = {key_group for key in keys for key_group in key.split("_")}
+    metrics_path_key = make_key(series.name, "analysis", "analysis.BASIC_METRICS")
 
-    for superkey in superkeys:
-        logger.info("Processing data for superkey [ %s ]", superkey)
-        data_key = make_key(metrics_path_key, f"{series.name}_{superkey}.METRICS.csv")
+    keys = [condition["key"].split("_") for condition in series.conditions]
+    superkeys = {
+        superkey: ["_".join(k) for k in key_group]
+        for index in range(len(keys[0]))
+        for superkey, key_group in groupby(sorted(keys, key=lambda k: k[index]), lambda k: k[index])
+    }
 
-        if check_key(context.working_location, data_key):
+    for superkey, key_group in superkeys.items():
+        logger.info("Processing results for superkey [ %s ]", superkey)
+        metrics_key = make_key(metrics_path_key, f"{series.name}_{superkey}.BASIC_METRICS.csv")
+
+        if check_key(context.working_location, metrics_key):
             continue
 
         all_results = []
 
-        for key in keys:
-            if f"_{superkey}_" not in key and not key.endswith(superkey):
-                continue
-
+        for key in key_group:
             for seed in series.seeds:
                 results_key = make_key(results_path_key, f"{series.name}_{key}_{seed:04d}.csv")
                 results = load_dataframe.with_options(**OPTIONS)(
@@ -123,10 +127,10 @@ def run_flow_process_data(
                 all_results.append(results)
 
         # Combine into single dataframe.
-        data = pd.concat(all_results)
+        results_df = pd.concat(all_results)
 
         # Convert units.
-        convert_model_units(data, parameters.ds, parameters.dt, parameters.regions)
+        convert_model_units(results_df, parameters.ds, parameters.dt, parameters.regions)
 
         # Save final dataframe.
-        save_dataframe(context.working_location, data_key, data, index=False)
+        save_dataframe(context.working_location, metrics_key, results_df, index=False)
