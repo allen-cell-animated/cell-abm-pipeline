@@ -7,13 +7,13 @@ Working location structure:
 
     (name)
     ├── analysis
-    │   ├── analysis.METRICS
-    │   │   └── (name)_(key).METRICS.csv
+    │   ├── analysis.BASIC_METRICS
+    │   │   └── (name)_(key).BASIC_METRICS.csv
     │   └── analysis.POSITIONS
     │       ├── (name)_(key)_(seed).POSITIONS.csv
     │       └── (name)_(key)_(seed).POSITIONS.tar.xz
     └── groups
-       └── groups.BASIC
+       └── groups.BASIC_METRICS
             ├── (name).metrics_bins.(key).(time).(metric).csv
             ├── (name).metrics_distributions.(metric).json
             ├── (name).metrics_individuals.(key).(seed).(metric).json
@@ -23,7 +23,7 @@ Working location structure:
 
 Different groups use inputs from the **results** and
 **analysis/analysis.POSITIONS** directories.
-Grouped data is saved to the **groups/groups.BASIC** directory.
+Grouped data is saved to the **groups/groups.BASIC_METRICS** directory.
 
 Different groups can be visualized using the corresponding plotting workflow or
 loaded into alternative tools.
@@ -321,14 +321,15 @@ def run_flow_group_metrics_bins(
 ) -> None:
     """Group basic metrics subflow for binned metrics."""
 
-    analysis_metrics_key = make_key(series.name, "analysis", "analysis.METRICS")
+    analysis_metrics_key = make_key(series.name, "analysis", "analysis.BASIC_METRICS")
     analysis_positions_key = make_key(series.name, "analysis", "analysis.POSITIONS")
-    group_key = make_key(series.name, "groups", "groups.BASIC")
+    group_key = make_key(series.name, "groups", "groups.BASIC_METRICS")
+
     keys = [condition["key"] for condition in series.conditions]
     superkeys = {key_group for key in keys for key_group in key.split("_")}
 
     for superkey in superkeys:
-        metrics_key = make_key(analysis_metrics_key, f"{series.name}_{superkey}.METRICS.csv")
+        metrics_key = make_key(analysis_metrics_key, f"{series.name}_{superkey}.BASIC_METRICS.csv")
         metrics_df = load_dataframe.with_options(**OPTIONS)(context.working_location, metrics_key)
         metrics_df = metrics_df[
             metrics_df["SEED"].isin(parameters.seeds) & (metrics_df["time"] == parameters.time)
@@ -381,8 +382,9 @@ def run_flow_group_metrics_distributions(
 ) -> None:
     """Group basic metrics subflow for metrics distributions."""
 
-    analysis_key = make_key(series.name, "analysis", "analysis.METRICS")
-    group_key = make_key(series.name, "groups", "groups.BASIC")
+    analysis_key = make_key(series.name, "analysis", "analysis.BASIC_METRICS")
+    group_key = make_key(series.name, "groups", "groups.BASIC_METRICS")
+
     keys = [condition["key"] for condition in series.conditions]
     superkeys = {key_group for key in keys for key_group in key.split("_")}
 
@@ -400,7 +402,7 @@ def run_flow_group_metrics_distributions(
     distribution_stdevs: dict[str, dict] = {metric: {} for metric in metrics}
 
     for key in superkeys:
-        metrics_key = make_key(analysis_key, f"{series.name}_{key}.METRICS.csv")
+        metrics_key = make_key(analysis_key, f"{series.name}_{key}.BASIC_METRICS.csv")
         metrics_df = load_dataframe.with_options(**OPTIONS)(context.working_location, metrics_key)
         metrics_df = metrics_df[metrics_df["SEED"].isin(parameters.seeds)]
 
@@ -415,7 +417,10 @@ def run_flow_group_metrics_distributions(
             bounds = (parameters.bounds[metric][0], parameters.bounds[metric][1])
             bandwidth = parameters.bandwidth[metric]
 
-            check_data_bounds(values, bounds, f"[ {key} ] metric [ {metric} ]")
+            valid = check_data_bounds(values, bounds, f"[ {key} ] metric [ {metric} ]")
+
+            if not valid:
+                continue
 
             distribution_means[metric][key] = np.mean(values)
             distribution_stdevs[metric][key] = np.std(values, ddof=1)
@@ -441,8 +446,9 @@ def run_flow_group_metrics_individuals(
 ) -> None:
     """Group basic metrics subflow for individual metrics."""
 
-    analysis_key = make_key(series.name, "analysis", "analysis.METRICS")
-    group_key = make_key(series.name, "groups", "groups.BASIC")
+    analysis_key = make_key(series.name, "analysis", "analysis.BASIC_METRICS")
+    group_key = make_key(series.name, "groups", "groups.BASIC_METRICS")
+
     keys = [condition["key"] for condition in series.conditions]
     superkeys = {key_group for key in keys for key_group in key.split("_")}
 
@@ -451,7 +457,7 @@ def run_flow_group_metrics_individuals(
     ]
 
     for key in superkeys:
-        metrics_key = make_key(analysis_key, f"{series.name}_{key}.METRICS.csv")
+        metrics_key = make_key(analysis_key, f"{series.name}_{key}.BASIC_METRICS.csv")
         metrics_df = load_dataframe.with_options(**OPTIONS)(context.working_location, metrics_key)
         metrics_df = metrics_df[metrics_df["SEED"] == parameters.seed]
 
@@ -494,8 +500,9 @@ def run_flow_group_metrics_spatial(
 ) -> None:
     """Group basic metrics subflow for spatial metrics."""
 
-    analysis_key = make_key(series.name, "analysis", "analysis.METRICS")
-    group_key = make_key(series.name, "groups", "groups.BASIC")
+    analysis_key = make_key(series.name, "analysis", "analysis.BASIC_METRICS")
+    group_key = make_key(series.name, "groups", "groups.BASIC_METRICS")
+
     keys = [condition["key"] for condition in series.conditions]
     superkeys = {key_group for key in keys for key_group in key.split("_")}
 
@@ -507,7 +514,7 @@ def run_flow_group_metrics_spatial(
             metrics.append(metric)
 
     for key in superkeys:
-        metrics_key = make_key(analysis_key, f"{series.name}_{key}.METRICS.csv")
+        metrics_key = make_key(analysis_key, f"{series.name}_{key}.BASIC_METRICS.csv")
         metrics_df = load_dataframe.with_options(**OPTIONS)(context.working_location, metrics_key)
 
         for seed in parameters.seeds:
@@ -518,8 +525,8 @@ def run_flow_group_metrics_spatial(
 
                 for metric in metrics:
                     column = metric.replace(".DEFAULT", "") if "." in metric else metric.upper()
-                    spatial = data[["CENTER_X", "CENTER_Y", "CENTER_Z", column]].rename(
-                        columns={"CENTER_X": "x", "CENTER_Y": "y", "CENTER_Z": "z", column: "v"}
+                    spatial = data[["cx", "cy", "cz", column]].rename(
+                        columns={"cx": "x", "cy": "y", "cz": "z", column: "v"}
                     )
 
                     metric_key = f"{key}.{seed:04d}.{time:03d}.{metric.upper()}"
@@ -537,8 +544,9 @@ def run_flow_group_metrics_temporal(
 ) -> None:
     """Group basic metrics subflow for temporal metrics."""
 
-    analysis_key = make_key(series.name, "analysis", "analysis.METRICS")
-    group_key = make_key(series.name, "groups", "groups.BASIC")
+    analysis_key = make_key(series.name, "analysis", "analysis.BASIC_METRICS")
+    group_key = make_key(series.name, "groups", "groups.BASIC_METRICS")
+
     keys = [condition["key"] for condition in series.conditions]
     superkeys = {key_group for key in keys for key_group in key.split("_")}
 
@@ -554,7 +562,7 @@ def run_flow_group_metrics_temporal(
             metrics.append(metric)
 
     for key in superkeys:
-        metrics_key = make_key(analysis_key, f"{series.name}_{key}.METRICS.csv")
+        metrics_key = make_key(analysis_key, f"{series.name}_{key}.BASIC_METRICS.csv")
         metrics_df = load_dataframe.with_options(**OPTIONS)(context.working_location, metrics_key)
 
         for metric in metrics:
@@ -595,15 +603,16 @@ def run_flow_group_population_counts(
 ) -> None:
     """Group basic metrics subflow for population counts."""
 
-    analysis_key = make_key(series.name, "analysis", "analysis.METRICS")
-    group_key = make_key(series.name, "groups", "groups.BASIC")
+    analysis_key = make_key(series.name, "analysis", "analysis.BASIC_METRICS")
+    group_key = make_key(series.name, "groups", "groups.BASIC_METRICS")
+
     keys = [condition["key"] for condition in series.conditions]
     superkeys = {key_group for key in keys for key_group in key.split("_")}
 
     counts: list[dict] = []
 
     for key in superkeys:
-        metrics_key = make_key(analysis_key, f"{series.name}_{key}.METRICS.csv")
+        metrics_key = make_key(analysis_key, f"{series.name}_{key}.BASIC_METRICS.csv")
         metrics_df = load_dataframe.with_options(**OPTIONS)(
             context.working_location, metrics_key, usecols=["KEY", "SEED", "time"]
         )
@@ -628,6 +637,6 @@ def run_flow_group_population_counts(
     save_dataframe(
         context.working_location,
         make_key(group_key, f"{series.name}.population_counts.{parameters.time:03d}.csv"),
-        pd.DataFrame(counts),
+        pd.DataFrame(counts).drop_duplicates(),
         index=False,
     )
