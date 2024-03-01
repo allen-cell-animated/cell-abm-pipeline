@@ -368,20 +368,20 @@ requests-oauthlib = "*"
 
 [[package]]
 name = "arcade-collection"
-version = "0.14.0"
+version = "0.15.0"
 description = "Collection of tasks for working with ARCADE."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "arcade_collection-0.14.0-py3-none-any.whl", hash = "sha256:b8f91100885470e99bc30bd826e59f519a0df2af7c2748ddc9575eda7a476a7e"},
-    {file = "arcade_collection-0.14.0.tar.gz", hash = "sha256:a4d6856fe988881e61df41057102fcbae973a0fb2ee49bce477c7e282fce2840"},
+    {file = "arcade_collection-0.15.0-py3-none-any.whl", hash = "sha256:cddbe94a6811fb96cbf50036f4ff2897b79ebfafa3c426377262d66b59f132fb"},
+    {file = "arcade_collection-0.15.0.tar.gz", hash = "sha256:d952370ed8c77d3d14d60ea4e83149360a0553ec32fae8eaefa9bd69df61a3ae"},
 ]
 
 [package.dependencies]
 matplotlib = ">=3.7.2,<4.0.0"
 numpy = ">=1.24.2,<2.0.0"
 pandas = ">=1.5.3,<2.0.0"
-prefect = ">=2.8.2,<3.0.0"
+prefect = ">=2.14.3,<3.0.0"
 scikit-image = ">=0.19.3,<0.20.0"
 simulariumio = ">=1.7.0,<2.0.0"
 
@@ -5435,4 +5435,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "4a55d92a5f442965c3c088d4725185979b3cef22446358ffec34edb6e1215479"
+content-hash = "56a13e6c0497775fc952cfd6eaae3350ffad1ef904c7dbf347760a2442bdcf85"
