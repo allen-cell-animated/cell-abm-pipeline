@@ -7,7 +7,7 @@ from prefect.deployments import Deployment
 
 STORAGE_PATH = settings.PREFECT_LOCAL_STORAGE_PATH.value()
 
-DATABASE_PATH = "/home/ec2-user/.prefect/orion.db"
+DATABASE_PATH = "/home/ec2-user/.prefect/prefect.db"
 
 RETENTION_PERIOD = 48
 
