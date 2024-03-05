@@ -660,9 +660,7 @@ def run_flow_group_feature_distributions(
         data = load_dataframe.with_options(**OPTIONS)(context.working_location, dataframe_key)
 
         if parameters.reference_model is not None:
-            transform = ref_model["modes"].transform(
-                data[ref_coeffs.filter(like="shcoeffs").columns].values
-            )
+            transform = ref_model.transform(data[ref_coeffs.filter(like="shcoeffs").columns].values)
             for component in range(parameters.components):
                 data[f"PC{component + 1}"] = transform[:, component]
 
@@ -1071,7 +1069,7 @@ def run_flow_group_shape_modes(
 
         # Load model.
         model_key = make_key(analysis_model_key, f"{series_key}.CELL_SHAPES_MODELS.pkl")
-        model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)["modes"]
+        model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)
 
         # Load dataframe.
         dataframe_key = make_key(analysis_data_key, f"{series_key}.CELL_SHAPES_DATA.csv")
@@ -1179,7 +1177,7 @@ def run_flow_group_variance_explained(
 
     for superkey in superkeys:
         model_key = make_key(analysis_key, f"{series.name}_{superkey}.CELL_SHAPES_MODELS.pkl")
-        model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)["modes"]
+        model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)
 
         variance.append(
             pd.DataFrame(

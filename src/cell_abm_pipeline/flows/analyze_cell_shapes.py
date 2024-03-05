@@ -407,9 +407,7 @@ def run_flow_fit_models(
         data = load_dataframe.with_options(**OPTIONS)(context.working_location, data_key)
         ordering = data["volume"].values
 
-        models = {}
-
-        # Fit model for shape modes.
+        # Get coefficient columns
         coeff_columns = [
             column
             for column in data.filter(like="shcoeff")
@@ -417,21 +415,15 @@ def run_flow_fit_models(
             or ("." in column and column.split(".")[1] in parameters.regions)
         ]
         coeffs = data[coeff_columns].values
-        if coeffs.any():
-            models["modes"] = fit_pca_model(coeffs, parameters.components, ordering)
 
-        # Fit model for features.
-        feature_columns = [
-            f"{feature}.{region}" if region != "DEFAULT" else feature
-            for region in parameters.regions
-            for feature in parameters.features
-        ]
-        features = data[feature_columns].values
-        if features.any():
-            models["features"] = fit_pca_model(features, parameters.components, ordering)
+        if not coeffs.any():
+            continue
+
+        # Fit model for shape modes.
+        model = fit_pca_model(coeffs, parameters.components, ordering)
 
         # Save models.
-        save_pickle(context.working_location, model_key, models)
+        save_pickle(context.working_location, model_key, model)
 
 
 @flow(name="analyze-cell-shapes_analyze-stats")
@@ -461,7 +453,7 @@ def run_flow_analyze_stats(
     )
     ref_model = load_pickle.with_options(**OPTIONS)(
         context.working_location, parameters.reference["model"]
-    )["modes"]
+    )
 
     features = [
         f"{feature}.{region}" if region != "DEFAULT" else feature
