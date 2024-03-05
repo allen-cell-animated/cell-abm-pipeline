@@ -16,6 +16,7 @@ Working location structure:
     │       └── (name)_(key)_(seed).LOCATIONS.tar.xz
     └── groups
         └── groups.CELL_SHAPES
+            ├── (name).feature_components.csv
             ├── (name).feature_correlations.(key).(region).csv
             ├── (name).feature_correlations.(key).(mode).(property).(region).csv
             ├── (name).feature_distributions.(feature).json
@@ -65,6 +66,7 @@ from prefect import flow, get_run_logger
 from prefect.tasks import task_input_hash
 from scipy.spatial import KDTree
 from scipy.stats import pearsonr
+from sklearn.decomposition import PCA
 
 from cell_abm_pipeline.flows.analyze_cell_shapes import PCA_COMPONENTS
 from cell_abm_pipeline.flows.calculate_coefficients import COEFFICIENT_ORDER
@@ -77,6 +79,7 @@ OPTIONS = {
 }
 
 GROUPS: list[str] = [
+    "feature_components",
     "feature_correlations",
     "feature_distributions",
     "mode_correlations",
@@ -88,6 +91,19 @@ GROUPS: list[str] = [
     "shape_modes",
     "shape_samples",
     "variance_explained",
+]
+
+COMPONENT_FEATURES: list[str] = [
+    "volume",
+    "height",
+    "area",
+    "axis_major_length",
+    "axis_minor_length",
+    "eccentricity",
+    "orientation",
+    "perimeter",
+    "extent",
+    "solidity",
 ]
 
 CORRELATION_PROPERTIES: list[str] = [
@@ -197,6 +213,20 @@ BANDWIDTH: dict[str, float] = {
     "PC7": 5,
     "PC8": 5,
 }
+
+
+@dataclass
+class ParametersConfigFeatureComponents:
+    """Parameter configuration for group cell shapes subflow - feature components."""
+
+    features: list[str] = field(default_factory=lambda: COMPONENT_FEATURES)
+    """List of shape features."""
+
+    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
+
+    components: int = PCA_COMPONENTS
+    """Number of principal components."""
 
 
 @dataclass
@@ -314,7 +344,7 @@ class ParametersConfigShapeAverage:
 class ParametersConfigShapeContours:
     """Parameter configuration for group cell shapes subflow - shape contours."""
 
-    regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
+    regions: list[Optional[str]] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
 
     seed: int = 0
@@ -399,6 +429,9 @@ class ParametersConfig:
     groups: list[str] = field(default_factory=lambda: GROUPS)
     """List of cell shapes groups."""
 
+    feature_components: ParametersConfigFeatureComponents = ParametersConfigFeatureComponents()
+    """Parameters for group feature components subflow."""
+
     feature_correlations: ParametersConfigFeatureCorrelations = (
         ParametersConfigFeatureCorrelations()
     )
@@ -463,6 +496,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     Calls the following subflows, if the group is specified:
 
+    - :py:func:`run_flow_group_feature_components`
     - :py:func:`run_flow_group_feature_correlations`
     - :py:func:`run_flow_group_feature_distributions`
     - :py:func:`run_flow_group_mode_correlations`
@@ -475,6 +509,9 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
     - :py:func:`run_flow_group_shape_samples`
     - :py:func:`run_flow_group_variance_explained`
     """
+
+    if "feature_components" in parameters.groups:
+        run_flow_group_feature_components(context, series, parameters.feature_components)
 
     if "feature_correlations" in parameters.groups:
         run_flow_group_feature_correlations(context, series, parameters.feature_correlations)
@@ -508,6 +545,56 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     if "variance_explained" in parameters.groups:
         run_flow_group_variance_explained(context, series, parameters.variance_explained)
+
+
+@flow(name="group-cell-shapes_group-feature-components")
+def run_flow_group_feature_components(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigFeatureComponents
+) -> None:
+    """Group cell shapes subflow for feature components."""
+
+    analysis_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_DATA")
+    group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
+
+    keys = [condition["key"] for condition in series.conditions]
+    superkeys = sorted(list({key.split("_")[0] for key in keys}))
+
+    # Get feature columns
+    columns = [
+        f"{feature}.{region}" if region != "DEFAULT" else feature
+        for region in parameters.regions
+        for feature in parameters.features
+    ]
+
+    # Load data.
+    data_key = make_key(analysis_key, f"{series.name}_%s.CELL_SHAPES_DATA.csv")
+    data = pd.concat(
+        [
+            load_dataframe.with_options(**OPTIONS)(context.working_location, data_key % superkey)
+            for superkey in superkeys
+        ]
+    )
+
+    # Fit model.
+    pca_data = data[columns]
+    pca_data_zscore = (pca_data - pca_data.mean(axis=0)) / pca_data.std(axis=0)
+    pca = PCA(n_components=parameters.components)
+    pca = pca.fit(pca_data_zscore)
+    transform = pca.transform(pca_data_zscore)
+
+    # Create output data.
+    feature_components = data[["KEY"]].copy()
+    feature_components.rename(columns={"KEY": "key"}, inplace=True)
+    for comp in range(parameters.components):
+        feature_components[f"component_{comp + 1}"] = transform[:, comp]
+
+    # Save dataframe.
+    save_dataframe(
+        context.working_location,
+        make_key(group_key, f"{series.name}.feature_components.csv"),
+        feature_components,
+        index=False,
+    )
 
 
 @flow(name="group-cell-shapes_group-feature-correlations")
@@ -995,7 +1082,7 @@ def run_flow_group_shape_contours(
             all_contours = []
 
             for location in locations:
-                voxels = get_location_voxels(location, region)
+                voxels = get_location_voxels(location, None if region == "DEFAULT" else region)
                 contours = [
                     (np.array(contour) * ds).astype("int").tolist()
                     for contour in extract_voxel_contours(voxels, projection, box)
