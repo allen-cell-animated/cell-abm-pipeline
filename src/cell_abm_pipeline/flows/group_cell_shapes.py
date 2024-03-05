@@ -7,34 +7,32 @@ Working location structure:
 
     (name)
     ├── analysis
-    │   ├── analysis.PCA
-    │   │   └── (name)_(key)_(regions).PCA.pkl
-    │   ├── analysis.SHAPES
-    │   │   └── (name)_(key)_(regions).SHAPES.csv
-    │   └── analysis.STATISTICS
-    │       └── (name)_(key)_(regions).STATISTICS.csv
+    │   ├── analysis.CELL_SHAPES_DATA
+    │   │   └── (name)_(key).CELL_SHAPES_DATA.csv
+    │   └── analysis.CELL_SHAPES_MODELS
+    │       └── (name)_(key).CELL_SHAPES_MODELS.pkl
     ├── data
     │   └── data.LOCATIONS
     │       └── (name)_(key)_(seed).LOCATIONS.tar.xz
     └── groups
-        └── groups.SHAPES
+        └── groups.CELL_SHAPES
             ├── (name).feature_correlations.(key).(region).csv
             ├── (name).feature_correlations.(key).(mode).(property).(region).csv
             ├── (name).feature_distributions.(feature).json
             ├── (name).mode_correlations.csv
-            ├── (name).population_counts.(tick).csv
+            ├── (name).population_counts.(time).csv
             ├── (name).population_stats.json
             ├── (name).shape_average.(key).(projection).json
-            ├── (name).shape_contours.(key).(seed).(tick).(region).(projection).json
+            ├── (name).shape_contours.(key).(seed).(time).(region).(projection).json
             ├── (name).shape_errors.json
             ├── (name).shape_modes.(key).(region).(mode).(projection).json
             ├── (name).shape_samples.json
             └── (name).variance_explained.csv
 
 Different groups use inputs from the **data/data.LOCATIONS**,
-**analysis/analysis.SHAPES**, **analysis/analysis.PCA**, and
-**analysis/analysis.STATISTICS** directories.
-Grouped data is saved to the **groups/groups.SHAPES** directory.
+**analysis/analysis.CELL_SHAPES_DATA**, and
+**analysis/analysis.CELL_SHAPES_MODELS** directories.
+Grouped data is saved to the **groups/groups.CELL_SHAPES** directory.
 
 Different groups can be visualized using the corresponding plotting workflow or
 loaded into alternative tools.
@@ -56,6 +54,10 @@ from abm_shape_collection import (
     make_voxels_array,
 )
 from arcade_collection.output import extract_tick_json, get_location_voxels
+from arcade_collection.output.convert_model_units import (
+    estimate_spatial_resolution,
+    estimate_temporal_resolution,
+)
 from io_collection.keys import make_key
 from io_collection.load import load_dataframe, load_pickle, load_tar
 from io_collection.save import save_dataframe, save_json
@@ -137,8 +139,24 @@ LIMITS: dict[str, list] = {
 BOUNDS: dict[str, list] = {
     "volume.DEFAULT": [0, 6000],
     "volume.NUCLEUS": [0, 2000],
-    "height.DEFAULT": [0, 20],
-    "height.NUCLEUS": [0, 20],
+    "height.DEFAULT": [0, 21],
+    "height.NUCLEUS": [0, 21],
+    "area.DEFAULT": [0, 2500],
+    "area.NUCLEUS": [0, 1000],
+    "perimeter.DEFAULT": [0, 2000],
+    "perimeter.NUCLEUS": [0, 600],
+    "axis_major_length.DEFAULT": [0, 300],
+    "axis_major_length.NUCLEUS": [0, 100],
+    "axis_minor_length.DEFAULT": [0, 100],
+    "axis_minor_length.NUCLEUS": [0, 50],
+    "eccentricity.DEFAULT": [0, 1],
+    "eccentricity.NUCLEUS": [0, 1],
+    "orientation.DEFAULT": [-2, 2],
+    "orientation.NUCLEUS": [-2, 2],
+    "extent.DEFAULT": [0, 1],
+    "extent.NUCLEUS": [0, 1],
+    "solidity.DEFAULT": [0, 1],
+    "solidity.NUCLEUS": [0, 1],
     "PC1": [-50, 50],
     "PC2": [-50, 50],
     "PC3": [-50, 50],
@@ -154,6 +172,22 @@ BANDWIDTH: dict[str, float] = {
     "volume.NUCLEUS": 50,
     "height.DEFAULT": 1,
     "height.NUCLEUS": 1,
+    "area.DEFAULT": 50,
+    "area.NUCLEUS": 10,
+    "perimeter.DEFAULT": 50,
+    "perimeter.NUCLEUS": 10,
+    "axis_major_length.DEFAULT": 10,
+    "axis_major_length.NUCLEUS": 5,
+    "axis_minor_length.DEFAULT": 5,
+    "axis_minor_length.NUCLEUS": 2,
+    "eccentricity.DEFAULT": 0.01,
+    "eccentricity.NUCLEUS": 0.01,
+    "orientation.DEFAULT": 0.05,
+    "orientation.NUCLEUS": 0.05,
+    "extent.DEFAULT": 0.01,
+    "extent.NUCLEUS": 0.01,
+    "solidity.DEFAULT": 0.01,
+    "solidity.NUCLEUS": 0.01,
     "PC1": 5,
     "PC2": 5,
     "PC3": 5,
@@ -189,11 +223,17 @@ class ParametersConfigFeatureCorrelations:
 class ParametersConfigFeatureDistributions:
     """Parameter configuration for group cell shapes subflow - feature distributions."""
 
+    reference_metrics: Optional[str] = None
+    """Full key for reference metrics data."""
+
+    reference_properties: Optional[str] = None
+    """Full key for reference properties data."""
+
+    reference_coefficients: Optional[str] = None
+    """Full key for reference coefficients data."""
+
     reference_model: Optional[str] = None
     """Full key for reference PCA model."""
-
-    reference_data: Optional[str] = None
-    """Full key for reference coefficients data."""
 
     properties: list[str] = field(default_factory=lambda: DISTRIBUTION_PROPERTIES)
     """List of shape properties."""
@@ -235,11 +275,11 @@ class ParametersConfigPopulationCounts:
     regions: list[str] = field(default_factory=lambda: ["DEFAULT"])
     """List of subcellular regions."""
 
-    tick: int = 0
-    """Simulation tick to use for grouping population counts."""
-
     seeds: list[int] = field(default_factory=lambda: [0])
-    """Simulation seeds to use for grouping population counts."""
+    """Simulation seed(s) to use for grouping population counts."""
+
+    time: int = 0
+    """Simulation time (in hours) to use for grouping population counts."""
 
 
 @dataclass
@@ -280,8 +320,14 @@ class ParametersConfigShapeContours:
     seed: int = 0
     """Simulation random seed to use for grouping shape contours."""
 
-    tick: int = 0
-    """Simulation tick to use for grouping shape contours."""
+    time: int = 0
+    """Simulation time (in hours) to use for grouping shape contours."""
+
+    ds: Optional[float] = None
+    """Spatial scaling in units/um."""
+
+    dt: Optional[float] = None
+    """Temporal scaling in hours/tick."""
 
     projection: str = "top"
     """Selected shape projection."""
@@ -556,61 +602,114 @@ def run_flow_group_feature_distributions(
 ) -> None:
     """Group cell shapes subflow for feature distributions."""
 
-    analysis_key = make_key(series.name, "analysis", "analysis.SHAPES")
-    group_key = make_key(series.name, "groups", "groups.SHAPES")
-    region_key = "_".join(sorted(parameters.regions))
+    analysis_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_DATA")
+    group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
+
     keys = [condition["key"] for condition in series.conditions]
+    superkeys = {key_group for key in keys for key_group in key.split("_")}
 
     features = [
-        f"{prop}.{region}" for prop in parameters.properties for region in parameters.regions
+        (f"{prop}.{region}", False)
+        for prop in parameters.properties
+        for region in parameters.regions
     ]
 
-    if parameters.reference_model is not None and parameters.reference_data is not None:
-        ref_data = load_dataframe.with_options(**OPTIONS)(
-            context.working_location, parameters.reference_data, nrows=1
+    if parameters.reference_metrics is not None:
+        ref_metrics = load_dataframe.with_options(**OPTIONS)(
+            context.working_location, parameters.reference_metrics
+        )
+        features.extend(
+            [
+                (feature, True)
+                for feature, _ in features
+                if feature.replace(".DEFAULT", "") in ref_metrics.columns
+            ]
+        )
+
+    if parameters.reference_properties is not None:
+        ref_props = load_dataframe.with_options(**OPTIONS)(
+            context.working_location, parameters.reference_properties
+        )
+        features.extend(
+            [
+                (feature, True)
+                for feature, _ in features
+                if feature.replace(".DEFAULT", "") in ref_props.columns
+            ]
+        )
+
+    if parameters.reference_model is not None and parameters.reference_coefficients is not None:
+        ref_coeffs = load_dataframe.with_options(**OPTIONS)(
+            context.working_location, parameters.reference_coefficients, nrows=1
         )
         ref_model = load_pickle.with_options(**OPTIONS)(
             context.working_location, parameters.reference_model
         )
-        features = features + [f"PC{component + 1}" for component in range(parameters.components)]
+        features.extend(
+            [(f"PC{component + 1}", False) for component in range(parameters.components)]
+        )
 
-    distribution_bins: dict[str, dict] = {feature: {} for feature in features}
-    distribution_means: dict[str, dict] = {feature: {} for feature in features}
-    distribution_stdevs: dict[str, dict] = {feature: {} for feature in features}
+    distribution_bins: dict[tuple[str, bool], dict] = {feature: {} for feature in features}
+    distribution_means: dict[tuple[str, bool], dict] = {feature: {} for feature in features}
+    distribution_stdevs: dict[tuple[str, bool], dict] = {feature: {} for feature in features}
+    distribution_mins: dict[tuple[str, bool], dict] = {feature: {} for feature in features}
+    distribution_maxs: dict[tuple[str, bool], dict] = {feature: {} for feature in features}
 
-    for key in keys:
-        # Load dataframe.
-        dataframe_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.SHAPES.csv")
+    for key in superkeys:
+        dataframe_key = make_key(analysis_key, f"{series.name}_{key}.CELL_SHAPES_DATA.csv")
         data = load_dataframe.with_options(**OPTIONS)(context.working_location, dataframe_key)
 
-        # Calculate shape modes, if model is given.
         if parameters.reference_model is not None:
-            transform = ref_model.transform(data[ref_data.filter(like="shcoeffs").columns].values)
+            transform = ref_model["modes"].transform(
+                data[ref_coeffs.filter(like="shcoeffs").columns].values
+            )
             for component in range(parameters.components):
                 data[f"PC{component + 1}"] = transform[:, component]
 
-        for feature in features:
-            values = data[feature.replace(".DEFAULT", "")].values
+        for feature, filtered in features:
+            feature_column = feature.replace(".DEFAULT", "")
+            values = data[feature_column].values
+
+            if filtered:
+                if ref_metrics is not None and feature_column in ref_metrics.columns:
+                    ref_max = ref_metrics[feature_column].max()
+                    ref_min = ref_metrics[feature_column].min()
+                    values = values[(values >= ref_min) & (values <= ref_max)]
+
+                if ref_props is not None and feature_column in ref_props.columns:
+                    ref_max = ref_props[feature_column].max()
+                    ref_min = ref_props[feature_column].min()
+                    values = values[(values >= ref_min) & (values <= ref_max)]
 
             bounds = (parameters.bounds[feature][0], parameters.bounds[feature][1])
             bandwidth = parameters.bandwidth[feature]
 
-            check_data_bounds(values, bounds, f"[ {key} ] feature [ {feature} ]")
+            valid = check_data_bounds(values, bounds, f"[ {key} ] feature [ {feature} ]")
 
-            distribution_means[feature][key] = np.mean(values)
-            distribution_stdevs[feature][key] = np.std(values, ddof=1)
-            distribution_bins[feature][key] = calculate_data_bins(values, bounds, bandwidth)
+            if not valid:
+                continue
 
-    for feature, distribution in distribution_bins.items():
+            distribution_means[(feature, filtered)][key] = np.mean(values)
+            distribution_stdevs[(feature, filtered)][key] = np.std(values, ddof=1)
+            distribution_bins[(feature, filtered)][key] = calculate_data_bins(
+                values, bounds, bandwidth
+            )
+            distribution_mins[(feature, filtered)][key] = np.min(values)
+            distribution_maxs[(feature, filtered)][key] = np.max(values)
+
+    for (feature, filtered), distribution in distribution_bins.items():
         distribution["*"] = {
             "bandwidth": parameters.bandwidth[feature],
-            "means": distribution_means[feature],
-            "stdevs": distribution_stdevs[feature],
+            "means": distribution_means[(feature, filtered)],
+            "stdevs": distribution_stdevs[(feature, filtered)],
+            "mins": distribution_mins[(feature, filtered)],
+            "maxs": distribution_maxs[(feature, filtered)],
         }
 
+        feature_key = f"{feature.upper()}{'.FILTERED' if filtered else ''}"
         save_json(
             context.working_location,
-            make_key(group_key, f"{series.name}.feature_distributions.{feature.upper()}.json"),
+            make_key(group_key, f"{series.name}.feature_distributions.{feature_key}.json"),
             distribution,
         )
 
@@ -716,36 +815,36 @@ def run_flow_group_population_counts(
 ) -> None:
     """Group cell shapes subflow for population counts."""
 
-    analysis_key = make_key(series.name, "analysis", "analysis.SHAPES")
-    group_key = make_key(series.name, "groups", "groups.SHAPES")
-    region_key = "_".join(sorted(parameters.regions))
+    analysis_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_DATA")
+    group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
+
     keys = [condition["key"] for condition in series.conditions]
+    superkeys = {key_group for key in keys for key_group in key.split("_")}
 
-    counts = []
+    counts: list[dict] = []
 
-    for key in keys:
-        dataframe_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.SHAPES.csv")
+    for key in superkeys:
+        dataframe_key = make_key(analysis_key, f"{series.name}_{key}.CELL_SHAPES_DATA.csv")
         data = load_dataframe.with_options(**OPTIONS)(
-            context.working_location, dataframe_key, usecols=["TICK", "SEED"]
+            context.working_location, dataframe_key, usecols=["KEY", "SEED", "time"]
         )
-        groups = data[data["TICK"] == parameters.tick].groupby("SEED")
+        data = data[data["SEED"].isin(parameters.seeds) & (data["time"] == parameters.time)]
 
-        for seed in parameters.seeds:
-            if seed not in groups.groups:
-                continue
-
-            counts.append(
+        counts.extend(
+            [
                 {
-                    "key": key,
-                    "seed": seed,
-                    "count": len(groups.get_group(seed)),
+                    "key": record["KEY"],
+                    "seed": record["SEED"],
+                    "count": record[0],
                 }
-            )
+                for record in data.groupby(["KEY", "SEED"]).size().reset_index().to_dict("records")
+            ]
+        )
 
     save_dataframe(
         context.working_location,
-        make_key(group_key, f"{series.name}.population_counts.{parameters.tick:06d}.csv"),
-        pd.DataFrame(counts),
+        make_key(group_key, f"{series.name}.population_counts.{parameters.time:03d}.csv"),
+        pd.DataFrame(counts).drop_duplicates(),
         index=False,
     )
 
@@ -875,7 +974,7 @@ def run_flow_group_shape_contours(
     """Group cell shapes subflow for shape contours."""
 
     data_key = make_key(series.name, "data", "data.LOCATIONS")
-    group_key = make_key(series.name, "groups", "groups.SHAPES")
+    group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
     keys = [condition["key"] for condition in series.conditions]
 
     projection = parameters.projection
@@ -884,21 +983,29 @@ def run_flow_group_shape_contours(
         series_key = f"{series.name}_{key}_{parameters.seed:04d}"
         tar_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
         tar = load_tar(context.working_location, tar_key)
-        locations = extract_tick_json(tar, series_key, parameters.tick, "LOCATIONS")
+
+        ds = parameters.ds if parameters.ds is not None else estimate_spatial_resolution(key)
+        dt = parameters.dt if parameters.dt is not None else estimate_temporal_resolution(key)
+
+        tick = int(parameters.time / dt)
+        length, width, height = parameters.box
+        box = (int((length - 2) / ds) + 2, int((width - 2) / ds) + 2, int((height - 2) / ds) + 2)
+
+        locations = extract_tick_json(tar, series_key, tick, "LOCATIONS")
 
         for region in parameters.regions:
             all_contours = []
 
             for location in locations:
                 voxels = get_location_voxels(location, region)
-                all_contours.append(
-                    {
-                        "id": location["id"],
-                        "contours": extract_voxel_contours(voxels, projection, parameters.box),
-                    }
-                )
+                contours = [
+                    (np.array(contour) * ds).astype("int").tolist()
+                    for contour in extract_voxel_contours(voxels, projection, box)
+                ]
 
-            contour_key = f"{key}.{parameters.seed:04d}.{parameters.tick:06d}.{region}"
+                all_contours.append({"id": location["id"], "contours": contours})
+
+            contour_key = f"{key}.{parameters.seed:04d}.{parameters.time:03d}.{region}"
             save_json(
                 context.working_location,
                 make_key(
@@ -950,23 +1057,24 @@ def run_flow_group_shape_modes(
     point and projection. Consolidate shape modes from keys into single json.
     """
 
-    analysis_shapes_key = make_key(series.name, "analysis", "analysis.SHAPES")
-    analysis_pca_key = make_key(series.name, "analysis", "analysis.PCA")
-    group_key = make_key(series.name, "groups", "groups.SHAPES")
-    region_key = "_".join(sorted(parameters.regions))
+    analysis_data_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_DATA")
+    analysis_model_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_MODELS")
+    group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
+
     keys = [condition["key"] for condition in series.conditions]
+    superkeys = {key_group for key in keys for key_group in key.split("_")}
 
     projections = ["top", "side1", "side2"]
 
-    for key in keys:
-        series_key = f"{series.name}_{key}_{region_key}"
+    for superkey in superkeys:
+        series_key = f"{series.name}_{superkey}"
 
         # Load model.
-        model_key = make_key(analysis_pca_key, f"{series_key}.PCA.pkl")
-        model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)
+        model_key = make_key(analysis_model_key, f"{series_key}.CELL_SHAPES_MODELS.pkl")
+        model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)["modes"]
 
         # Load dataframe.
-        dataframe_key = make_key(analysis_shapes_key, f"{series_key}.SHAPES.csv")
+        dataframe_key = make_key(analysis_data_key, f"{series_key}.CELL_SHAPES_DATA.csv")
         data = load_dataframe.with_options(**OPTIONS)(context.working_location, dataframe_key)
 
         # Extract shape modes.
@@ -995,12 +1103,12 @@ def run_flow_group_shape_modes(
                         }
                     )
 
-            for projection_key, projections in shape_mode_projections.items():
+            for proj_key, projections in shape_mode_projections.items():
                 save_json(
                     context.working_location,
                     make_key(
                         group_key,
-                        f"{series.name}.shape_modes.{key}.{region}.{projection_key.upper()}.json",
+                        f"{series.name}.shape_modes.{superkey}.{region}.{proj_key.upper()}.json",
                     ).replace("..", "."),
                     projections,
                 )
@@ -1061,21 +1169,22 @@ def run_flow_group_variance_explained(
 ) -> None:
     """Group cell shapes subflow for variance explained."""
 
-    analysis_key = make_key(series.name, "analysis", "analysis.PCA")
-    group_key = make_key(series.name, "groups", "groups.SHAPES")
-    region_key = "_".join(sorted(parameters.regions))
+    analysis_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_MODELS")
+    group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
+
     keys = [condition["key"] for condition in series.conditions]
+    superkeys = {key_group for key in keys for key_group in key.split("_")}
 
     variance = []
 
-    for key in keys:
-        model_key = make_key(analysis_key, f"{series.name}_{key}_{region_key}.PCA.pkl")
-        model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)
+    for superkey in superkeys:
+        model_key = make_key(analysis_key, f"{series.name}_{superkey}.CELL_SHAPES_MODELS.pkl")
+        model = load_pickle.with_options(**OPTIONS)(context.working_location, model_key)["modes"]
 
         variance.append(
             pd.DataFrame(
                 {
-                    "key": [key] * parameters.components,
+                    "key": [superkey] * parameters.components,
                     "mode": [f"PC{i}" for i in range(1, parameters.components + 1)],
                     "variance": model.explained_variance_ratio_,
                 }
