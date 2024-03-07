@@ -113,7 +113,7 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
         group_conditions = [
             condition
             for condition in series.conditions
-            if group is "_" or condition["group"] == group
+            if group == "_" or condition["group"] == group
         ]
         group_inits = [init for init in series.inits if group == "_" or init["group"] == group]
 

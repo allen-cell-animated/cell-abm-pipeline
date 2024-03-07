@@ -108,8 +108,8 @@ TEMPORAL_METRICS: list[str] = [
 BOUNDS: dict[str, list] = {
     "volume.DEFAULT": [0, 6000],
     "volume.NUCLEUS": [0, 2000],
-    "height.DEFAULT": [0, 20],
-    "height.NUCLEUS": [0, 20],
+    "height.DEFAULT": [0, 21],
+    "height.NUCLEUS": [0, 21],
     "phase.PROLIFERATIVE_G1": [0, 5],
     "phase.PROLIFERATIVE_S": [0, 20],
     "phase.PROLIFERATIVE_G2": [0, 18],

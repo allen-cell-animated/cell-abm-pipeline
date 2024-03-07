@@ -477,7 +477,9 @@ def run_flow_convert_to_projections(
                 projection_key = make_key(
                     converted_key, f"{series_key}_{frame:06d}_{region_key}.PROJECTION.png"
                 )
-                save_figure(context.working_location, projection_key, projection)
+                save_figure(
+                    context.working_location, projection_key, projection, bbox_inches="tight"
+                )
 
 
 @flow(name="convert-arcade-format_convert-to-simularium-shapes")
