@@ -556,9 +556,6 @@ def run_flow_group_feature_components(
     analysis_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_DATA")
     group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
 
-    keys = [condition["key"] for condition in series.conditions]
-    superkeys = sorted(list({key.split("_")[0] for key in keys}))
-
     # Get feature columns
     columns = [
         f"{feature}.{region}" if region != "DEFAULT" else feature
@@ -567,13 +564,8 @@ def run_flow_group_feature_components(
     ]
 
     # Load data.
-    data_key = make_key(analysis_key, f"{series.name}_%s.CELL_SHAPES_DATA.csv")
-    data = pd.concat(
-        [
-            load_dataframe.with_options(**OPTIONS)(context.working_location, data_key % superkey)
-            for superkey in superkeys
-        ]
-    )
+    data_key = make_key(analysis_key, f"{series.name}.CELL_SHAPES_DATA.csv")
+    data = load_dataframe.with_options(**OPTIONS)(context.working_location, data_key)
 
     # Fit model.
     pca_data = data[columns]

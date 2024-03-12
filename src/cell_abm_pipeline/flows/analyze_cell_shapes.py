@@ -374,6 +374,22 @@ def run_flow_combine_data(
         # Save final dataframe.
         save_dataframe(context.working_location, analysis_key, data, index=False)
 
+    # Save final combined dataframe with all data.
+    combined_key = make_key(analysis_path_key, f"{series.name}.{tag}.csv")
+
+    if check_key(context.working_location, combined_key):
+        return
+
+    logger.info("Combining data for all keys")
+
+    combined_template = make_key(analysis_path_key, f"{series.name}_%s.{tag}.csv")
+    combined_data = []
+
+    for superkey in sorted(list({key.split("_")[0] for key in keys})):
+        combined_data.append(load_dataframe(context.working_location, combined_template % superkey))
+
+    save_dataframe(context.working_location, combined_key, pd.concat(combined_data), index=False)
+
 
 @flow(name="analyze-cell-shapes_fit-models")
 def run_flow_fit_models(
