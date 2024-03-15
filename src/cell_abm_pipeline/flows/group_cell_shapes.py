@@ -365,6 +365,9 @@ class ParametersConfigShapeContours:
     box: tuple[int, int, int] = field(default_factory=lambda: (1, 1, 1))
     """Size of projection bounding box."""
 
+    slice_index: Optional[int] = None
+    """Slice index along the shape projection axis."""
+
 
 @dataclass
 class ParametersConfigShapeErrors:
@@ -1055,6 +1058,7 @@ def run_flow_group_shape_contours(
     keys = [condition["key"] for condition in series.conditions]
 
     projection = parameters.projection
+    projection_index = list(reversed(PROJECTIONS)).index(projection)
 
     for key in keys:
         series_key = f"{series.name}_{key}_{parameters.seed:04d}"
@@ -1075,6 +1079,17 @@ def run_flow_group_shape_contours(
 
             for location in locations:
                 voxels = get_location_voxels(location, None if region == "DEFAULT" else region)
+
+                if parameters.slice_index is not None:
+                    voxels = [
+                        voxel
+                        for voxel in voxels
+                        if voxel[projection_index] == parameters.slice_index
+                    ]
+
+                if len(voxels) == 0:
+                    continue
+
                 contours = [
                     (np.array(contour) * ds).astype("int").tolist()
                     for contour in extract_voxel_contours(voxels, projection, box)
