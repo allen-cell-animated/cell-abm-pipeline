@@ -29,11 +29,18 @@ loaded into alternative tools.
 import ast
 from dataclasses import dataclass, field
 from datetime import timedelta
+from typing import Optional
 
 import numpy as np
 import pandas as pd
+from abm_shape_collection import extract_voxel_contours
+from arcade_collection.output import extract_tick_json, get_location_voxels
+from arcade_collection.output.convert_model_units import (
+    estimate_spatial_resolution,
+    estimate_temporal_resolution,
+)
 from io_collection.keys import make_key
-from io_collection.load import load_dataframe
+from io_collection.load import load_dataframe, load_tar
 from io_collection.save import save_dataframe, save_json
 from prefect import flow
 from prefect.tasks import task_input_hash
@@ -47,9 +54,16 @@ OPTIONS = {
 }
 
 GROUPS: list[str] = [
+    "colony_contours",
     "feature_distributions",
     "feature_temporal",
     "neighbor_positions",
+]
+
+PROJECTIONS: list[str] = [
+    "top",
+    "side1",
+    "side2",
 ]
 
 DISTRIBUTION_FEATURES: list[str] = [
@@ -90,6 +104,32 @@ BANDWIDTH: dict[str, float] = {
     "closeness_centrality": 0.05,
     "betweenness_centrality": 0.05,
 }
+
+
+@dataclass
+class ParametersConfigColonyContours:
+    """Parameter configuration for group colony dynamics subflow - colony contours."""
+
+    seed: int = 0
+    """Simulation random seed to use for grouping colony contours."""
+
+    time: int = 0
+    """Simulation time (in hours) to use for grouping colony contours."""
+
+    ds: Optional[float] = None
+    """Spatial scaling in units/um."""
+
+    dt: Optional[float] = None
+    """Temporal scaling in hours/tick."""
+
+    projection: str = "top"
+    """Selected colony projection."""
+
+    box: tuple[int, int, int] = field(default_factory=lambda: (1, 1, 1))
+    """Size of projection bounding box."""
+
+    slice_index: Optional[int] = None
+    """Slice index along the colony projection axis."""
 
 
 @dataclass
@@ -135,6 +175,9 @@ class ParametersConfig:
     groups: list[str] = field(default_factory=lambda: GROUPS)
     """List of colony dynamics groups."""
 
+    colony_contours: ParametersConfigColonyContours = ParametersConfigColonyContours()
+    """Parameters for group colony contours subflow."""
+
     feature_distributions: ParametersConfigFeatureDistributions = (
         ParametersConfigFeatureDistributions()
     )
@@ -173,10 +216,14 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     Calls the following subflows, if the group is specified:
 
+    - :py:func:`run_flow_group_colony_contours`
     - :py:func:`run_flow_group_feature_distributions`
     - :py:func:`run_flow_group_feature_temporal`
     - :py:func:`run_flow_group_neighbor_positions`
     """
+
+    if "colony_contours" in parameters.groups:
+        run_flow_group_colony_contours(context, series, parameters.colony_contours)
 
     if "feature_distributions" in parameters.groups:
         run_flow_group_feature_distributions(context, series, parameters.feature_distributions)
@@ -186,6 +233,56 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     if "neighbor_positions" in parameters.groups:
         run_flow_group_neighbor_positions(context, series, parameters.neighbor_positions)
+
+
+@flow(name="group-cell-shapes_group-colony-contours")
+def run_flow_group_colony_contours(
+    context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigColonyContours
+) -> None:
+    """Group colony dynamics subflow for colony contours."""
+
+    data_key = make_key(series.name, "data", "data.LOCATIONS")
+    group_key = make_key(series.name, "groups", "groups.COLONY_DYNAMICS")
+    keys = [condition["key"] for condition in series.conditions]
+
+    projection = parameters.projection
+    projection_index = list(reversed(PROJECTIONS)).index(projection)
+
+    for key in keys:
+        series_key = f"{series.name}_{key}_{parameters.seed:04d}"
+        tar_key = make_key(data_key, f"{series_key}.LOCATIONS.tar.xz")
+        tar = load_tar(context.working_location, tar_key)
+
+        ds = parameters.ds if parameters.ds is not None else estimate_spatial_resolution(key)
+        dt = parameters.dt if parameters.dt is not None else estimate_temporal_resolution(key)
+
+        tick = int(parameters.time / dt)
+        length, width, height = parameters.box
+        box = (int((length - 2) / ds) + 2, int((width - 2) / ds) + 2, int((height - 2) / ds) + 2)
+
+        locations = extract_tick_json(tar, series_key, tick, "LOCATIONS")
+
+        all_voxels = [voxel for location in locations for voxel in get_location_voxels(location)]
+
+        if parameters.slice_index is not None:
+            all_voxels = [
+                voxel for voxel in all_voxels if voxel[projection_index] == parameters.slice_index
+            ]
+
+        contours = [
+            (np.array(contour) * ds).astype("int").tolist()
+            for contour in extract_voxel_contours(all_voxels, projection, box)
+        ]
+
+        contour_key = f"{key}.{parameters.seed:04d}.{parameters.time:03d}"
+        save_json(
+            context.working_location,
+            make_key(
+                group_key,
+                f"{series.name}.colony_contours.{contour_key}.{projection.upper()}.json",
+            ),
+            contours,
+        )
 
 
 @flow(name="group-colony-dynamics_group-feature-distributions")
