@@ -64,7 +64,7 @@ from io_collection.load import load_dataframe, load_pickle, load_tar
 from io_collection.save import save_dataframe, save_json
 from prefect import flow, get_run_logger
 from prefect.tasks import task_input_hash
-from scipy.spatial import KDTree
+from scipy.spatial import ConvexHull, KDTree
 from scipy.stats import pearsonr
 from sklearn.decomposition import PCA
 
@@ -227,6 +227,12 @@ class ParametersConfigFeatureComponents:
 
     components: int = PCA_COMPONENTS
     """Number of principal components."""
+
+    reference_metrics: Optional[str] = None
+    """Full key for reference metrics data."""
+
+    reference_properties: Optional[str] = None
+    """Full key for reference properties data."""
 
 
 @dataclass
@@ -572,7 +578,9 @@ def run_flow_group_feature_components(
 
     # Fit model.
     pca_data = data[columns]
-    pca_data_zscore = (pca_data - pca_data.mean(axis=0)) / pca_data.std(axis=0)
+    pca_data_mean = pca_data.mean(axis=0)
+    pca_data_std = pca_data.std(axis=0)
+    pca_data_zscore = (pca_data - pca_data_mean) / pca_data_std
     pca = PCA(n_components=parameters.components)
     pca = pca.fit(pca_data_zscore)
     transform = pca.transform(pca_data_zscore)
@@ -590,6 +598,33 @@ def run_flow_group_feature_components(
         feature_components,
         index=False,
     )
+
+    # Get reference data convex hull.
+    if parameters.reference_metrics is not None and parameters.reference_properties is not None:
+        index_columns = ["KEY", "ID", "SEED", "TICK"]
+        reference_metrics = load_dataframe.with_options(**OPTIONS)(
+            context.working_location, parameters.reference_metrics
+        )
+        reference_properties = load_dataframe.with_options(**OPTIONS)(
+            context.working_location, parameters.reference_properties
+        )
+
+        reference_metrics.set_index(index_columns, inplace=True)
+        reference_properties.set_index(index_columns, inplace=True)
+
+        reference = reference_metrics.join(reference_properties, on=index_columns).reset_index()
+        reference_zscore = (reference[columns] - pca_data_mean) / pca_data_std
+        reference_transform = pca.transform(reference_zscore)
+
+        hull = ConvexHull(reference_transform)
+        points = pd.DataFrame(reference_transform[hull.vertices, :], columns=["x", "y"])
+
+        save_dataframe(
+            context.working_location,
+            make_key(group_key, f"{series.name}.feature_components.REFERENCE.csv"),
+            pd.DataFrame(points),
+            index=False,
+        )
 
 
 @flow(name="group-cell-shapes_group-feature-correlations")
