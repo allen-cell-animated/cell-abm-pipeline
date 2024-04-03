@@ -48,6 +48,9 @@ class ParametersConfig:
     dt: Optional[float] = None
     """Temporal scaling in hours/tick."""
 
+    full: bool = False
+    """True if all conditions should be combined into a single dataset, False otherwise."""
+
 
 @dataclass
 class ContextConfig:
@@ -100,12 +103,17 @@ def run_flow_process_results(
     results_path_key = make_key(series.name, "results")
     metrics_path_key = make_key(series.name, "analysis", "analysis.BASIC_METRICS")
 
-    keys = [condition["key"].split("_") for condition in series.conditions]
-    superkeys = {
-        superkey: ["_".join(k) for k in key_group]
-        for index in range(len(keys[0]))
-        for superkey, key_group in groupby(sorted(keys, key=lambda k: k[index]), lambda k: k[index])
-    }
+    if parameters.full:
+        superkeys = {"": [condition["key"] for condition in series.conditions]}
+    else:
+        keys = [condition["key"].split("_") for condition in series.conditions]
+        superkeys = {
+            superkey: ["_".join(k) for k in key_group]
+            for index in range(len(keys[0]))
+            for superkey, key_group in groupby(
+                sorted(keys, key=lambda k: k[index]), lambda k: k[index]
+            )
+        }
 
     for superkey, key_group in superkeys.items():
         logger.info("Processing results for superkey [ %s ]", superkey)
