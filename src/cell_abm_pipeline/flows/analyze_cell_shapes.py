@@ -107,9 +107,6 @@ class ParametersConfig:
     features: list[str] = field(default_factory=lambda: [])
     """List of features."""
 
-    full: bool = False
-    """True if all conditions should be combined into a single dataset, False otherwise."""
-
 
 @dataclass
 class ContextConfig:
@@ -149,13 +146,13 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 
     run_flow_process_properties(context, series, parameters)
 
-    # run_flow_process_coefficients(context, series, parameters)
+    run_flow_process_coefficients(context, series, parameters)
 
     run_flow_combine_data(context, series, parameters)
 
-    # run_flow_fit_models(context, series, parameters)
+    run_flow_fit_models(context, series, parameters)
 
-    # run_flow_analyze_stats(context, series, parameters)
+    run_flow_analyze_stats(context, series, parameters)
 
 
 @flow(name="analyze-cell-shapes_process-properties")
@@ -176,17 +173,12 @@ def run_flow_process_properties(
     props_path_key = make_key(series.name, "calculations", "calculations.PROPERTIES")
     analysis_path_key = make_key(series.name, "analysis", f"analysis.{tag}")
 
-    if parameters.full:
-        superkeys = {"": [condition["key"] for condition in series.conditions]}
-    else:
-        keys = [condition["key"].split("_") for condition in series.conditions]
-        superkeys = {
-            superkey: ["_".join(k) for k in key_group]
-            for index in range(len(keys[0]))
-            for superkey, key_group in groupby(
-                sorted(keys, key=lambda k: k[index]), lambda k: k[index]
-            )
-        }
+    keys = [condition["key"].split("_") for condition in series.conditions]
+    superkeys = {
+        superkey: ["_".join(k) for k in key_group]
+        for index in range(len(keys[0]))
+        for superkey, key_group in groupby(sorted(keys, key=lambda k: k[index]), lambda k: k[index])
+    }
 
     for superkey, key_group in superkeys.items():
         logger.info("Processing properties for superkey [ %s ]", superkey)
@@ -249,17 +241,12 @@ def run_flow_process_coefficients(
     coeffs_path_key = make_key(series.name, "calculations", "calculations.COEFFICIENTS")
     analysis_path_key = make_key(series.name, "analysis", f"analysis.{tag}")
 
-    if parameters.full:
-        superkeys = {"": [condition["key"] for condition in series.conditions]}
-    else:
-        keys = [condition["key"].split("_") for condition in series.conditions]
-        superkeys = {
-            superkey: ["_".join(k) for k in key_group]
-            for index in range(len(keys[0]))
-            for superkey, key_group in groupby(
-                sorted(keys, key=lambda k: k[index]), lambda k: k[index]
-            )
-        }
+    keys = [condition["key"].split("_") for condition in series.conditions]
+    superkeys = {
+        superkey: ["_".join(k) for k in key_group]
+        for index in range(len(keys[0]))
+        for superkey, key_group in groupby(sorted(keys, key=lambda k: k[index]), lambda k: k[index])
+    }
 
     for superkey, key_group in superkeys.items():
         logger.info("Processing coefficients for superkey [ %s ]", superkey)
@@ -324,11 +311,8 @@ def run_flow_combine_data(
     coeffs_path_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_COEFFICIENTS")
     analysis_path_key = make_key(series.name, "analysis", f"analysis.{tag}")
 
-    if parameters.full:
-        superkeys = [""]
-    else:
-        keys = [condition["key"] for condition in series.conditions]
-        superkeys = {key_group for key in keys for key_group in key.split("_")}
+    keys = [condition["key"] for condition in series.conditions]
+    superkeys = {key_group for key in keys for key_group in key.split("_")}
 
     for superkey in superkeys:
         logger.info("Combining data for superkey [ %s ]", superkey)
@@ -423,11 +407,8 @@ def run_flow_fit_models(
     data_path_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_DATA")
     model_path_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_MODELS")
 
-    if parameters.full:
-        superkeys = [""]
-    else:
-        keys = [condition["key"] for condition in series.conditions]
-        superkeys = {key_group for key in keys for key_group in key.split("_")}
+    keys = [condition["key"] for condition in series.conditions]
+    superkeys = {key_group for key in keys for key_group in key.split("_")}
 
     for superkey in superkeys:
         logger.info("Fitting models for superkey [ %s ]", superkey)
@@ -477,11 +458,8 @@ def run_flow_analyze_stats(
     data_path_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_DATA")
     stats_path_key = make_key(series.name, "analysis", "analysis.CELL_SHAPES_STATISTICS")
 
-    if parameters.full:
-        superkeys = [""]
-    else:
-        keys = [condition["key"] for condition in series.conditions]
-        superkeys = {key_group for key in keys for key_group in key.split("_")}
+    keys = [condition["key"] for condition in series.conditions]
+    superkeys = {key_group for key in keys for key_group in key.split("_")}
 
     if parameters.reference is None:
         return
