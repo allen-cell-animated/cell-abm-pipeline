@@ -5,7 +5,9 @@ from prefect import task
 
 
 @task
-def calculate_category_durations(data: pd.DataFrame, category: str, key: str) -> list[float]:
+def calculate_category_durations(
+    data: pd.DataFrame, category: str, key: str, threshold: float = 0
+) -> list[float]:
     durations: list[float] = []
 
     end = data["time"].max()
@@ -13,11 +15,15 @@ def calculate_category_durations(data: pd.DataFrame, category: str, key: str) ->
 
     for _, group in key_data.groupby(["SEED", "ID"]):
         group.sort_values("time", inplace=True)
-        items = [list(g) for _, g in groupby(enumerate(group["time"]), lambda x: x[0] - x[1])]
+        items = [
+            list(grouping)
+            for valid, grouping in groupby(
+                zip(group["time"], group["time"][1:]), lambda x: x[1] - x[0] < threshold
+            )
+            if valid
+        ]
         durations = durations + [
-            group.iloc[item[-1][0]]["time"] - group.iloc[item[0][0]]["time"]
-            for item in items
-            if item[-1][1] != end
+            item[-1][1] - item[0][0] for item in items if item[0][0] != 0 and item[-1][1] != end
         ]
 
     return durations

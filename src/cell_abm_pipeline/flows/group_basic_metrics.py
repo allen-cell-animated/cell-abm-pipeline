@@ -112,7 +112,7 @@ BOUNDS: dict[str, list] = {
     "height.NUCLEUS": [0, 21],
     "phase.PROLIFERATIVE_G1": [0, 5],
     "phase.PROLIFERATIVE_S": [0, 20],
-    "phase.PROLIFERATIVE_G2": [0, 18],
+    "phase.PROLIFERATIVE_G2": [0, 40],
     "phase.PROLIFERATIVE_M": [0, 2],
     "phase.APOPTOTIC_EARLY": [0, 6],
     "phase.APOPTOTIC_LATE": [0, 12],
@@ -123,12 +123,12 @@ BANDWIDTH: dict[str, float] = {
     "volume.NUCLEUS": 50,
     "height.DEFAULT": 1,
     "height.NUCLEUS": 1,
-    "phase.PROLIFERATIVE_G1": 0.5,
-    "phase.PROLIFERATIVE_S": 0.5,
-    "phase.PROLIFERATIVE_G2": 0.5,
+    "phase.PROLIFERATIVE_G1": 0.25,
+    "phase.PROLIFERATIVE_S": 0.25,
+    "phase.PROLIFERATIVE_G2": 0.25,
     "phase.PROLIFERATIVE_M": 0.25,
     "phase.APOPTOTIC_EARLY": 0.25,
-    "phase.APOPTOTIC_LATE": 0.5,
+    "phase.APOPTOTIC_LATE": 0.25,
 }
 
 
@@ -170,6 +170,9 @@ class ParametersConfigMetricsDistributions:
 
     bandwidth: dict[str, float] = field(default_factory=lambda: BANDWIDTH)
     """Bandwidths for metric distributions."""
+
+    threshold: float = 0.2
+    """Threshold for separating phase durations (in hours)."""
 
 
 @dataclass
@@ -409,7 +412,9 @@ def run_flow_group_metrics_distributions(
         for metric in metrics:
             if "phase" in metric:
                 phase = metric.split(".")[1]
-                values = np.array(calculate_category_durations(metrics_df, "PHASE", phase))
+                values = np.array(
+                    calculate_category_durations(metrics_df, "PHASE", phase, parameters.threshold)
+                )
             else:
                 column = metric.replace(".DEFAULT", "")
                 values = metrics_df[column].values
