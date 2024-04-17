@@ -110,6 +110,9 @@ BANDWIDTH: dict[str, float] = {
 class ParametersConfigColonyContours:
     """Parameter configuration for group colony dynamics subflow - colony contours."""
 
+    regions: list[Optional[str]] = field(default_factory=lambda: ["DEFAULT"])
+    """List of subcellular regions."""
+
     seed: int = 0
     """Simulation random seed to use for grouping colony contours."""
 
@@ -262,27 +265,34 @@ def run_flow_group_colony_contours(
 
         locations = extract_tick_json(tar, series_key, tick, "LOCATIONS")
 
-        all_voxels = [voxel for location in locations for voxel in get_location_voxels(location)]
-
-        if parameters.slice_index is not None:
+        for region in parameters.regions:
             all_voxels = [
-                voxel for voxel in all_voxels if voxel[projection_index] == parameters.slice_index
+                voxel
+                for location in locations
+                for voxel in get_location_voxels(location, None if region == "DEFAULT" else region)
             ]
 
-        contours = [
-            (np.array(contour) * ds).astype("int").tolist()
-            for contour in extract_voxel_contours(all_voxels, projection, box)
-        ]
+            if parameters.slice_index is not None:
+                all_voxels = [
+                    voxel
+                    for voxel in all_voxels
+                    if voxel[projection_index] == parameters.slice_index
+                ]
 
-        contour_key = f"{key}.{parameters.seed:04d}.{parameters.time:03d}"
-        save_json(
-            context.working_location,
-            make_key(
-                group_key,
-                f"{series.name}.colony_contours.{contour_key}.{projection.upper()}.json",
-            ),
-            contours,
-        )
+            contours = [
+                (np.array(contour) * ds).astype("int").tolist()
+                for contour in extract_voxel_contours(all_voxels, projection, box)
+            ]
+
+            contour_key = f"{key}.{parameters.seed:04d}.{parameters.time:03d}.{region}"
+            save_json(
+                context.working_location,
+                make_key(
+                    group_key,
+                    f"{series.name}.colony_contours.{contour_key}.{projection.upper()}.json",
+                ),
+                contours,
+            )
 
 
 @flow(name="group-colony-dynamics_group-feature-distributions")
