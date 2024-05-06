@@ -158,37 +158,7 @@
   <p class="caption" role="heading"><span class="caption-text">API reference</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="cell_abm_pipeline.flows.html">flows</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of flows</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.analyze_cell_shapes.html">analyze_cell_shapes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.analyze_colony_dynamics.html">analyze_colony_dynamics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.calculate_coefficients.html">calculate_coefficients</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.calculate_neighbors.html">calculate_neighbors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.calculate_positions.html">calculate_positions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.calculate_properties.html">calculate_properties</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.convert_arcade_format.html">convert_arcade_format</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.convert_physicell_format.html">convert_physicell_format</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.demo.html">demo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.download_images.html">download_images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.generate_voronoi_tessellation.html">generate_voronoi_tessellation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.group_basic_metrics.html">group_basic_metrics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.group_cell_shapes.html">group_cell_shapes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.group_colony_dynamics.html">group_colony_dynamics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.group_resource_usage.html">group_resource_usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.initialize_arcade_simulations.html">initialize_arcade_simulations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.initialize_physicell_simulations.html">initialize_physicell_simulations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.make_simulation_movies.html">make_simulation_movies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.organize_analysis_files.html">organize_analysis_files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.parse_arcade_simulations.html">parse_arcade_simulations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.parse_physicell_simulations.html">parse_physicell_simulations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.plot_basic_metrics.html">plot_basic_metrics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.plot_cell_shapes.html">plot_cell_shapes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.plot_colony_dynamics.html">plot_colony_dynamics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.plot_resource_usage.html">plot_resource_usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.process_sample.html">process_sample</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.run_batch_simulations.html">run_batch_simulations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.run_docker_simulations.html">run_docker_simulations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.run_fargate_calculations.html">run_fargate_calculations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.sample_image.html">sample_image</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cell_abm_pipeline.flows.summarize_manifest.html">summarize_manifest</a></li>
 </ul>
 </li>
 </ul>
@@ -255,7 +225,7 @@
 <span id="check-data-bounds"></span><h1>check_data_bounds<a class="headerlink" href="#module-cell_abm_pipeline.tasks.check_data_bounds" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="cell_abm_pipeline.tasks.check_data_bounds.check_data_bounds">
-<span class="sig-name descname"><span class="pre">check_data_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/tasks/check_data_bounds.html#check_data_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.tasks.check_data_bounds.check_data_bounds" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">check_data_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/tasks/check_data_bounds.html#check_data_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.tasks.check_data_bounds.check_data_bounds" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </section>

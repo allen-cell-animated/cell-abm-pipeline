@@ -158,37 +158,7 @@
   <p class="caption" role="heading"><span class="caption-text">API reference</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.html">flows</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of flows</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.analyze_cell_shapes.html">analyze_cell_shapes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.analyze_colony_dynamics.html">analyze_colony_dynamics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.calculate_coefficients.html">calculate_coefficients</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.calculate_neighbors.html">calculate_neighbors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.calculate_positions.html">calculate_positions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.calculate_properties.html">calculate_properties</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.convert_arcade_format.html">convert_arcade_format</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.convert_physicell_format.html">convert_physicell_format</a></li>
 <li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.demo.html">demo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.download_images.html">download_images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.generate_voronoi_tessellation.html">generate_voronoi_tessellation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.group_basic_metrics.html">group_basic_metrics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.group_cell_shapes.html">group_cell_shapes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.group_colony_dynamics.html">group_colony_dynamics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.group_resource_usage.html">group_resource_usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.initialize_arcade_simulations.html">initialize_arcade_simulations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html">initialize_physicell_simulations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.make_simulation_movies.html">make_simulation_movies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.organize_analysis_files.html">organize_analysis_files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html">parse_arcade_simulations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.parse_physicell_simulations.html">parse_physicell_simulations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.plot_basic_metrics.html">plot_basic_metrics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.plot_cell_shapes.html">plot_cell_shapes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.plot_colony_dynamics.html">plot_colony_dynamics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.plot_resource_usage.html">plot_resource_usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.process_sample.html">process_sample</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.run_batch_simulations.html">run_batch_simulations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.run_docker_simulations.html">run_docker_simulations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.run_fargate_calculations.html">run_fargate_calculations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.sample_image.html">sample_image</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_summary/cell_abm_pipeline.flows.summarize_manifest.html">summarize_manifest</a></li>
 </ul>
 </li>
 </ul>
@@ -295,19 +265,43 @@ Install dependencies directly from this file using:</p>
 </section>
 <section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">#</a></h2>
-<p>The pipeline uses <a class="reference external" href="https://docs.prefect.io/">Prefect</a> for workflows and <a class="reference external" href="https://hydra.cc/docs/intro/">Hydra</a> for composable configuration.</p>
-<p>Run the demo workflow using:</p>
+<p>The pipeline uses <a class="reference external" href="https://docs.prefect.io/">Prefect</a> for workflows and <a class="reference external" href="https://hydra.cc/docs/intro/">Hydra</a> for composable configuration.
+Workflows can be run via CLI or through the Prefect UI as deployments.</p>
+<p>When running via CLI, configurations can be passed in three ways: inline, using a single config file, or using composable config files.
+Note that Hydra supports additional overriding configurations via CLI for all three options.</p>
+<section id="run-with-inline-configs">
+<h3>Run with inline configs<a class="headerlink" href="#run-with-inline-configs" title="Permalink to this heading">#</a></h3>
+<p>Configurations can be passed directly using:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>abmpipe<span class="w"> </span>demo<span class="w"> </span>::<span class="w"> </span>parameters.name<span class="o">=</span>demo_parameters<span class="w"> </span>context.name<span class="o">=</span>demo_context<span class="w"> </span>series.name<span class="o">=</span>demo_series
 </pre></div>
 </div>
-<p>To use config files, create a <code class="docutils literal notranslate"><span class="pre">configs</span></code> directory with the following structure:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>configs
-├── context
-│   └── demo.yaml
-├── parameters
-│   └── demo.yaml
-└── series
-    └── demo.yaml
+</section>
+<section id="run-using-single-config-file">
+<h3>Run using single config file<a class="headerlink" href="#run-using-single-config-file" title="Permalink to this heading">#</a></h3>
+<p>Create a config file <code class="docutils literal notranslate"><span class="pre">demo.yaml</span></code> with the following contents:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">context</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">demo_context</span>
+<span class="nt">series</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">demo_series</span>
+<span class="nt">parameters</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">demo_parameters</span>
+</pre></div>
+</div>
+<p>Then use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>abmpipe<span class="w"> </span>demo<span class="w"> </span>/path/to/demo.yaml
+</pre></div>
+</div>
+</section>
+<section id="run-using-composable-config-files">
+<h3>Run using composable config files<a class="headerlink" href="#run-using-composable-config-files" title="Permalink to this heading">#</a></h3>
+<p>Create a <code class="docutils literal notranslate"><span class="pre">configs</span></code> directory with the following structure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>configs
+├──<span class="w"> </span>context
+│<span class="w">   </span>└──<span class="w"> </span>demo.yaml
+├──<span class="w"> </span>parameters
+│<span class="w">   </span>└──<span class="w"> </span>demo.yaml
+└──<span class="w"> </span>series
+<span class="w">    </span>└──<span class="w"> </span>demo.yaml
 </pre></div>
 </div>
 <p>Each <code class="docutils literal notranslate"><span class="pre">demo.yaml</span></code> should contain the field <code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">&lt;name&gt;</span></code>.
@@ -315,8 +309,12 @@ Then use:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>abmpipe<span class="w"> </span>demo<span class="w"> </span><span class="nv">parameters</span><span class="o">=</span>demo<span class="w"> </span><span class="nv">context</span><span class="o">=</span>demo<span class="w"> </span><span class="nv">series</span><span class="o">=</span>demo
 </pre></div>
 </div>
+</section>
+<section id="additional-flags">
+<h3>Additional flags<a class="headerlink" href="#additional-flags" title="Permalink to this heading">#</a></h3>
 <p>Use the flag <code class="docutils literal notranslate"><span class="pre">--dryrun</span></code> to display the composed configuration without running the workflow.</p>
 <p>Use the flag <code class="docutils literal notranslate"><span class="pre">--deploy</span></code> to create a Prefect deployment.</p>
+</section>
 <section id="adding-secrets">
 <h3>Adding secrets<a class="headerlink" href="#adding-secrets" title="Permalink to this heading">#</a></h3>
 <p>Configs can use <a class="reference external" href="https://docs.prefect.io/concepts/blocks/?h=secret#secret-fields">Secret</a> fields.
@@ -505,6 +503,10 @@ Fields in object initialization can also be loaded using <code class="docutils l
 </ul>
 </li>
 <li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#run-with-inline-configs">Run with inline configs</a></li>
+<li><a class="reference internal" href="#run-using-single-config-file">Run using single config file</a></li>
+<li><a class="reference internal" href="#run-using-composable-config-files">Run using composable config files</a></li>
+<li><a class="reference internal" href="#additional-flags">Additional flags</a></li>
 <li><a class="reference internal" href="#adding-secrets">Adding secrets</a></li>
 </ul>
 </li>

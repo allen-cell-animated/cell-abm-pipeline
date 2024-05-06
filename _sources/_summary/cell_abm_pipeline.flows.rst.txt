@@ -31,9 +31,11 @@
    :template: custom_flow_module.rst
    :recursive:
 
+   analyze_basic_metrics
    analyze_cell_shapes
    analyze_colony_dynamics
    calculate_coefficients
+   calculate_image_properties
    calculate_neighbors
    calculate_positions
    calculate_properties
@@ -49,7 +51,7 @@
    initialize_arcade_simulations
    initialize_physicell_simulations
    make_simulation_movies
-   organize_analysis_files
+   organize_calculation_files
    parse_arcade_simulations
    parse_physicell_simulations
    plot_basic_metrics
