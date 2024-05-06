@@ -93,7 +93,7 @@ def make_config_from_yaml(module: ModuleType, args: list[str]) -> DictConfig:
     return config
 
 
-def make_config_from_file(module: ModuleType, file: str) -> Union[ListConfig, DictConfig]:
+def make_config_from_file(module: ModuleType, file: str) -> DictConfig:
     contents = OmegaConf.load(file)
 
     context_config = load_config(module.ContextConfig, contents.context)
