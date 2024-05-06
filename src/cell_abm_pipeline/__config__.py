@@ -93,9 +93,34 @@ def make_config_from_yaml(module: ModuleType, args: list[str]) -> DictConfig:
     return config
 
 
-def make_config_from_file(schema: Any, file: str) -> Union[ListConfig, DictConfig]:
-    config = OmegaConf.load(file)
+def make_config_from_file(module: ModuleType, file: str) -> Union[ListConfig, DictConfig]:
+    contents = OmegaConf.load(file)
 
+    context_config = load_config(module.ContextConfig, contents.context)
+    series_config = load_config(module.SeriesConfig, contents.series)
+    parameters_config = load_config(module.ParametersConfig, contents.parameters)
+
+    config = OmegaConf.create(
+        {
+            "context": context_config,
+            "series": series_config,
+            "parameters": parameters_config,
+        }
+    )
+
+    return config
+
+
+def generate_config(config_class: Any, group: str, args: list[str]) -> DictConfig:
+    dotlist = [arg.replace(group, "", 1).strip(".") for arg in args if arg.startswith(group)]
+    config = OmegaConf.structured(config_class)
+    config.merge_with_dotlist(dotlist)
+    return config
+
+
+def load_config(
+    schema: Any, config: Union[ListConfig, DictConfig]
+) -> Union[ListConfig, DictConfig]:
     config_keys = list(config.keys())
     schema_fields = [field.name for field in fields(schema)]
 
@@ -104,13 +129,6 @@ def make_config_from_file(schema: Any, file: str) -> Union[ListConfig, DictConfi
             del config[key]
 
     return OmegaConf.merge(schema, config)
-
-
-def generate_config(config_class: Any, group: str, args: list[str]) -> DictConfig:
-    dotlist = [arg.replace(group, "", 1).strip(".") for arg in args if arg.startswith(group)]
-    config = OmegaConf.structured(config_class)
-    config.merge_with_dotlist(dotlist)
-    return config
 
 
 def display_config(config: DictConfig) -> None:

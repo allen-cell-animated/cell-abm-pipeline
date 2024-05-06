@@ -43,16 +43,43 @@ pip install -e .
 ## Usage
 
 The pipeline uses [Prefect](https://docs.prefect.io/) for workflows and [Hydra](https://hydra.cc/docs/intro/) for composable configuration.
+Workflows can be run via CLI or through the Prefect UI as deployments.
 
-Run the demo workflow using:
+When running via CLI, configurations can be passed in three ways: inline, using a single config file, or using composable config files.
+Note that Hydra supports additional overriding configurations via CLI for all three options.
+
+### Run with inline configs
+
+Configurations can be passed directly using:
 
 ```bash
 abmpipe demo :: parameters.name=demo_parameters context.name=demo_context series.name=demo_series
 ```
 
-To use config files, create a `configs` directory with the following structure:
+### Run using single config file
 
+Create a config file `demo.yaml` with the following contents:
+
+```yaml
+context:
+  name: demo_context
+series:
+  name: demo_series
+parameters:
+  name: demo_parameters
 ```
+
+Then use:
+
+```bash
+abmpipe demo /path/to/demo.yaml
+```
+
+### Run using composable config files
+
+Create a `configs` directory with the following structure:
+
+```bash
 configs
 ├── context
 │   └── demo.yaml
@@ -68,6 +95,8 @@ Then use:
 ```bash
 abmpipe demo parameters=demo context=demo series=demo
 ```
+
+### Additional flags
 
 Use the flag `--dryrun` to display the composed configuration without running the workflow.
 

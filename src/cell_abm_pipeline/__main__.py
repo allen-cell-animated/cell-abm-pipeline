@@ -13,6 +13,7 @@ from prefect.deployments import Deployment
 from cell_abm_pipeline.__config__ import (
     display_config,
     make_config_from_dotlist,
+    make_config_from_file,
     make_config_from_yaml,
 )
 
@@ -47,6 +48,8 @@ def main() -> None:
 
     if len(sys.argv) > 2 and sys.argv[2] == "::":
         config = make_config_from_dotlist(module, sys.argv[3:])
+    elif len(sys.argv) == 3:
+        config = make_config_from_file(module, sys.argv[2])
     else:
         config = make_config_from_yaml(module, sys.argv[2:])
 
