@@ -62,10 +62,10 @@
         <p class="text">
             <a id="prevFileLink" class="nav" href="d_225eb92fe287c98e_analyze_colony_dynamics_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a id="nextFileLink" class="nav" href="d_225eb92fe287c98e_calculate_neighbors_py.html">&#xbb; next</a>
+            <a id="nextFileLink" class="nav" href="d_225eb92fe287c98e_calculate_image_properties_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
-            created at 2024-01-09 21:02 +0000
+            created at 2024-05-06 18:34 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -139,7 +139,7 @@
     <p class="pln"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">    <span class="str">"""Main calculate coefficients flow."""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">    <span class="nam">data_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"data"</span><span class="op">,</span> <span class="str">"data.LOCATIONS"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">    <span class="nam">analysis_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"analysis"</span><span class="op">,</span> <span class="str">"analysis.COEFFICIENTS"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">    <span class="nam">calc_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"calculations"</span><span class="op">,</span> <span class="str">"calculations.COEFFICIENTS"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t">    <span class="nam">series_key</span> <span class="op">=</span> <span class="str">f"{series.name}_{parameters.key}_{parameters.seed:04d}"</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">    <span class="nam">locations_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">data_key</span><span class="op">,</span> <span class="str">f"{series_key}.LOCATIONS.tar.xz"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -195,20 +195,18 @@
     <p class="mis show_mis"><span class="n"><a id="t113" href="#t113">113</a></span><span class="t">    <span class="nam">region_key</span> <span class="op">=</span> <span class="str">f"_{parameters.region}"</span> <span class="key">if</span> <span class="nam">parameters</span><span class="op">.</span><span class="nam">region</span> <span class="key">is</span> <span class="key">not</span> <span class="key">None</span> <span class="key">else</span> <span class="str">""</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t114" href="#t114">114</a></span><span class="t">    <span class="nam">suffix</span> <span class="op">=</span> <span class="str">f"{region_key}{offset_key}{chunk_key}"</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t115" href="#t115">115</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t116" href="#t116">116</a></span><span class="t">    <span class="nam">coeffs_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t117" href="#t117">117</a></span><span class="t">        <span class="nam">analysis_key</span><span class="op">,</span> <span class="str">f"{series_key}_{parameters.tick:06d}{suffix}.COEFFICIENTS.csv"</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t118" href="#t118">118</a></span><span class="t">    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t119" href="#t119">119</a></span><span class="t">    <span class="nam">save_dataframe</span><span class="op">(</span><span class="nam">context</span><span class="op">.</span><span class="nam">working_location</span><span class="op">,</span> <span class="nam">coeffs_key</span><span class="op">,</span> <span class="nam">coeffs_dataframe</span><span class="op">,</span> <span class="nam">index</span><span class="op">=</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t116" href="#t116">116</a></span><span class="t">    <span class="nam">coeffs_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">calc_key</span><span class="op">,</span> <span class="str">f"{series_key}_{parameters.tick:06d}{suffix}.COEFFICIENTS.csv"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t117" href="#t117">117</a></span><span class="t">    <span class="nam">save_dataframe</span><span class="op">(</span><span class="nam">context</span><span class="op">.</span><span class="nam">working_location</span><span class="op">,</span> <span class="nam">coeffs_key</span><span class="op">,</span> <span class="nam">coeffs_dataframe</span><span class="op">,</span> <span class="nam">index</span><span class="op">=</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
         <p>
             <a id="prevFileLink" class="nav" href="d_225eb92fe287c98e_analyze_colony_dynamics_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a id="nextFileLink" class="nav" href="d_225eb92fe287c98e_calculate_neighbors_py.html">&#xbb; next</a>
+            <a id="nextFileLink" class="nav" href="d_225eb92fe287c98e_calculate_image_properties_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
-            created at 2024-01-09 21:02 +0000
+            created at 2024-05-06 18:34 +0000
         </p>
     </div>
 </footer>

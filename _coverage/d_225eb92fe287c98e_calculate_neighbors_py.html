@@ -60,12 +60,12 @@
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
-            <a id="prevFileLink" class="nav" href="d_225eb92fe287c98e_calculate_coefficients_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="d_225eb92fe287c98e_calculate_image_properties_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_225eb92fe287c98e_calculate_positions_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
-            created at 2024-01-09 21:02 +0000
+            created at 2024-05-06 18:34 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -125,7 +125,7 @@
     <p class="pln"><span class="n"><a id="t43" href="#t43">43</a></span><span class="t">    <span class="str">"""Main calculate neighbors flow."""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t44" href="#t44">44</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t45" href="#t45">45</a></span><span class="t">    <span class="nam">data_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"data"</span><span class="op">,</span> <span class="str">"data.LOCATIONS"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t46" href="#t46">46</a></span><span class="t">    <span class="nam">analysis_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"analysis"</span><span class="op">,</span> <span class="str">"analysis.NEIGHBORS"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t46" href="#t46">46</a></span><span class="t">    <span class="nam">calc_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"calculations"</span><span class="op">,</span> <span class="str">"calculations.NEIGHBORS"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t47" href="#t47">47</a></span><span class="t">    <span class="nam">series_key</span> <span class="op">=</span> <span class="str">f"{series.name}_{parameters.key}_{parameters.seed:04d}"</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t48" href="#t48">48</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t">    <span class="nam">locations_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">data_key</span><span class="op">,</span> <span class="str">f"{series_key}.LOCATIONS.tar.xz"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -155,18 +155,18 @@
     <p class="mis show_mis"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t">        <span class="nam">all_neighbors</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">voxel_neighbors</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t75" href="#t75">75</a></span><span class="t">    <span class="nam">neighbors_dataframe</span> <span class="op">=</span> <span class="nam">pd</span><span class="op">.</span><span class="nam">DataFrame</span><span class="op">(</span><span class="nam">all_neighbors</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t">    <span class="nam">neighbors_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">analysis_key</span><span class="op">,</span> <span class="str">f"{series_key}_{parameters.tick:06d}.NEIGHBORS.csv"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t">    <span class="nam">neighbors_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">calc_key</span><span class="op">,</span> <span class="str">f"{series_key}_{parameters.tick:06d}.NEIGHBORS.csv"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t77" href="#t77">77</a></span><span class="t">    <span class="nam">save_dataframe</span><span class="op">(</span><span class="nam">context</span><span class="op">.</span><span class="nam">working_location</span><span class="op">,</span> <span class="nam">neighbors_key</span><span class="op">,</span> <span class="nam">neighbors_dataframe</span><span class="op">,</span> <span class="nam">index</span><span class="op">=</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
         <p>
-            <a id="prevFileLink" class="nav" href="d_225eb92fe287c98e_calculate_coefficients_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="d_225eb92fe287c98e_calculate_image_properties_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_225eb92fe287c98e_calculate_positions_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
-            created at 2024-01-09 21:02 +0000
+            created at 2024-05-06 18:34 +0000
         </p>
     </div>
 </footer>

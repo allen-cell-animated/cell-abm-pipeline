@@ -54,18 +54,18 @@
             </div>
         </aside>
         <h2>
-            <span class="text">33 statements &nbsp;</span>
+            <span class="text">35 statements &nbsp;</span>
             <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">0<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">33<span class="text"> missing</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">35<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
-            <a id="prevFileLink" class="nav" href="d_225eb92fe287c98e_organize_analysis_files_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="d_225eb92fe287c98e_organize_calculation_files_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_225eb92fe287c98e_parse_physicell_simulations_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
-            created at 2024-01-09 21:02 +0000
+            created at 2024-05-06 18:34 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -88,7 +88,7 @@
     <p class="pln"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">from</span> <span class="nam">arcade_collection</span><span class="op">.</span><span class="nam">output</span> <span class="key">import</span> <span class="nam">merge_parsed_results</span><span class="op">,</span> <span class="nam">parse_cells_file</span><span class="op">,</span> <span class="nam">parse_locations_file</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="key">from</span> <span class="nam">container_collection</span><span class="op">.</span><span class="nam">manifest</span> <span class="key">import</span> <span class="nam">filter_manifest_files</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">from</span> <span class="nam">io_collection</span><span class="op">.</span><span class="nam">keys</span> <span class="key">import</span> <span class="nam">make_key</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">from</span> <span class="nam">io_collection</span><span class="op">.</span><span class="nam">keys</span> <span class="key">import</span> <span class="nam">check_key</span><span class="op">,</span> <span class="nam">make_key</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">io_collection</span><span class="op">.</span><span class="nam">load</span> <span class="key">import</span> <span class="nam">load_dataframe</span><span class="op">,</span> <span class="nam">load_tar</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="key">from</span> <span class="nam">io_collection</span><span class="op">.</span><span class="nam">save</span> <span class="key">import</span> <span class="nam">save_dataframe</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="key">from</span> <span class="nam">prefect</span> <span class="key">import</span> <span class="nam">flow</span>&nbsp;</span><span class="r"></span></p>
@@ -135,25 +135,29 @@
     <p class="pln"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">    <span class="key">for</span> <span class="nam">key</span><span class="op">,</span> <span class="nam">files</span> <span class="key">in</span> <span class="nam">filtered_files</span><span class="op">.</span><span class="nam">items</span><span class="op">(</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">        <span class="nam">cells_tar</span> <span class="op">=</span> <span class="nam">load_tar</span><span class="op">(</span><span class="op">**</span><span class="nam">files</span><span class="op">[</span><span class="str">"CELLS.tar.xz"</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">        <span class="nam">cells</span> <span class="op">=</span> <span class="nam">parse_cells_file</span><span class="op">(</span><span class="nam">cells_tar</span><span class="op">,</span> <span class="nam">parameters</span><span class="op">.</span><span class="nam">regions</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">        <span class="nam">locs_tar</span> <span class="op">=</span> <span class="nam">load_tar</span><span class="op">(</span><span class="op">**</span><span class="nam">files</span><span class="op">[</span><span class="str">"LOCATIONS.tar.xz"</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">        <span class="nam">locs</span> <span class="op">=</span> <span class="nam">parse_locations_file</span><span class="op">(</span><span class="nam">locs_tar</span><span class="op">,</span> <span class="nam">parameters</span><span class="op">.</span><span class="nam">regions</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">        <span class="nam">results</span> <span class="op">=</span> <span class="nam">merge_parsed_results</span><span class="op">(</span><span class="nam">cells</span><span class="op">,</span> <span class="nam">locs</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">        <span class="nam">results_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"{{timestamp}}"</span><span class="op">,</span> <span class="str">"results"</span><span class="op">,</span> <span class="str">f"{key}.csv"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">        <span class="nam">save_dataframe</span><span class="op">(</span><span class="nam">context</span><span class="op">.</span><span class="nam">working_location</span><span class="op">,</span> <span class="nam">results_key</span><span class="op">,</span> <span class="nam">results</span><span class="op">,</span> <span class="nam">index</span><span class="op">=</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">        <span class="nam">results_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"{{timestamp}}"</span><span class="op">,</span> <span class="str">"results"</span><span class="op">,</span> <span class="str">f"{key}.csv"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">        <span class="key">if</span> <span class="nam">check_key</span><span class="op">(</span><span class="nam">context</span><span class="op">.</span><span class="nam">working_location</span><span class="op">,</span> <span class="nam">results_key</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">            <span class="key">continue</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t">        <span class="nam">cells_tar</span> <span class="op">=</span> <span class="nam">load_tar</span><span class="op">(</span><span class="op">**</span><span class="nam">files</span><span class="op">[</span><span class="str">"CELLS.tar.xz"</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">        <span class="nam">cells</span> <span class="op">=</span> <span class="nam">parse_cells_file</span><span class="op">(</span><span class="nam">cells_tar</span><span class="op">,</span> <span class="nam">parameters</span><span class="op">.</span><span class="nam">regions</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">        <span class="nam">locs_tar</span> <span class="op">=</span> <span class="nam">load_tar</span><span class="op">(</span><span class="op">**</span><span class="nam">files</span><span class="op">[</span><span class="str">"LOCATIONS.tar.xz"</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t">        <span class="nam">locs</span> <span class="op">=</span> <span class="nam">parse_locations_file</span><span class="op">(</span><span class="nam">locs_tar</span><span class="op">,</span> <span class="nam">parameters</span><span class="op">.</span><span class="nam">regions</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t66" href="#t66">66</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t67" href="#t67">67</a></span><span class="t">        <span class="nam">results</span> <span class="op">=</span> <span class="nam">merge_parsed_results</span><span class="op">(</span><span class="nam">cells</span><span class="op">,</span> <span class="nam">locs</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t68" href="#t68">68</a></span><span class="t">        <span class="nam">save_dataframe</span><span class="op">(</span><span class="nam">context</span><span class="op">.</span><span class="nam">working_location</span><span class="op">,</span> <span class="nam">results_key</span><span class="op">,</span> <span class="nam">results</span><span class="op">,</span> <span class="nam">index</span><span class="op">=</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
         <p>
-            <a id="prevFileLink" class="nav" href="d_225eb92fe287c98e_organize_analysis_files_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="d_225eb92fe287c98e_organize_calculation_files_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_225eb92fe287c98e_parse_physicell_simulations_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
-            created at 2024-01-09 21:02 +0000
+            created at 2024-05-06 18:34 +0000
         </p>
     </div>
 </footer>

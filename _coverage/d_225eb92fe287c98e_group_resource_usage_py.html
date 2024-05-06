@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_225eb92fe287c98e_initialize_arcade_simulations_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
-            created at 2024-01-09 21:02 +0000
+            created at 2024-05-06 18:34 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -92,14 +92,14 @@
     <p class="pln"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="str">    &#9474;   &#9492;&#9472;&#9472; data.(category)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="str">    &#9474;       &#9492;&#9472;&#9472; (name)_(key)_(seed).(category).tar.xz</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="str">    &#9500;&#9472;&#9472; groups</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="str">    &#9474;   &#9492;&#9472;&#9472; groups.RESOURCES</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="str">    &#9474;   &#9492;&#9472;&#9472; groups.RESOURCE_USAGE</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="str">    &#9474;       &#9500;&#9472;&#9472; (name).object_storage.csv</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="str">    &#9474;       &#9492;&#9472;&#9472; (name).wall_clock.csv</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="str">    &#9492;&#9472;&#9472; logs</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="str">        &#9492;&#9472;&#9472; (job_id).log</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t"><span class="str">Different groups use inputs from the **data** and **logs** directories.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t"><span class="str">Grouped data is saved to the **groups/groups.RESOURCES** directory.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t"><span class="str">Grouped data is saved to the **groups/groups.RESOURCE_USAGE** directory.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t"><span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t"><span class="key">import</span> <span class="nam">os</span>&nbsp;</span><span class="r"></span></p>
@@ -207,7 +207,7 @@
     <p class="pln"><span class="n"><a id="t125" href="#t125">125</a></span><span class="t"><span class="op">)</span> <span class="op">-></span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t126" href="#t126">126</a></span><span class="t">    <span class="str">"""Group resource usage subflow for object storage size."""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t127" href="#t127">127</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t128" href="#t128">128</a></span><span class="t">    <span class="nam">group_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"groups"</span><span class="op">,</span> <span class="str">"groups.RESOURCES"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t128" href="#t128">128</a></span><span class="t">    <span class="nam">group_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"groups"</span><span class="op">,</span> <span class="str">"groups.RESOURCE_USAGE"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t129" href="#t129">129</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t130" href="#t130">130</a></span><span class="t">    <span class="nam">all_sizes</span> <span class="op">=</span> <span class="op">[</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t131" href="#t131">131</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -243,7 +243,7 @@
     <p class="pln"><span class="n"><a id="t161" href="#t161">161</a></span><span class="t"><span class="op">)</span> <span class="op">-></span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t162" href="#t162">162</a></span><span class="t">    <span class="str">"""Group resource usage subflow for wall clock time."""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t163" href="#t163">163</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">    <span class="nam">group_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"groups"</span><span class="op">,</span> <span class="str">"groups.RESOURCES"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">    <span class="nam">group_key</span> <span class="op">=</span> <span class="nam">make_key</span><span class="op">(</span><span class="nam">series</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="str">"groups"</span><span class="op">,</span> <span class="str">"groups.RESOURCE_USAGE"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t165" href="#t165">165</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t166" href="#t166">166</a></span><span class="t">    <span class="nam">all_times</span> <span class="op">=</span> <span class="op">[</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t167" href="#t167">167</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -279,7 +279,7 @@
             <a id="nextFileLink" class="nav" href="d_225eb92fe287c98e_initialize_arcade_simulations_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
-            created at 2024-01-09 21:02 +0000
+            created at 2024-05-06 18:34 +0000
         </p>
     </div>
 </footer>
