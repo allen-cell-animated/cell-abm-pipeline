@@ -1,0 +1,49 @@
+analyze\_basic\_metrics
+=======================
+
+.. automodule:: cell_abm_pipeline.flows.analyze_basic_metrics
+   
+   
+   
+
+   
+   
+   .. rubric:: Flows
+
+   .. autosummary::
+      :nosignatures:
+   
+      run_flow
+      run_flow_process_results
+   
+   .. autofunction:: cell_abm_pipeline.flows.analyze_basic_metrics.run_flow
+   .. autofunction:: cell_abm_pipeline.flows.analyze_basic_metrics.run_flow_process_results
+   
+   
+
+   
+   
+   .. rubric:: Configs
+
+   .. autosummary::
+      :nosignatures:
+   
+      ContextConfig
+      ParametersConfig
+      SeriesConfig
+   
+   .. autoclass:: cell_abm_pipeline.flows.analyze_basic_metrics.ContextConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.analyze_basic_metrics.ParametersConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.analyze_basic_metrics.SeriesConfig
+      :members:
+      :exclude-members: __init__
+   
+   
+
+   
+   
+   

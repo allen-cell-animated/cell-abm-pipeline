@@ -1,0 +1,59 @@
+make\_simulation\_movies
+========================
+
+.. automodule:: cell_abm_pipeline.flows.make_simulation_movies
+   
+   
+   
+
+   
+   
+   .. rubric:: Flows
+
+   .. autosummary::
+      :nosignatures:
+   
+      run_flow
+      run_flow_make_centroids_movie
+      run_flow_make_scan_movie
+   
+   .. autofunction:: cell_abm_pipeline.flows.make_simulation_movies.run_flow
+   .. autofunction:: cell_abm_pipeline.flows.make_simulation_movies.run_flow_make_centroids_movie
+   .. autofunction:: cell_abm_pipeline.flows.make_simulation_movies.run_flow_make_scan_movie
+   
+   
+
+   
+   
+   .. rubric:: Configs
+
+   .. autosummary::
+      :nosignatures:
+   
+      ContextConfig
+      ParametersConfig
+      ParametersConfigCentroids
+      ParametersConfigScan
+      SeriesConfig
+   
+   .. autoclass:: cell_abm_pipeline.flows.make_simulation_movies.ContextConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.make_simulation_movies.ParametersConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigCentroids
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.make_simulation_movies.ParametersConfigScan
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.make_simulation_movies.SeriesConfig
+      :members:
+      :exclude-members: __init__
+   
+   
+
+   
+   
+   

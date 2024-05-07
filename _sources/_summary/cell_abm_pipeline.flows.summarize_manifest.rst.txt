@@ -1,0 +1,47 @@
+summarize\_manifest
+===================
+
+.. automodule:: cell_abm_pipeline.flows.summarize_manifest
+   
+   
+   
+
+   
+   
+   .. rubric:: Flows
+
+   .. autosummary::
+      :nosignatures:
+   
+      run_flow
+   
+   .. autofunction:: cell_abm_pipeline.flows.summarize_manifest.run_flow
+   
+   
+
+   
+   
+   .. rubric:: Configs
+
+   .. autosummary::
+      :nosignatures:
+   
+      ContextConfig
+      ParametersConfig
+      SeriesConfig
+   
+   .. autoclass:: cell_abm_pipeline.flows.summarize_manifest.ContextConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.summarize_manifest.ParametersConfig
+      :members:
+      :exclude-members: __init__
+   .. autoclass:: cell_abm_pipeline.flows.summarize_manifest.SeriesConfig
+      :members:
+      :exclude-members: __init__
+   
+   
+
+   
+   
+   
