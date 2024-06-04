@@ -1,5 +1,27 @@
 """
 Workflow for calculating shape properties.
+
+Working location structure:
+
+.. code-block:: bash
+
+    (name)
+    ├── data
+    │   └── data.LOCATIONS
+    │       └── (name)_(key)_(seed).LOCATIONS.tar.xz
+    └── calculations
+        └── calculations.PROPERTIES
+            ├── (name)_(key)_(seed)_(tick).PROPERTIES.csv
+            └── (name)_(key)_(seed)_(tick)_(region).PROPERTIES.csv
+
+Data from **data.LOCATIONS** are used to calculate properties, which are saved
+to **calculations.PROPERTIES**.
+
+If region is specified, the region is included in the output key. For
+calculations with offset but no chunking, the output key extension starts with
+``.(offset).`` to specify the index offset. For calculations with chunking, the
+output key extension starts with ``.(offset).(chunk).`` to specify the index
+offset and chunk size.
 """
 
 from dataclasses import dataclass, field
@@ -30,18 +52,25 @@ class ParametersConfig:
     """Parameter configuration for calculate properties flow."""
 
     key: str
+    """Simulation key to calculate."""
 
     seed: int
+    """Simulation random seed to calculate."""
 
     tick: int
+    """Simulation tick to calculate."""
 
     offset: int = 0
+    """Index offset for skipped calculations."""
 
     chunk: Optional[int] = None
+    """Number of indices to calculate, starting from offset."""
 
     region: Optional[str] = None
+    """Subcellular region to calculate."""
 
     properties: list[str] = field(default_factory=lambda: SHAPE_PROPERTIES)
+    """List of shape properties to calculate."""
 
 
 @dataclass
@@ -49,6 +78,7 @@ class ContextConfig:
     """Context configuration for calculate properties flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
 
 @dataclass
@@ -56,6 +86,7 @@ class SeriesConfig:
     """Series configuration for calculate properties flow."""
 
     name: str
+    """Name of the simulation series."""
 
 
 @flow(name="calculate-properties")

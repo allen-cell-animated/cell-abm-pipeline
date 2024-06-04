@@ -1,5 +1,22 @@
 """
-Workflow for calculating shape properties from images.
+Workflow for calculating shape properties from existing images.
+
+Working location structure:
+
+.. code-block:: bash
+
+    (name)
+    ├── results
+    │   └── (name)_(key)_(seed).csv
+    └── calculations
+        └── calculations.PROPERTIES
+            ├── (name)_(key)_(seed)_(tick).PROPERTIES.csv
+            └── (name)_(key)_(seed)_(tick)_(region).PROPERTIES.csv
+
+Data from **results** are used to specify existing images, which are then used
+to calculate properties. Calculations are saved to **calculations.PROPERTIES**.
+
+If region is specified, the region is included in the output key.
 """
 
 from dataclasses import dataclass, field
@@ -20,16 +37,22 @@ class ParametersConfig:
     """Parameter configuration for calculate image properties flow."""
 
     key: str
+    """Simulation key to calculate."""
 
     seed: int
+    """Simulation random seed to calculate."""
 
     tick: int
+    """Simulation tick to calculate."""
 
     channel: int
+    """Index of channel to calculate."""
 
     region: Optional[str] = None
+    """Subcellular region to calculate."""
 
     properties: list[str] = field(default_factory=lambda: SHAPE_PROPERTIES)
+    """List of shape properties to calculate."""
 
 
 @dataclass
@@ -37,6 +60,7 @@ class ContextConfig:
     """Context configuration for calculate image properties flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
 
 @dataclass
@@ -44,6 +68,7 @@ class SeriesConfig:
     """Series configuration for calculate image properties flow."""
 
     name: str
+    """Name of the simulation series."""
 
 
 @flow(name="calculate-image-properties")

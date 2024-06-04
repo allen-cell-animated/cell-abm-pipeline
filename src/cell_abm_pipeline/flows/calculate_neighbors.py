@@ -1,5 +1,20 @@
 """
 Workflow for calculating neighbor connections.
+
+Working location structure:
+
+.. code-block:: bash
+
+    (name)
+    ├── data
+    │   └── data.LOCATIONS
+    │       └── (name)_(key)_(seed).LOCATIONS.tar.xz
+    └── calculations
+        └── calculations.NEIGHBORS
+            └── (name)_(key)_(seed)_(tick).NEIGHBORS.csv
+
+Data from **data.LOCATIONS** are used to calculate neighbors, which are saved to
+**calculations.NEIGHBORS**.
 """
 
 from dataclasses import dataclass
@@ -18,10 +33,13 @@ class ParametersConfig:
     """Parameter configuration for calculate neighbors flow."""
 
     key: str
+    """Simulation key to calculate."""
 
     seed: int
+    """Simulation random seed to calculate."""
 
     tick: int
+    """Simulation tick to calculate."""
 
 
 @dataclass
@@ -29,6 +47,7 @@ class ContextConfig:
     """Context configuration for calculate neighbors flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
 
 @dataclass
@@ -36,6 +55,7 @@ class SeriesConfig:
     """Series configuration for calculate neighbors flow."""
 
     name: str
+    """Name of the simulation series."""
 
 
 @flow(name="calculate-neighbors")

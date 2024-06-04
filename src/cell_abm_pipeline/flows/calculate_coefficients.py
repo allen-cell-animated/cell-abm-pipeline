@@ -1,5 +1,27 @@
 """
 Workflow for calculating spherical harmonic coefficients.
+
+Working location structure:
+
+.. code-block:: bash
+
+    (name)
+    ├── data
+    │   └── data.LOCATIONS
+    │       └── (name)_(key)_(seed).LOCATIONS.tar.xz
+    └── calculations
+        └── calculations.COEFFICIENTS
+            ├── (name)_(key)_(seed)_(tick).COEFFICIENTS.csv
+            └── (name)_(key)_(seed)_(tick)_(region).COEFFICIENTS.csv
+
+Data from **data.LOCATIONS** are used to calculate coefficients, which are saved
+to **calculations.COEFFICIENTS**.
+
+If region is specified, the region is included in the output key. For
+calculations with offset but no chunking, the output key extension starts with
+``.(offset).`` to specify the index offset. For calculations with chunking, the
+output key extension starts with ``.(offset).(chunk).`` to specify the index
+offset and chunk size.
 """
 
 from dataclasses import dataclass
@@ -21,18 +43,25 @@ class ParametersConfig:
     """Parameter configuration for calculate coefficients flow."""
 
     key: str
+    """Simulation key to calculate."""
 
     seed: int
+    """Simulation random seed to calculate."""
 
     tick: int
+    """Simulation tick to calculate."""
 
     offset: int = 0
+    """Index offset for skipped calculations."""
 
     chunk: Optional[int] = None
+    """Number of indices to calculate, starting from offset."""
 
     region: Optional[str] = None
+    """Subcellular region to calculate."""
 
     scale: int = 1
+    """Rescaling factor for image array."""
 
     order: int = COEFFICIENT_ORDER
     """Order of the spherical harmonics coefficient parametrization."""
@@ -43,6 +72,7 @@ class ContextConfig:
     """Context configuration for calculate coefficients flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
 
 @dataclass
@@ -50,6 +80,7 @@ class SeriesConfig:
     """Series configuration for calculate coefficients flow."""
 
     name: str
+    """Name of the simulation series."""
 
 
 @flow(name="calculate-coefficients")
