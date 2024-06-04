@@ -7,7 +7,7 @@ Working location structure:
 
     (name)
     ├── groups
-    │   └── groups.BASIC
+    │   └── groups.BASIC_METRICS
     │       ├── (name).metrics_bins.(key).(seed).(tick).(metric).csv
     │       ├── (name).metrics_distributions.(metric).json
     │       ├── (name).metrics_individuals.(key).(seed).(metric).json
@@ -15,7 +15,7 @@ Working location structure:
     │       ├── (name).metrics_temporal.(key).(metric).json
     │       └── (name).population_counts.(tick).csv
     └── plots
-        └── plots.BASIC
+        └── plots.BASIC_METRICS
             ├── (name).metrics_bins.(key).(seed).(tick).(metric).png
             ├── (name).metrics_distributions.(metric).png
             ├── (name).metrics_individuals.(key).(seed).(metric).png
@@ -23,8 +23,8 @@ Working location structure:
             ├── (name).metrics_temporal.(key).(metric).png
             └── (name).population_counts.(tick).png
 
-Plots use grouped data from the **groups/groups.BASIC** directory.
-Plots are saved to the **plots/plots.BASIC** directory.
+Plots use grouped data from **groups.BASIC_METRICS**. Plots are saved to
+**plots.BASIC_METRICS**.
 """
 
 from dataclasses import dataclass, field
@@ -258,8 +258,8 @@ def run_flow_plot_metrics_bins(
 ) -> None:
     """Plot basic metrics subflow for binned metrics."""
 
-    group_key = make_key(series.name, "groups", "groups.BASIC")
-    plot_key = make_key(series.name, "plots", "plots.BASIC")
+    group_key = make_key(series.name, "groups", "groups.BASIC_METRICS")
+    plot_key = make_key(series.name, "plots", "plots.BASIC_METRICS")
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
@@ -285,8 +285,8 @@ def run_flow_plot_metrics_distributions(
 ) -> None:
     """Plot basic metrics subflow for metrics distributions."""
 
-    group_key = make_key(series.name, "groups", "groups.BASIC")
-    plot_key = make_key(series.name, "plots", "plots.BASIC")
+    group_key = make_key(series.name, "groups", "groups.BASIC_METRICS")
+    plot_key = make_key(series.name, "plots", "plots.BASIC_METRICS")
     keys = [condition["key"] for condition in series.conditions]
 
     metrics: list[str] = []
@@ -321,8 +321,8 @@ def run_flow_plot_metrics_individuals(
 ) -> None:
     """Plot basic metrics subflow for individual metrics."""
 
-    group_key = make_key(series.name, "groups", "groups.BASIC")
-    plot_key = make_key(series.name, "plots", "plots.BASIC")
+    group_key = make_key(series.name, "groups", "groups.BASIC_METRICS")
+    plot_key = make_key(series.name, "plots", "plots.BASIC_METRICS")
     keys = [condition["key"] for condition in series.conditions]
 
     metrics: list[str] = [
@@ -361,8 +361,8 @@ def run_flow_plot_metrics_spatial(
 ) -> None:
     """Plot basic metrics subflow for spatial metrics."""
 
-    group_key = make_key(series.name, "groups", "groups.BASIC")
-    plot_key = make_key(series.name, "plots", "plots.BASIC")
+    group_key = make_key(series.name, "groups", "groups.BASIC_METRICS")
+    plot_key = make_key(series.name, "plots", "plots.BASIC_METRICS")
     keys = [condition["key"] for condition in series.conditions]
 
     metrics: list[str] = []
@@ -403,8 +403,8 @@ def run_flow_plot_metrics_temporal(
 ) -> None:
     """Plot basic metrics subflow for temporal metrics."""
 
-    group_key = make_key(series.name, "groups", "groups.BASIC")
-    plot_key = make_key(series.name, "plots", "plots.BASIC")
+    group_key = make_key(series.name, "groups", "groups.BASIC_METRICS")
+    plot_key = make_key(series.name, "plots", "plots.BASIC_METRICS")
     keys = [condition["key"] for condition in series.conditions]
 
     metrics: list[str] = []
@@ -442,8 +442,8 @@ def run_flow_plot_population_counts(
 ) -> None:
     """Plot basic metrics subflow for population counts."""
 
-    group_key = make_key(series.name, "groups", "groups.BASIC")
-    plot_key = make_key(series.name, "plots", "plots.BASIC")
+    group_key = make_key(series.name, "groups", "groups.BASIC_METRICS")
+    plot_key = make_key(series.name, "plots", "plots.BASIC_METRICS")
     keys = [condition["key"] for condition in series.conditions]
 
     group = load_dataframe(

@@ -7,7 +7,7 @@ Working location structure:
 
     (name)
     ├── groups
-    │   └── groups.SHAPES
+    │   └── groups.CELL_SHAPES
     │       ├── (name).feature_correlations.(key).(region).csv
     │       ├── (name).feature_distributions.(feature).json
     │       ├── (name).mode_correlations.csv
@@ -18,7 +18,7 @@ Working location structure:
     │       ├── (name).shape_modes.(key).(region).(mode).(projection).json
     │       └── (name).variance_explained.csv
     └── plots
-        └── plots.SHAPES
+        └── plots.CELL_SHAPES
             ├── (name).feature_correlations.(key).(region).png
             ├── (name).feature_distributions.(feature).png
             ├── (name).mode_correlations.(key).(key).png
@@ -29,8 +29,8 @@ Working location structure:
             ├── (name).shape_modes.(key).(region).(mode).(projection).(point).svg
             └── (name).variance_explained.png
 
-Plots use grouped data from the **groups/groups.SHAPES** directory.
-Plots are saved to the **plots/plots.SHAPES** directory.
+Plots use grouped data from **groups.CELL_SHAPES**. Plots are saved to
+**plots.CELL_SHAPES**.
 """
 
 from dataclasses import dataclass, field
@@ -301,8 +301,8 @@ def run_flow_plot_feature_correlations(
 ) -> None:
     """Plot cell shapes subflow for feature correlations."""
 
-    group_key = make_key(series.name, "groups", "groups.SHAPES")
-    plot_key = make_key(series.name, "plots", "plots.SHAPES")
+    group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
+    plot_key = make_key(series.name, "plots", "plots.CELL_SHAPES")
     keys = [condition["key"] for condition in series.conditions]
 
     modes = [f"PC{component + 1}" for component in range(parameters.components)]
@@ -334,8 +334,8 @@ def run_flow_plot_feature_distributions(
 ) -> None:
     """Plot cell shapes subflow for feature distributions."""
 
-    group_key = make_key(series.name, "groups", "groups.SHAPES")
-    plot_key = make_key(series.name, "plots", "plots.SHAPES")
+    group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
+    plot_key = make_key(series.name, "plots", "plots.CELL_SHAPES")
     keys = [condition["key"] for condition in series.conditions]
 
     features = [
@@ -365,8 +365,8 @@ def run_flow_plot_mode_correlations(
 ) -> None:
     """Plot cell shapes subflow for mode correlations."""
 
-    group_key = make_key(series.name, "groups", "groups.SHAPES")
-    plot_key = make_key(series.name, "plots", "plots.SHAPES")
+    group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
+    plot_key = make_key(series.name, "plots", "plots.CELL_SHAPES")
     keys = ["reference"] + [condition["key"] for condition in series.conditions]
 
     modes = [f"PC{component + 1}" for component in range(parameters.components)]
@@ -409,8 +409,8 @@ def run_flow_plot_population_counts(
 ) -> None:
     """Plot cell shapes subflow for population counts."""
 
-    group_key = make_key(series.name, "groups", "groups.SHAPES")
-    plot_key = make_key(series.name, "plots", "plots.SHAPES")
+    group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
+    plot_key = make_key(series.name, "plots", "plots.CELL_SHAPES")
     keys = [condition["key"] for condition in series.conditions]
 
     group = load_dataframe(
@@ -441,8 +441,8 @@ def run_flow_plot_population_stats(
 ) -> None:
     """Plot cell shapes subflow for population stats."""
 
-    group_key = make_key(series.name, "groups", "groups.SHAPES")
-    plot_key = make_key(series.name, "plots", "plots.SHAPES")
+    group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
+    plot_key = make_key(series.name, "plots", "plots.CELL_SHAPES")
     keys = [condition["key"] for condition in series.conditions]
 
     group = load_json(
@@ -467,8 +467,8 @@ def run_flow_plot_shape_average(
     Plot cell shapes subflow for shape average.
     """
 
-    group_key = make_key(series.name, "groups", "groups.SHAPES")
-    plot_key = make_key(series.name, "plots", "plots.SHAPES")
+    group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
+    plot_key = make_key(series.name, "plots", "plots.CELL_SHAPES")
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
@@ -520,8 +520,8 @@ def run_flow_plot_shape_errors(
 ) -> None:
     """Plot cell shapes subflow for shape errors."""
 
-    group_key = make_key(series.name, "groups", "groups.SHAPES")
-    plot_key = make_key(series.name, "plots", "plots.SHAPES")
+    group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
+    plot_key = make_key(series.name, "plots", "plots.CELL_SHAPES")
     keys = [condition["key"] for condition in series.conditions]
 
     group = load_json(
@@ -546,8 +546,8 @@ def run_flow_plot_shape_modes(
     Plot cell shapes subflow for shape modes.
     """
 
-    group_key = make_key(series.name, "groups", "groups.SHAPES")
-    plot_key = make_key(series.name, "plots", "plots.SHAPES")
+    group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
+    plot_key = make_key(series.name, "plots", "plots.CELL_SHAPES")
     keys = [condition["key"] for condition in series.conditions]
 
     for key in keys:
@@ -596,8 +596,8 @@ def run_flow_plot_variance_explained(
 ) -> None:
     """Plot cell shapes subflow for variance explained."""
 
-    group_key = make_key(series.name, "groups", "groups.SHAPES")
-    plot_key = make_key(series.name, "plots", "plots.SHAPES")
+    group_key = make_key(series.name, "groups", "groups.CELL_SHAPES")
+    plot_key = make_key(series.name, "plots", "plots.CELL_SHAPES")
     keys = [condition["key"] for condition in series.conditions]
 
     group = load_dataframe(

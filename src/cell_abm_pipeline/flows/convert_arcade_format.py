@@ -31,8 +31,8 @@ Working location structure:
     └── results
         └── (name)_(key)_(seed).csv
 
-Different formats use inputs from **results**, **data/data.CELLS**, and
-**data/data.LOCATIONS**. Formatted data are saved to **converted**.
+Different formats use inputs from **results**, **data.CELLS**, and
+**data.LOCATIONS**. Formatted data are saved to **converted**.
 """
 
 from dataclasses import dataclass, field

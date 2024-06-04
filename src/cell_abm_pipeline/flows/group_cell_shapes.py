@@ -30,10 +30,9 @@ Working location structure:
             ├── (name).shape_samples.json
             └── (name).variance_explained.csv
 
-Different groups use inputs from the **data/data.LOCATIONS**,
-**analysis/analysis.CELL_SHAPES_DATA**, and
-**analysis/analysis.CELL_SHAPES_MODELS** directories.
-Grouped data is saved to the **groups/groups.CELL_SHAPES** directory.
+Different groups use inputs from **data.LOCATIONS**,
+**analysis.CELL_SHAPES_DATA**, and **analysis.CELL_SHAPES_MODELS**. Grouped data
+are saved to **groups.CELL_SHAPES**.
 
 Different groups can be visualized using the corresponding plotting workflow or
 loaded into alternative tools.

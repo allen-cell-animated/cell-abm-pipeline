@@ -18,9 +18,8 @@ Working location structure:
             ├── (name).neighbor_positions.(key).(seed).(tick).csv
             └── (name).neighbor_positions.(key).(seed).(tick).(feature).csv
 
-Different groups use inputs from the **analysis/analysis.COLONIES** and
-**analysis/analysis.MEASURES** directories.
-Grouped data is saved to the **groups/groups.COLONIES** directory.
+Different groups use inputs from **analysis.COLONIES** and
+**analysis.MEASURES**. Grouped data are saved to **groups.COLONIES**.
 
 Different groups can be visualized using the corresponding plotting workflow or
 loaded into alternative tools.

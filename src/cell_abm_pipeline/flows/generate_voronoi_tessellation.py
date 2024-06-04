@@ -1,5 +1,10 @@
 """
 Workflow for generating Voronoi tessellation images.
+
+For each condition, a Voronoi tessellation is applied to the nuclear
+segmentation to approximate the cell shape. The number of iterations and the
+target height can be used to refine the tessellation to produce realistic cell
+volumes.
 """
 
 from dataclasses import dataclass
@@ -16,10 +21,13 @@ class ParametersConfig:
     """Parameter configuration for generate voronoi tessellation flow."""
 
     channel: int
+    """Image channel."""
 
     iterations: int
+    """Number of boundary estimation steps."""
 
     target_height: int
+    """Target height in voxels."""
 
 
 @dataclass
@@ -27,6 +35,7 @@ class ContextConfig:
     """Context configuration for generate voronoi tessellation flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
 
 @dataclass
@@ -34,8 +43,10 @@ class SeriesConfig:
     """Series configuration for generate voronoi tessellation flow."""
 
     name: str
+    """Name of the simulation series."""
 
     conditions: list[dict]
+    """List of series condition dictionaries (must include unique condition "key")."""
 
 
 @flow(name="generate-voronoi-tessellation")

@@ -15,8 +15,8 @@ Working location structure:
             ├── (name).object_storage.(category).png
             └── (name).wall_clock.png
 
-Plots use grouped data from the **groups/groups.RESOURCE_USAGE** directory.
-Plots are saved to the **plots/plots.RESOURCE_USAGE** directory.
+Plots use grouped data from **groups.RESOURCE_USAGE**. Plots are saved to
+**plots.RESOURCE_USAGE**.
 """
 
 from dataclasses import dataclass, field

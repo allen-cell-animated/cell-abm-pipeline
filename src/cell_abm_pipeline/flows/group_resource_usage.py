@@ -16,8 +16,8 @@ Working location structure:
     └── logs
         └── (job_id).log
 
-Different groups use inputs from the **data** and **logs** directories.
-Grouped data is saved to the **groups/groups.RESOURCE_USAGE** directory.
+Different groups use inputs from **data** and **logs**. Grouped data are saved
+to **groups.RESOURCE_USAGE**.
 """
 
 import os

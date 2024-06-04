@@ -18,8 +18,8 @@ Working location structure:
             ├── (name).feature_temporal.(key).(feature).json
             └── (name).neighbor_positions.(key).(seed).(tick).(feature).png
 
-Plots use grouped data from the **groups/groups.COLONIES** directory.
-Plots are saved to the **plots/plots.COLONIES** directory.
+Plots use grouped data from **groups.COLONIES**. Plots are saved to
+**plots.COLONIES**.
 """
 
 from dataclasses import dataclass, field

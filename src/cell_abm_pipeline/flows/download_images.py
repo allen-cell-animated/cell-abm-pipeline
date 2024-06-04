@@ -1,5 +1,10 @@
 """
 Workflow for downloading images from Quilt.
+
+Image metadata is loaded from the Quilt package and used to filter for FOVs with
+the specified number of cells. FOVs are selected to meet the specified number of
+FOVs within each cell volume bin. For each selected FOV, the image is downloaded
+to the working location under **images**.
 """
 
 from dataclasses import dataclass
@@ -16,14 +21,19 @@ class ParametersConfig:
     """Parameter configuration for download images flow."""
 
     cells_per_fov: int
+    """Number of cells per FOV."""
 
     bins: list[int]
+    """Cell volume bin boundaries."""
 
     counts: list[int]
+    """Number of FOVs to select from each cell volume bin."""
 
     quilt_package: str = "aics/hipsc_single_cell_image_dataset"
+    """Name of Quilt package."""
 
     quilt_registry: str = "s3://allencell"
+    """Name of Quilt registry."""
 
 
 @dataclass
@@ -31,8 +41,10 @@ class ContextConfig:
     """Context configuration for download images flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
     metadata_location: str
+    """Location of metadata file (local path or S3 bucket)."""
 
 
 @dataclass
@@ -40,8 +52,10 @@ class SeriesConfig:
     """Series configuration for download images flow."""
 
     name: str
+    """Name of the simulation series."""
 
     metadata_key: str
+    """Key for metadata file."""
 
 
 @flow(name="download-images")

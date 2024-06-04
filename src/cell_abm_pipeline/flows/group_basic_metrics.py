@@ -21,9 +21,8 @@ Working location structure:
             ├── (name).metrics_temporal.(key).(metric).json
             └── (name).population_counts.(time).csv
 
-Different groups use inputs from the **results** and
-**analysis/analysis.POSITIONS** directories.
-Grouped data is saved to the **groups/groups.BASIC_METRICS** directory.
+Different groups use inputs from **results** and **analysis.POSITIONS**. Grouped
+data are saved to **groups.BASIC_METRICS**.
 
 Different groups can be visualized using the corresponding plotting workflow or
 loaded into alternative tools.
