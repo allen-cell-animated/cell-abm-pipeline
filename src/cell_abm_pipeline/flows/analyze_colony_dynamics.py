@@ -17,10 +17,11 @@ Working location structure:
         └── analysis.NETWORKS
             └── (name)_(key).NETWORKS.pkl
 
-Data from the **analysis.NEIGHBORS** directories are processed into the
-**analysis.COLONIES** directory.
-Networks are saved to the **analysis.NETWORKS** directory.
-Graph analysis is saved to the **analysis.MEASURES** directory.
+Data from **analysis.NEIGHBORS** are processed into **analysis.COLONIES**.
+Networks are saved to **analysis.NETWORKS**. Graph analysis is saved to
+**analysis.MEASURES**.
+
+TODO: update for new calculate_neighbors flow
 """
 
 import ast

@@ -12,7 +12,7 @@ Working location structure:
     └── results
         └── (name)_(key)_(seed).csv
 
-Data from **results** are processed into the **analysis.BASIC_METRICS** directory.
+Data from **results** are processed into **analysis.BASIC_METRICS**.
 """
 
 from dataclasses import dataclass, field

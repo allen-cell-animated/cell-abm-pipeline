@@ -27,15 +27,14 @@ Working location structure:
             ├── (name)_(key)_(seed)_(region).PROPERTIES.csv
             └── (name)_(key)_(seed)_(region).PROPERTIES.tar.xz
 
-Data from the **calculations.PROPERTIES** directories are processed into the
-**analysis.CELL_SHAPES_PROPERTIES** directory.
-Data from the **calculations.COEFFICIENTS** directories are processed into the
-**analysis.CELL_SHAPES_COEFFICIENTS** directory.
-Data from the **analysis.BASIC_METRICS** directory is combined with data from
-the **analysis.CELL_SHAPES_PROPERTIES** and **analysis.CELL_SHAPES_COEFFICIENTS**
-directories into the **analysis.CELL_SHAPES_DATA** directory.
-PCA models are saved to the **analysis.CELL_SHAPES_MODELS** directory.
-Statistical analysis is saved to the **analysis.CELL_SHAPES_STATISTICS** directory.
+Data from **calculations.PROPERTIES** are processed into
+**analysis.CELL_SHAPES_PROPERTIES**. Data from **calculations.COEFFICIENTS** are
+processed into **analysis.CELL_SHAPES_COEFFICIENTS**. Data from
+**analysis.BASIC_METRICS** are combined with data from
+**analysis.CELL_SHAPES_PROPERTIES** and **analysis.CELL_SHAPES_COEFFICIENTS**
+into **analysis.CELL_SHAPES_DATA**. PCA models are saved to
+**analysis.CELL_SHAPES_MODELS**. Statistical analysis is saved to
+**analysis.CELL_SHAPES_STATISTICS**.
 """
 
 from dataclasses import dataclass, field
@@ -162,8 +161,8 @@ def run_flow_process_properties(
     """
     Analyze cell shapes subflow for processing properties.
 
-    Processes cell shape properties and compiles into a single dataframe. If
-    the combined dataframe already exists for a given key, that key is skipped.
+    Processes cell shape properties and compiles into a single dataframe. If the
+    combined dataframe already exists for a given key, that key is skipped.
     """
 
     logger = get_run_logger()
