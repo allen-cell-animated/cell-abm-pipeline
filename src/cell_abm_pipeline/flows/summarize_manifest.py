@@ -1,5 +1,16 @@
 """
 Workflow for summarizing files in the manifest.
+
+.. code-block:: bash
+
+    (name)
+    └── YYYY-MM-DD
+        └── (name).SUMMARY.txt
+
+For each search location, flow will attempt to find all files matching the
+specified series name. After applying include and exclude filters, the manifest
+is updated and a summary of files, grouped by extension, is printed and saved to
+a dated directory.
 """
 
 from dataclasses import dataclass, field
@@ -17,12 +28,16 @@ class ParametersConfig:
     """Parameter configuration for summarize manifest flow."""
 
     update_manifest: bool = True
+    """True if the manifest file should be updated, False otherwise."""
 
     search_locations: list[str] = field(default_factory=lambda: [])
+    """List of locations to search for files (local path or S3 bucket)."""
 
     include_filters: list[str] = field(default_factory=lambda: ["*"])
+    """List of Unix filename patterns for files to include in summary."""
 
     exclude_filters: list[str] = field(default_factory=lambda: [])
+    """List of Unix filename patterns for files to exclude from summary."""
 
 
 @dataclass
@@ -30,8 +45,10 @@ class ContextConfig:
     """Context configuration for summarize manifest flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
     manifest_location: str
+    """Location of manifest file (local path or S3 bucket)."""
 
 
 @dataclass
@@ -39,12 +56,16 @@ class SeriesConfig:
     """Series configuration for summarize manifest flow."""
 
     name: str
+    """Name of the simulation series."""
 
     manifest_key: str
+    """Key for manifest file."""
 
     seeds: list[int]
+    """List of series random seeds."""
 
     conditions: list[dict]
+    """List of series condition dictionaries (must include unique condition "key")."""
 
 
 @flow(name="summarize-manifest")

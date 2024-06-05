@@ -485,7 +485,7 @@ def run_flow_convert_to_projections(
 def run_flow_convert_to_simularium_shapes(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigSimulariumShapes
 ) -> None:
-    """Convert ARCADE format subflow for simularium with shapes."""
+    """Convert ARCADE format subflow for Simularium with shapes."""
 
     cells_data_key = make_key(series.name, "data", "data.CELLS")
     locs_data_key = make_key(series.name, "data", "data.LOCATIONS")
@@ -525,7 +525,7 @@ def run_flow_convert_to_simularium_shapes(
 def run_flow_convert_to_simularium_objects(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfigSimulariumObjects
 ) -> None:
-    """Convert ARCADE format subflow for simularium with objects."""
+    """Convert ARCADE format subflow for Simularium with objects."""
 
     data_key = make_key(series.name, "data", "data.LOCATIONS")
     converted_key = make_key(series.name, "converted", "converted.SIMULARIUM")

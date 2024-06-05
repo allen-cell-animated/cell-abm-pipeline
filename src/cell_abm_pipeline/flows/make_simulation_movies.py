@@ -1,7 +1,29 @@
 """
 Workflow for making simulation movies.
-"""
 
+Working location structure:
+
+.. code-block:: bash
+
+    (name)
+    ├── data
+    │   └── data.LOCATIONS
+    │       └── (name)_(key)_(seed).LOCATIONS.tar.xz
+    ├── movies
+    │   ├── movies.CENTROIDS
+    │   │   ├── (name)_(key)_(seed).CENTROIDS.gif
+    │   │   └── (name)_(key)_(seed)
+    │   │       └── (frame).CENTROIDS.png
+    │   └── movies.SCAN
+    │       ├── (name)_(key)_(seed)_(view)_(frame).SCAN.gif
+    │       └── (name)_(key)_(seed)_(view)_(frame)
+    │           └── (index).SCAN.png
+    └── results
+        └── (name)_(key)_(seed).csv
+
+Different formats use inputs from **results** and **data.LOCATIONS**. Movies are
+saved to **movies**.
+"""
 
 from dataclasses import dataclass, field
 

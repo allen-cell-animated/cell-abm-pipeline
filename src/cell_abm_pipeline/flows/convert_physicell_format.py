@@ -108,6 +108,8 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 def run_flow_convert_to_simularium(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    """Convert PhysiCell format subflow for Simularium."""
+
     data_key = make_key(series.name, "data")
     converted_key = make_key(series.name, "converted", "converted.SIMULARIUM")
     keys = [condition["key"] for condition in series.conditions]

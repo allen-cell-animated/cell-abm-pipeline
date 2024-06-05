@@ -1,5 +1,10 @@
 """
 Workflow for organizing calculation files.
+
+Calculation files for each specified tick are merged into a single csv. The
+individual tick calculation files are also compressed into a tar.xz archive.
+After verifying that the file exists in the archive, the individual tick
+calculation file is removed.
 """
 
 import re
@@ -18,10 +23,13 @@ class ParametersConfig:
     """Parameter configuration for organize calculation files flow."""
 
     suffix: str
+    """Calculation type suffix."""
 
     ticks: list[int]
+    """List of ticks to run flow on."""
 
     region: Optional[str] = None
+    """Subcellular region name."""
 
 
 @dataclass
@@ -29,6 +37,7 @@ class ContextConfig:
     """Context configuration for organize calculation files flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
 
 @dataclass
@@ -36,30 +45,31 @@ class SeriesConfig:
     """Series configuration for organize calculation files flow."""
 
     name: str
+    """Name of the simulation series."""
 
     seeds: list[int]
+    """List of series random seeds."""
 
     conditions: list[dict]
+    """List of series condition dictionaries (must include unique condition "key")."""
 
 
 @flow(name="organize-calculation-files")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    """Main organize calculation files flow."""
+    """
+    Main organize calculation files flow.
 
-    # Iterate through conditions and seeds to merge contents of individual
-    # ticks into a single csv. If merged csv exists and the specified tick
-    # does not exist in the csv, the tick is appended. If the merged csv exists
-    # and specified tick exists in the csv, the tick is skipped.
+    Calls the following subflows, in order:
+
+    1. :py:func:`run_flow_merge_files`
+    2. :py:func:`run_flow_compress_files`
+    3. :py:func:`run_flow_remove_files`
+    """
+
     run_flow_merge_files(context, series, parameters)
 
-    # Iterate through conditions and seeds to combine and compress individual
-    # ticks into a .tar.xz archive. If the archive exists and the specified
-    # tick is not in the archive, the tick is appended. If the archive exists
-    # and specified tick exists in the archive, the tick is skipped.
     run_flow_compress_files(context, series, parameters)
 
-    # Iterate through conditions and seeds to remove individual ticks if the
-    # tick exists in the corresponding .tar.xz archive.
     run_flow_remove_files(context, series, parameters)
 
 
@@ -67,6 +77,15 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 def run_flow_merge_files(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    """
+    Organize calculation files subflow for merging files.
+
+    Iterate through conditions and seeds to merge contents of individual ticks
+    into a single csv. If merged csv exists and the specified tick does not
+    exist in the csv, the tick is appended. If the merged csv exists and
+    specified tick exists in the csv, the tick is skipped.
+    """
+
     suffix = parameters.suffix
     calc_key = make_key(series.name, "calculations", f"calculations.{suffix}")
     region = f"_{parameters.region}" if parameters.region is not None else ""
@@ -108,6 +127,15 @@ def run_flow_merge_files(
 def run_flow_compress_files(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    """
+    Organize calculation files subflow for compressing files.
+
+    Iterate through conditions and seeds to combine and compress individual
+    ticks into a .tar.xz archive. If the archive exists and the specified tick
+    is not in the archive, the tick is appended. If the archive exists and
+    specified tick exists in the archive, the tick is skipped.
+    """
+
     suffix = parameters.suffix
     calc_key = make_key(series.name, "calculations", f"calculations.{suffix}")
     region = f"_{parameters.region}" if parameters.region is not None else ""
@@ -145,6 +173,13 @@ def run_flow_compress_files(
 def run_flow_remove_files(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    """
+    Organize calculation files subflow for removing files.
+
+    Iterate through conditions and seeds to remove individual ticks if the
+    tick exists in the corresponding .tar.xz archive.
+    """
+
     suffix = parameters.suffix
     calc_key = make_key(series.name, "calculations", f"calculations.{suffix}")
     region = f"_{parameters.region}" if parameters.region is not None else ""

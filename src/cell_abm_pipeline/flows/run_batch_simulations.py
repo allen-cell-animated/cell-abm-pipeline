@@ -1,5 +1,34 @@
 """
 Workflow for running containerized models using AWS Batch.
+
+Working location structure:
+
+.. code-block:: bash
+
+    (name)
+    └── YYYY-MM-DD
+        ├── inits
+        │   └── (name)_(group)_(seed).(extension)
+        └── inputs
+            └── (name)_(group)_(index).xml
+
+The simulation series manifest, produced by the summarize manifest flow, is used
+to identify which simulation conditions and seeds are missing. These conditions
+and seeds are converted into input files using the given template file, grouped
+by the specified job size. The relevant initialization and input files are then
+saved to a dated directory. All simulations in the same group will use the same
+initialization file for a given seed; if different initializations need to be
+used for different conditions, assign the conditions to different groups.
+
+Jobs are submitted to AWS Batch with the given infrastructure context. The jobs
+are periodically queried for status at the specified retry delay interval, for
+the specified number of retries. If jobs are still running after these retries
+are complete, the job is not terminated unless specified. Output logs are also
+saved after these retries are complete. Note that if the job is not complete
+when the logs are saved, only the logs available at that time will be saved.
+
+Note that this workflow works only if working location is an S3 bucket. For
+local working locations, use the run docker simulations flow instead.
 """
 
 from dataclasses import dataclass, field
@@ -29,22 +58,31 @@ class ParametersConfig:
     """Parameter configuration for run batch simulations flow."""
 
     model: str
+    """Name of model."""
 
     image: str
+    """Name of model image."""
 
     retries: int
+    """Number of retries to check if jobs are complete."""
 
     retry_delay: int
+    """Delay between retries in seconds."""
 
     seeds_per_job: int = 1
+    """Number of seeds per job."""
 
     log_filter: str = ""
+    """Filter pattern for logs."""
 
     terminate_jobs: bool = True
+    """True if jobs should be terminated after total retry time, False otherwise."""
 
     save_logs: bool = True
+    """True to save job logs, False otherwise."""
 
     clean_jobs: bool = True
+    """True to clean up job files, False otherwise."""
 
 
 @dataclass
@@ -52,22 +90,31 @@ class ContextConfig:
     """Context configuration for run batch simulations flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
     manifest_location: str
+    """Location of manifest file (local path or S3 bucket)."""
 
     template_location: str
+    """Location of template file (local path or S3 bucket)."""
 
     account: str
+    """AWS account number."""
 
     region: str
+    """AWS region."""
 
     user: str
+    """User name prefix."""
 
     vcpus: int
+    """Requested number of vcpus for AWS Batch job."""
 
     memory: int
+    """Requested memory for AWS Batch job."""
 
     queue: str
+    """Name of AWS Batch queue."""
 
 
 @dataclass
@@ -75,20 +122,28 @@ class SeriesConfig:
     """Series configuration for run batch simulations flow."""
 
     name: str
+    """Name of the simulation series."""
 
     manifest_key: str
+    """Key for manifest file."""
 
     template_key: str
+    """Key for template file."""
 
     seeds: list[int]
+    """List of series random seeds."""
 
     conditions: list[dict]
+    """List of series condition dictionaries (must include unique condition "key")."""
 
     extensions: list[str]
+    """List of file extensions in complete run."""
 
     inits: list[dict] = field(default_factory=lambda: [])
+    """Initialization keys and associated group names."""
 
     groups: dict[str, Optional[str]] = field(default_factory=lambda: {"_": ""})
+    """Initialization groups, keyed by group name."""
 
 
 @flow(name="run-batch-simulations")

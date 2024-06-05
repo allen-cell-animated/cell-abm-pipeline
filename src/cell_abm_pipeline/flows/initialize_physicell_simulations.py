@@ -1,5 +1,21 @@
 """
 Workflow for initializing PhysiCell simulations.
+
+Working location structure:
+
+.. code-block:: bash
+
+    (name)
+    ├── inits
+    │   └── inits.PHYSICELL
+    │       └── (name)_(key)_(resolution).csv
+    └── plots
+        └── plots.COORDINATES
+            └── (name)_(key)_(resolution).COORDINATES.png
+
+Initialization consist of a single cell of the specified height and volume,
+sampled at the given spatial resolution. Coordinates are saved to
+**inits.PHYSICELL**.
 """
 
 from dataclasses import dataclass, field
@@ -12,51 +28,64 @@ from io_collection.keys import make_key
 from io_collection.save import save_dataframe, save_figure
 from prefect import flow
 
+# Default average cell height in um.
 AVERAGE_CELL_HEIGHT = 9.0
 
+# Default average cell volume in um^3.
 AVERAGE_CELL_VOLUME = 1300.0
 
+# Default cell id.
 DEFAULT_CELL_ID = 1
 
+# Substrate id.
 SUBSTRATE_ID = -1
 
 
 @dataclass
 class ParametersConfig:
-    """Parameter configuration for initialize physicell simulations flow."""
+    """Parameter configuration for initialize PhysiCell simulations flow."""
 
     grid: str = "rect"
+    """Type of sampling grid (rect = rectangular, hex = hexagonal)."""
 
-    ds: list[float] = field(default_factory=lambda: [1.0])  # um/voxel
+    ds: list[float] = field(default_factory=lambda: [1.0])
+    """Spatial scaling in um/voxel."""
 
-    bounding_box: tuple[int, int] = (100, 100)  # um
+    bounding_box: tuple[int, int] = (100, 100)
+    """Size of bounding box in um."""
 
     cell_height: float = AVERAGE_CELL_HEIGHT
+    """Average cell height in um."""
 
     cell_volume: float = AVERAGE_CELL_VOLUME
+    """Average cell volume in um^3."""
 
     substrate: bool = True
+    """True to include substrate in initialization, False otherwise."""
 
     contact_sheet: bool = True
+    """True to save contact sheet of initialization, False otherwise."""
 
 
 @dataclass
 class ContextConfig:
-    """Context configuration for initialize physicell simulations flow."""
+    """Context configuration for initialize PhysiCell simulations flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
 
 @dataclass
 class SeriesConfig:
-    """Series configuration for initialize physicell simulations flow."""
+    """Series configuration for initialize PhysiCell simulations flow."""
 
     name: str
+    """Name of the simulation series."""
 
 
 @flow(name="initialize-physicell-simulations")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    """Main initialize physicell simulations flow."""
+    """Main initialize PhysiCell simulations flow."""
 
     for ds in parameters.ds:
         # Calculate cell radius and height.

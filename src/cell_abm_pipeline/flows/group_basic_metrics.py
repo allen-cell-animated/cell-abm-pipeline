@@ -13,7 +13,7 @@ Working location structure:
     │       ├── (name)_(key)_(seed).POSITIONS.csv
     │       └── (name)_(key)_(seed).POSITIONS.tar.xz
     └── groups
-       └── groups.BASIC_METRICS
+        └── groups.BASIC_METRICS
             ├── (name).metrics_bins.(key).(time).(metric).csv
             ├── (name).metrics_distributions.(metric).json
             ├── (name).metrics_individuals.(key).(seed).(metric).json

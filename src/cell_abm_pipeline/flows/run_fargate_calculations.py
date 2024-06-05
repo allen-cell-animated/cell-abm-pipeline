@@ -1,5 +1,25 @@
 """
 Workflow for running containerized calculations using Fargate.
+
+This workflow is used to run registered calculation flows across different
+simulation conditions and random seeds in parallel. The configurations for the
+selected calculation are passed into the corresponding flows.
+
+Some calculations can be chunked (in which the calculation is only run on a
+subset of the cells for the given condition, seed, and tick) in order to further
+parallelize the flow. For chunked calculations, re-running the flow will merge
+completed chunks into a single file.
+
+The flow will aim to avoid re-running any existing calculations. Calculations
+are skipped if the calculation output file already exists, or if the specific
+chunk already exists. Calculations for additional ticks are appended into the
+existing calculation output file.
+
+If the submit tasks option is turned off, the flow will print the full pipeline
+command instead, which can then be run locally. Running commands locally can be
+useful for conditions that require more CPUs/memory than are available.
+
+Note that this workflow works only if working location is an S3 bucket.
 """
 
 import importlib
@@ -40,16 +60,22 @@ class ParametersConfig:
     """Parameter configuration for run fargate calculations flow."""
 
     image: str
+    """Name of pipeline image."""
 
     ticks: list[int]
+    """List of ticks to run flow on."""
 
     calculate: Optional[Calculation] = None
+    """Calculation type."""
 
     chunk: Optional[int] = None
+    """Chunk size, if possible for the given calculation type."""
 
     submit_tasks: bool = True
+    """True to submit calculation tasks, False otherwise."""
 
     overrides: dict = field(default_factory=lambda: {})
+    """Overrides for the specific calculation type."""
 
 
 @dataclass
@@ -57,22 +83,31 @@ class ContextConfig:
     """Context configuration for run fargate calculations flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
     account: str
+    """AWS account number."""
 
     region: str
+    """AWS region."""
 
     user: str
+    """User name prefix."""
 
     vcpus: int
+    """Requested number of vcpus for AWS Fargate task."""
 
     memory: int
+    """Requested memory for AWS Fargate task."""
 
     cluster: str
+    """AWS Fargate cluster name."""
 
     security_groups: str
+    """AWS Fargate security groups, separated by colon."""
 
     subnets: str
+    """AWS Fargate subnets groups, separated by colon."""
 
 
 @dataclass
@@ -80,10 +115,13 @@ class SeriesConfig:
     """Series configuration for run fargate calculations flow."""
 
     name: str
+    """Name of the simulation series."""
 
     seeds: list[int]
+    """List of series random seeds."""
 
     conditions: list[dict]
+    """List of series condition dictionaries (must include unique condition "key")."""
 
 
 @flow(name="run-fargate-calculations")

@@ -7,20 +7,21 @@ Working location structure:
 
     (name)
     ├── images
-    │    └── (name)_(key).(extension)
+    │   └── (name)_(key).(extension)
     ├── plots
-    │    └── plots.SAMPLE
-    │        └── (name)_(key)_C(channel)_R(resolution).SAMPLE.png
+    │   └── plots.SAMPLE
+    │       └── (name)_(key)_C(channel)_R(resolution).SAMPLE.png
     └── samples
         └── samples.RAW
             └── (name)_(key)_C(channel)_R(resolution).RAW.csv
 
-The **images** directory contains the input image to be sampled.
-Resulting sample(s) are placed into the **samples/samples.RAW** directory and
-corresponding plot(s) are placed into the **plots/plots.SAMPLE** directory.
+Input images to be sampled are loaded from **images**. Resulting image sample(s)
+are placed into **samples.RAW** and corresponding contact sheet(s) are placed
+into **plots.SAMPLE**.
 """
 
 from dataclasses import dataclass, field
+from typing import Optional
 
 from abm_initialization_collection.image import get_image_bounds, plot_contact_sheet
 from abm_initialization_collection.sample import (
@@ -33,10 +34,10 @@ from io_collection.load import load_image
 from io_collection.save import save_dataframe, save_figure
 from prefect import flow
 
-# Pixel resolution for images (um/pixel) in x/y
+# Default pixel resolution for images in x/y in um/pixel
 SCALE_MICRONS_XY: float = 0.108333
 
-# Pixel resolution for images (um/pixel) in z
+# Default pixel resolution for images in z in um/pixel
 SCALE_MICRONS_Z: float = 0.29
 
 
@@ -45,22 +46,31 @@ class ParametersConfig:
     """Parameter configuration for sample image flow."""
 
     key: str
+    """Image key to sample."""
 
     channels: list[int] = field(default_factory=lambda: [0])
+    """Image channels to sample."""
 
     grid: str = "rect"
+    """Type of sampling grid (rect = rectangular, hex = hexagonal)."""
 
-    coordinate_type: str = "index"
+    coordinate_type: Optional[str] = None
+    """Coordinate scaling type (None = unscaled, absolute = in um, step = by step size)."""
 
     resolution: float = 1.0
+    """Distance between samples in um."""
 
     scale_xy: float = SCALE_MICRONS_XY
+    """ Resolution scaling in x/y in um/pixel."""
 
     scale_z: float = SCALE_MICRONS_Z
-
-    contact_sheet: bool = True
+    """Resolution scaling in z in um/pixel."""
 
     extension: str = ".ome.tiff"
+    """Image extension."""
+
+    contact_sheet: bool = True
+    """True to save contact sheet of processed samples, False otherwise."""
 
 
 @dataclass
@@ -68,6 +78,7 @@ class ContextConfig:
     """Context configuration for sample image flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
 
 @dataclass
@@ -75,6 +86,7 @@ class SeriesConfig:
     """Series configuration for sample image flow."""
 
     name: str
+    """Name of the simulation series."""
 
 
 @flow(name="sample-image")

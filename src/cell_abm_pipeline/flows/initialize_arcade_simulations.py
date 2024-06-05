@@ -1,5 +1,30 @@
 """
 Workflow for initializing ARCADE simulations.
+
+Working location structure:
+
+.. code-block:: bash
+
+    (name)
+    ├── images
+    │   └── (name)_(key).(extension)
+    ├── inits
+    │   └── inits.ARCADE
+    │       ├── (name)_(key)_(margin)_(resolution).CELLS.json
+    │       ├── (name)_(key)_(margin)_(resolution).LOCATIONS.json
+    │       └── (name)_(key)_(margin)_(resolution).xml
+    ├── plots
+    │   └── plots.SAMPLE
+    │       └── (name)_(key).SAMPLE.png
+    └── samples
+        ├── samples.PROCESSED
+        │   └── (name)_(key).PROCESSED.csv
+        └── samples.RAW
+            └── (name)_(key).RAW.csv
+
+Images are loaded from **images**, which are then sampled and processed into
+**samples**. ARCADE initialization files are then generated and placed into
+**inits.ARCADE**.
 """
 
 import copy
@@ -30,30 +55,37 @@ from cell_abm_pipeline.flows.sample_image import ContextConfig as ContextConfigS
 from cell_abm_pipeline.flows.sample_image import ParametersConfig as ParametersConfigSampleImage
 from cell_abm_pipeline.flows.sample_image import SeriesConfig as SeriesConfigSampleImage
 
+# Command for running sample image flow.
 SAMPLE_IMAGE_COMMAND = ["abmpipe", "sample-image", "::"]
 
+# Command for running process sample flow.
 PROCESS_SAMPLE_COMMAND = ["abmpipe", "process-sample", "::"]
 
+# Default volume means and standard deviations in um^3.
 VOLUMES: dict[str, tuple[float, float]] = {
     "DEFAULT": (1865.0, 517.0),
     "NUCLEUS": (543.0, 157.0),
 }
 
+# Default height means and standard deviations in um.
 HEIGHTS: dict[str, tuple[float, float]] = {
     "DEFAULT": (9.75, 2.4),
     "NUCLEUS": (6.86, 1.7),
 }
 
+# Default critical volume means and standard deviations in um^3.
 CRITICAL_VOLUMES: dict[str, tuple[float, float]] = {
     "DEFAULT": (1300.0, 200.0),
     "NUCLEUS": (400.0, 50.0),
 }
 
+# Default critical height means and standard deviations in um.
 CRITICAL_HEIGHTS: dict[str, tuple[float, float]] = {
     "DEFAULT": (9.0, 2.0),
     "NUCLEUS": (6.5, 1.5),
 }
 
+# Default cell state phase thresholds.
 STATE_THRESHOLDS: dict[str, float] = {
     "APOPTOTIC_LATE": 0.25,
     "APOPTOTIC_EARLY": 0.90,
@@ -63,6 +95,7 @@ STATE_THRESHOLDS: dict[str, float] = {
     "PROLIFERATIVE_M": 2,
 }
 
+# Default list of Cellular Potts Model Hamiltonian terms.
 POTTS_TERMS: list[str] = [
     "volume",
     "adhesion",
@@ -71,80 +104,100 @@ POTTS_TERMS: list[str] = [
 
 @dataclass
 class ParametersConfigConvertToArcade:
-    """Parameter configuration for initialize arcade simulations subflow - convert to arcade."""
+    """Parameter configuration for initialize ARCADE simulations subflow - convert to ARCADE."""
 
     regions: dict[str, str] = field(default_factory=lambda: {"DEFAULT": "%s"})
+    """Subcellular region samples used to initialize voxels."""
 
     margins: tuple[int, int, int] = (0, 0, 0)
+    """Margins around initial voxel positions."""
 
     volumes: dict = field(default_factory=lambda: VOLUMES)
+    """Volume means and standard deviations in um^3."""
 
     heights: dict = field(default_factory=lambda: HEIGHTS)
+    """Height means and standard deviations in um."""
 
     critical_volumes: dict = field(default_factory=lambda: CRITICAL_VOLUMES)
+    """Critical volume means and standard deviations in um^3."""
 
     critical_heights: dict = field(default_factory=lambda: CRITICAL_HEIGHTS)
+    """Critical height means and standard deviations in um."""
 
     state_thresholds: dict[str, float] = field(default_factory=lambda: STATE_THRESHOLDS)
+    """Cell state phase thresholds."""
 
     potts_terms: list[str] = field(default_factory=lambda: POTTS_TERMS)
+    """List of Cellular Potts Model Hamiltonian terms."""
 
 
 @dataclass
 class ParametersConfig:
-    """Parameter configuration for initialize arcade simulations flow."""
+    """Parameter configuration for initialize ARCADE simulations flow."""
 
     image: str
+    """Name of pipeline image."""
 
     resolution: float
+    """Distance between samples in um."""
 
     sample_images: dict[str, ParametersConfigSampleImage]
+    """Configs for sample images flow, keyed by region."""
 
     process_samples: dict[str, ParametersConfigProcessSample]
+    """Configs for process samples flow, keyed by region."""
 
     convert_to_arcade: ParametersConfigConvertToArcade = ParametersConfigConvertToArcade()
+    """Convert to ARCADE configuration instance."""
 
 
 @dataclass
 class ContextConfig:
-    """Context configuration for initialize arcade simulations flow."""
+    """Context configuration for initialize ARCADE simulations flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
     reference_location: str
+    """Location of reference file (local path or S3 bucket)."""
 
     access_key_id: Optional[str] = None
+    """AWS access key id for accessing S3 in Docker image."""
 
     secret_access_key: Optional[str] = None
+    """AWS secret access key for accessing S3 in Docker image."""
 
 
 @dataclass
 class SeriesConfig:
-    """Series configuration for initialize arcade simulations flow."""
+    """Series configuration for initialize ARCADE simulations flow."""
 
     name: str
+    """Name of the simulation series."""
 
     reference_key: str
+    """Key for reference file."""
 
     conditions: list
+    """List of series condition dictionaries (must include unique condition "key")."""
 
 
 @flow(name="initialize-arcade-simulations")
 def run_flow(context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig) -> None:
-    """Main initialize arcade simulations flow."""
+    """
+    Main initialize ARCADE simulations flow.
 
-    # Iterate through conditions to sample images for each specified channel.
-    # The subflow `sample_image` is run via Docker for each condition and
-    # channel combination by passing in the subflow configuration as a dotlist.
+    Calls the following subflows, in order:
+
+    1. :py:func:`run_flow_sample_images`
+    2. :py:func:`run_flow_process_samples`
+    3. :py:func:`run_flow_convert_to_arcade`
+    """
+
     run_flow_sample_images(context, series, parameters)
 
-    # Iterate through conditions to process samples for each specified channel.
-    # The subflow `process_sample` is run via Docker for each condition and
-    # channel combination by passing in the subflow configuration as a dotlist.
     run_flow_process_samples(context, series, parameters)
 
-    # Converted processed samples into the ARCADE .CELLS and .LOCATIONS formats,
-    # along with a basic simulation setup XML file.
     run_flow_convert_to_arcade(context, series, parameters)
 
 
@@ -152,6 +205,14 @@ def run_flow(context: ContextConfig, series: SeriesConfig, parameters: Parameter
 def run_flow_sample_images(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    """
+    Initialize ARCADE simulations subflow for sampling images.
+
+    Iterate through conditions to sample images for each specified channel. The
+    subflow `sample_image` is run via Docker for each condition and channel
+    combination by passing in the subflow configuration as a dotlist.
+    """
+
     docker_args = get_docker_arguments(context)
 
     if context.working_location.startswith("s3://"):
@@ -184,6 +245,13 @@ def run_flow_sample_images(
 def run_flow_process_samples(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    """
+    Initialize ARCADE simulations subflow for processing samples.
+
+    Iterate through conditions to process samples for each specified channel.
+    The subflow `process_sample` is run via Docker for each condition and
+    channel combination by passing in the subflow configuration as a dotlist.
+    """
     docker_args = get_docker_arguments(context)
 
     if context.working_location.startswith("s3://"):
@@ -224,6 +292,13 @@ def run_flow_process_samples(
 def run_flow_convert_to_arcade(
     context: ContextConfig, series: SeriesConfig, parameters: ParametersConfig
 ) -> None:
+    """
+    Initialize ARCADE simulations subflow for converting to ARCADE.
+
+    Converted processed samples into the ARCADE .CELLS and .LOCATIONS formats,
+    along with a basic simulation setup XML file.
+    """
+
     samples_key = make_key(series.name, "samples", "samples.PROCESSED")
     inits_key = make_key(series.name, "inits", "inits.ARCADE")
 
@@ -298,6 +373,8 @@ def run_flow_convert_to_arcade(
 
 
 def get_docker_arguments(context: ContextConfig) -> dict:
+    """Compile Docker arguments for the given context."""
+
     if context.working_location.startswith("s3://"):
         environment = []
 

@@ -1,5 +1,22 @@
 """
 Workflow for parsing ARCADE simulations into tidy data.
+
+Working location structure:
+
+.. code-block:: bash
+
+    (name)
+    ├── data
+    │   ├── data.CELLS
+    │   │   └── (name)_(key)_(seed).CELLS.tar.xz
+    │   └── data.LOCATIONS
+    │       └── (name)_(key)_(seed).LOCATIONS.tar.xz
+    └── results
+        └── (name)_(key)_(seed).csv
+
+Data from **data.CELLS** and **data.LOCATIONS** are parsed into **results**. If
+the results file already exists, additional parsing will merge results based on
+cell id and tick.
 """
 
 from dataclasses import dataclass, field
@@ -17,10 +34,13 @@ class ParametersConfig:
     """Parameter configuration for parse arcade simulations flow."""
 
     regions: list[str] = field(default_factory=lambda: [])
+    """List of subcellular regions to parse."""
 
     include_filters: list[str] = field(default_factory=lambda: ["*"])
+    """List of Unix filename patterns for files to include in parsing."""
 
     exclude_filters: list[str] = field(default_factory=lambda: [])
+    """List of Unix filename patterns for files to exclude from parsing."""
 
 
 @dataclass
@@ -28,8 +48,10 @@ class ContextConfig:
     """Context configuration for parse arcade simulations flow."""
 
     working_location: str
+    """Location for input and output files (local path or S3 bucket)."""
 
     manifest_location: str
+    """Location of manifest file (local path or S3 bucket)."""
 
 
 @dataclass
@@ -37,10 +59,13 @@ class SeriesConfig:
     """Series configuration for parse arcade simulations flow."""
 
     name: str
+    """Name of the simulation series."""
 
     manifest_key: str
+    """Key for manifest file."""
 
     extensions: list[str]
+    """List of file extensions in complete run."""
 
 
 @flow(name="parse-arcade-simulations")
