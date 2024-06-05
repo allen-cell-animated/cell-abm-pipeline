@@ -256,6 +256,10 @@
           <section id="module-cell_abm_pipeline.flows.organize_calculation_files">
 <span id="organize-calculation-files"></span><h1>organize_calculation_files<a class="headerlink" href="#module-cell_abm_pipeline.flows.organize_calculation_files" title="Permalink to this heading">#</a></h1>
 <p>Workflow for organizing calculation files.</p>
+<p>Calculation files for each specified tick are merged into a single csv. The
+individual tick calculation files are also compressed into a tar.xz archive.
+After verifying that the file exists in the archive, the individual tick
+calculation file is removed.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -264,13 +268,13 @@
 <td><p>Main organize calculation files flow.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.run_flow_compress_files" title="cell_abm_pipeline.flows.organize_calculation_files.run_flow_compress_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_flow_compress_files</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Organize calculation files subflow for compressing files.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.run_flow_merge_files" title="cell_abm_pipeline.flows.organize_calculation_files.run_flow_merge_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_flow_merge_files</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Organize calculation files subflow for merging files.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.run_flow_remove_files" title="cell_abm_pipeline.flows.organize_calculation_files.run_flow_remove_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_flow_remove_files</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Organize calculation files subflow for removing files.</p></td>
 </tr>
 </tbody>
 </table>
@@ -279,22 +283,41 @@
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.organize_calculation_files.run_flow">
 <span class="sig-name descname"><span class="pre">run_flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.ContextConfig" title="cell_abm_pipeline.flows.organize_calculation_files.ContextConfig"><span class="pre">ContextConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.SeriesConfig" title="cell_abm_pipeline.flows.organize_calculation_files.SeriesConfig"><span class="pre">SeriesConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.ParametersConfig" title="cell_abm_pipeline.flows.organize_calculation_files.ParametersConfig"><span class="pre">ParametersConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/organize_calculation_files.html#run_flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.organize_calculation_files.run_flow" title="Permalink to this definition">#</a></dt>
 <dd><p>Main organize calculation files flow.</p>
+<p>Calls the following subflows, in order:</p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.run_flow_merge_files" title="cell_abm_pipeline.flows.organize_calculation_files.run_flow_merge_files"><code class="xref py py-func docutils literal notranslate"><span class="pre">run_flow_merge_files()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.run_flow_compress_files" title="cell_abm_pipeline.flows.organize_calculation_files.run_flow_compress_files"><code class="xref py py-func docutils literal notranslate"><span class="pre">run_flow_compress_files()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.run_flow_remove_files" title="cell_abm_pipeline.flows.organize_calculation_files.run_flow_remove_files"><code class="xref py py-func docutils literal notranslate"><span class="pre">run_flow_remove_files()</span></code></a></p></li>
+</ol>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.organize_calculation_files.run_flow_compress_files">
 <span class="sig-name descname"><span class="pre">run_flow_compress_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.ContextConfig" title="cell_abm_pipeline.flows.organize_calculation_files.ContextConfig"><span class="pre">ContextConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.SeriesConfig" title="cell_abm_pipeline.flows.organize_calculation_files.SeriesConfig"><span class="pre">SeriesConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.ParametersConfig" title="cell_abm_pipeline.flows.organize_calculation_files.ParametersConfig"><span class="pre">ParametersConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/organize_calculation_files.html#run_flow_compress_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.organize_calculation_files.run_flow_compress_files" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Organize calculation files subflow for compressing files.</p>
+<p>Iterate through conditions and seeds to combine and compress individual
+ticks into a .tar.xz archive. If the archive exists and the specified tick
+is not in the archive, the tick is appended. If the archive exists and
+specified tick exists in the archive, the tick is skipped.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.organize_calculation_files.run_flow_merge_files">
 <span class="sig-name descname"><span class="pre">run_flow_merge_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.ContextConfig" title="cell_abm_pipeline.flows.organize_calculation_files.ContextConfig"><span class="pre">ContextConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.SeriesConfig" title="cell_abm_pipeline.flows.organize_calculation_files.SeriesConfig"><span class="pre">SeriesConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.ParametersConfig" title="cell_abm_pipeline.flows.organize_calculation_files.ParametersConfig"><span class="pre">ParametersConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/organize_calculation_files.html#run_flow_merge_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.organize_calculation_files.run_flow_merge_files" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Organize calculation files subflow for merging files.</p>
+<p>Iterate through conditions and seeds to merge contents of individual ticks
+into a single csv. If merged csv exists and the specified tick does not
+exist in the csv, the tick is appended. If the merged csv exists and
+specified tick exists in the csv, the tick is skipped.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.organize_calculation_files.run_flow_remove_files">
 <span class="sig-name descname"><span class="pre">run_flow_remove_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.ContextConfig" title="cell_abm_pipeline.flows.organize_calculation_files.ContextConfig"><span class="pre">ContextConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.SeriesConfig" title="cell_abm_pipeline.flows.organize_calculation_files.SeriesConfig"><span class="pre">SeriesConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.organize_calculation_files.ParametersConfig" title="cell_abm_pipeline.flows.organize_calculation_files.ParametersConfig"><span class="pre">ParametersConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/organize_calculation_files.html#run_flow_remove_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.organize_calculation_files.run_flow_remove_files" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Organize calculation files subflow for removing files.</p>
+<p>Iterate through conditions and seeds to remove individual ticks if the
+tick exists in the corresponding .tar.xz archive.</p>
+</dd></dl>
 
 <p class="rubric">Configs</p>
 <div class="table-wrapper autosummary longtable docutils container">
@@ -319,7 +342,8 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.organize_calculation_files.ContextConfig.working_location">
 <span class="sig-name descname"><span class="pre">working_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.organize_calculation_files.ContextConfig.working_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location for input and output files (local path or S3 bucket).</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -330,17 +354,20 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.organize_calculation_files.ParametersConfig.suffix">
 <span class="sig-name descname"><span class="pre">suffix</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.organize_calculation_files.ParametersConfig.suffix" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Calculation type suffix.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.organize_calculation_files.ParametersConfig.ticks">
 <span class="sig-name descname"><span class="pre">ticks</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.organize_calculation_files.ParametersConfig.ticks" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of ticks to run flow on.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.organize_calculation_files.ParametersConfig.region">
 <span class="sig-name descname"><span class="pre">region</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.organize_calculation_files.ParametersConfig.region" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Subcellular region name.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -351,17 +378,20 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.organize_calculation_files.SeriesConfig.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.organize_calculation_files.SeriesConfig.name" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of the simulation series.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.organize_calculation_files.SeriesConfig.seeds">
 <span class="sig-name descname"><span class="pre">seeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.organize_calculation_files.SeriesConfig.seeds" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of series random seeds.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.organize_calculation_files.SeriesConfig.conditions">
 <span class="sig-name descname"><span class="pre">conditions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.organize_calculation_files.SeriesConfig.conditions" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of series condition dictionaries (must include unique condition “key”).</p>
+</dd></dl>
 
 </dd></dl>
 

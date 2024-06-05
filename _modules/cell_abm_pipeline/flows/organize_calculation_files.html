@@ -254,6 +254,11 @@
           <h1>Source code for cell_abm_pipeline.flows.organize_calculation_files</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Workflow for organizing calculation files.</span>
+
+<span class="sd">Calculation files for each specified tick are merged into a single csv. The</span>
+<span class="sd">individual tick calculation files are also compressed into a tar.xz archive.</span>
+<span class="sd">After verifying that the file exists in the archive, the individual tick</span>
+<span class="sd">calculation file is removed.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">re</span>
@@ -272,17 +277,21 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for organize calculation files flow.&quot;&quot;&quot;</span>
 
     <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculation type suffix.&quot;&quot;&quot;</span>
 
     <span class="n">ticks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of ticks to run flow on.&quot;&quot;&quot;</span>
 
-    <span class="n">region</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+    <span class="n">region</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Subcellular region name.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="ContextConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.organize_calculation_files.html#cell_abm_pipeline.flows.organize_calculation_files.ContextConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">ContextConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Context configuration for organize calculation files flow.&quot;&quot;&quot;</span>
 
-    <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Location for input and output files (local path or S3 bucket).&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="SeriesConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.organize_calculation_files.html#cell_abm_pipeline.flows.organize_calculation_files.SeriesConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -290,30 +299,31 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Series configuration for organize calculation files flow.&quot;&quot;&quot;</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Name of the simulation series.&quot;&quot;&quot;</span>
 
     <span class="n">seeds</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of series random seeds.&quot;&quot;&quot;</span>
 
-    <span class="n">conditions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span></div>
+    <span class="n">conditions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of series condition dictionaries (must include unique condition &quot;key&quot;).&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="run_flow"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.organize_calculation_files.html#cell_abm_pipeline.flows.organize_calculation_files.run_flow">[docs]</a><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;organize-calculation-files&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">run_flow</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">ContextConfig</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="n">SeriesConfig</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main organize calculation files flow.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main organize calculation files flow.</span>
 
-    <span class="c1"># Iterate through conditions and seeds to merge contents of individual</span>
-    <span class="c1"># ticks into a single csv. If merged csv exists and the specified tick</span>
-    <span class="c1"># does not exist in the csv, the tick is appended. If the merged csv exists</span>
-    <span class="c1"># and specified tick exists in the csv, the tick is skipped.</span>
+<span class="sd">    Calls the following subflows, in order:</span>
+
+<span class="sd">    1. :py:func:`run_flow_merge_files`</span>
+<span class="sd">    2. :py:func:`run_flow_compress_files`</span>
+<span class="sd">    3. :py:func:`run_flow_remove_files`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">run_flow_merge_files</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">series</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
 
-    <span class="c1"># Iterate through conditions and seeds to combine and compress individual</span>
-    <span class="c1"># ticks into a .tar.xz archive. If the archive exists and the specified</span>
-    <span class="c1"># tick is not in the archive, the tick is appended. If the archive exists</span>
-    <span class="c1"># and specified tick exists in the archive, the tick is skipped.</span>
     <span class="n">run_flow_compress_files</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">series</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
 
-    <span class="c1"># Iterate through conditions and seeds to remove individual ticks if the</span>
-    <span class="c1"># tick exists in the corresponding .tar.xz archive.</span>
     <span class="n">run_flow_remove_files</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">series</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span></div>
 
 
@@ -321,6 +331,15 @@
 <span class="k">def</span> <span class="nf">run_flow_merge_files</span><span class="p">(</span>
     <span class="n">context</span><span class="p">:</span> <span class="n">ContextConfig</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="n">SeriesConfig</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersConfig</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Organize calculation files subflow for merging files.</span>
+
+<span class="sd">    Iterate through conditions and seeds to merge contents of individual ticks</span>
+<span class="sd">    into a single csv. If merged csv exists and the specified tick does not</span>
+<span class="sd">    exist in the csv, the tick is appended. If the merged csv exists and</span>
+<span class="sd">    specified tick exists in the csv, the tick is skipped.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">suffix</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">suffix</span>
     <span class="n">calc_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;calculations&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;calculations.</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">region</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
@@ -362,6 +381,15 @@
 <span class="k">def</span> <span class="nf">run_flow_compress_files</span><span class="p">(</span>
     <span class="n">context</span><span class="p">:</span> <span class="n">ContextConfig</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="n">SeriesConfig</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersConfig</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Organize calculation files subflow for compressing files.</span>
+
+<span class="sd">    Iterate through conditions and seeds to combine and compress individual</span>
+<span class="sd">    ticks into a .tar.xz archive. If the archive exists and the specified tick</span>
+<span class="sd">    is not in the archive, the tick is appended. If the archive exists and</span>
+<span class="sd">    specified tick exists in the archive, the tick is skipped.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">suffix</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">suffix</span>
     <span class="n">calc_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;calculations&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;calculations.</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">region</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
@@ -399,6 +427,13 @@
 <span class="k">def</span> <span class="nf">run_flow_remove_files</span><span class="p">(</span>
     <span class="n">context</span><span class="p">:</span> <span class="n">ContextConfig</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="n">SeriesConfig</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersConfig</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Organize calculation files subflow for removing files.</span>
+
+<span class="sd">    Iterate through conditions and seeds to remove individual ticks if the</span>
+<span class="sd">    tick exists in the corresponding .tar.xz archive.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">suffix</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">suffix</span>
     <span class="n">calc_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;calculations&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;calculations.</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">region</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>

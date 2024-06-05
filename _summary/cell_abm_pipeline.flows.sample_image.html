@@ -259,18 +259,18 @@
 <p>Working location structure:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>name<span class="o">)</span>
 ├──<span class="w"> </span>images
-│<span class="w">    </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>.<span class="o">(</span>extension<span class="o">)</span>
+│<span class="w">   </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>.<span class="o">(</span>extension<span class="o">)</span>
 ├──<span class="w"> </span>plots
-│<span class="w">    </span>└──<span class="w"> </span>plots.SAMPLE
-│<span class="w">        </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_C<span class="o">(</span>channel<span class="o">)</span>_R<span class="o">(</span>resolution<span class="o">)</span>.SAMPLE.png
+│<span class="w">   </span>└──<span class="w"> </span>plots.SAMPLE
+│<span class="w">       </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_C<span class="o">(</span>channel<span class="o">)</span>_R<span class="o">(</span>resolution<span class="o">)</span>.SAMPLE.png
 └──<span class="w"> </span>samples
 <span class="w">    </span>└──<span class="w"> </span>samples.RAW
 <span class="w">        </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_C<span class="o">(</span>channel<span class="o">)</span>_R<span class="o">(</span>resolution<span class="o">)</span>.RAW.csv
 </pre></div>
 </div>
-<p>The <strong>images</strong> directory contains the input image to be sampled.
-Resulting sample(s) are placed into the <strong>samples/samples.RAW</strong> directory and
-corresponding plot(s) are placed into the <strong>plots/plots.SAMPLE</strong> directory.</p>
+<p>Input images to be sampled are loaded from <strong>images</strong>. Resulting image sample(s)
+are placed into <strong>samples.RAW</strong> and corresponding contact sheet(s) are placed
+into <strong>plots.SAMPLE</strong>.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -310,7 +310,8 @@ corresponding plot(s) are placed into the <strong>plots/plots.SAMPLE</strong> di
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.sample_image.ContextConfig.working_location">
 <span class="sig-name descname"><span class="pre">working_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.sample_image.ContextConfig.working_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location for input and output files (local path or S3 bucket).</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -321,47 +322,56 @@ corresponding plot(s) are placed into the <strong>plots/plots.SAMPLE</strong> di
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.sample_image.ParametersConfig.key">
 <span class="sig-name descname"><span class="pre">key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.key" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Image key to sample.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.sample_image.ParametersConfig.channels">
 <span class="sig-name descname"><span class="pre">channels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.channels" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Image channels to sample.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.sample_image.ParametersConfig.grid">
 <span class="sig-name descname"><span class="pre">grid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rect'</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.grid" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Type of sampling grid (rect = rectangular, hex = hexagonal).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.sample_image.ParametersConfig.coordinate_type">
-<span class="sig-name descname"><span class="pre">coordinate_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'index'</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.coordinate_type" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">coordinate_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.coordinate_type" title="Permalink to this definition">#</a></dt>
+<dd><p>Coordinate scaling type (None = unscaled, absolute = in um, step = by step size).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.sample_image.ParametersConfig.resolution">
 <span class="sig-name descname"><span class="pre">resolution</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.resolution" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Distance between samples in um.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.sample_image.ParametersConfig.scale_xy">
 <span class="sig-name descname"><span class="pre">scale_xy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.108333</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.scale_xy" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Resolution scaling in x/y in um/pixel.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.sample_image.ParametersConfig.scale_z">
 <span class="sig-name descname"><span class="pre">scale_z</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.29</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.scale_z" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="cell_abm_pipeline.flows.sample_image.ParametersConfig.contact_sheet">
-<span class="sig-name descname"><span class="pre">contact_sheet</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.contact_sheet" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Resolution scaling in z in um/pixel.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.sample_image.ParametersConfig.extension">
 <span class="sig-name descname"><span class="pre">extension</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'.ome.tiff'</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.extension" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Image extension.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cell_abm_pipeline.flows.sample_image.ParametersConfig.contact_sheet">
+<span class="sig-name descname"><span class="pre">contact_sheet</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.contact_sheet" title="Permalink to this definition">#</a></dt>
+<dd><p>True to save contact sheet of processed samples, False otherwise.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -372,7 +382,8 @@ corresponding plot(s) are placed into the <strong>plots/plots.SAMPLE</strong> di
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.sample_image.SeriesConfig.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.sample_image.SeriesConfig.name" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of the simulation series.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -447,8 +458,8 @@ corresponding plot(s) are placed into the <strong>plots/plots.SAMPLE</strong> di
 <li><a class="reference internal" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.resolution"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.resolution</span></code></a></li>
 <li><a class="reference internal" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.scale_xy"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.scale_xy</span></code></a></li>
 <li><a class="reference internal" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.scale_z"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.scale_z</span></code></a></li>
-<li><a class="reference internal" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.contact_sheet"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.contact_sheet</span></code></a></li>
 <li><a class="reference internal" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.extension"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.extension</span></code></a></li>
+<li><a class="reference internal" href="#cell_abm_pipeline.flows.sample_image.ParametersConfig.contact_sheet"><code class="docutils literal notranslate"><span class="pre">ParametersConfig.contact_sheet</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#cell_abm_pipeline.flows.sample_image.SeriesConfig"><code class="docutils literal notranslate"><span class="pre">SeriesConfig</span></code></a><ul>

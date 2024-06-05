@@ -256,24 +256,46 @@
           <section id="module-cell_abm_pipeline.flows.initialize_arcade_simulations">
 <span id="initialize-arcade-simulations"></span><h1>initialize_arcade_simulations<a class="headerlink" href="#module-cell_abm_pipeline.flows.initialize_arcade_simulations" title="Permalink to this heading">#</a></h1>
 <p>Workflow for initializing ARCADE simulations.</p>
+<p>Working location structure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>name<span class="o">)</span>
+├──<span class="w"> </span>images
+│<span class="w">   </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>.<span class="o">(</span>extension<span class="o">)</span>
+├──<span class="w"> </span>inits
+│<span class="w">   </span>└──<span class="w"> </span>inits.ARCADE
+│<span class="w">       </span>├──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>margin<span class="o">)</span>_<span class="o">(</span>resolution<span class="o">)</span>.CELLS.json
+│<span class="w">       </span>├──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>margin<span class="o">)</span>_<span class="o">(</span>resolution<span class="o">)</span>.LOCATIONS.json
+│<span class="w">       </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>margin<span class="o">)</span>_<span class="o">(</span>resolution<span class="o">)</span>.xml
+├──<span class="w"> </span>plots
+│<span class="w">   </span>└──<span class="w"> </span>plots.SAMPLE
+│<span class="w">       </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>.SAMPLE.png
+└──<span class="w"> </span>samples
+<span class="w">    </span>├──<span class="w"> </span>samples.PROCESSED
+<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>.PROCESSED.csv
+<span class="w">    </span>└──<span class="w"> </span>samples.RAW
+<span class="w">        </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>.RAW.csv
+</pre></div>
+</div>
+<p>Images are loaded from <strong>images</strong>, which are then sampled and processed into
+<strong>samples</strong>. ARCADE initialization files are then generated and placed into
+<strong>inits.ARCADE</strong>.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.get_docker_arguments" title="cell_abm_pipeline.flows.initialize_arcade_simulations.get_docker_arguments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_docker_arguments</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Compile Docker arguments for the given context.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow" title="cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_flow</span></code></a></p></td>
-<td><p>Main initialize arcade simulations flow.</p></td>
+<td><p>Main initialize ARCADE simulations flow.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_convert_to_arcade" title="cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_convert_to_arcade"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_flow_convert_to_arcade</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Initialize ARCADE simulations subflow for converting to ARCADE.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_process_samples" title="cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_process_samples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_flow_process_samples</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Initialize ARCADE simulations subflow for processing samples.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_sample_images" title="cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_sample_images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_flow_sample_images</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Initialize ARCADE simulations subflow for sampling images.</p></td>
 </tr>
 </tbody>
 </table>
@@ -281,44 +303,62 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.get_docker_arguments">
 <span class="sig-name descname"><span class="pre">get_docker_arguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig"><span class="pre">ContextConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/initialize_arcade_simulations.html#get_docker_arguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.get_docker_arguments" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compile Docker arguments for the given context.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow">
 <span class="sig-name descname"><span class="pre">run_flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig"><span class="pre">ContextConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig"><span class="pre">SeriesConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig"><span class="pre">ParametersConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/initialize_arcade_simulations.html#run_flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow" title="Permalink to this definition">#</a></dt>
-<dd><p>Main initialize arcade simulations flow.</p>
+<dd><p>Main initialize ARCADE simulations flow.</p>
+<p>Calls the following subflows, in order:</p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_sample_images" title="cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_sample_images"><code class="xref py py-func docutils literal notranslate"><span class="pre">run_flow_sample_images()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_process_samples" title="cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_process_samples"><code class="xref py py-func docutils literal notranslate"><span class="pre">run_flow_process_samples()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_convert_to_arcade" title="cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_convert_to_arcade"><code class="xref py py-func docutils literal notranslate"><span class="pre">run_flow_convert_to_arcade()</span></code></a></p></li>
+</ol>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_convert_to_arcade">
 <span class="sig-name descname"><span class="pre">run_flow_convert_to_arcade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig"><span class="pre">ContextConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig"><span class="pre">SeriesConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig"><span class="pre">ParametersConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/initialize_arcade_simulations.html#run_flow_convert_to_arcade"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_convert_to_arcade" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Initialize ARCADE simulations subflow for converting to ARCADE.</p>
+<p>Converted processed samples into the ARCADE .CELLS and .LOCATIONS formats,
+along with a basic simulation setup XML file.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_process_samples">
 <span class="sig-name descname"><span class="pre">run_flow_process_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig"><span class="pre">ContextConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig"><span class="pre">SeriesConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig"><span class="pre">ParametersConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/initialize_arcade_simulations.html#run_flow_process_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_process_samples" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Initialize ARCADE simulations subflow for processing samples.</p>
+<p>Iterate through conditions to process samples for each specified channel.
+The subflow <cite>process_sample</cite> is run via Docker for each condition and
+channel combination by passing in the subflow configuration as a dotlist.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_sample_images">
 <span class="sig-name descname"><span class="pre">run_flow_sample_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig"><span class="pre">ContextConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig"><span class="pre">SeriesConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig"><span class="pre">ParametersConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/initialize_arcade_simulations.html#run_flow_sample_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.run_flow_sample_images" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Initialize ARCADE simulations subflow for sampling images.</p>
+<p>Iterate through conditions to sample images for each specified channel. The
+subflow <cite>sample_image</cite> is run via Docker for each condition and channel
+combination by passing in the subflow configuration as a dotlist.</p>
+</dd></dl>
 
 <p class="rubric">Configs</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ContextConfig</span></code></a></p></td>
-<td><p>Context configuration for initialize arcade simulations flow.</p></td>
+<td><p>Context configuration for initialize ARCADE simulations flow.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParametersConfig</span></code></a></p></td>
-<td><p>Parameter configuration for initialize arcade simulations flow.</p></td>
+<td><p>Parameter configuration for initialize ARCADE simulations flow.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParametersConfigConvertToArcade</span></code></a></p></td>
-<td><p>Parameter configuration for initialize arcade simulations subflow - convert to arcade.</p></td>
+<td><p>Parameter configuration for initialize ARCADE simulations subflow - convert to ARCADE.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig" title="cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SeriesConfig</span></code></a></p></td>
-<td><p>Series configuration for initialize arcade simulations flow.</p></td>
+<td><p>Series configuration for initialize ARCADE simulations flow.</p></td>
 </tr>
 </tbody>
 </table>
@@ -326,124 +366,144 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ContextConfig</span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/initialize_arcade_simulations.html#ContextConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig" title="Permalink to this definition">#</a></dt>
-<dd><p>Context configuration for initialize arcade simulations flow.</p>
+<dd><p>Context configuration for initialize ARCADE simulations flow.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig.working_location">
 <span class="sig-name descname"><span class="pre">working_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig.working_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location for input and output files (local path or S3 bucket).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig.reference_location">
 <span class="sig-name descname"><span class="pre">reference_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig.reference_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location of reference file (local path or S3 bucket).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig.access_key_id">
 <span class="sig-name descname"><span class="pre">access_key_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig.access_key_id" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>AWS access key id for accessing S3 in Docker image.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig.secret_access_key">
 <span class="sig-name descname"><span class="pre">secret_access_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ContextConfig.secret_access_key" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>AWS secret access key for accessing S3 in Docker image.</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ParametersConfig</span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/initialize_arcade_simulations.html#ParametersConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig" title="Permalink to this definition">#</a></dt>
-<dd><p>Parameter configuration for initialize arcade simulations flow.</p>
+<dd><p>Parameter configuration for initialize ARCADE simulations flow.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.image">
 <span class="sig-name descname"><span class="pre">image</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.image" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of pipeline image.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.resolution">
 <span class="sig-name descname"><span class="pre">resolution</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.resolution" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Distance between samples in um.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.sample_images">
 <span class="sig-name descname"><span class="pre">sample_images</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="cell_abm_pipeline.flows.sample_image.html#cell_abm_pipeline.flows.sample_image.ParametersConfig" title="cell_abm_pipeline.flows.sample_image.ParametersConfig"><span class="pre">cell_abm_pipeline.flows.sample_image.ParametersConfig</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.sample_images" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Configs for sample images flow, keyed by region.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.process_samples">
 <span class="sig-name descname"><span class="pre">process_samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="cell_abm_pipeline.flows.process_sample.html#cell_abm_pipeline.flows.process_sample.ParametersConfig" title="cell_abm_pipeline.flows.process_sample.ParametersConfig"><span class="pre">cell_abm_pipeline.flows.process_sample.ParametersConfig</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.process_samples" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Configs for process samples flow, keyed by region.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.convert_to_arcade">
 <span class="sig-name descname"><span class="pre">convert_to_arcade</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade" title="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade"><span class="pre">ParametersConfigConvertToArcade</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ParametersConfigConvertToArcade(regions={'DEFAULT':</span> <span class="pre">'%s'},</span> <span class="pre">margins=(0,</span> <span class="pre">0,</span> <span class="pre">0),</span> <span class="pre">volumes={'DEFAULT':</span> <span class="pre">(1865.0,</span> <span class="pre">517.0),</span> <span class="pre">'NUCLEUS':</span> <span class="pre">(543.0,</span> <span class="pre">157.0)},</span> <span class="pre">heights={'DEFAULT':</span> <span class="pre">(9.75,</span> <span class="pre">2.4),</span> <span class="pre">'NUCLEUS':</span> <span class="pre">(6.86,</span> <span class="pre">1.7)},</span> <span class="pre">critical_volumes={'DEFAULT':</span> <span class="pre">(1300.0,</span> <span class="pre">200.0),</span> <span class="pre">'NUCLEUS':</span> <span class="pre">(400.0,</span> <span class="pre">50.0)},</span> <span class="pre">critical_heights={'DEFAULT':</span> <span class="pre">(9.0,</span> <span class="pre">2.0),</span> <span class="pre">'NUCLEUS':</span> <span class="pre">(6.5,</span> <span class="pre">1.5)},</span> <span class="pre">state_thresholds={'APOPTOTIC_LATE':</span> <span class="pre">0.25,</span> <span class="pre">'APOPTOTIC_EARLY':</span> <span class="pre">0.9,</span> <span class="pre">'PROLIFERATIVE_G1':</span> <span class="pre">1.124,</span> <span class="pre">'PROLIFERATIVE_S':</span> <span class="pre">1.726,</span> <span class="pre">'PROLIFERATIVE_G2':</span> <span class="pre">1.969,</span> <span class="pre">'PROLIFERATIVE_M':</span> <span class="pre">2},</span> <span class="pre">potts_terms=['volume',</span> <span class="pre">'adhesion'])</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfig.convert_to_arcade" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Convert to ARCADE configuration instance.</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ParametersConfigConvertToArcade</span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/initialize_arcade_simulations.html#ParametersConfigConvertToArcade"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade" title="Permalink to this definition">#</a></dt>
-<dd><p>Parameter configuration for initialize arcade simulations subflow - convert to arcade.</p>
+<dd><p>Parameter configuration for initialize ARCADE simulations subflow - convert to ARCADE.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.regions">
 <span class="sig-name descname"><span class="pre">regions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.regions" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Subcellular region samples used to initialize voxels.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.margins">
 <span class="sig-name descname"><span class="pre">margins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.margins" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Margins around initial voxel positions.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.volumes">
 <span class="sig-name descname"><span class="pre">volumes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.volumes" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Volume means and standard deviations in um^3.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.heights">
 <span class="sig-name descname"><span class="pre">heights</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.heights" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Height means and standard deviations in um.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.critical_volumes">
 <span class="sig-name descname"><span class="pre">critical_volumes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.critical_volumes" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Critical volume means and standard deviations in um^3.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.critical_heights">
 <span class="sig-name descname"><span class="pre">critical_heights</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.critical_heights" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Critical height means and standard deviations in um.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.state_thresholds">
 <span class="sig-name descname"><span class="pre">state_thresholds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.state_thresholds" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Cell state phase thresholds.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.potts_terms">
 <span class="sig-name descname"><span class="pre">potts_terms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.ParametersConfigConvertToArcade.potts_terms" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of Cellular Potts Model Hamiltonian terms.</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SeriesConfig</span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/initialize_arcade_simulations.html#SeriesConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig" title="Permalink to this definition">#</a></dt>
-<dd><p>Series configuration for initialize arcade simulations flow.</p>
+<dd><p>Series configuration for initialize ARCADE simulations flow.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig.name" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of the simulation series.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig.reference_key">
 <span class="sig-name descname"><span class="pre">reference_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig.reference_key" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Key for reference file.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig.conditions">
 <span class="sig-name descname"><span class="pre">conditions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_arcade_simulations.SeriesConfig.conditions" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of series condition dictionaries (must include unique condition “key”).</p>
+</dd></dl>
 
 </dd></dl>
 

@@ -285,9 +285,8 @@
 <span class="sd">    └── results</span>
 <span class="sd">        └── (name)_(key)_(seed).csv</span>
 
-<span class="sd">Different formats use inputs from the **results**, **data/data.CELLS**, and</span>
-<span class="sd">**data/data.LOCATIONS** directories.</span>
-<span class="sd">Formatted data is saved to the **converted** directory.</span>
+<span class="sd">Different formats use inputs from **results**, **data.CELLS**, and</span>
+<span class="sd">**data.LOCATIONS**. Formatted data are saved to **converted**.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
@@ -740,7 +739,7 @@
 <span class="k">def</span> <span class="nf">run_flow_convert_to_simularium_shapes</span><span class="p">(</span>
     <span class="n">context</span><span class="p">:</span> <span class="n">ContextConfig</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="n">SeriesConfig</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersConfigSimulariumShapes</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert ARCADE format subflow for simularium with shapes.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert ARCADE format subflow for Simularium with shapes.&quot;&quot;&quot;</span>
 
     <span class="n">cells_data_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;data.CELLS&quot;</span><span class="p">)</span>
     <span class="n">locs_data_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;data.LOCATIONS&quot;</span><span class="p">)</span>
@@ -780,7 +779,7 @@
 <span class="k">def</span> <span class="nf">run_flow_convert_to_simularium_objects</span><span class="p">(</span>
     <span class="n">context</span><span class="p">:</span> <span class="n">ContextConfig</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="n">SeriesConfig</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersConfigSimulariumObjects</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert ARCADE format subflow for simularium with objects.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert ARCADE format subflow for Simularium with objects.&quot;&quot;&quot;</span>
 
     <span class="n">data_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;data.LOCATIONS&quot;</span><span class="p">)</span>
     <span class="n">converted_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;converted&quot;</span><span class="p">,</span> <span class="s2">&quot;converted.SIMULARIUM&quot;</span><span class="p">)</span>

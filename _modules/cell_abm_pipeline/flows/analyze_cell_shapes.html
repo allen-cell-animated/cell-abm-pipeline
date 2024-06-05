@@ -281,15 +281,14 @@
 <span class="sd">            ├── (name)_(key)_(seed)_(region).PROPERTIES.csv</span>
 <span class="sd">            └── (name)_(key)_(seed)_(region).PROPERTIES.tar.xz</span>
 
-<span class="sd">Data from the **calculations.PROPERTIES** directories are processed into the</span>
-<span class="sd">**analysis.CELL_SHAPES_PROPERTIES** directory.</span>
-<span class="sd">Data from the **calculations.COEFFICIENTS** directories are processed into the</span>
-<span class="sd">**analysis.CELL_SHAPES_COEFFICIENTS** directory.</span>
-<span class="sd">Data from the **analysis.BASIC_METRICS** directory is combined with data from</span>
-<span class="sd">the **analysis.CELL_SHAPES_PROPERTIES** and **analysis.CELL_SHAPES_COEFFICIENTS**</span>
-<span class="sd">directories into the **analysis.CELL_SHAPES_DATA** directory.</span>
-<span class="sd">PCA models are saved to the **analysis.CELL_SHAPES_MODELS** directory.</span>
-<span class="sd">Statistical analysis is saved to the **analysis.CELL_SHAPES_STATISTICS** directory.</span>
+<span class="sd">Data from **calculations.PROPERTIES** are processed into</span>
+<span class="sd">**analysis.CELL_SHAPES_PROPERTIES**. Data from **calculations.COEFFICIENTS** are</span>
+<span class="sd">processed into **analysis.CELL_SHAPES_COEFFICIENTS**. Data from</span>
+<span class="sd">**analysis.BASIC_METRICS** are combined with data from</span>
+<span class="sd">**analysis.CELL_SHAPES_PROPERTIES** and **analysis.CELL_SHAPES_COEFFICIENTS**</span>
+<span class="sd">into **analysis.CELL_SHAPES_DATA**. PCA models are saved to</span>
+<span class="sd">**analysis.CELL_SHAPES_MODELS**. Statistical analysis is saved to</span>
+<span class="sd">**analysis.CELL_SHAPES_STATISTICS**.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
@@ -416,8 +415,8 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Analyze cell shapes subflow for processing properties.</span>
 
-<span class="sd">    Processes cell shape properties and compiles into a single dataframe. If</span>
-<span class="sd">    the combined dataframe already exists for a given key, that key is skipped.</span>
+<span class="sd">    Processes cell shape properties and compiles into a single dataframe. If the</span>
+<span class="sd">    combined dataframe already exists for a given key, that key is skipped.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">logger</span> <span class="o">=</span> <span class="n">get_run_logger</span><span class="p">()</span>

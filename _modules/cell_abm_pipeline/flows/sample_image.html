@@ -261,20 +261,21 @@
 
 <span class="sd">    (name)</span>
 <span class="sd">    ├── images</span>
-<span class="sd">    │    └── (name)_(key).(extension)</span>
+<span class="sd">    │   └── (name)_(key).(extension)</span>
 <span class="sd">    ├── plots</span>
-<span class="sd">    │    └── plots.SAMPLE</span>
-<span class="sd">    │        └── (name)_(key)_C(channel)_R(resolution).SAMPLE.png</span>
+<span class="sd">    │   └── plots.SAMPLE</span>
+<span class="sd">    │       └── (name)_(key)_C(channel)_R(resolution).SAMPLE.png</span>
 <span class="sd">    └── samples</span>
 <span class="sd">        └── samples.RAW</span>
 <span class="sd">            └── (name)_(key)_C(channel)_R(resolution).RAW.csv</span>
 
-<span class="sd">The **images** directory contains the input image to be sampled.</span>
-<span class="sd">Resulting sample(s) are placed into the **samples/samples.RAW** directory and</span>
-<span class="sd">corresponding plot(s) are placed into the **plots/plots.SAMPLE** directory.</span>
+<span class="sd">Input images to be sampled are loaded from **images**. Resulting image sample(s)</span>
+<span class="sd">are placed into **samples.RAW** and corresponding contact sheet(s) are placed</span>
+<span class="sd">into **plots.SAMPLE**.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
 <span class="kn">from</span> <span class="nn">abm_initialization_collection.image</span> <span class="kn">import</span> <span class="n">get_image_bounds</span><span class="p">,</span> <span class="n">plot_contact_sheet</span>
 <span class="kn">from</span> <span class="nn">abm_initialization_collection.sample</span> <span class="kn">import</span> <span class="p">(</span>
@@ -287,10 +288,10 @@
 <span class="kn">from</span> <span class="nn">io_collection.save</span> <span class="kn">import</span> <span class="n">save_dataframe</span><span class="p">,</span> <span class="n">save_figure</span>
 <span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
 
-<span class="c1"># Pixel resolution for images (um/pixel) in x/y</span>
+<span class="c1"># Default pixel resolution for images in x/y in um/pixel</span>
 <span class="n">SCALE_MICRONS_XY</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.108333</span>
 
-<span class="c1"># Pixel resolution for images (um/pixel) in z</span>
+<span class="c1"># Default pixel resolution for images in z in um/pixel</span>
 <span class="n">SCALE_MICRONS_Z</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.29</span>
 
 
@@ -299,36 +300,47 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for sample image flow.&quot;&quot;&quot;</span>
 
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Image key to sample.&quot;&quot;&quot;</span>
 
     <span class="n">channels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Image channels to sample.&quot;&quot;&quot;</span>
 
     <span class="n">grid</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rect&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Type of sampling grid (rect = rectangular, hex = hexagonal).&quot;&quot;&quot;</span>
 
-    <span class="n">coordinate_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;index&quot;</span>
+    <span class="n">coordinate_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coordinate scaling type (None = unscaled, absolute = in um, step = by step size).&quot;&quot;&quot;</span>
 
     <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Distance between samples in um.&quot;&quot;&quot;</span>
 
     <span class="n">scale_xy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">SCALE_MICRONS_XY</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Resolution scaling in x/y in um/pixel.&quot;&quot;&quot;</span>
 
     <span class="n">scale_z</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">SCALE_MICRONS_Z</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolution scaling in z in um/pixel.&quot;&quot;&quot;</span>
+
+    <span class="n">extension</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.ome.tiff&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Image extension.&quot;&quot;&quot;</span>
 
     <span class="n">contact_sheet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-
-    <span class="n">extension</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.ome.tiff&quot;</span></div>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;True to save contact sheet of processed samples, False otherwise.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="ContextConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.sample_image.html#cell_abm_pipeline.flows.sample_image.ContextConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">ContextConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Context configuration for sample image flow.&quot;&quot;&quot;</span>
 
-    <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Location for input and output files (local path or S3 bucket).&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="SeriesConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.sample_image.html#cell_abm_pipeline.flows.sample_image.SeriesConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SeriesConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Series configuration for sample image flow.&quot;&quot;&quot;</span>
 
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Name of the simulation series.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="run_flow"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.sample_image.html#cell_abm_pipeline.flows.sample_image.run_flow">[docs]</a><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;sample-image&quot;</span><span class="p">)</span>

@@ -254,6 +254,11 @@
           <h1>Source code for cell_abm_pipeline.flows.download_images</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Workflow for downloading images from Quilt.</span>
+
+<span class="sd">Image metadata is loaded from the Quilt package and used to filter for FOVs with</span>
+<span class="sd">the specified number of cells. FOVs are selected to meet the specified number of</span>
+<span class="sd">FOVs within each cell volume bin. For each selected FOV, the image is downloaded</span>
+<span class="sd">to the working location under **images**.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
@@ -270,14 +275,19 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for download images flow.&quot;&quot;&quot;</span>
 
     <span class="n">cells_per_fov</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of cells per FOV.&quot;&quot;&quot;</span>
 
     <span class="n">bins</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cell volume bin boundaries.&quot;&quot;&quot;</span>
 
     <span class="n">counts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of FOVs to select from each cell volume bin.&quot;&quot;&quot;</span>
 
     <span class="n">quilt_package</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;aics/hipsc_single_cell_image_dataset&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Name of Quilt package.&quot;&quot;&quot;</span>
 
-    <span class="n">quilt_registry</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;s3://allencell&quot;</span></div>
+    <span class="n">quilt_registry</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;s3://allencell&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Name of Quilt registry.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="ContextConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.download_images.html#cell_abm_pipeline.flows.download_images.ContextConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -285,8 +295,10 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Context configuration for download images flow.&quot;&quot;&quot;</span>
 
     <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Location for input and output files (local path or S3 bucket).&quot;&quot;&quot;</span>
 
-    <span class="n">metadata_location</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">metadata_location</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Location of metadata file (local path or S3 bucket).&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="SeriesConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.download_images.html#cell_abm_pipeline.flows.download_images.SeriesConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -294,8 +306,10 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Series configuration for download images flow.&quot;&quot;&quot;</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Name of the simulation series.&quot;&quot;&quot;</span>
 
-    <span class="n">metadata_key</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">metadata_key</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Key for metadata file.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="run_flow"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.download_images.html#cell_abm_pipeline.flows.download_images.run_flow">[docs]</a><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;download-images&quot;</span><span class="p">)</span>

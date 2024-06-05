@@ -261,7 +261,7 @@
 
 <span class="sd">    (name)</span>
 <span class="sd">    ├── groups</span>
-<span class="sd">    │   └── groups.SHAPES</span>
+<span class="sd">    │   └── groups.CELL_SHAPES</span>
 <span class="sd">    │       ├── (name).feature_correlations.(key).(region).csv</span>
 <span class="sd">    │       ├── (name).feature_distributions.(feature).json</span>
 <span class="sd">    │       ├── (name).mode_correlations.csv</span>
@@ -272,7 +272,7 @@
 <span class="sd">    │       ├── (name).shape_modes.(key).(region).(mode).(projection).json</span>
 <span class="sd">    │       └── (name).variance_explained.csv</span>
 <span class="sd">    └── plots</span>
-<span class="sd">        └── plots.SHAPES</span>
+<span class="sd">        └── plots.CELL_SHAPES</span>
 <span class="sd">            ├── (name).feature_correlations.(key).(region).png</span>
 <span class="sd">            ├── (name).feature_distributions.(feature).png</span>
 <span class="sd">            ├── (name).mode_correlations.(key).(key).png</span>
@@ -283,8 +283,8 @@
 <span class="sd">            ├── (name).shape_modes.(key).(region).(mode).(projection).(point).svg</span>
 <span class="sd">            └── (name).variance_explained.png</span>
 
-<span class="sd">Plots use grouped data from the **groups/groups.SHAPES** directory.</span>
-<span class="sd">Plots are saved to the **plots/plots.SHAPES** directory.</span>
+<span class="sd">Plots use grouped data from **groups.CELL_SHAPES**. Plots are saved to</span>
+<span class="sd">**plots.CELL_SHAPES**.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
@@ -555,8 +555,8 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot cell shapes subflow for feature correlations.&quot;&quot;&quot;</span>
 
-    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.SHAPES&quot;</span><span class="p">)</span>
-    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.CELL_SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.CELL_SHAPES&quot;</span><span class="p">)</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">condition</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">conditions</span><span class="p">]</span>
 
     <span class="n">modes</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PC</span><span class="si">{</span><span class="n">component</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">components</span><span class="p">)]</span>
@@ -588,8 +588,8 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot cell shapes subflow for feature distributions.&quot;&quot;&quot;</span>
 
-    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.SHAPES&quot;</span><span class="p">)</span>
-    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.CELL_SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.CELL_SHAPES&quot;</span><span class="p">)</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">condition</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">conditions</span><span class="p">]</span>
 
     <span class="n">features</span> <span class="o">=</span> <span class="p">[</span>
@@ -619,8 +619,8 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot cell shapes subflow for mode correlations.&quot;&quot;&quot;</span>
 
-    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.SHAPES&quot;</span><span class="p">)</span>
-    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.CELL_SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.CELL_SHAPES&quot;</span><span class="p">)</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;reference&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">condition</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">conditions</span><span class="p">]</span>
 
     <span class="n">modes</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PC</span><span class="si">{</span><span class="n">component</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">components</span><span class="p">)]</span>
@@ -663,8 +663,8 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot cell shapes subflow for population counts.&quot;&quot;&quot;</span>
 
-    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.SHAPES&quot;</span><span class="p">)</span>
-    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.CELL_SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.CELL_SHAPES&quot;</span><span class="p">)</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">condition</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">conditions</span><span class="p">]</span>
 
     <span class="n">group</span> <span class="o">=</span> <span class="n">load_dataframe</span><span class="p">(</span>
@@ -695,8 +695,8 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot cell shapes subflow for population stats.&quot;&quot;&quot;</span>
 
-    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.SHAPES&quot;</span><span class="p">)</span>
-    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.CELL_SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.CELL_SHAPES&quot;</span><span class="p">)</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">condition</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">conditions</span><span class="p">]</span>
 
     <span class="n">group</span> <span class="o">=</span> <span class="n">load_json</span><span class="p">(</span>
@@ -721,8 +721,8 @@
 <span class="sd">    Plot cell shapes subflow for shape average.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.SHAPES&quot;</span><span class="p">)</span>
-    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.CELL_SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.CELL_SHAPES&quot;</span><span class="p">)</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">condition</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">conditions</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
@@ -774,8 +774,8 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot cell shapes subflow for shape errors.&quot;&quot;&quot;</span>
 
-    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.SHAPES&quot;</span><span class="p">)</span>
-    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.CELL_SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.CELL_SHAPES&quot;</span><span class="p">)</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">condition</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">conditions</span><span class="p">]</span>
 
     <span class="n">group</span> <span class="o">=</span> <span class="n">load_json</span><span class="p">(</span>
@@ -800,8 +800,8 @@
 <span class="sd">    Plot cell shapes subflow for shape modes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.SHAPES&quot;</span><span class="p">)</span>
-    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.CELL_SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.CELL_SHAPES&quot;</span><span class="p">)</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">condition</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">conditions</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
@@ -850,8 +850,8 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot cell shapes subflow for variance explained.&quot;&quot;&quot;</span>
 
-    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.SHAPES&quot;</span><span class="p">)</span>
-    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">group_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.CELL_SHAPES&quot;</span><span class="p">)</span>
+    <span class="n">plot_key</span> <span class="o">=</span> <span class="n">make_key</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span> <span class="s2">&quot;plots.CELL_SHAPES&quot;</span><span class="p">)</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">condition</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">conditions</span><span class="p">]</span>
 
     <span class="n">group</span> <span class="o">=</span> <span class="n">load_dataframe</span><span class="p">(</span>

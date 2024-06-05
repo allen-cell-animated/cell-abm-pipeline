@@ -256,6 +256,21 @@
           <section id="module-cell_abm_pipeline.flows.run_fargate_calculations">
 <span id="run-fargate-calculations"></span><h1>run_fargate_calculations<a class="headerlink" href="#module-cell_abm_pipeline.flows.run_fargate_calculations" title="Permalink to this heading">#</a></h1>
 <p>Workflow for running containerized calculations using Fargate.</p>
+<p>This workflow is used to run registered calculation flows across different
+simulation conditions and random seeds in parallel. The configurations for the
+selected calculation are passed into the corresponding flows.</p>
+<p>Some calculations can be chunked (in which the calculation is only run on a
+subset of the cells for the given condition, seed, and tick) in order to further
+parallelize the flow. For chunked calculations, re-running the flow will merge
+completed chunks into a single file.</p>
+<p>The flow will aim to avoid re-running any existing calculations. Calculations
+are skipped if the calculation output file already exists, or if the specific
+chunk already exists. Calculations for additional ticks are appended into the
+existing calculation output file.</p>
+<p>If the submit tasks option is turned off, the flow will print the full pipeline
+command instead, which can then be run locally. Running commands locally can be
+useful for conditions that require more CPUs/memory than are available.</p>
+<p>Note that this workflow works only if working location is an S3 bucket.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -329,47 +344,56 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.working_location">
 <span class="sig-name descname"><span class="pre">working_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.working_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location for input and output files (local path or S3 bucket).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.account">
 <span class="sig-name descname"><span class="pre">account</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.account" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>AWS account number.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.region">
 <span class="sig-name descname"><span class="pre">region</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.region" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>AWS region.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.user">
 <span class="sig-name descname"><span class="pre">user</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.user" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>User name prefix.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.vcpus">
 <span class="sig-name descname"><span class="pre">vcpus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.vcpus" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Requested number of vcpus for AWS Fargate task.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.memory">
 <span class="sig-name descname"><span class="pre">memory</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.memory" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Requested memory for AWS Fargate task.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.cluster">
 <span class="sig-name descname"><span class="pre">cluster</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.cluster" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>AWS Fargate cluster name.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.security_groups">
 <span class="sig-name descname"><span class="pre">security_groups</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.security_groups" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>AWS Fargate security groups, separated by colon.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.subnets">
 <span class="sig-name descname"><span class="pre">subnets</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig.subnets" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>AWS Fargate subnets groups, separated by colon.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -380,32 +404,38 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.ParametersConfig.image">
 <span class="sig-name descname"><span class="pre">image</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.ParametersConfig.image" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of pipeline image.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.ParametersConfig.ticks">
 <span class="sig-name descname"><span class="pre">ticks</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.ParametersConfig.ticks" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of ticks to run flow on.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.ParametersConfig.calculate">
 <span class="sig-name descname"><span class="pre">calculate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#cell_abm_pipeline.flows.run_fargate_calculations.Calculation" title="cell_abm_pipeline.flows.run_fargate_calculations.Calculation"><span class="pre">Calculation</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.ParametersConfig.calculate" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Calculation type.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.ParametersConfig.chunk">
 <span class="sig-name descname"><span class="pre">chunk</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.ParametersConfig.chunk" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Chunk size, if possible for the given calculation type.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.ParametersConfig.submit_tasks">
 <span class="sig-name descname"><span class="pre">submit_tasks</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.ParametersConfig.submit_tasks" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>True to submit calculation tasks, False otherwise.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.ParametersConfig.overrides">
 <span class="sig-name descname"><span class="pre">overrides</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.ParametersConfig.overrides" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Overrides for the specific calculation type.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -416,17 +446,20 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.SeriesConfig.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.SeriesConfig.name" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of the simulation series.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.SeriesConfig.seeds">
 <span class="sig-name descname"><span class="pre">seeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.SeriesConfig.seeds" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of series random seeds.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_fargate_calculations.SeriesConfig.conditions">
 <span class="sig-name descname"><span class="pre">conditions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_fargate_calculations.SeriesConfig.conditions" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of series condition dictionaries (must include unique condition “key”).</p>
+</dd></dl>
 
 </dd></dl>
 

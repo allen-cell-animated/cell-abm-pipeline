@@ -256,6 +256,10 @@
           <section id="module-cell_abm_pipeline.flows.download_images">
 <span id="download-images"></span><h1>download_images<a class="headerlink" href="#module-cell_abm_pipeline.flows.download_images" title="Permalink to this heading">#</a></h1>
 <p>Workflow for downloading images from Quilt.</p>
+<p>Image metadata is loaded from the Quilt package and used to filter for FOVs with
+the specified number of cells. FOVs are selected to meet the specified number of
+FOVs within each cell volume bin. For each selected FOV, the image is downloaded
+to the working location under <strong>images</strong>.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -295,12 +299,14 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.download_images.ContextConfig.working_location">
 <span class="sig-name descname"><span class="pre">working_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.download_images.ContextConfig.working_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location for input and output files (local path or S3 bucket).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.download_images.ContextConfig.metadata_location">
 <span class="sig-name descname"><span class="pre">metadata_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.download_images.ContextConfig.metadata_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location of metadata file (local path or S3 bucket).</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -311,27 +317,32 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.download_images.ParametersConfig.cells_per_fov">
 <span class="sig-name descname"><span class="pre">cells_per_fov</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.download_images.ParametersConfig.cells_per_fov" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Number of cells per FOV.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.download_images.ParametersConfig.bins">
 <span class="sig-name descname"><span class="pre">bins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.download_images.ParametersConfig.bins" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Cell volume bin boundaries.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.download_images.ParametersConfig.counts">
 <span class="sig-name descname"><span class="pre">counts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.download_images.ParametersConfig.counts" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Number of FOVs to select from each cell volume bin.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.download_images.ParametersConfig.quilt_package">
 <span class="sig-name descname"><span class="pre">quilt_package</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'aics/hipsc_single_cell_image_dataset'</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.download_images.ParametersConfig.quilt_package" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of Quilt package.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.download_images.ParametersConfig.quilt_registry">
 <span class="sig-name descname"><span class="pre">quilt_registry</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'s3://allencell'</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.download_images.ParametersConfig.quilt_registry" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of Quilt registry.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -342,12 +353,14 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.download_images.SeriesConfig.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.download_images.SeriesConfig.name" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of the simulation series.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.download_images.SeriesConfig.metadata_key">
 <span class="sig-name descname"><span class="pre">metadata_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.download_images.SeriesConfig.metadata_key" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Key for metadata file.</p>
+</dd></dl>
 
 </dd></dl>
 

@@ -259,7 +259,7 @@
 <p>Working location structure:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>name<span class="o">)</span>
 ├──<span class="w"> </span>groups
-│<span class="w">   </span>└──<span class="w"> </span>groups.BASIC
+│<span class="w">   </span>└──<span class="w"> </span>groups.BASIC_METRICS
 │<span class="w">       </span>├──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>.metrics_bins.<span class="o">(</span>key<span class="o">)</span>.<span class="o">(</span>seed<span class="o">)</span>.<span class="o">(</span>tick<span class="o">)</span>.<span class="o">(</span>metric<span class="o">)</span>.csv
 │<span class="w">       </span>├──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>.metrics_distributions.<span class="o">(</span>metric<span class="o">)</span>.json
 │<span class="w">       </span>├──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>.metrics_individuals.<span class="o">(</span>key<span class="o">)</span>.<span class="o">(</span>seed<span class="o">)</span>.<span class="o">(</span>metric<span class="o">)</span>.json
@@ -267,7 +267,7 @@
 │<span class="w">       </span>├──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>.metrics_temporal.<span class="o">(</span>key<span class="o">)</span>.<span class="o">(</span>metric<span class="o">)</span>.json
 │<span class="w">       </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>.population_counts.<span class="o">(</span>tick<span class="o">)</span>.csv
 └──<span class="w"> </span>plots
-<span class="w">    </span>└──<span class="w"> </span>plots.BASIC
+<span class="w">    </span>└──<span class="w"> </span>plots.BASIC_METRICS
 <span class="w">        </span>├──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>.metrics_bins.<span class="o">(</span>key<span class="o">)</span>.<span class="o">(</span>seed<span class="o">)</span>.<span class="o">(</span>tick<span class="o">)</span>.<span class="o">(</span>metric<span class="o">)</span>.png
 <span class="w">        </span>├──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>.metrics_distributions.<span class="o">(</span>metric<span class="o">)</span>.png
 <span class="w">        </span>├──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>.metrics_individuals.<span class="o">(</span>key<span class="o">)</span>.<span class="o">(</span>seed<span class="o">)</span>.<span class="o">(</span>metric<span class="o">)</span>.png
@@ -276,8 +276,8 @@
 <span class="w">        </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>.population_counts.<span class="o">(</span>tick<span class="o">)</span>.png
 </pre></div>
 </div>
-<p>Plots use grouped data from the <strong>groups/groups.BASIC</strong> directory.
-Plots are saved to the <strong>plots/plots.BASIC</strong> directory.</p>
+<p>Plots use grouped data from <strong>groups.BASIC_METRICS</strong>. Plots are saved to
+<strong>plots.BASIC_METRICS</strong>.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">

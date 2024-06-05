@@ -254,6 +254,26 @@
           <h1>Source code for cell_abm_pipeline.flows.run_fargate_calculations</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Workflow for running containerized calculations using Fargate.</span>
+
+<span class="sd">This workflow is used to run registered calculation flows across different</span>
+<span class="sd">simulation conditions and random seeds in parallel. The configurations for the</span>
+<span class="sd">selected calculation are passed into the corresponding flows.</span>
+
+<span class="sd">Some calculations can be chunked (in which the calculation is only run on a</span>
+<span class="sd">subset of the cells for the given condition, seed, and tick) in order to further</span>
+<span class="sd">parallelize the flow. For chunked calculations, re-running the flow will merge</span>
+<span class="sd">completed chunks into a single file.</span>
+
+<span class="sd">The flow will aim to avoid re-running any existing calculations. Calculations</span>
+<span class="sd">are skipped if the calculation output file already exists, or if the specific</span>
+<span class="sd">chunk already exists. Calculations for additional ticks are appended into the</span>
+<span class="sd">existing calculation output file.</span>
+
+<span class="sd">If the submit tasks option is turned off, the flow will print the full pipeline</span>
+<span class="sd">command instead, which can then be run locally. Running commands locally can be</span>
+<span class="sd">useful for conditions that require more CPUs/memory than are available.</span>
+
+<span class="sd">Note that this workflow works only if working location is an S3 bucket.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">importlib</span>
@@ -294,16 +314,22 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for run fargate calculations flow.&quot;&quot;&quot;</span>
 
     <span class="n">image</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Name of pipeline image.&quot;&quot;&quot;</span>
 
     <span class="n">ticks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of ticks to run flow on.&quot;&quot;&quot;</span>
 
     <span class="n">calculate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Calculation</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculation type.&quot;&quot;&quot;</span>
 
     <span class="n">chunk</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Chunk size, if possible for the given calculation type.&quot;&quot;&quot;</span>
 
     <span class="n">submit_tasks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;True to submit calculation tasks, False otherwise.&quot;&quot;&quot;</span>
 
-    <span class="n">overrides</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{})</span></div>
+    <span class="n">overrides</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{})</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Overrides for the specific calculation type.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="ContextConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.run_fargate_calculations.html#cell_abm_pipeline.flows.run_fargate_calculations.ContextConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -311,22 +337,31 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Context configuration for run fargate calculations flow.&quot;&quot;&quot;</span>
 
     <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Location for input and output files (local path or S3 bucket).&quot;&quot;&quot;</span>
 
     <span class="n">account</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;AWS account number.&quot;&quot;&quot;</span>
 
     <span class="n">region</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;AWS region.&quot;&quot;&quot;</span>
 
     <span class="n">user</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;User name prefix.&quot;&quot;&quot;</span>
 
     <span class="n">vcpus</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Requested number of vcpus for AWS Fargate task.&quot;&quot;&quot;</span>
 
     <span class="n">memory</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Requested memory for AWS Fargate task.&quot;&quot;&quot;</span>
 
     <span class="n">cluster</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;AWS Fargate cluster name.&quot;&quot;&quot;</span>
 
     <span class="n">security_groups</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;AWS Fargate security groups, separated by colon.&quot;&quot;&quot;</span>
 
-    <span class="n">subnets</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">subnets</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;AWS Fargate subnets groups, separated by colon.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="SeriesConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.run_fargate_calculations.html#cell_abm_pipeline.flows.run_fargate_calculations.SeriesConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -334,10 +369,13 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Series configuration for run fargate calculations flow.&quot;&quot;&quot;</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Name of the simulation series.&quot;&quot;&quot;</span>
 
     <span class="n">seeds</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of series random seeds.&quot;&quot;&quot;</span>
 
-    <span class="n">conditions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span></div>
+    <span class="n">conditions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of series condition dictionaries (must include unique condition &quot;key&quot;).&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="run_flow"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.run_fargate_calculations.html#cell_abm_pipeline.flows.run_fargate_calculations.run_flow">[docs]</a><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;run-fargate-calculations&quot;</span><span class="p">)</span>

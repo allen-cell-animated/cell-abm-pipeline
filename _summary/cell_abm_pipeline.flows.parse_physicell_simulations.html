@@ -256,6 +256,15 @@
           <section id="module-cell_abm_pipeline.flows.parse_physicell_simulations">
 <span id="parse-physicell-simulations"></span><h1>parse_physicell_simulations<a class="headerlink" href="#module-cell_abm_pipeline.flows.parse_physicell_simulations" title="Permalink to this heading">#</a></h1>
 <p>Workflow for parsing PhysiCell simulations into tidy data.</p>
+<p>Working location structure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>name<span class="o">)</span>
+├──<span class="w"> </span>data
+│<span class="w">   </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>.tar.xz
+└──<span class="w"> </span>results
+<span class="w">    </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>.csv
+</pre></div>
+</div>
+<p>Data from <strong>data</strong> are parsed into <strong>results</strong>.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -295,12 +304,14 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.parse_physicell_simulations.ContextConfig.working_location">
 <span class="sig-name descname"><span class="pre">working_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.parse_physicell_simulations.ContextConfig.working_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location for input and output files (local path or S3 bucket).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.parse_physicell_simulations.ContextConfig.manifest_location">
 <span class="sig-name descname"><span class="pre">manifest_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.parse_physicell_simulations.ContextConfig.manifest_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location of manifest file (local path or S3 bucket).</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -311,12 +322,14 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.parse_physicell_simulations.ParametersConfig.include_filters">
 <span class="sig-name descname"><span class="pre">include_filters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.parse_physicell_simulations.ParametersConfig.include_filters" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of Unix filename patterns for files to include in parsing.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.parse_physicell_simulations.ParametersConfig.exclude_filters">
 <span class="sig-name descname"><span class="pre">exclude_filters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.parse_physicell_simulations.ParametersConfig.exclude_filters" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of Unix filename patterns for files to exclude from parsing.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -327,17 +340,20 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.parse_physicell_simulations.SeriesConfig.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.parse_physicell_simulations.SeriesConfig.name" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of the simulation series.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.parse_physicell_simulations.SeriesConfig.manifest_key">
 <span class="sig-name descname"><span class="pre">manifest_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.parse_physicell_simulations.SeriesConfig.manifest_key" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Key for manifest file.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.parse_physicell_simulations.SeriesConfig.extensions">
 <span class="sig-name descname"><span class="pre">extensions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.parse_physicell_simulations.SeriesConfig.extensions" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of file extensions in complete run.</p>
+</dd></dl>
 
 </dd></dl>
 

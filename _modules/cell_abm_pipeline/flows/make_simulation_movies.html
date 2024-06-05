@@ -254,8 +254,30 @@
           <h1>Source code for cell_abm_pipeline.flows.make_simulation_movies</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Workflow for making simulation movies.</span>
-<span class="sd">&quot;&quot;&quot;</span>
 
+<span class="sd">Working location structure:</span>
+
+<span class="sd">.. code-block:: bash</span>
+
+<span class="sd">    (name)</span>
+<span class="sd">    ├── data</span>
+<span class="sd">    │   └── data.LOCATIONS</span>
+<span class="sd">    │       └── (name)_(key)_(seed).LOCATIONS.tar.xz</span>
+<span class="sd">    ├── movies</span>
+<span class="sd">    │   ├── movies.CENTROIDS</span>
+<span class="sd">    │   │   ├── (name)_(key)_(seed).CENTROIDS.gif</span>
+<span class="sd">    │   │   └── (name)_(key)_(seed)</span>
+<span class="sd">    │   │       └── (frame).CENTROIDS.png</span>
+<span class="sd">    │   └── movies.SCAN</span>
+<span class="sd">    │       ├── (name)_(key)_(seed)_(view)_(frame).SCAN.gif</span>
+<span class="sd">    │       └── (name)_(key)_(seed)_(view)_(frame)</span>
+<span class="sd">    │           └── (index).SCAN.png</span>
+<span class="sd">    └── results</span>
+<span class="sd">        └── (name)_(key)_(seed).csv</span>
+
+<span class="sd">Different formats use inputs from **results** and **data.LOCATIONS**. Movies are</span>
+<span class="sd">saved to **movies**.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 

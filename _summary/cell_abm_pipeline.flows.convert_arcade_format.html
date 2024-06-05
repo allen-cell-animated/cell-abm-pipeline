@@ -284,9 +284,8 @@
 <span class="w">    </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>.csv
 </pre></div>
 </div>
-<p>Different formats use inputs from the <strong>results</strong>, <strong>data/data.CELLS</strong>, and
-<strong>data/data.LOCATIONS</strong> directories.
-Formatted data is saved to the <strong>converted</strong> directory.</p>
+<p>Different formats use inputs from <strong>results</strong>, <strong>data.CELLS</strong>, and
+<strong>data.LOCATIONS</strong>. Formatted data are saved to <strong>converted</strong>.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -307,10 +306,10 @@ Formatted data is saved to the <strong>converted</strong> directory.</p>
 <td><p>Convert ARCADE format subflow for projections.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium_objects" title="cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium_objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_flow_convert_to_simularium_objects</span></code></a></p></td>
-<td><p>Convert ARCADE format subflow for simularium with objects.</p></td>
+<td><p>Convert ARCADE format subflow for Simularium with objects.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium_shapes" title="cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium_shapes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_flow_convert_to_simularium_shapes</span></code></a></p></td>
-<td><p>Convert ARCADE format subflow for simularium with shapes.</p></td>
+<td><p>Convert ARCADE format subflow for Simularium with shapes.</p></td>
 </tr>
 </tbody>
 </table>
@@ -357,13 +356,13 @@ Formatted data is saved to the <strong>converted</strong> directory.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium_objects">
 <span class="sig-name descname"><span class="pre">run_flow_convert_to_simularium_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.convert_arcade_format.ContextConfig" title="cell_abm_pipeline.flows.convert_arcade_format.ContextConfig"><span class="pre">ContextConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.convert_arcade_format.SeriesConfig" title="cell_abm_pipeline.flows.convert_arcade_format.SeriesConfig"><span class="pre">SeriesConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumObjects" title="cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumObjects"><span class="pre">ParametersConfigSimulariumObjects</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/convert_arcade_format.html#run_flow_convert_to_simularium_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium_objects" title="Permalink to this definition">#</a></dt>
-<dd><p>Convert ARCADE format subflow for simularium with objects.</p>
+<dd><p>Convert ARCADE format subflow for Simularium with objects.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium_shapes">
 <span class="sig-name descname"><span class="pre">run_flow_convert_to_simularium_shapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.convert_arcade_format.ContextConfig" title="cell_abm_pipeline.flows.convert_arcade_format.ContextConfig"><span class="pre">ContextConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.convert_arcade_format.SeriesConfig" title="cell_abm_pipeline.flows.convert_arcade_format.SeriesConfig"><span class="pre">SeriesConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumShapes" title="cell_abm_pipeline.flows.convert_arcade_format.ParametersConfigSimulariumShapes"><span class="pre">ParametersConfigSimulariumShapes</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/convert_arcade_format.html#run_flow_convert_to_simularium_shapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.convert_arcade_format.run_flow_convert_to_simularium_shapes" title="Permalink to this definition">#</a></dt>
-<dd><p>Convert ARCADE format subflow for simularium with shapes.</p>
+<dd><p>Convert ARCADE format subflow for Simularium with shapes.</p>
 </dd></dl>
 
 <p class="rubric">Configs</p>

@@ -253,7 +253,24 @@
         <article role="main">
           <h1>Source code for cell_abm_pipeline.flows.calculate_image_properties</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Workflow for calculating shape properties from images.</span>
+<span class="sd">Workflow for calculating shape properties from existing images.</span>
+
+<span class="sd">Working location structure:</span>
+
+<span class="sd">.. code-block:: bash</span>
+
+<span class="sd">    (name)</span>
+<span class="sd">    ├── results</span>
+<span class="sd">    │   └── (name)_(key)_(seed).csv</span>
+<span class="sd">    └── calculations</span>
+<span class="sd">        └── calculations.PROPERTIES</span>
+<span class="sd">            ├── (name)_(key)_(seed)_(tick).PROPERTIES.csv</span>
+<span class="sd">            └── (name)_(key)_(seed)_(tick)_(region).PROPERTIES.csv</span>
+
+<span class="sd">Data from **results** are used to specify existing images, which are then used</span>
+<span class="sd">to calculate properties. Calculations are saved to **calculations.PROPERTIES**.</span>
+
+<span class="sd">If region is specified, the region is included in the output key.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
@@ -274,30 +291,38 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for calculate image properties flow.&quot;&quot;&quot;</span>
 
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulation key to calculate.&quot;&quot;&quot;</span>
 
     <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulation random seed to calculate.&quot;&quot;&quot;</span>
 
     <span class="n">tick</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulation tick to calculate.&quot;&quot;&quot;</span>
 
     <span class="n">channel</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Index of channel to calculate.&quot;&quot;&quot;</span>
 
     <span class="n">region</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Subcellular region to calculate.&quot;&quot;&quot;</span>
 
-    <span class="n">properties</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">SHAPE_PROPERTIES</span><span class="p">)</span></div>
+    <span class="n">properties</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">SHAPE_PROPERTIES</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of shape properties to calculate.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="ContextConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.calculate_image_properties.html#cell_abm_pipeline.flows.calculate_image_properties.ContextConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">ContextConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Context configuration for calculate image properties flow.&quot;&quot;&quot;</span>
 
-    <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Location for input and output files (local path or S3 bucket).&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="SeriesConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.calculate_image_properties.html#cell_abm_pipeline.flows.calculate_image_properties.SeriesConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SeriesConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Series configuration for calculate image properties flow.&quot;&quot;&quot;</span>
 
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Name of the simulation series.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="run_flow"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.calculate_image_properties.html#cell_abm_pipeline.flows.calculate_image_properties.run_flow">[docs]</a><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;calculate-image-properties&quot;</span><span class="p">)</span>

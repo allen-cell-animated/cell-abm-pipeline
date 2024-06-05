@@ -256,6 +256,26 @@
           <section id="module-cell_abm_pipeline.flows.make_simulation_movies">
 <span id="make-simulation-movies"></span><h1>make_simulation_movies<a class="headerlink" href="#module-cell_abm_pipeline.flows.make_simulation_movies" title="Permalink to this heading">#</a></h1>
 <p>Workflow for making simulation movies.</p>
+<p>Working location structure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>name<span class="o">)</span>
+├──<span class="w"> </span>data
+│<span class="w">   </span>└──<span class="w"> </span>data.LOCATIONS
+│<span class="w">       </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>.LOCATIONS.tar.xz
+├──<span class="w"> </span>movies
+│<span class="w">   </span>├──<span class="w"> </span>movies.CENTROIDS
+│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>.CENTROIDS.gif
+│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>
+│<span class="w">   </span>│<span class="w">       </span>└──<span class="w"> </span><span class="o">(</span>frame<span class="o">)</span>.CENTROIDS.png
+│<span class="w">   </span>└──<span class="w"> </span>movies.SCAN
+│<span class="w">       </span>├──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>_<span class="o">(</span>view<span class="o">)</span>_<span class="o">(</span>frame<span class="o">)</span>.SCAN.gif
+│<span class="w">       </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>_<span class="o">(</span>view<span class="o">)</span>_<span class="o">(</span>frame<span class="o">)</span>
+│<span class="w">           </span>└──<span class="w"> </span><span class="o">(</span>index<span class="o">)</span>.SCAN.png
+└──<span class="w"> </span>results
+<span class="w">    </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>.csv
+</pre></div>
+</div>
+<p>Different formats use inputs from <strong>results</strong> and <strong>data.LOCATIONS</strong>. Movies are
+saved to <strong>movies</strong>.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">

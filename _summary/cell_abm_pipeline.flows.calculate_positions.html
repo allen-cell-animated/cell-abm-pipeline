@@ -256,6 +256,18 @@
           <section id="module-cell_abm_pipeline.flows.calculate_positions">
 <span id="calculate-positions"></span><h1>calculate_positions<a class="headerlink" href="#module-cell_abm_pipeline.flows.calculate_positions" title="Permalink to this heading">#</a></h1>
 <p>Workflow for calculating voxel positions.</p>
+<p>Working location structure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>name<span class="o">)</span>
+├──<span class="w"> </span>data
+│<span class="w">   </span>└──<span class="w"> </span>data.LOCATIONS
+│<span class="w">       </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>.LOCATIONS.tar.xz
+└──<span class="w"> </span>calculations
+<span class="w">    </span>└──<span class="w"> </span>calculations.POSITIONS
+<span class="w">        </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>_<span class="o">(</span>tick<span class="o">)</span>.POSITIONS.csv
+</pre></div>
+</div>
+<p>Data from <strong>data.LOCATIONS</strong> are used to calculate positions, which are saved to
+<strong>calculations.POSITIONS</strong>.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -295,7 +307,8 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.calculate_positions.ContextConfig.working_location">
 <span class="sig-name descname"><span class="pre">working_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.calculate_positions.ContextConfig.working_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location for input and output files (local path or S3 bucket).</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -306,17 +319,20 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.calculate_positions.ParametersConfig.key">
 <span class="sig-name descname"><span class="pre">key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.calculate_positions.ParametersConfig.key" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Simulation key to calculate.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.calculate_positions.ParametersConfig.seed">
 <span class="sig-name descname"><span class="pre">seed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.calculate_positions.ParametersConfig.seed" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Simulation random seed to calculate.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.calculate_positions.ParametersConfig.tick">
 <span class="sig-name descname"><span class="pre">tick</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.calculate_positions.ParametersConfig.tick" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Simulation tick to calculate.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -327,7 +343,8 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.calculate_positions.SeriesConfig.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.calculate_positions.SeriesConfig.name" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of the simulation series.</p>
+</dd></dl>
 
 </dd></dl>
 

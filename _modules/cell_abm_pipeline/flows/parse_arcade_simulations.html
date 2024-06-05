@@ -254,6 +254,23 @@
           <h1>Source code for cell_abm_pipeline.flows.parse_arcade_simulations</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Workflow for parsing ARCADE simulations into tidy data.</span>
+
+<span class="sd">Working location structure:</span>
+
+<span class="sd">.. code-block:: bash</span>
+
+<span class="sd">    (name)</span>
+<span class="sd">    ├── data</span>
+<span class="sd">    │   ├── data.CELLS</span>
+<span class="sd">    │   │   └── (name)_(key)_(seed).CELLS.tar.xz</span>
+<span class="sd">    │   └── data.LOCATIONS</span>
+<span class="sd">    │       └── (name)_(key)_(seed).LOCATIONS.tar.xz</span>
+<span class="sd">    └── results</span>
+<span class="sd">        └── (name)_(key)_(seed).csv</span>
+
+<span class="sd">Data from **data.CELLS** and **data.LOCATIONS** are parsed into **results**. If</span>
+<span class="sd">the results file already exists, additional parsing will merge results based on</span>
+<span class="sd">cell id and tick.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
@@ -271,10 +288,13 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for parse arcade simulations flow.&quot;&quot;&quot;</span>
 
     <span class="n">regions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of subcellular regions to parse.&quot;&quot;&quot;</span>
 
     <span class="n">include_filters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of Unix filename patterns for files to include in parsing.&quot;&quot;&quot;</span>
 
-    <span class="n">exclude_filters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[])</span></div>
+    <span class="n">exclude_filters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of Unix filename patterns for files to exclude from parsing.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="ContextConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html#cell_abm_pipeline.flows.parse_arcade_simulations.ContextConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -282,8 +302,10 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Context configuration for parse arcade simulations flow.&quot;&quot;&quot;</span>
 
     <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Location for input and output files (local path or S3 bucket).&quot;&quot;&quot;</span>
 
-    <span class="n">manifest_location</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">manifest_location</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Location of manifest file (local path or S3 bucket).&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="SeriesConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html#cell_abm_pipeline.flows.parse_arcade_simulations.SeriesConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -291,10 +313,13 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Series configuration for parse arcade simulations flow.&quot;&quot;&quot;</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Name of the simulation series.&quot;&quot;&quot;</span>
 
     <span class="n">manifest_key</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Key for manifest file.&quot;&quot;&quot;</span>
 
-    <span class="n">extensions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
+    <span class="n">extensions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of file extensions in complete run.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="run_flow"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.parse_arcade_simulations.html#cell_abm_pipeline.flows.parse_arcade_simulations.run_flow">[docs]</a><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;parse-arcade-simulations&quot;</span><span class="p">)</span>

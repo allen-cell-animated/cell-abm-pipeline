@@ -254,6 +254,21 @@
           <h1>Source code for cell_abm_pipeline.flows.calculate_neighbors</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Workflow for calculating neighbor connections.</span>
+
+<span class="sd">Working location structure:</span>
+
+<span class="sd">.. code-block:: bash</span>
+
+<span class="sd">    (name)</span>
+<span class="sd">    ├── data</span>
+<span class="sd">    │   └── data.LOCATIONS</span>
+<span class="sd">    │       └── (name)_(key)_(seed).LOCATIONS.tar.xz</span>
+<span class="sd">    └── calculations</span>
+<span class="sd">        └── calculations.NEIGHBORS</span>
+<span class="sd">            └── (name)_(key)_(seed)_(tick).NEIGHBORS.csv</span>
+
+<span class="sd">Data from **data.LOCATIONS** are used to calculate neighbors, which are saved to</span>
+<span class="sd">**calculations.NEIGHBORS**.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
@@ -272,24 +287,29 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for calculate neighbors flow.&quot;&quot;&quot;</span>
 
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulation key to calculate.&quot;&quot;&quot;</span>
 
     <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulation random seed to calculate.&quot;&quot;&quot;</span>
 
-    <span class="n">tick</span><span class="p">:</span> <span class="nb">int</span></div>
+    <span class="n">tick</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulation tick to calculate.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="ContextConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.calculate_neighbors.html#cell_abm_pipeline.flows.calculate_neighbors.ContextConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">ContextConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Context configuration for calculate neighbors flow.&quot;&quot;&quot;</span>
 
-    <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Location for input and output files (local path or S3 bucket).&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="SeriesConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.calculate_neighbors.html#cell_abm_pipeline.flows.calculate_neighbors.SeriesConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SeriesConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Series configuration for calculate neighbors flow.&quot;&quot;&quot;</span>
 
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Name of the simulation series.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="run_flow"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.calculate_neighbors.html#cell_abm_pipeline.flows.calculate_neighbors.run_flow">[docs]</a><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;calculate-neighbors&quot;</span><span class="p">)</span>

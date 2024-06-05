@@ -256,6 +256,15 @@
           <section id="module-cell_abm_pipeline.flows.summarize_manifest">
 <span id="summarize-manifest"></span><h1>summarize_manifest<a class="headerlink" href="#module-cell_abm_pipeline.flows.summarize_manifest" title="Permalink to this heading">#</a></h1>
 <p>Workflow for summarizing files in the manifest.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>name<span class="o">)</span>
+└──<span class="w"> </span>YYYY-MM-DD
+<span class="w">    </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>.SUMMARY.txt
+</pre></div>
+</div>
+<p>For each search location, flow will attempt to find all files matching the
+specified series name. After applying include and exclude filters, the manifest
+is updated and a summary of files, grouped by extension, is printed and saved to
+a dated directory.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -295,12 +304,14 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.summarize_manifest.ContextConfig.working_location">
 <span class="sig-name descname"><span class="pre">working_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.summarize_manifest.ContextConfig.working_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location for input and output files (local path or S3 bucket).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.summarize_manifest.ContextConfig.manifest_location">
 <span class="sig-name descname"><span class="pre">manifest_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.summarize_manifest.ContextConfig.manifest_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location of manifest file (local path or S3 bucket).</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -311,22 +322,26 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.summarize_manifest.ParametersConfig.update_manifest">
 <span class="sig-name descname"><span class="pre">update_manifest</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.summarize_manifest.ParametersConfig.update_manifest" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>True if the manifest file should be updated, False otherwise.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.summarize_manifest.ParametersConfig.search_locations">
 <span class="sig-name descname"><span class="pre">search_locations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.summarize_manifest.ParametersConfig.search_locations" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of locations to search for files (local path or S3 bucket).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.summarize_manifest.ParametersConfig.include_filters">
 <span class="sig-name descname"><span class="pre">include_filters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.summarize_manifest.ParametersConfig.include_filters" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of Unix filename patterns for files to include in summary.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.summarize_manifest.ParametersConfig.exclude_filters">
 <span class="sig-name descname"><span class="pre">exclude_filters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.summarize_manifest.ParametersConfig.exclude_filters" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of Unix filename patterns for files to exclude from summary.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -337,22 +352,26 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.summarize_manifest.SeriesConfig.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.summarize_manifest.SeriesConfig.name" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of the simulation series.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.summarize_manifest.SeriesConfig.manifest_key">
 <span class="sig-name descname"><span class="pre">manifest_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.summarize_manifest.SeriesConfig.manifest_key" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Key for manifest file.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.summarize_manifest.SeriesConfig.seeds">
 <span class="sig-name descname"><span class="pre">seeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.summarize_manifest.SeriesConfig.seeds" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of series random seeds.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.summarize_manifest.SeriesConfig.conditions">
 <span class="sig-name descname"><span class="pre">conditions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.summarize_manifest.SeriesConfig.conditions" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of series condition dictionaries (must include unique condition “key”).</p>
+</dd></dl>
 
 </dd></dl>
 

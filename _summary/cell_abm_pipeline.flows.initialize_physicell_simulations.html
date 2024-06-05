@@ -256,12 +256,25 @@
           <section id="module-cell_abm_pipeline.flows.initialize_physicell_simulations">
 <span id="initialize-physicell-simulations"></span><h1>initialize_physicell_simulations<a class="headerlink" href="#module-cell_abm_pipeline.flows.initialize_physicell_simulations" title="Permalink to this heading">#</a></h1>
 <p>Workflow for initializing PhysiCell simulations.</p>
+<p>Working location structure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>name<span class="o">)</span>
+├──<span class="w"> </span>inits
+│<span class="w">   </span>└──<span class="w"> </span>inits.PHYSICELL
+│<span class="w">       </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>resolution<span class="o">)</span>.csv
+└──<span class="w"> </span>plots
+<span class="w">    </span>└──<span class="w"> </span>plots.COORDINATES
+<span class="w">        </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>resolution<span class="o">)</span>.COORDINATES.png
+</pre></div>
+</div>
+<p>Initialization consist of a single cell of the specified height and volume,
+sampled at the given spatial resolution. Coordinates are saved to
+<strong>inits.PHYSICELL</strong>.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.run_flow" title="cell_abm_pipeline.flows.initialize_physicell_simulations.run_flow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_flow</span></code></a></p></td>
-<td><p>Main initialize physicell simulations flow.</p></td>
+<td><p>Main initialize PhysiCell simulations flow.</p></td>
 </tr>
 </tbody>
 </table>
@@ -269,7 +282,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_physicell_simulations.run_flow">
 <span class="sig-name descname"><span class="pre">run_flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.ContextConfig" title="cell_abm_pipeline.flows.initialize_physicell_simulations.ContextConfig"><span class="pre">ContextConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.SeriesConfig" title="cell_abm_pipeline.flows.initialize_physicell_simulations.SeriesConfig"><span class="pre">SeriesConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig" title="cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig"><span class="pre">ParametersConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/initialize_physicell_simulations.html#run_flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.run_flow" title="Permalink to this definition">#</a></dt>
-<dd><p>Main initialize physicell simulations flow.</p>
+<dd><p>Main initialize PhysiCell simulations flow.</p>
 </dd></dl>
 
 <p class="rubric">Configs</p>
@@ -277,13 +290,13 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.ContextConfig" title="cell_abm_pipeline.flows.initialize_physicell_simulations.ContextConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ContextConfig</span></code></a></p></td>
-<td><p>Context configuration for initialize physicell simulations flow.</p></td>
+<td><p>Context configuration for initialize PhysiCell simulations flow.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig" title="cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParametersConfig</span></code></a></p></td>
-<td><p>Parameter configuration for initialize physicell simulations flow.</p></td>
+<td><p>Parameter configuration for initialize PhysiCell simulations flow.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.SeriesConfig" title="cell_abm_pipeline.flows.initialize_physicell_simulations.SeriesConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SeriesConfig</span></code></a></p></td>
-<td><p>Series configuration for initialize physicell simulations flow.</p></td>
+<td><p>Series configuration for initialize PhysiCell simulations flow.</p></td>
 </tr>
 </tbody>
 </table>
@@ -291,63 +304,72 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_physicell_simulations.ContextConfig">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ContextConfig</span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/initialize_physicell_simulations.html#ContextConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.ContextConfig" title="Permalink to this definition">#</a></dt>
-<dd><p>Context configuration for initialize physicell simulations flow.</p>
+<dd><p>Context configuration for initialize PhysiCell simulations flow.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_physicell_simulations.ContextConfig.working_location">
 <span class="sig-name descname"><span class="pre">working_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.ContextConfig.working_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location for input and output files (local path or S3 bucket).</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ParametersConfig</span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/initialize_physicell_simulations.html#ParametersConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig" title="Permalink to this definition">#</a></dt>
-<dd><p>Parameter configuration for initialize physicell simulations flow.</p>
+<dd><p>Parameter configuration for initialize PhysiCell simulations flow.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig.grid">
 <span class="sig-name descname"><span class="pre">grid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rect'</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig.grid" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Type of sampling grid (rect = rectangular, hex = hexagonal).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig.ds">
 <span class="sig-name descname"><span class="pre">ds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig.ds" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Spatial scaling in um/voxel.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig.bounding_box">
 <span class="sig-name descname"><span class="pre">bounding_box</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(100,</span> <span class="pre">100)</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig.bounding_box" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Size of bounding box in um.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig.cell_height">
 <span class="sig-name descname"><span class="pre">cell_height</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9.0</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig.cell_height" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Average cell height in um.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig.cell_volume">
 <span class="sig-name descname"><span class="pre">cell_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1300.0</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig.cell_volume" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Average cell volume in um^3.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig.substrate">
 <span class="sig-name descname"><span class="pre">substrate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig.substrate" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>True to include substrate in initialization, False otherwise.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig.contact_sheet">
 <span class="sig-name descname"><span class="pre">contact_sheet</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig.contact_sheet" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>True to save contact sheet of initialization, False otherwise.</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_physicell_simulations.SeriesConfig">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SeriesConfig</span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/initialize_physicell_simulations.html#SeriesConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.SeriesConfig" title="Permalink to this definition">#</a></dt>
-<dd><p>Series configuration for initialize physicell simulations flow.</p>
+<dd><p>Series configuration for initialize PhysiCell simulations flow.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.initialize_physicell_simulations.SeriesConfig.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.initialize_physicell_simulations.SeriesConfig.name" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of the simulation series.</p>
+</dd></dl>
 
 </dd></dl>
 

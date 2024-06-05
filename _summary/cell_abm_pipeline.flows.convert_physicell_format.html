@@ -256,15 +256,25 @@
           <section id="module-cell_abm_pipeline.flows.convert_physicell_format">
 <span id="convert-physicell-format"></span><h1>convert_physicell_format<a class="headerlink" href="#module-cell_abm_pipeline.flows.convert_physicell_format" title="Permalink to this heading">#</a></h1>
 <p>Workflow for converting PhysiCell simulations to other formats.</p>
+<p>Working location structure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>name<span class="o">)</span>
+├──<span class="w"> </span>converted
+│<span class="w">   </span>└──<span class="w"> </span>converted.SIMULARIUM
+│<span class="w">       </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>.simularium
+└──<span class="w"> </span>data
+<span class="w">    </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>.tar.xz
+</pre></div>
+</div>
+<p>Formatted data are saved to <strong>converted</strong>.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.convert_physicell_format.run_flow" title="cell_abm_pipeline.flows.convert_physicell_format.run_flow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_flow</span></code></a></p></td>
-<td><p>Main convert physicell format flow.</p></td>
+<td><p>Main convert PhysiCell format flow.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.convert_physicell_format.run_flow_convert_to_simularium" title="cell_abm_pipeline.flows.convert_physicell_format.run_flow_convert_to_simularium"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_flow_convert_to_simularium</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Convert PhysiCell format subflow for Simularium.</p></td>
 </tr>
 </tbody>
 </table>
@@ -272,26 +282,27 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_physicell_format.run_flow">
 <span class="sig-name descname"><span class="pre">run_flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.convert_physicell_format.ContextConfig" title="cell_abm_pipeline.flows.convert_physicell_format.ContextConfig"><span class="pre">ContextConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig" title="cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig"><span class="pre">SeriesConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig" title="cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig"><span class="pre">ParametersConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/convert_physicell_format.html#run_flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.convert_physicell_format.run_flow" title="Permalink to this definition">#</a></dt>
-<dd><p>Main convert physicell format flow.</p>
+<dd><p>Main convert PhysiCell format flow.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_physicell_format.run_flow_convert_to_simularium">
 <span class="sig-name descname"><span class="pre">run_flow_convert_to_simularium</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.convert_physicell_format.ContextConfig" title="cell_abm_pipeline.flows.convert_physicell_format.ContextConfig"><span class="pre">ContextConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig" title="cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig"><span class="pre">SeriesConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig" title="cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig"><span class="pre">ParametersConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/convert_physicell_format.html#run_flow_convert_to_simularium"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.convert_physicell_format.run_flow_convert_to_simularium" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Convert PhysiCell format subflow for Simularium.</p>
+</dd></dl>
 
 <p class="rubric">Configs</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.convert_physicell_format.ContextConfig" title="cell_abm_pipeline.flows.convert_physicell_format.ContextConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ContextConfig</span></code></a></p></td>
-<td><p>Context configuration for convert physicell format flow.</p></td>
+<td><p>Context configuration for convert PhysiCell format flow.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig" title="cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParametersConfig</span></code></a></p></td>
-<td><p>Parameter configuration for convert physicell format flow.</p></td>
+<td><p>Parameter configuration for convert PhysiCell format flow.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig" title="cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SeriesConfig</span></code></a></p></td>
-<td><p>Series configuration for convert physicell format flow.</p></td>
+<td><p>Series configuration for convert PhysiCell format flow.</p></td>
 </tr>
 </tbody>
 </table>
@@ -299,68 +310,78 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_physicell_format.ContextConfig">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ContextConfig</span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/convert_physicell_format.html#ContextConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.convert_physicell_format.ContextConfig" title="Permalink to this definition">#</a></dt>
-<dd><p>Context configuration for convert physicell format flow.</p>
+<dd><p>Context configuration for convert PhysiCell format flow.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_physicell_format.ContextConfig.working_location">
 <span class="sig-name descname"><span class="pre">working_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.convert_physicell_format.ContextConfig.working_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location for input and output files (local path or S3 bucket).</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ParametersConfig</span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/convert_physicell_format.html#ParametersConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig" title="Permalink to this definition">#</a></dt>
-<dd><p>Parameter configuration for convert physicell format flow.</p>
+<dd><p>Parameter configuration for convert PhysiCell format flow.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig.box_size">
 <span class="sig-name descname"><span class="pre">box_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(1.0,</span> <span class="pre">1.0,</span> <span class="pre">1.0)</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig.box_size" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Size of bounding box.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig.timestep">
 <span class="sig-name descname"><span class="pre">timestep</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig.timestep" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Simulation timestep.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig.formats">
 <span class="sig-name descname"><span class="pre">formats</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig.formats" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of convert formats.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig.substrate_color">
 <span class="sig-name descname"><span class="pre">substrate_color</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'#d0c5c8'</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig.substrate_color" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Color for substrate.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig.cell_colors">
 <span class="sig-name descname"><span class="pre">cell_colors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig.cell_colors" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Colors for individual cells.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig.frame_spec">
 <span class="sig-name descname"><span class="pre">frame_spec</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(0,</span> <span class="pre">1,</span> <span class="pre">1)</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.convert_physicell_format.ParametersConfig.frame_spec" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Specification for simulation ticks to use for converting to simularium.</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SeriesConfig</span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/convert_physicell_format.html#SeriesConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig" title="Permalink to this definition">#</a></dt>
-<dd><p>Series configuration for convert physicell format flow.</p>
+<dd><p>Series configuration for convert PhysiCell format flow.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig.name" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of the simulation series.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig.seeds">
 <span class="sig-name descname"><span class="pre">seeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig.seeds" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of series random seeds.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig.conditions">
 <span class="sig-name descname"><span class="pre">conditions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.convert_physicell_format.SeriesConfig.conditions" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of series condition dictionaries (must include unique condition “key”).</p>
+</dd></dl>
 
 </dd></dl>
 

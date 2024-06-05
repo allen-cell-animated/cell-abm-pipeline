@@ -254,6 +254,11 @@
           <h1>Source code for cell_abm_pipeline.flows.generate_voronoi_tessellation</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Workflow for generating Voronoi tessellation images.</span>
+
+<span class="sd">For each condition, a Voronoi tessellation is applied to the nuclear</span>
+<span class="sd">segmentation to approximate the cell shape. The number of iterations and the</span>
+<span class="sd">target height can be used to refine the tessellation to produce realistic cell</span>
+<span class="sd">volumes.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
@@ -270,17 +275,21 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for generate voronoi tessellation flow.&quot;&quot;&quot;</span>
 
     <span class="n">channel</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Image channel.&quot;&quot;&quot;</span>
 
     <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of boundary estimation steps.&quot;&quot;&quot;</span>
 
-    <span class="n">target_height</span><span class="p">:</span> <span class="nb">int</span></div>
+    <span class="n">target_height</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Target height in voxels.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="ContextConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.generate_voronoi_tessellation.html#cell_abm_pipeline.flows.generate_voronoi_tessellation.ContextConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">ContextConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Context configuration for generate voronoi tessellation flow.&quot;&quot;&quot;</span>
 
-    <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Location for input and output files (local path or S3 bucket).&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="SeriesConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.generate_voronoi_tessellation.html#cell_abm_pipeline.flows.generate_voronoi_tessellation.SeriesConfig">[docs]</a><span class="nd">@dataclass</span>
@@ -288,8 +297,10 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Series configuration for generate voronoi tessellation flow.&quot;&quot;&quot;</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Name of the simulation series.&quot;&quot;&quot;</span>
 
-    <span class="n">conditions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span></div>
+    <span class="n">conditions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of series condition dictionaries (must include unique condition &quot;key&quot;).&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="run_flow"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.generate_voronoi_tessellation.html#cell_abm_pipeline.flows.generate_voronoi_tessellation.run_flow">[docs]</a><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;generate-voronoi-tessellation&quot;</span><span class="p">)</span>

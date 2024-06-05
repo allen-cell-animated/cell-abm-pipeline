@@ -280,15 +280,14 @@
 <span class="w">        </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>_<span class="o">(</span>region<span class="o">)</span>.PROPERTIES.tar.xz
 </pre></div>
 </div>
-<p>Data from the <strong>calculations.PROPERTIES</strong> directories are processed into the
-<strong>analysis.CELL_SHAPES_PROPERTIES</strong> directory.
-Data from the <strong>calculations.COEFFICIENTS</strong> directories are processed into the
-<strong>analysis.CELL_SHAPES_COEFFICIENTS</strong> directory.
-Data from the <strong>analysis.BASIC_METRICS</strong> directory is combined with data from
-the <strong>analysis.CELL_SHAPES_PROPERTIES</strong> and <strong>analysis.CELL_SHAPES_COEFFICIENTS</strong>
-directories into the <strong>analysis.CELL_SHAPES_DATA</strong> directory.
-PCA models are saved to the <strong>analysis.CELL_SHAPES_MODELS</strong> directory.
-Statistical analysis is saved to the <strong>analysis.CELL_SHAPES_STATISTICS</strong> directory.</p>
+<p>Data from <strong>calculations.PROPERTIES</strong> are processed into
+<strong>analysis.CELL_SHAPES_PROPERTIES</strong>. Data from <strong>calculations.COEFFICIENTS</strong> are
+processed into <strong>analysis.CELL_SHAPES_COEFFICIENTS</strong>. Data from
+<strong>analysis.BASIC_METRICS</strong> are combined with data from
+<strong>analysis.CELL_SHAPES_PROPERTIES</strong> and <strong>analysis.CELL_SHAPES_COEFFICIENTS</strong>
+into <strong>analysis.CELL_SHAPES_DATA</strong>. PCA models are saved to
+<strong>analysis.CELL_SHAPES_MODELS</strong>. Statistical analysis is saved to
+<strong>analysis.CELL_SHAPES_STATISTICS</strong>.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -367,8 +366,8 @@ that key is skipped.</p>
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.analyze_cell_shapes.run_flow_process_properties">
 <span class="sig-name descname"><span class="pre">run_flow_process_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.analyze_cell_shapes.ContextConfig" title="cell_abm_pipeline.flows.analyze_cell_shapes.ContextConfig"><span class="pre">ContextConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.analyze_cell_shapes.SeriesConfig" title="cell_abm_pipeline.flows.analyze_cell_shapes.SeriesConfig"><span class="pre">SeriesConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cell_abm_pipeline.flows.analyze_cell_shapes.ParametersConfig" title="cell_abm_pipeline.flows.analyze_cell_shapes.ParametersConfig"><span class="pre">ParametersConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/cell_abm_pipeline/flows/analyze_cell_shapes.html#run_flow_process_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cell_abm_pipeline.flows.analyze_cell_shapes.run_flow_process_properties" title="Permalink to this definition">#</a></dt>
 <dd><p>Analyze cell shapes subflow for processing properties.</p>
-<p>Processes cell shape properties and compiles into a single dataframe. If
-the combined dataframe already exists for a given key, that key is skipped.</p>
+<p>Processes cell shape properties and compiles into a single dataframe. If the
+combined dataframe already exists for a given key, that key is skipped.</p>
 </dd></dl>
 
 <p class="rubric">Configs</p>

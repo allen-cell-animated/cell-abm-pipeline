@@ -254,6 +254,22 @@
           <h1>Source code for cell_abm_pipeline.flows.initialize_physicell_simulations</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Workflow for initializing PhysiCell simulations.</span>
+
+<span class="sd">Working location structure:</span>
+
+<span class="sd">.. code-block:: bash</span>
+
+<span class="sd">    (name)</span>
+<span class="sd">    ├── inits</span>
+<span class="sd">    │   └── inits.PHYSICELL</span>
+<span class="sd">    │       └── (name)_(key)_(resolution).csv</span>
+<span class="sd">    └── plots</span>
+<span class="sd">        └── plots.COORDINATES</span>
+<span class="sd">            └── (name)_(key)_(resolution).COORDINATES.png</span>
+
+<span class="sd">Initialization consist of a single cell of the specified height and volume,</span>
+<span class="sd">sampled at the given spatial resolution. Coordinates are saved to</span>
+<span class="sd">**inits.PHYSICELL**.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
@@ -266,51 +282,64 @@
 <span class="kn">from</span> <span class="nn">io_collection.save</span> <span class="kn">import</span> <span class="n">save_dataframe</span><span class="p">,</span> <span class="n">save_figure</span>
 <span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span>
 
+<span class="c1"># Default average cell height in um.</span>
 <span class="n">AVERAGE_CELL_HEIGHT</span> <span class="o">=</span> <span class="mf">9.0</span>
 
+<span class="c1"># Default average cell volume in um^3.</span>
 <span class="n">AVERAGE_CELL_VOLUME</span> <span class="o">=</span> <span class="mf">1300.0</span>
 
+<span class="c1"># Default cell id.</span>
 <span class="n">DEFAULT_CELL_ID</span> <span class="o">=</span> <span class="mi">1</span>
 
+<span class="c1"># Substrate id.</span>
 <span class="n">SUBSTRATE_ID</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
 
 <div class="viewcode-block" id="ParametersConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html#cell_abm_pipeline.flows.initialize_physicell_simulations.ParametersConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">ParametersConfig</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for initialize physicell simulations flow.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter configuration for initialize PhysiCell simulations flow.&quot;&quot;&quot;</span>
 
     <span class="n">grid</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rect&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Type of sampling grid (rect = rectangular, hex = hexagonal).&quot;&quot;&quot;</span>
 
-    <span class="n">ds</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">])</span>  <span class="c1"># um/voxel</span>
+    <span class="n">ds</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Spatial scaling in um/voxel.&quot;&quot;&quot;</span>
 
-    <span class="n">bounding_box</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>  <span class="c1"># um</span>
+    <span class="n">bounding_box</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Size of bounding box in um.&quot;&quot;&quot;</span>
 
     <span class="n">cell_height</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">AVERAGE_CELL_HEIGHT</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Average cell height in um.&quot;&quot;&quot;</span>
 
     <span class="n">cell_volume</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">AVERAGE_CELL_VOLUME</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Average cell volume in um^3.&quot;&quot;&quot;</span>
 
     <span class="n">substrate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;True to include substrate in initialization, False otherwise.&quot;&quot;&quot;</span>
 
-    <span class="n">contact_sheet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></div>
+    <span class="n">contact_sheet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;True to save contact sheet of initialization, False otherwise.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="ContextConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html#cell_abm_pipeline.flows.initialize_physicell_simulations.ContextConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">ContextConfig</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Context configuration for initialize physicell simulations flow.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Context configuration for initialize PhysiCell simulations flow.&quot;&quot;&quot;</span>
 
-    <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">working_location</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Location for input and output files (local path or S3 bucket).&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="SeriesConfig"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html#cell_abm_pipeline.flows.initialize_physicell_simulations.SeriesConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SeriesConfig</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Series configuration for initialize physicell simulations flow.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Series configuration for initialize PhysiCell simulations flow.&quot;&quot;&quot;</span>
 
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Name of the simulation series.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="run_flow"><a class="viewcode-back" href="../../../_summary/cell_abm_pipeline.flows.initialize_physicell_simulations.html#cell_abm_pipeline.flows.initialize_physicell_simulations.run_flow">[docs]</a><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;initialize-physicell-simulations&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">run_flow</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">ContextConfig</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="n">SeriesConfig</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">ParametersConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main initialize physicell simulations flow.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main initialize PhysiCell simulations flow.&quot;&quot;&quot;</span>
 
     <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">ds</span><span class="p">:</span>
         <span class="c1"># Calculate cell radius and height.</span>

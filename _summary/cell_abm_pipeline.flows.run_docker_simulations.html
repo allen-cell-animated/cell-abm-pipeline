@@ -256,6 +256,32 @@
           <section id="module-cell_abm_pipeline.flows.run_docker_simulations">
 <span id="run-docker-simulations"></span><h1>run_docker_simulations<a class="headerlink" href="#module-cell_abm_pipeline.flows.run_docker_simulations" title="Permalink to this heading">#</a></h1>
 <p>Workflow for running containerized models using local Docker.</p>
+<p>Working location structure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>name<span class="o">)</span>
+└──<span class="w"> </span>YYYY-MM-DD
+<span class="w">    </span>├──<span class="w"> </span>inits
+<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>group<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>.<span class="o">(</span>extension<span class="o">)</span>
+<span class="w">    </span>└──<span class="w"> </span>inputs
+<span class="w">        </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>group<span class="o">)</span>_<span class="o">(</span>index<span class="o">)</span>.xml
+</pre></div>
+</div>
+<p>The simulation series manifest, produced by the summarize manifest flow, is used
+to identify which simulation conditions and seeds are missing. These conditions
+and seeds are converted into input files using the given template file, grouped
+by the specified job size. The relevant initialization and input files are then
+saved to a dated directory. All simulations in the same group will use the same
+initialization file for a given seed; if different initializations need to be
+used for different conditions, assign the conditions to different groups.</p>
+<p>Jobs are submitted to run via Docker using a volume to hold input and output
+files. The jobs are periodically queried for status at the specified retry delay
+interval, for the specified number of retries. If jobs are still running after
+these retries are complete, the job is not terminated unless specified. Output
+logs are also saved after these retries are complete. Note that if the job is
+not complete when the logs are saved, only the logs available at that time will
+be saved. The running containers and the mounted volume are removed unless
+specified.</p>
+<p>Note that this workflow works only if working location is local. For S3 working
+locations, use the run batch simulations flow instead.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -295,17 +321,20 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.ContextConfig.working_location">
 <span class="sig-name descname"><span class="pre">working_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.ContextConfig.working_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location for input and output files (local path or S3 bucket).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.ContextConfig.manifest_location">
 <span class="sig-name descname"><span class="pre">manifest_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.ContextConfig.manifest_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location of manifest file (local path or S3 bucket).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.ContextConfig.template_location">
 <span class="sig-name descname"><span class="pre">template_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.ContextConfig.template_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location of template file (local path or S3 bucket).</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -316,47 +345,56 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.model">
 <span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.model" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of model.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.image">
 <span class="sig-name descname"><span class="pre">image</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.image" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of model image.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.retries">
 <span class="sig-name descname"><span class="pre">retries</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.retries" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Number of retries to check if jobs are complete.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.retry_delay">
 <span class="sig-name descname"><span class="pre">retry_delay</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.retry_delay" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Delay between retries in seconds.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.seeds_per_job">
 <span class="sig-name descname"><span class="pre">seeds_per_job</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.seeds_per_job" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Number of seeds per job.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.log_filter">
 <span class="sig-name descname"><span class="pre">log_filter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.log_filter" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Filter pattern for logs.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.terminate_jobs">
 <span class="sig-name descname"><span class="pre">terminate_jobs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.terminate_jobs" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>True if jobs should be terminated after total retry time, False otherwise.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.save_logs">
 <span class="sig-name descname"><span class="pre">save_logs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.save_logs" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>True to save job logs, False otherwise.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.clean_jobs">
 <span class="sig-name descname"><span class="pre">clean_jobs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.ParametersConfig.clean_jobs" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>True to clean up job files, False otherwise.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -367,42 +405,50 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.name" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of the simulation series.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.manifest_key">
 <span class="sig-name descname"><span class="pre">manifest_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.manifest_key" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Key for manifest file.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.template_key">
 <span class="sig-name descname"><span class="pre">template_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.template_key" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Key for template file.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.seeds">
 <span class="sig-name descname"><span class="pre">seeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.seeds" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of series random seeds.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.conditions">
 <span class="sig-name descname"><span class="pre">conditions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.conditions" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of series condition dictionaries (must include unique condition “key”).</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.extensions">
 <span class="sig-name descname"><span class="pre">extensions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.extensions" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of file extensions in complete run.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.inits">
 <span class="sig-name descname"><span class="pre">inits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.inits" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Initialization keys and associated group names.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.groups">
 <span class="sig-name descname"><span class="pre">groups</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.run_docker_simulations.SeriesConfig.groups" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Initialization groups, keyed by group name.</p>
+</dd></dl>
 
 </dd></dl>
 

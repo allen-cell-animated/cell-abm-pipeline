@@ -255,7 +255,20 @@
         <article role="main">
           <section id="module-cell_abm_pipeline.flows.calculate_image_properties">
 <span id="calculate-image-properties"></span><h1>calculate_image_properties<a class="headerlink" href="#module-cell_abm_pipeline.flows.calculate_image_properties" title="Permalink to this heading">#</a></h1>
-<p>Workflow for calculating shape properties from images.</p>
+<p>Workflow for calculating shape properties from existing images.</p>
+<p>Working location structure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>name<span class="o">)</span>
+├──<span class="w"> </span>results
+│<span class="w">   </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>.csv
+└──<span class="w"> </span>calculations
+<span class="w">    </span>└──<span class="w"> </span>calculations.PROPERTIES
+<span class="w">        </span>├──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>_<span class="o">(</span>tick<span class="o">)</span>.PROPERTIES.csv
+<span class="w">        </span>└──<span class="w"> </span><span class="o">(</span>name<span class="o">)</span>_<span class="o">(</span>key<span class="o">)</span>_<span class="o">(</span>seed<span class="o">)</span>_<span class="o">(</span>tick<span class="o">)</span>_<span class="o">(</span>region<span class="o">)</span>.PROPERTIES.csv
+</pre></div>
+</div>
+<p>Data from <strong>results</strong> are used to specify existing images, which are then used
+to calculate properties. Calculations are saved to <strong>calculations.PROPERTIES</strong>.</p>
+<p>If region is specified, the region is included in the output key.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -295,7 +308,8 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.calculate_image_properties.ContextConfig.working_location">
 <span class="sig-name descname"><span class="pre">working_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.calculate_image_properties.ContextConfig.working_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location for input and output files (local path or S3 bucket).</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -306,32 +320,38 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.calculate_image_properties.ParametersConfig.key">
 <span class="sig-name descname"><span class="pre">key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.calculate_image_properties.ParametersConfig.key" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Simulation key to calculate.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.calculate_image_properties.ParametersConfig.seed">
 <span class="sig-name descname"><span class="pre">seed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.calculate_image_properties.ParametersConfig.seed" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Simulation random seed to calculate.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.calculate_image_properties.ParametersConfig.tick">
 <span class="sig-name descname"><span class="pre">tick</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.calculate_image_properties.ParametersConfig.tick" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Simulation tick to calculate.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.calculate_image_properties.ParametersConfig.channel">
 <span class="sig-name descname"><span class="pre">channel</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.calculate_image_properties.ParametersConfig.channel" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Index of channel to calculate.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.calculate_image_properties.ParametersConfig.region">
 <span class="sig-name descname"><span class="pre">region</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.calculate_image_properties.ParametersConfig.region" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Subcellular region to calculate.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.calculate_image_properties.ParametersConfig.properties">
 <span class="sig-name descname"><span class="pre">properties</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.calculate_image_properties.ParametersConfig.properties" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of shape properties to calculate.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -342,7 +362,8 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.calculate_image_properties.SeriesConfig.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.calculate_image_properties.SeriesConfig.name" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of the simulation series.</p>
+</dd></dl>
 
 </dd></dl>
 

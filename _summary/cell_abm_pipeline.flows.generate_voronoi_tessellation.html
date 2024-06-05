@@ -256,6 +256,10 @@
           <section id="module-cell_abm_pipeline.flows.generate_voronoi_tessellation">
 <span id="generate-voronoi-tessellation"></span><h1>generate_voronoi_tessellation<a class="headerlink" href="#module-cell_abm_pipeline.flows.generate_voronoi_tessellation" title="Permalink to this heading">#</a></h1>
 <p>Workflow for generating Voronoi tessellation images.</p>
+<p>For each condition, a Voronoi tessellation is applied to the nuclear
+segmentation to approximate the cell shape. The number of iterations and the
+target height can be used to refine the tessellation to produce realistic cell
+volumes.</p>
 <p class="rubric">Flows</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -295,7 +299,8 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.generate_voronoi_tessellation.ContextConfig.working_location">
 <span class="sig-name descname"><span class="pre">working_location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.generate_voronoi_tessellation.ContextConfig.working_location" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Location for input and output files (local path or S3 bucket).</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -306,17 +311,20 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.generate_voronoi_tessellation.ParametersConfig.channel">
 <span class="sig-name descname"><span class="pre">channel</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.generate_voronoi_tessellation.ParametersConfig.channel" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Image channel.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.generate_voronoi_tessellation.ParametersConfig.iterations">
 <span class="sig-name descname"><span class="pre">iterations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.generate_voronoi_tessellation.ParametersConfig.iterations" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Number of boundary estimation steps.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.generate_voronoi_tessellation.ParametersConfig.target_height">
 <span class="sig-name descname"><span class="pre">target_height</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.generate_voronoi_tessellation.ParametersConfig.target_height" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Target height in voxels.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -327,12 +335,14 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.generate_voronoi_tessellation.SeriesConfig.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#cell_abm_pipeline.flows.generate_voronoi_tessellation.SeriesConfig.name" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of the simulation series.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cell_abm_pipeline.flows.generate_voronoi_tessellation.SeriesConfig.conditions">
 <span class="sig-name descname"><span class="pre">conditions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#cell_abm_pipeline.flows.generate_voronoi_tessellation.SeriesConfig.conditions" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>List of series condition dictionaries (must include unique condition “key”).</p>
+</dd></dl>
 
 </dd></dl>
 
